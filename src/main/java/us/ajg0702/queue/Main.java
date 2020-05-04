@@ -1,0 +1,241 @@
+package us.ajg0702.queue;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+
+import org.bstats.bungeecord.Metrics;
+
+import net.md_5.bungee.api.Callback;
+import net.md_5.bungee.api.ProxyServer;
+import net.md_5.bungee.api.ServerPing;
+import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.api.chat.TextComponent;
+import net.md_5.bungee.api.config.ServerInfo;
+import net.md_5.bungee.api.connection.ProxiedPlayer;
+import net.md_5.bungee.api.event.PlayerDisconnectEvent;
+import net.md_5.bungee.api.event.ServerSwitchEvent;
+import net.md_5.bungee.api.plugin.Listener;
+import net.md_5.bungee.api.plugin.Plugin;
+import net.md_5.bungee.event.EventHandler;
+import us.ajg0702.queue.utils.BungeeMessages;
+
+public class Main extends Plugin implements Listener {
+	
+	int timeBetweenPlayers = 5;
+	int offlineSecs = 120;
+	
+	Metrics metrics;
+	
+	BungeeMessages msgs;
+	
+	@Override
+	public void onEnable() {
+		
+		msgs = BungeeMessages.getInstance(this);
+		
+		this.getProxy().getPluginManager().registerCommand(this, new MoveCommand(this));
+		//this.getProxy().getPluginManager().registerCommand(this, new QueueCommand(this));
+		//this.getProxy().getPluginManager().registerCommand(this, new ServerCommand(this));
+		
+		this.getProxy().getPluginManager().registerListener(this, this);
+		
+		updateOnlineServers();
+		
+		getProxy().getScheduler().schedule(this, new Runnable() {
+			public void run() {
+				updateOnlineServers();
+				sendPlayers();
+			}
+		}, 5, timeBetweenPlayers, TimeUnit.SECONDS);
+		
+		
+		metrics = new Metrics(this, 7404);
+		
+		
+	}
+	
+	public static BaseComponent[] formatMessage(String text) {
+		return TextComponent.fromLegacyText(net.md_5.bungee.api.ChatColor.translateAlternateColorCodes('&', text));
+	}
+	
+	
+	HashMap<String, Integer> offlineTime = new HashMap<>();
+	boolean notif = false;
+	public void sendPlayers(String sv) {
+		for(String server : queues.keySet()) {
+			if(sv != null && !server.equalsIgnoreCase(sv)) continue;
+			List<ProxiedPlayer> plys = queues.get(server);
+			if(plys.size() <= 0) continue;
+			while(!plys.get(0).isConnected()) {
+				plys.remove(0);
+				if(plys.size() <= 0) break;
+			}
+			if(plys.size() <= 0) continue;
+			ProxiedPlayer p = plys.get(0);
+			if(!servers.get(server)) {
+				int ot;
+				if(!offlineTime.containsKey(server)) {
+					ot = timeBetweenPlayers;
+				} else {
+					ot = offlineTime.get(server)+timeBetweenPlayers;
+				}
+				offlineTime.put(server, ot);
+				for(ProxiedPlayer ply : plys) {
+					int pos = plys.indexOf(ply)+1;
+					int len = plys.size();
+					if(notif) {
+						String or = msgs.get("status.offline.restarting");
+						if(ot > offlineSecs) {
+							or = msgs.get("status.offline.offline");
+						} else {
+							//ply.sendMessage(formatMessage(ot + " <= "+offlineSecs));
+						}
+						
+						ply.sendMessage(formatMessage(
+								msgs.get("status.offline.base")
+								.replaceAll("\\{STATUS\\}", or)
+								.replaceAll("\\{POS\\}", pos+"")
+								.replaceAll("\\{LEN\\}", len+"")
+								));
+					}
+				}
+				if(!notif) {
+					notif = true;
+				} else {
+					notif = false;
+				}
+				continue;
+			} else {
+				offlineTime.put(server, 0);
+				ServerInfo target = ProxyServer.getInstance().getServerInfo(server);
+				p.connect(target);
+				//plys.remove(p);
+			}
+			
+			for(ProxiedPlayer ply : plys) {
+				int pos = plys.indexOf(ply)+1;
+				int len = plys.size();
+				if(notif) {
+					ply.sendMessage(formatMessage(
+							msgs.get("status.online.base")
+							.replaceAll("\\{POS\\}", pos+"")
+							.replaceAll("\\{LEN\\}", len+"")
+							));
+				}
+			}
+			if(!notif) {
+				notif = true;
+			} else {
+				notif = false;
+			}
+		}
+		
+	}
+	public void sendPlayers() {
+		sendPlayers(null);
+	}
+	
+	
+	@EventHandler
+	public void moveServer(ServerSwitchEvent e) {
+		ProxiedPlayer p = e.getPlayer();
+		String queue = getPlayerInQueue(p);
+		if(queue != null) {
+			queues.get(queue).remove(p);
+		}
+	}
+	
+	@EventHandler
+	public void onLeave(PlayerDisconnectEvent e) {
+		ProxiedPlayer p = e.getPlayer();
+		String queue = getPlayerInQueue(p);
+		if(queue != null) {
+			queues.get(queue).remove(p);
+		}
+	}
+	
+	
+	HashMap<String, Boolean> servers = new HashMap<>();
+	public void updateOnlineServers() {
+		for(final String server : getProxy().getServers().keySet()) {
+			if(!servers.containsKey(server)) {
+				servers.put(server, false);
+			}
+			getProxy().getServers().get(server).ping(new Callback<ServerPing>() {
+		         
+	            @Override
+	            public void done(ServerPing result, Throwable error) {
+	                servers.put(server, error == null);
+	            }
+	        });
+		}
+	}
+	
+	
+	HashMap<String, List<ProxiedPlayer>> queues = new HashMap<>();
+	public void addToQueue(ProxiedPlayer p, String server) {
+		if(!servers.containsKey(server)) {
+			p.sendMessage(msgs.getBC("errors.server-not-exist"));
+			return;
+		}
+		if(!queues.containsKey(server)) {
+			queues.put(server, new ArrayList<ProxiedPlayer>());
+		}
+		if(p.getServer().getInfo().getName().equals(server)) {
+			p.sendMessage(msgs.getBC("errors.already-connected"));
+			return;
+		}
+		String currentQueued = getPlayerInQueue(p);
+		List<ProxiedPlayer> list = queues.get(server);
+		if(list.indexOf(p) != -1) {
+			int pos = list.indexOf(p)+1;
+			int len = list.size();
+			p.sendMessage(formatMessage(
+					msgs.get("errors.already-queued")
+					.replaceAll("\\{POS\\}", pos+"")
+					.replaceAll("\\{LEN\\}", len+"")
+					));
+			return;
+		}
+		if(currentQueued != null) {
+			queues.get(currentQueued).remove(p);
+			p.sendMessage(msgs.getBC("status.left-last-queue"));
+		}
+		if(p.hasPermission("ajqueue.priority") && list.size() > 0) {
+			int i = 0;
+			for(ProxiedPlayer ply : list) {
+				if(!ply.hasPermission("ajqueue.priority")) {
+					list.add(i, p);
+					break;
+				}
+				i++;
+			}
+		} else {
+			list.add(p);
+		}
+		int pos = list.indexOf(p)+1;
+		int len = list.size();
+		p.sendMessage(formatMessage(
+				msgs.get("status.now-in-queue")
+				.replaceAll("\\{POS\\}", pos+"")
+				.replaceAll("\\{LEN\\}", len+"")
+				));
+		
+		if(list.size() == 1) {
+			sendPlayers(server);
+		}
+	}
+	
+	
+	public String getPlayerInQueue(ProxiedPlayer p) {
+		for(String server : queues.keySet()) {
+			if(queues.get(server).indexOf(p) != -1) {
+				return server;
+			}
+		}
+		return null;
+	}
+	
+}
