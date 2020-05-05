@@ -117,11 +117,25 @@ public class Main extends Plugin implements Listener {
 			for(ProxiedPlayer ply : plys) {
 				int pos = plys.indexOf(ply)+1;
 				int len = plys.size();
+				int time = pos*timeBetweenPlayers;
+				int min = (int) Math.floor((time) / (60));
+	        	int sec = (int) Math.floor((time % (60)));
+	        	String timeStr;
+	        	if(min <= 0) {
+	        		timeStr = msgs.get("format.time.secs")
+	        				.replaceAll("\\{m\\}", "0")
+	        				.replaceAll("\\{s\\}", sec+"");
+	        	} else {
+	        		timeStr = msgs.get("format.time.mins")
+	        				.replaceAll("\\{m\\}", min+"")
+	        				.replaceAll("\\{s\\}", sec+"");
+	        	}
 				if(notif) {
 					ply.sendMessage(formatMessage(
 							msgs.get("status.online.base")
 							.replaceAll("\\{POS\\}", pos+"")
 							.replaceAll("\\{LEN\\}", len+"")
+							.replaceAll("\\{TIME\\}", timeStr)
 							));
 				}
 			}
