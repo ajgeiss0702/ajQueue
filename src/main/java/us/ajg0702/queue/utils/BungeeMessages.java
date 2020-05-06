@@ -72,6 +72,10 @@ public class BungeeMessages {
 		d.put("format.time.mins", "{m}m {s}s");
 		d.put("format.time.secs", "{s} seconds");
 		
+		d.put("list.format", "&b{SERVER} &7({COUNT}): {LIST}");
+		d.put("list.playerlist", "&9{NAME}&7, ");
+		d.put("list.total", "&7Total players in queues: &f{TOTAL}");
+		
 		
 		for(String k : d.keySet()) {
 			if(!msgs.contains(k)) {
@@ -88,12 +92,15 @@ public class BungeeMessages {
 	
 	public String get(String key) {
 		String msg = msgs.get(key, "&cMessage '"+key+"' does not exist!");
-		msg = net.md_5.bungee.api.ChatColor.translateAlternateColorCodes('&', msg);
+		msg = color(msg);
 		return msg;
 	}
 	public BaseComponent[] getBC(String key) {
 		String m = get(key);
 		return TextComponent.fromLegacyText(m);
+	}
+	public String color(String msg) {
+		return net.md_5.bungee.api.ChatColor.translateAlternateColorCodes('&', msg);
 	}
 	
 	public void reload() {

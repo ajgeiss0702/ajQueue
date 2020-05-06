@@ -36,8 +36,7 @@ public class Main extends Plugin implements Listener {
 		msgs = BungeeMessages.getInstance(this);
 		
 		this.getProxy().getPluginManager().registerCommand(this, new MoveCommand(this));
-		//this.getProxy().getPluginManager().registerCommand(this, new QueueCommand(this));
-		//this.getProxy().getPluginManager().registerCommand(this, new ServerCommand(this));
+		this.getProxy().getPluginManager().registerCommand(this, new ManageCommand(this));
 		
 		this.getProxy().getPluginManager().registerListener(this, this);
 		

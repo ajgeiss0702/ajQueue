@@ -3,6 +3,7 @@ package us.ajg0702.queue;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Command;
+
 import us.ajg0702.queue.utils.BungeeMessages;
 
 public class MoveCommand extends Command {
@@ -22,14 +23,6 @@ public class MoveCommand extends Command {
 		}
 		ProxiedPlayer p = (ProxiedPlayer) sender;
 		if(args.length > 0) {
-			if(args[0].equalsIgnoreCase("reload")) {
-				if(!sender.hasPermission("ajqueue.reload")) {
-					sender.sendMessage(msgs.getBC("noperm"));
-					return;
-				}
-				msgs.reload();
-				return;
-			}
 			plugin.addToQueue(p, args[0]);
 		} else if(args.length == 0) {
 			String queue = plugin.getPlayerInQueue((ProxiedPlayer) sender);
