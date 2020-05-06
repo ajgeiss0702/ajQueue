@@ -76,6 +76,7 @@ public class BungeeMessages {
 		d.put("list.format", "&b{SERVER} &7({COUNT}): {LIST}");
 		d.put("list.playerlist", "&9{NAME}&7, ");
 		d.put("list.total", "&7Total players in queues: &f{TOTAL}");
+		d.put("list.none", "&7None");
 		
 		
 		for(String k : d.keySet()) {

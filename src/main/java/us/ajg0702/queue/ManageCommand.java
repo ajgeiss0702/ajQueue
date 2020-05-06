@@ -46,7 +46,7 @@ public class ManageCommand extends Command {
 							playerlist += msgs.get("list.playerlist").replaceAll("\\{NAME\\}", p.getDisplayName());
 						}
 						if(playerlist.equalsIgnoreCase("")) {
-							playerlist = msgs.color("&7None, ");
+							playerlist = msgs.get("list.none")+", ";
 						}
 						playerlist = playerlist.substring(0, playerlist.length()-2);
 						msg = msg.replaceAll("\\{LIST\\}", playerlist);
