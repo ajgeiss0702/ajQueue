@@ -84,6 +84,7 @@ public class Main extends Plugin implements Listener {
 				offlineTime.put(server, ot);
 				for(ProxiedPlayer ply : plys) {
 					int pos = plys.indexOf(ply)+1;
+					if(pos == 0) continue;
 					int len = plys.size();
 					if(notif) {
 						String or = msgs.get("status.offline.restarting");
@@ -225,6 +226,9 @@ public class Main extends Plugin implements Listener {
 					break;
 				}
 				i++;
+			}
+			if(list.size() == 0) {
+				list.add(p);
 			}
 		} else {
 			list.add(p);
