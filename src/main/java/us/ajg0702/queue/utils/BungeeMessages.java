@@ -66,6 +66,7 @@ public class BungeeMessages {
 		d.put("errors.already-connected", "&cYou are already connected to this server!");
 		
 		d.put("commands.leave-queue", "&aYou left the queue!");
+		d.put("commands.reload", "&aConfig and messages reloaded successfully!");
 		
 		d.put("noperm", "&cYou do not have permission to do this!");
 		

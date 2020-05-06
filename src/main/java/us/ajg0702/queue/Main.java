@@ -19,6 +19,7 @@ import net.md_5.bungee.api.event.ServerSwitchEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.event.EventHandler;
+import us.ajg0702.queue.utils.BungeeConfig;
 import us.ajg0702.queue.utils.BungeeMessages;
 
 public class Main extends Plugin implements Listener {
@@ -30,15 +31,21 @@ public class Main extends Plugin implements Listener {
 	
 	BungeeMessages msgs;
 	
+	BungeeConfig config;
+	
 	@Override
 	public void onEnable() {
 		
 		msgs = BungeeMessages.getInstance(this);
 		
+		config = new BungeeConfig(this);
+		
 		this.getProxy().getPluginManager().registerCommand(this, new MoveCommand(this));
 		this.getProxy().getPluginManager().registerCommand(this, new ManageCommand(this));
 		
 		this.getProxy().getPluginManager().registerListener(this, this);
+		
+		timeBetweenPlayers = config.getInt("wait-time");
 		
 		updateOnlineServers();
 		
@@ -53,6 +60,10 @@ public class Main extends Plugin implements Listener {
 		metrics = new Metrics(this, 7404);
 		
 		
+	}
+	
+	public BungeeConfig getConfig() {
+		return config;
 	}
 	
 	public static BaseComponent[] formatMessage(String text) {
@@ -158,6 +169,17 @@ public class Main extends Plugin implements Listener {
 		String queue = getPlayerInQueue(p);
 		if(queue != null) {
 			queues.get(queue).remove(p);
+		}
+		
+		String servername = e.getPlayer().getServer().getInfo().getName();
+		List<String> svs = config.getStringList("queue-servers");
+		for(String s : svs) {
+			String[] parts = s.split("\\:");
+			String from = parts[0];
+			String to = parts[1];
+			if(from.equalsIgnoreCase(servername)) {
+				addToQueue(p, to);
+			}
 		}
 	}
 	
