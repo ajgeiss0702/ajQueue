@@ -1,5 +1,6 @@
 package us.ajg0702.queue;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import net.md_5.bungee.api.CommandSender;
@@ -62,7 +63,33 @@ public class ManageCommand extends Command {
 				sender.sendMessage(Main.formatMessage(pl.isp+""));
 				return;
 			}
+			if(args[0].equalsIgnoreCase("player")) {
+				sender.sendMessage(Main.formatMessage("/ajQueue <player> <server>"));
+			}
+		}
+		if(args.length == 2) {
+			
+			
+			List<String> playerNames = new ArrayList<>();
+			for(ProxiedPlayer ply : pl.getProxy().getPlayers()) {
+				if(ply == null || !ply.isConnected()) continue;
+				playerNames.add(ply.getName().toLowerCase());
+			}
+			if(playerNames.contains(args[0].toLowerCase())) {
+				if(!sender.hasPermission("ajqueue.send")) {
+					sender.sendMessage(msgs.getBC("noperm"));
+					return;
+				}
+				ProxiedPlayer ply = pl.getProxy().getPlayer(args[0]);
+				pl.addToQueue(ply, args[1]);
+				sender.sendMessage(Main.formatMessage(
+						msgs.get("send")
+						.replaceAll("\\{PLAYER\\}", ply.getDisplayName())
+						.replaceAll("\\{SERVER\\}", args[1]))
+					);
+				return;
+			}
 		}
 		
-		sender.sendMessage(Main.formatMessage("/ajqueue <reload|list>"));
+		sender.sendMessage(Main.formatMessage("/ajqueue <reload|list|player>"));
 	}}

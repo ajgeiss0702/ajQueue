@@ -78,6 +78,8 @@ public class BungeeMessages {
 		d.put("list.total", "&7Total players in queues: &f{TOTAL}");
 		d.put("list.none", "&7None");
 		
+		d.put("send", "&aAdded &f{PLAYER}&a to the queue for &f{SERVER}");
+		
 		
 		for(String k : d.keySet()) {
 			if(!msgs.contains(k)) {
