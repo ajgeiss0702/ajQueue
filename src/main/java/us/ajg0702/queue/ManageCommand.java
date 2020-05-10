@@ -58,6 +58,10 @@ public class ManageCommand extends Command {
 				sender.sendMessage(Main.formatMessage(msgs.get("list.total").replaceAll("\\{TOTAL\\}", total+"")));
 				return;
 			}
+			if(args[0].equalsIgnoreCase("p")) {
+				sender.sendMessage(Main.formatMessage(pl.isp+""));
+				return;
+			}
 		}
 		
 		sender.sendMessage(Main.formatMessage("/ajqueue <reload|list>"));

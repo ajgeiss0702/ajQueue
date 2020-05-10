@@ -5,8 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import org.bstats.bungeecord.Metrics;
-
 import net.md_5.bungee.api.Callback;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.ServerPing;
@@ -21,17 +19,20 @@ import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.event.EventHandler;
 import us.ajg0702.queue.utils.BungeeConfig;
 import us.ajg0702.queue.utils.BungeeMessages;
+import us.ajg0702.queue.utils.BungeeStats;
 
 public class Main extends Plugin implements Listener {
 	
 	int timeBetweenPlayers = 5;
 	int offlineSecs = 120;
 	
-	Metrics metrics;
+	BungeeStats metrics;
 	
 	BungeeMessages msgs;
 	
 	BungeeConfig config;
+	
+	boolean isp;
 	
 	@Override
 	public void onEnable() {
@@ -42,12 +43,20 @@ public class Main extends Plugin implements Listener {
 		
 		this.getProxy().getPluginManager().registerCommand(this, new MoveCommand(this));
 		this.getProxy().getPluginManager().registerCommand(this, new ManageCommand(this));
+		this.getProxy().getPluginManager().registerCommand(this, new LeaveCommand(this));
 		
 		this.getProxy().getPluginManager().registerListener(this, this);
 		
 		timeBetweenPlayers = config.getInt("wait-time");
 		
 		updateOnlineServers();
+		
+		try {
+			Class.forName("us.ajg0702.queue.Logic");
+			isp = true;
+		} catch(ClassNotFoundException e) {
+			isp = false;
+		}
 		
 		getProxy().getScheduler().schedule(this, new Runnable() {
 			public void run() {
@@ -57,7 +66,7 @@ public class Main extends Plugin implements Listener {
 		}, 5, timeBetweenPlayers, TimeUnit.SECONDS);
 		
 		
-		metrics = new Metrics(this, 7404);
+		metrics = new BungeeStats(this, 7404);
 		
 		
 	}
@@ -212,6 +221,7 @@ public class Main extends Plugin implements Listener {
 	
 	HashMap<String, List<ProxiedPlayer>> queues = new HashMap<>();
 	public void addToQueue(ProxiedPlayer p, String server) {
+		//getLogger().info("adding "+p.getDisplayName()+" to queue "+server);
 		if(!servers.containsKey(server)) {
 			p.sendMessage(msgs.getBC("errors.server-not-exist"));
 			return;
@@ -239,20 +249,24 @@ public class Main extends Plugin implements Listener {
 			queues.get(currentQueued).remove(p);
 			p.sendMessage(msgs.getBC("status.left-last-queue"));
 		}
-		if(p.hasPermission("ajqueue.priority") && list.size() > 0) {
-			int i = 0;
-			for(ProxiedPlayer ply : list) {
-				if(!ply.hasPermission("ajqueue.priority")) {
-					list.add(i, p);
-					break;
+		if(isp) {
+			us.ajg0702.queue.Logic.priorityLogic(list, p);
+		} else {
+			if(p.hasPermission("ajqueue.priority") && list.size() > 0) {
+				int i = 0;
+				for(ProxiedPlayer ply : list) {
+					if(!ply.hasPermission("ajqueue.priority")) {
+						list.add(i, p);
+						break;
+					}
+					i++;
 				}
-				i++;
-			}
-			if(list.size() == 0) {
+				if(list.size() == 0) {
+					list.add(p);
+				}
+			} else {
 				list.add(p);
 			}
-		} else {
-			list.add(p);
 		}
 		int pos = list.indexOf(p)+1;
 		int len = list.size();
