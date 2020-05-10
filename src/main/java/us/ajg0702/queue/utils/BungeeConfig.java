@@ -61,7 +61,7 @@ public class BungeeConfig {
 	}
 	
 	public String getDefaultConfig() throws IOException {
-		BufferedReader stream = new BufferedReader(new InputStreamReader(this.getClass().getResourceAsStream(File.separator+"config.yml")));
+		BufferedReader stream = new BufferedReader(new InputStreamReader(this.getClass().getResourceAsStream("/config.yml")));
 		StringBuilder configfile = new StringBuilder();
 		String line;
 		while((line = stream.readLine()) != null) {
