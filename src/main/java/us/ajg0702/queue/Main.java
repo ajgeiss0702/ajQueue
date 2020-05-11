@@ -24,7 +24,6 @@ import us.ajg0702.queue.utils.BungeeStats;
 public class Main extends Plugin implements Listener {
 	
 	int timeBetweenPlayers = 5;
-	int offlineSecs = 120;
 	
 	BungeeStats metrics;
 	
@@ -118,7 +117,7 @@ public class Main extends Plugin implements Listener {
 					int len = plys.size();
 					if(notif) {
 						String or = msgs.get("status.offline.restarting");
-						if(ot > offlineSecs) {
+						if(ot > config.getInt("offline-time")) {
 							or = msgs.get("status.offline.offline");
 						} else {
 							//ply.sendMessage(formatMessage(ot + " <= "+offlineSecs));
