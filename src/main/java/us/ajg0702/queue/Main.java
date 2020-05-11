@@ -40,6 +40,7 @@ public class Main extends Plugin implements Listener {
 		msgs = BungeeMessages.getInstance(this);
 		
 		config = new BungeeConfig(this);
+		checkConfig();
 		
 		this.getProxy().getPluginManager().registerCommand(this, new MoveCommand(this));
 		this.getProxy().getPluginManager().registerCommand(this, new ManageCommand(this));
@@ -69,6 +70,16 @@ public class Main extends Plugin implements Listener {
 		metrics = new BungeeStats(this, 7404);
 		
 		
+	}
+	
+	public void checkConfig() {
+		List<String> svs = getConfig().getStringList("queue-servers");
+		for(String s : svs) {
+			if(!s.contains(":")) {
+				getLogger().warning("The queue-servers section in the config has been set up incorrectly! Please read the comment above the setting and make sure you have a queue server and a destination server separated by a colon (:)");
+				break;
+			}
+		}
 	}
 	
 	public BungeeConfig getConfig() {

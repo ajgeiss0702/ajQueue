@@ -31,13 +31,7 @@ public class ManageCommand extends Command {
 				}
 				msgs.reload();
 				pl.getConfig().reload();
-				List<String> svs = pl.getConfig().getStringList("queue-servers");
-				for(String s : svs) {
-					if(!s.contains(":")) {
-						pl.getLogger().warning("The queue-servers section in the config has been set up incorrectly! Please read the comment above the setting and make sure you have a queue server and a destination server separated by a colon (:)");
-						break;
-					}
-				}
+				pl.checkConfig();
 				sender.sendMessage(msgs.getBC("commands.reload"));
 				return;
 				
