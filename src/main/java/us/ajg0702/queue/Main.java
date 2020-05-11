@@ -183,6 +183,7 @@ public class Main extends Plugin implements Listener {
 		String servername = e.getPlayer().getServer().getInfo().getName();
 		List<String> svs = config.getStringList("queue-servers");
 		for(String s : svs) {
+			if(!s.contains(":")) continue;
 			String[] parts = s.split("\\:");
 			String from = parts[0];
 			String to = parts[1];
