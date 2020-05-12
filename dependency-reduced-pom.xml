@@ -4,7 +4,7 @@
   <groupId>us.ajg0702</groupId>
   <artifactId>ajQueue</artifactId>
   <name>ajQueue</name>
-  <version>1.1.7</version>
+  <version>1.1.8</version>
   <build>
     <resources>
       <resource>
@@ -68,6 +68,14 @@
     </plugins>
   </build>
   <repositories>
+    <repository>
+      <id>spigotmc-repo</id>
+      <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
+    </repository>
+    <repository>
+      <id>placeholderapi</id>
+      <url>http://repo.extendedclip.com/content/repositories/placeholderapi/</url>
+    </repository>
     <repository>
       <id>bungeecord-repo</id>
       <url>https://oss.sonatype.org/content/repositories/snapshots</url>
@@ -134,6 +142,40 @@
           <groupId>com.google.guava</groupId>
         </exclusion>
       </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.spigotmc</groupId>
+      <artifactId>spigot-api</artifactId>
+      <version>1.14.4-R0.1-SNAPSHOT</version>
+      <scope>provided</scope>
+      <exclusions>
+        <exclusion>
+          <artifactId>commons-lang</artifactId>
+          <groupId>commons-lang</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>gson</artifactId>
+          <groupId>com.google.code.gson</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>snakeyaml</artifactId>
+          <groupId>org.yaml</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>guava</artifactId>
+          <groupId>com.google.guava</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>bungeecord-chat</artifactId>
+          <groupId>net.md-5</groupId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>me.clip</groupId>
+      <artifactId>placeholderapi</artifactId>
+      <version>2.10.4</version>
+      <scope>provided</scope>
     </dependency>
   </dependencies>
 </project>
