@@ -24,7 +24,6 @@ import java.util.zip.GZIPOutputStream;
  * <p>
  * Check out https://bStats.org/ to learn more about bStats!
  */
-@SuppressWarnings({"WeakerAccess", "unused"})
 public class BungeeStats {
 
     static {
@@ -171,7 +170,8 @@ public class BungeeStats {
      *
      * @return The server specific data.
      */
-    private JsonObject getServerData() {
+    @SuppressWarnings("deprecation")
+	private JsonObject getServerData() {
         // Minecraft specific data
         int playerAmount = Math.min(plugin.getProxy().getOnlineCount(), 500);
         int onlineMode = plugin.getProxy().getConfig().isOnlineMode() ? 1 : 0;

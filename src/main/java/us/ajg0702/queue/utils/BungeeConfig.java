@@ -59,6 +59,9 @@ public class BungeeConfig {
 		}
 		return r;
 	}
+	public boolean getBoolean(String key) {
+		return config.getBoolean(key);
+	}
 	
 	public String getDefaultConfig() throws IOException {
 		BufferedReader stream = new BufferedReader(new InputStreamReader(this.getClass().getResourceAsStream("/config.yml")));

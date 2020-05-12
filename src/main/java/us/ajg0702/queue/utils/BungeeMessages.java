@@ -78,6 +78,9 @@ public class BungeeMessages {
 		d.put("list.total", "&7Total players in queues: &f{TOTAL}");
 		d.put("list.none", "&7None");
 		
+		d.put("spigot.actionbar.online", "&7You are in position &f{POS}&7 of &f{LEN}&7. Estimated time: {TIME}");
+		d.put("spigot.actionbar.offline", "&7You are in position &f{POS}&7 of &f{LEN}&7.");
+		
 		d.put("send", "&aAdded &f{PLAYER}&a to the queue for &f{SERVER}");
 		
 		

@@ -20,6 +20,7 @@ import net.md_5.bungee.event.EventHandler;
 import us.ajg0702.queue.utils.BungeeConfig;
 import us.ajg0702.queue.utils.BungeeMessages;
 import us.ajg0702.queue.utils.BungeeStats;
+import us.ajg0702.queue.utils.BungeeUtils;
 
 public class Main extends Plugin implements Listener {
 	
@@ -46,6 +47,8 @@ public class Main extends Plugin implements Listener {
 		this.getProxy().getPluginManager().registerCommand(this, new LeaveCommand(this));
 		
 		this.getProxy().getPluginManager().registerListener(this, this);
+		
+		getProxy().registerChannel("ajqueue:tospigot");
 		
 		timeBetweenPlayers = config.getInt("wait-time");
 		
@@ -115,20 +118,25 @@ public class Main extends Plugin implements Listener {
 					int pos = plys.indexOf(ply)+1;
 					if(pos == 0) continue;
 					int len = plys.size();
+					String or = msgs.get("status.offline.restarting");
+					if(ot > config.getInt("offline-time")) {
+						or = msgs.get("status.offline.offline");
+					} else {
+						//ply.sendMessage(formatMessage(ot + " <= "+offlineSecs));
+					}
 					if(notif) {
-						String or = msgs.get("status.offline.restarting");
-						if(ot > config.getInt("offline-time")) {
-							or = msgs.get("status.offline.offline");
-						} else {
-							//ply.sendMessage(formatMessage(ot + " <= "+offlineSecs));
-						}
-						
 						ply.sendMessage(formatMessage(
 								msgs.get("status.offline.base")
 								.replaceAll("\\{STATUS\\}", or)
 								.replaceAll("\\{POS\\}", pos+"")
 								.replaceAll("\\{LEN\\}", len+"")
 								));
+					}
+					if(getConfig().getBoolean("send-actionbar")) {
+						BungeeUtils.sendCustomData(ply, "actionbar", msgs.get("spigot.actionbar.offline")
+								.replaceAll("\\{POS\\}", pos+"")
+								.replaceAll("\\{LEN\\}", len+"")
+								.replaceAll("\\{STATUS\\}", or)+";time="+timeBetweenPlayers);
 					}
 				}
 				if(!notif) {
@@ -167,6 +175,12 @@ public class Main extends Plugin implements Listener {
 							.replaceAll("\\{LEN\\}", len+"")
 							.replaceAll("\\{TIME\\}", timeStr)
 							));
+				}
+				if(getConfig().getBoolean("send-actionbar")) {
+					BungeeUtils.sendCustomData(ply, "actionbar", msgs.get("spigot.actionbar.online")
+							.replaceAll("\\{POS\\}", pos+"")
+							.replaceAll("\\{LEN\\}", len+"")
+							.replaceAll("\\{TIME\\}", timeStr)+";time="+timeBetweenPlayers);
 				}
 			}
 			if(!notif) {
