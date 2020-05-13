@@ -16,11 +16,12 @@ public class BungeeUtils {
 
 	    ByteArrayDataOutput out = ByteStreams.newDataOutput();
 	    out.writeUTF( channel );
+	    out.writeUTF(player.getName());
 	    out.writeUTF( data1 );
 	 
 	    // we send the data to the server
 	    // using ServerInfo the packet is being queued if there are no players in the server
 	    // using only the server to send data the packet will be lost if no players are in it
-	    player.getServer().getInfo().sendData( "ajqueue:tospigot", out.toByteArray() );
+	    player.getServer().sendData( "ajqueue:tospigot", out.toByteArray() );
 	}
 }

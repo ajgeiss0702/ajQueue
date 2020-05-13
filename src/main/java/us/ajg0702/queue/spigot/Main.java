@@ -19,22 +19,32 @@ public class Main extends JavaPlugin implements PluginMessageListener {
 	@Override
 	public void onPluginMessageReceived(String channel, Player player, byte[] message) {
 		if (!channel.equals("ajqueue:tospigot")) return;
+		
 		ByteArrayDataInput in = ByteStreams.newDataInput(message);
+		
 	    String subchannel = in.readUTF();
+	    
 	    if(subchannel.equals("actionbar")) {
+	    	String playername = in.readUTF();
+	    	Player p = Bukkit.getPlayer(playername);
+	    	if(p == null) return;
+	    	
 	    	String data = in.readUTF();
-	    	VersionSupport.sendActionBar(player, data.split(";time=")[0]);
+	    	final String text = data.split(";time=")[0];
+	    	//getLogger().info("recieved actionbar for "+player.getName()+": "+text);
+	    	VersionSupport.sendActionBar(p, text);
+	    	
 	    	int time = Integer.parseInt(data.split(";time=")[1]);
 	    	if(time > 2) {
 	    		Bukkit.getScheduler().runTaskLater(this, new Runnable() {
 	    			public void run() {
-	    				VersionSupport.sendActionBar(player, data.split(";time=")[0]);
+	    				VersionSupport.sendActionBar(p, text);
 	    			}
 	    		}, 2*20);
 	    		if(time > 4) {
 	    			Bukkit.getScheduler().runTaskLater(this, new Runnable() {
 		    			public void run() {
-		    				VersionSupport.sendActionBar(player, data.split(";time=")[0]);
+		    				VersionSupport.sendActionBar(p, text);
 		    			}
 		    		}, 4*20);
 	    		}
