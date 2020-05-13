@@ -24,6 +24,8 @@ import us.ajg0702.queue.utils.BungeeUtils;
 
 public class Main extends Plugin implements Listener {
 	
+	static Main plugin = null;
+	
 	int timeBetweenPlayers = 5;
 	
 	BungeeStats metrics;
@@ -36,6 +38,7 @@ public class Main extends Plugin implements Listener {
 	
 	@Override
 	public void onEnable() {
+		plugin = this;
 		
 		msgs = BungeeMessages.getInstance(this);
 		
@@ -72,6 +75,10 @@ public class Main extends Plugin implements Listener {
 		metrics = new BungeeStats(this, 7404);
 		
 		
+	}
+	
+	public static Main getInstance() {
+		return plugin;
 	}
 	
 	public void checkConfig() {
@@ -304,6 +311,13 @@ public class Main extends Plugin implements Listener {
 		if(list.size() == 1) {
 			sendPlayers(server);
 		}
+	}
+	
+	
+	public void sendPlayer(ProxiedPlayer p) {
+		String server = getPlayerInQueue(p);
+		if(server == null) return;
+		sendPlayers(server);
 	}
 	
 	
