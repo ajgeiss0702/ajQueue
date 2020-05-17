@@ -123,7 +123,10 @@ public class Main extends Plugin implements Listener {
 				offlineTime.put(server, ot);
 				for(ProxiedPlayer ply : plys) {
 					int pos = plys.indexOf(ply)+1;
-					if(pos == 0) continue;
+					if(pos == 0) {
+						plys.remove(ply);
+						continue;
+					}
 					int len = plys.size();
 					String or = msgs.get("status.offline.restarting");
 					if(ot > config.getInt("offline-time")) {
@@ -308,7 +311,7 @@ public class Main extends Plugin implements Listener {
 				.replaceAll("\\{LEN\\}", len+"")
 				));
 		
-		if(list.size() == 1) {
+		if(list.size() <= 1) {
 			sendPlayers(server);
 		}
 	}
