@@ -287,10 +287,10 @@ public class Main extends Plugin implements Listener {
 		if(isp) {
 			us.ajg0702.queue.Logic.priorityLogic(list, p);
 		} else {
-			if(p.hasPermission("ajqueue.priority") && list.size() > 0) {
+			if((p.hasPermission("ajqueue.priority") || p.hasPermission("ajqueue.serverpriority."+server)) && list.size() > 0) {
 				int i = 0;
 				for(ProxiedPlayer ply : list) {
-					if(!ply.hasPermission("ajqueue.priority")) {
+					if(!(ply.hasPermission("ajqueue.priority") || ply.hasPermission("ajqueue.serverpriority."+server))) {
 						list.add(i, p);
 						break;
 					}
