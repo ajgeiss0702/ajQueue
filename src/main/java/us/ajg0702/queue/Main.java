@@ -285,7 +285,7 @@ public class Main extends Plugin implements Listener {
 			p.sendMessage(msgs.getBC("status.left-last-queue"));
 		}
 		if(isp) {
-			us.ajg0702.queue.Logic.priorityLogic(list, p);
+			us.ajg0702.queue.Logic.priorityLogic(list, server, p);
 		} else {
 			if((p.hasPermission("ajqueue.priority") || p.hasPermission("ajqueue.serverpriority."+server)) && list.size() > 0) {
 				int i = 0;
