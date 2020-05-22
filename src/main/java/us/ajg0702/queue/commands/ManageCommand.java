@@ -1,4 +1,4 @@
-package us.ajg0702.queue;
+package us.ajg0702.queue.commands;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -6,6 +6,9 @@ import java.util.List;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Command;
+import us.ajg0702.queue.Main;
+import us.ajg0702.queue.Manager;
+import us.ajg0702.queue.Server;
 import us.ajg0702.queue.utils.BungeeMessages;
 
 public class ManageCommand extends Command {
@@ -31,6 +34,9 @@ public class ManageCommand extends Command {
 				}
 				msgs.reload();
 				pl.getConfig().reload();
+				pl.timeBetweenPlayers = pl.getConfig().getInt("wait-time");
+				Manager.getInstance().reloadIntervals();
+				Manager.getInstance().reloadServers();
 				pl.checkConfig();
 				sender.sendMessage(msgs.getBC("commands.reload"));
 				return;
@@ -38,11 +44,11 @@ public class ManageCommand extends Command {
 			}
 			if(args[0].equalsIgnoreCase("list")) {
 				int total = 0;
-				for(String server : pl.queues.keySet()) {
+				for(Server server : Manager.getInstance().getServers()) {
 					
-					String msg = msgs.get("list.format").replaceAll("\\{SERVER\\}", server);
+					String msg = msgs.get("list.format").replaceAll("\\{SERVER\\}", server.getName());
 					String playerlist = "";
-					List<ProxiedPlayer> players = pl.queues.get(server);
+					List<ProxiedPlayer> players = server.getQueue();
 					if(msg.contains("{LIST}")) {
 						for(ProxiedPlayer p : players) {
 							playerlist += msgs.get("list.playerlist").replaceAll("\\{NAME\\}", p.getDisplayName());
@@ -61,7 +67,7 @@ public class ManageCommand extends Command {
 				return;
 			}
 			if(args[0].equalsIgnoreCase("p")) {
-				sender.sendMessage(Main.formatMessage(pl.isp+""));
+				sender.sendMessage(Main.formatMessage(pl.isp()+""));
 				return;
 			}
 			if(args[0].equalsIgnoreCase("player")) {
@@ -82,7 +88,7 @@ public class ManageCommand extends Command {
 					return;
 				}
 				ProxiedPlayer ply = pl.getProxy().getPlayer(args[0]);
-				pl.addToQueue(ply, args[1]);
+				Manager.getInstance().addToQueue(ply, args[1]);
 				sender.sendMessage(Main.formatMessage(
 						msgs.get("send")
 						.replaceAll("\\{PLAYER\\}", ply.getDisplayName())

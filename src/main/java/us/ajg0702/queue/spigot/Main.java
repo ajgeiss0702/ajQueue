@@ -33,22 +33,6 @@ public class Main extends JavaPlugin implements PluginMessageListener {
 	    	final String text = data.split(";time=")[0];
 	    	//getLogger().info("recieved actionbar for "+player.getName()+": "+text);
 	    	VersionSupport.sendActionBar(p, text);
-	    	
-	    	int time = Integer.parseInt(data.split(";time=")[1]);
-	    	if(time > 2) {
-	    		Bukkit.getScheduler().runTaskLater(this, new Runnable() {
-	    			public void run() {
-	    				VersionSupport.sendActionBar(p, text);
-	    			}
-	    		}, 2*20);
-	    		if(time > 4) {
-	    			Bukkit.getScheduler().runTaskLater(this, new Runnable() {
-		    			public void run() {
-		    				VersionSupport.sendActionBar(p, text);
-		    			}
-		    		}, 4*20);
-	    		}
-	    	}
 	    }
 	}
 }

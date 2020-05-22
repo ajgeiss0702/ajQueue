@@ -1,5 +1,5 @@
 # Dont touch this number please
-config-version: 3
+config-version: 4
 
 # The time the server will wait between sending people in the queue
 #  Default: 5
@@ -8,6 +8,10 @@ wait-time: 5
 # The time that a server has to be offline to be marked as offline instead of restarting
 #  Default: 120
 offline-time: 120
+
+# The time the server will wait between sending players update messages on what position they are in the queue.
+# Default: 10
+message-time: 10
 
 # If a player is in a server, you can have the plugin make them automatically join a queue for another server
 # Example with the default values: Player joins survivalfallback server, they will auto-join the queue for survival

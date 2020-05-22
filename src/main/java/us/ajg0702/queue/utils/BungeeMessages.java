@@ -61,7 +61,7 @@ public class BungeeMessages {
 		d.put("status.now-in-queue", "&aYou are now queued! &7You are in position &f{POS}&7 of &f{LEN}&7.\n&7Type &f/leavequeue&7 to leave the queue!");
 		
 		d.put("errors.server-not-exist", "&cThat server does not exist!");
-		d.put("errors.already-queued", "&cYou are already queued! &7You are in position &f{POS}&7 of &f{LEN}&7.");
+		d.put("errors.already-queued", "&cYou are already queued for that server!");
 		d.put("errors.player-only", "&cThis command can only be executed as a player!");
 		d.put("errors.already-connected", "&cYou are already connected to this server!");
 		
