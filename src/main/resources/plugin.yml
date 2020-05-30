@@ -2,3 +2,7 @@ main: us.ajg0702.queue.spigot.Main
 version: ${project.version}
 author: ajgeiss0702
 name: ajQueue
+commands:
+   move:
+      aliases: [server, queue]
+      description: Queue for a server

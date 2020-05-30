@@ -122,7 +122,7 @@ public class Manager {
 					continue;
 				}
 				int len = plys.size();
-				if(!s.isOnline()) {
+				if(!s.isOnline() || s.isFull()) {
 					String or = msgs.get("status.offline.restarting");
 					if(ot > pl.config.getInt("offline-time")) {
 						or = msgs.get("status.offline.offline");
@@ -169,10 +169,13 @@ public class Manager {
 					continue;
 				}
 				int len = plys.size();
-				if(!s.isOnline()) {
+				if(!s.isOnline() || s.isFull()) {
 					String or = msgs.get("status.offline.restarting");
 					if(ot > pl.config.getInt("offline-time")) {
 						or = msgs.get("status.offline.offline");
+					}
+					if(s.isFull() && s.isOnline()) {
+						or = msgs.get("status.offline.full");
 					}
 					ply.sendMessage(Main.formatMessage(
 							msgs.get("status.offline.base")
@@ -246,7 +249,17 @@ public class Manager {
 			if(!s.isOnline()) continue;
 			if(s.getQueue().size() <= 0) continue;
 			
-			s.getQueue().get(0).connect(s.getInfo());
+			ProxiedPlayer nextplayer = s.getQueue().get(0);
+			
+			while(nextplayer.getServer().getInfo().getName().equals(s.getName())) {
+				s.getQueue().remove(nextplayer);
+				if(s.getQueue().size() <= 0) break;
+				nextplayer = s.getQueue().get(0);
+			}
+			if(s.getQueue().size() <= 0) continue;
+			if(s.isFull() && !nextplayer.hasPermission("ajqueue.joinfull")) continue;
+			
+			nextplayer.connect(s.getInfo());
 		}
 	}
 	
@@ -259,6 +272,11 @@ public class Manager {
 		Server server = findServer(s);
 		if(server == null) {
 			p.sendMessage(msgs.getBC("errors.server-not-exist"));
+			return;
+		}
+		
+		if(p.getServer().getInfo().getName().equals(s)) {
+			p.sendMessage(msgs.getBC("errors.already-connected"));
 			return;
 		}
 		

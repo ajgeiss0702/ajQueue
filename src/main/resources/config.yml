@@ -14,9 +14,9 @@ offline-time: 120
 message-time: 10
 
 # If a player is in a server, you can have the plugin make them automatically join a queue for another server
-# Example with the default values: Player joins survivalfallback server, they will auto-join the queue for survival
+# Example with the default values: Player joins survivalqueue server, they will auto-join the queue for survival
 queue-servers:
-- 'survivalfallback:survival'
+- 'survivalqueue:survival'
 
 # Should the plugin send an actionbar to the player?
 # Requires this plugin to be installed on the server the player is on for it to work

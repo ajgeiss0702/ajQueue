@@ -1,10 +1,14 @@
 package us.ajg0702.queue;
 
+import java.io.ByteArrayInputStream;
+import java.io.DataInputStream;
+import java.io.IOException;
 import java.util.List;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.PlayerDisconnectEvent;
+import net.md_5.bungee.api.event.PluginMessageEvent;
 import net.md_5.bungee.api.event.ServerSwitchEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.api.plugin.Plugin;
@@ -48,6 +52,7 @@ public class Main extends Plugin implements Listener {
 		this.getProxy().getPluginManager().registerListener(this, this);
 		
 		getProxy().registerChannel("ajqueue:tospigot");
+		getProxy().registerChannel("ajqueue:tobungee");
 		
 		timeBetweenPlayers = config.getInt("wait-time");
 		
@@ -118,6 +123,28 @@ public class Main extends Plugin implements Listener {
 		Server server = man.findPlayerInQueue(p);
 		if(server != null) {
 			server.getQueue().remove(p);
+		}
+	}
+	
+	
+	@EventHandler
+	public void onMessage(PluginMessageEvent e) {
+		//getLogger().info("Recieved message of "+e.getTag());
+		if(!e.getTag().equals("ajqueue:tobungee")) return;
+		DataInputStream in = new DataInputStream(new ByteArrayInputStream(e.getData()));
+		try {
+			String subchannel = in.readUTF();
+			
+			
+			if(subchannel.equals("queue")) {
+				String data = in.readUTF();
+				ProxiedPlayer player = (ProxiedPlayer) e.getReceiver();
+				man.addToQueue(player, data);
+			}
+			
+		} catch (IOException e1) {
+			getLogger().warning("An error occured while reading data from spigot side:");
+			e1.printStackTrace();
 		}
 	}
 	

@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>us.ajg0702</groupId>
   <artifactId>ajQueue</artifactId>
-  <version>1.3.0</version>
+  <version>1.3.4</version>
   <name>ajQueue</name>
   
   <repositories>
@@ -39,7 +39,7 @@
             <type>javadoc</type>
             <scope>provided</scope>
         </dependency>
-        <dependency>
+       <dependency>
             <groupId>us.ajg0702.premium</groupId>
             <artifactId>ajQueuePlus</artifactId>
             <version>1.0.0</version>
