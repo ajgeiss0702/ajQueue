@@ -1,5 +1,7 @@
 package us.ajg0702.queue.spigot;
 
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -17,8 +19,28 @@ public class Commands implements CommandExecutor {
 		if(!(sender instanceof Player)) return true;
 		Player player = (Player) sender;
 		if(args.length < 1) return false;
-		this.pl.sendMessage(player, "queue", args[0]);
+		
+		String srvname = args[0];
+		
+		if(args.length > 1) {
+			if(!sender.hasPermission("ajqueue.send")) {
+				sender.sendMessage(color("&cYou do not have permission to do this!"));
+				return true;
+			}
+			Player tply = Bukkit.getPlayer(args[0]);
+			if(tply == null) {
+				sender.sendMessage(color("&cCannot find that player!"));
+				return true;
+			}
+			player = tply;
+			srvname = args[1];
+		}
+		this.pl.sendMessage(player, "queue", srvname);
 		return true;
+	}
+	
+	public String color(String txt) {
+		return ChatColor.translateAlternateColorCodes('&', txt);
 	}
 
 }
