@@ -72,6 +72,11 @@ public class ManageCommand extends Command {
 			}
 			if(args[0].equalsIgnoreCase("player")) {
 				sender.sendMessage(Main.formatMessage("/ajQueue <player> <server>"));
+				return;
+			}
+			if(args[0].equalsIgnoreCase("version")) {
+				sender.sendMessage(Main.formatMessage(pl.getDescription().getVersion()));
+				return;
 			}
 		}
 		if(args.length == 2) {
