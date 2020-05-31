@@ -19,6 +19,7 @@ import us.ajg0702.queue.commands.MoveCommand;
 import us.ajg0702.queue.utils.BungeeConfig;
 import us.ajg0702.queue.utils.BungeeMessages;
 import us.ajg0702.queue.utils.BungeeStats;
+import us.ajg0702.queue.utils.BungeeUtils;
 
 public class Main extends Plugin implements Listener {
 	
@@ -134,12 +135,31 @@ public class Main extends Plugin implements Listener {
 		DataInputStream in = new DataInputStream(new ByteArrayInputStream(e.getData()));
 		try {
 			String subchannel = in.readUTF();
+			ProxiedPlayer player = (ProxiedPlayer) e.getReceiver();
 			
 			
 			if(subchannel.equals("queue")) {
 				String data = in.readUTF();
-				ProxiedPlayer player = (ProxiedPlayer) e.getReceiver();
 				man.addToQueue(player, data);
+			}
+			if(subchannel.equals("queuename")) {
+				BungeeUtils.sendCustomData(player, "queuename", man.getQueuedName(player));
+			}
+			if(subchannel.equals("position")) {
+				Server server = man.findPlayerInQueue(player);
+				String pos = msgs.get("placeholders.position.none");
+				if(server != null) {
+					pos = server.getQueue().indexOf(player)+1+"";
+				}
+				BungeeUtils.sendCustomData(player, "position", pos);
+			}
+			if(subchannel.equals("positionof")) {
+				Server server = man.findPlayerInQueue(player);
+				String pos = msgs.get("placeholders.position.none");
+				if(server != null) {
+					pos = server.getQueue().size()+"";
+				}
+				BungeeUtils.sendCustomData(player, "positionof", pos);
 			}
 			
 		} catch (IOException e1) {

@@ -89,6 +89,19 @@ public class Manager {
 		}, 0, 2, TimeUnit.SECONDS).getId();
 	}
 	
+	/**
+	 * Get the name of the server the player is queued for
+	 * @param p The player
+	 * @return The name of the server, the placeholder none message if not queued
+	 */
+	public String getQueuedName(ProxiedPlayer p) {
+		Server queued = findPlayerInQueue(p);
+		if(queued == null) {
+			return msgs.get("placeholders.queued.none");
+		}
+		return queued.getName();
+	}
+	
 	
 	
 	
@@ -326,7 +339,12 @@ public class Manager {
 				msgs.get("status.now-in-queue")
 				.replaceAll("\\{POS\\}", pos+"")
 				.replaceAll("\\{LEN\\}", len+"")
+				.replaceAll("\\{SERVER\\}", s)
 				));
+		
+		BungeeUtils.sendCustomData(p, "position", pos+"");
+		BungeeUtils.sendCustomData(p, "positionof", len+"");
+		BungeeUtils.sendCustomData(p, "queuename", s);
 		
 		if(list.size() <= 1) {
 			sendPlayers(s);

@@ -1,7 +1,12 @@
 package us.ajg0702.queue.spigot;
 
+import java.util.HashMap;
+
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.plugin.messaging.PluginMessageListener;
 
@@ -11,12 +16,25 @@ import com.google.common.io.ByteStreams;
 
 import us.ajg0702.queue.spigot.utils.VersionSupport;
 
-public class Main extends JavaPlugin implements PluginMessageListener {
+public class Main extends JavaPlugin implements PluginMessageListener,Listener {
+	
+	boolean papi = false;
+	Placeholders placeholders;
 	public void onEnable() {
 		getServer().getMessenger().registerIncomingPluginChannel(this, "ajqueue:tospigot", this);
 		getServer().getMessenger().registerOutgoingPluginChannel(this, "ajqueue:tobungee");
 		
 		this.getCommand("move").setExecutor(new Commands(this));
+		
+		Bukkit.getPluginManager().registerEvents(this, this);
+		
+		papi = Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null;
+		
+		if(papi) {
+			placeholders = new Placeholders(this);
+			placeholders.register();
+			getLogger().info("Registered PlaceholderAPI placeholders");
+		}
 		
 		getLogger().info("Spigot side enabled! v"+getDescription().getVersion());
 	}
@@ -40,6 +58,42 @@ public class Main extends JavaPlugin implements PluginMessageListener {
 	    	VersionSupport.sendActionBar(p, text);
 	    	return;
 	    }
+	    if(subchannel.equals("queuename")) {
+	    	String playername = in.readUTF();
+	    	Player p = Bukkit.getPlayer(playername);
+	    	if(p == null) return;
+	    	if(!p.isOnline()) return;
+	    	
+	    	String data = in.readUTF();
+	    	HashMap<String, String> phs = placeholders.responseCache.get(p);
+	    	if(phs == null) phs = new HashMap<>();
+	    	phs.put("queued", data);
+	    	placeholders.responseCache.put(p, phs);
+	    }
+	    if(subchannel.equals("position")) {
+	    	String playername = in.readUTF();
+	    	Player p = Bukkit.getPlayer(playername);
+	    	if(p == null) return;
+	    	if(!p.isOnline()) return;
+	    	
+	    	String data = in.readUTF();
+	    	HashMap<String, String> phs = placeholders.responseCache.get(p);
+	    	if(phs == null) phs = new HashMap<>();
+	    	phs.put("position", data);
+	    	placeholders.responseCache.put(p, phs);
+	    }
+	    if(subchannel.equals("positionof")) {
+	    	String playername = in.readUTF();
+	    	Player p = Bukkit.getPlayer(playername);
+	    	if(p == null) return;
+	    	if(!p.isOnline()) return;
+	    	
+	    	String data = in.readUTF();
+	    	HashMap<String, String> phs = placeholders.responseCache.get(p);
+	    	if(phs == null) phs = new HashMap<>();
+	    	phs.put("of", data);
+	    	placeholders.responseCache.put(p, phs);
+	    }
 	}
 	
 	
@@ -50,5 +104,11 @@ public class Main extends JavaPlugin implements PluginMessageListener {
 		out.writeUTF(data);
 		
 		player.sendPluginMessage(this, "ajqueue:tobungee", out.toByteArray());
+	}
+	
+	@EventHandler
+	public void onLeave(PlayerQuitEvent e) {
+		if(!papi) return;
+		placeholders.cleanCache();
 	}
 }

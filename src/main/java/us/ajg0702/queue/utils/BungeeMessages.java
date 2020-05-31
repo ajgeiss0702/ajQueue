@@ -84,6 +84,9 @@ public class BungeeMessages {
 		
 		d.put("send", "&aAdded &f{PLAYER}&a to the queue for &f{SERVER}");
 		
+		d.put("placeholders.queued.none", "None");
+		d.put("placeholders.position.none", "None");
+		
 		
 		for(String k : d.keySet()) {
 			if(!msgs.contains(k)) {
