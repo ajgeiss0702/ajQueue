@@ -1,6 +1,7 @@
 package us.ajg0702.queue;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -128,7 +129,9 @@ public class Manager {
 		for(Server s : servers) {
 			int ot = s.getOfflineTime();
 			List<ProxiedPlayer> plys = s.getQueue();
-			for(ProxiedPlayer ply : plys) {
+			Iterator<ProxiedPlayer> it = plys.iterator();
+			while(it.hasNext()) {
+				ProxiedPlayer ply = it.next();
 				int pos = plys.indexOf(ply)+1;
 				if(pos == 0) {
 					plys.remove(ply);
@@ -240,8 +243,9 @@ public class Manager {
 	 * Updates info about servers.
 	 */
 	public void updateServers() {
-		for(Server s : servers) {
-			s.update();
+		Iterator<Server> it = servers.iterator();
+		while(it.hasNext()) {
+			it.next().update();
 		}
 	}
 	
