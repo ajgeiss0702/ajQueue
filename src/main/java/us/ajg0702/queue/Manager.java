@@ -339,12 +339,21 @@ public class Manager {
 		}
 		int pos = list.indexOf(p)+1;
 		int len = list.size();
-		p.sendMessage(Main.formatMessage(
-				msgs.get("status.now-in-queue")
-				.replaceAll("\\{POS\\}", pos+"")
-				.replaceAll("\\{LEN\\}", len+"")
-				.replaceAll("\\{SERVER\\}", s)
-				));
+		if(list.size() <= 1) {
+			p.sendMessage(Main.formatMessage(
+					msgs.get("status.now-in-empty-queue")
+					.replaceAll("\\{POS\\}", pos+"")
+					.replaceAll("\\{LEN\\}", len+"")
+					.replaceAll("\\{SERVER\\}", s)
+					));
+		} else {
+			p.sendMessage(Main.formatMessage(
+					msgs.get("status.now-in-queue")
+					.replaceAll("\\{POS\\}", pos+"")
+					.replaceAll("\\{LEN\\}", len+"")
+					.replaceAll("\\{SERVER\\}", s)
+					));
+		}
 		
 		BungeeUtils.sendCustomData(p, "position", pos+"");
 		BungeeUtils.sendCustomData(p, "positionof", len+"");

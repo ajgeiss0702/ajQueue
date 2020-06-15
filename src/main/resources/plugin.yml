@@ -1,5 +1,6 @@
 main: us.ajg0702.queue.spigot.Main
 version: ${project.version}
+api-version: 1.13
 author: ajgeiss0702
 name: ajQueue
 softdepend: [PlaceholderAPI]

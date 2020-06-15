@@ -4,6 +4,8 @@ import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.util.List;
+import java.util.concurrent.Callable;
+
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
@@ -68,7 +70,12 @@ public class Main extends Plugin implements Listener {
 		
 		
 		metrics = new BungeeStats(this, 7404);
-		
+		metrics.addCustomChart(new BungeeStats.SimplePie("premium", new Callable<String>() {
+	        @Override
+	        public String call() throws Exception {
+	            return isp+"";
+	        }
+	    }));
 		
 	}
 	

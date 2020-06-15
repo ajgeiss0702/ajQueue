@@ -58,7 +58,7 @@ public class Main extends JavaPlugin implements PluginMessageListener,Listener {
 	    	VersionSupport.sendActionBar(p, text);
 	    	return;
 	    }
-	    if(subchannel.equals("queuename")) {
+	    if(subchannel.equals("queuename") && papi) {
 	    	String playername = in.readUTF();
 	    	Player p = Bukkit.getPlayer(playername);
 	    	if(p == null) return;
@@ -70,7 +70,7 @@ public class Main extends JavaPlugin implements PluginMessageListener,Listener {
 	    	phs.put("queued", data);
 	    	placeholders.responseCache.put(p, phs);
 	    }
-	    if(subchannel.equals("position")) {
+	    if(subchannel.equals("position") && papi) {
 	    	String playername = in.readUTF();
 	    	Player p = Bukkit.getPlayer(playername);
 	    	if(p == null) return;
@@ -82,7 +82,7 @@ public class Main extends JavaPlugin implements PluginMessageListener,Listener {
 	    	phs.put("position", data);
 	    	placeholders.responseCache.put(p, phs);
 	    }
-	    if(subchannel.equals("positionof")) {
+	    if(subchannel.equals("positionof") && papi) {
 	    	String playername = in.readUTF();
 	    	Player p = Bukkit.getPlayer(playername);
 	    	if(p == null) return;
