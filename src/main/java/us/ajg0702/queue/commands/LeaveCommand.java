@@ -12,7 +12,7 @@ public class LeaveCommand extends Command {
 	Main plugin;
 	BungeeMessages msgs;
 	public LeaveCommand(Main pl) {
-		super("leavequeue");
+		super("leavequeue", null, "leaveq");
 		this.plugin = pl;
 		msgs = BungeeMessages.getInstance();
 		
