@@ -12,7 +12,7 @@ public class MoveCommand extends Command {
 	Main plugin;
 	BungeeMessages msgs;
 	public MoveCommand(Main pl) {
-		super("move", null, "queue", "server");
+		super("move", null, "queue", "server", "joinqueue", "joinq");
 		this.plugin = pl;
 		msgs = BungeeMessages.getInstance();
 	}
