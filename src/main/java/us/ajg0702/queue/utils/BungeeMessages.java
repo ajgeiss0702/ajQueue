@@ -59,7 +59,7 @@ public class BungeeMessages {
 		d.put("status.offline.full", "full");
 		d.put("status.online.base", "&7You are in position &f{POS}&7 of &f{LEN}&7. Estimated time: {TIME}");
 		d.put("status.left-last-queue", "&aYou left the last queue you were in.");
-		d.put("status.now-in-queue", "&aYou are now queued! &7You are in position &f{POS}&7 of &f{LEN}&7.\n&7Type &f/leavequeue&7 to leave the queue!");
+		d.put("status.now-in-queue", "&aYou are now queued for {SERVER}! &7You are in position &f{POS}&7 of &f{LEN}&7.\n&7Type &f/leavequeue&7 to leave the queue!");
 		d.put("status.now-in-empty-queue", "");
 		
 		d.put("errors.server-not-exist", "&cThat server does not exist!");
@@ -80,8 +80,8 @@ public class BungeeMessages {
 		d.put("list.total", "&7Total players in queues: &f{TOTAL}");
 		d.put("list.none", "&7None");
 		
-		d.put("spigot.actionbar.online", "&7You are in position &f{POS}&7 of &f{LEN}&7. Estimated time: {TIME}");
-		d.put("spigot.actionbar.offline", "&7You are in position &f{POS}&7 of &f{LEN}&7.");
+		d.put("spigot.actionbar.online", "&7You are queued for &f{SERVER}&7. You are in position &f{POS}&7 of &f{LEN}&7. Estimated time: {TIME}");
+		d.put("spigot.actionbar.offline", "&7You are queued for &f{SERVER}&7. &7You are in position &f{POS}&7 of &f{LEN}&7.");
 		
 		d.put("send", "&aAdded &f{PLAYER}&a to the queue for &f{SERVER}");
 		

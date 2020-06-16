@@ -146,6 +146,7 @@ public class Manager {
 					BungeeUtils.sendCustomData(ply, "actionbar", msgs.get("spigot.actionbar.offline")
 							.replaceAll("\\{POS\\}", pos+"")
 							.replaceAll("\\{LEN\\}", len+"")
+							.replaceAll("\\{SERVER\\}", s.getName())
 							.replaceAll("\\{STATUS\\}", or)+";time="+pl.timeBetweenPlayers);
 				} else {
 					int time = pos*pl.timeBetweenPlayers;
@@ -164,6 +165,7 @@ public class Manager {
 					BungeeUtils.sendCustomData(ply, "actionbar", msgs.get("spigot.actionbar.online")
 							.replaceAll("\\{POS\\}", pos+"")
 							.replaceAll("\\{LEN\\}", len+"")
+							.replaceAll("\\{SERVER\\}", s.getName())
 							.replaceAll("\\{TIME\\}", timeStr)+";time="+pl.timeBetweenPlayers);
 				}
 			}
@@ -198,6 +200,7 @@ public class Manager {
 							.replaceAll("\\{STATUS\\}", or)
 							.replaceAll("\\{POS\\}", pos+"")
 							.replaceAll("\\{LEN\\}", len+"")
+							.replaceAll("\\{SERVER\\}", s.getName())
 						));
 				} else {
 					int time = pos*pl.timeBetweenPlayers;
@@ -218,6 +221,7 @@ public class Manager {
 							.replaceAll("\\{POS\\}", pos+"")
 							.replaceAll("\\{LEN\\}", len+"")
 							.replaceAll("\\{TIME\\}", timeStr)
+							.replaceAll("\\{SERVER\\}", s.getName())
 							));
 				}
 				
