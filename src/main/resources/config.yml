@@ -1,5 +1,5 @@
 # Dont touch this number please
-config-version: 4
+config-version: 5
 
 # The time the server will wait between sending people in the queue
 #  Default: 5
@@ -21,3 +21,10 @@ queue-servers:
 # Should the plugin send an actionbar to the player?
 # Requires this plugin to be installed on the server the player is on for it to work
 send-actionbar: true
+
+# What kick reasons should cause the player to be removed from the queue?
+# For example, if one of the below kick-reasons is 'banned' and the player gets kicked when trying to connect to
+#  a server in a queue with a message saying "You are banned from this server!" then it will kick them from the queue too.
+kick-reasons:
+- 'banned'
+- 'blacklisted'

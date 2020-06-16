@@ -37,6 +37,11 @@ public class Main extends JavaPlugin implements PluginMessageListener,Listener {
 		}
 		
 		getLogger().info("Spigot side enabled! v"+getDescription().getVersion());
+		/*Bukkit.getScheduler().runTaskTimer(this, new Runnable() {
+			public void run() {
+				sendMessage
+			}
+		}, 0, 2*20);*/
 	}
 
 	@Override

@@ -11,6 +11,7 @@ import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.PlayerDisconnectEvent;
 import net.md_5.bungee.api.event.PluginMessageEvent;
+import net.md_5.bungee.api.event.ServerKickEvent;
 import net.md_5.bungee.api.event.ServerSwitchEvent;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.api.plugin.Plugin;
@@ -134,6 +135,29 @@ public class Main extends Plugin implements Listener {
 		}
 	}
 	
+	@EventHandler
+	public void onFailedMove(ServerKickEvent e) {
+		ProxiedPlayer p = e.getPlayer();
+		Server server = man.findPlayerInQueue(p);
+		if(server == null) return;
+		if(!(e.getKickedFrom().equals(server.getInfo()))) return;
+		if(server.getQueue().indexOf(p) != 0) return;
+		List<String> kickreasons = config.getStringList("kick-reasons");
+		boolean hasReason = false;
+		//getLogger().info(e.getKickReasonComponent());
+		for(String reason : kickreasons) {
+			for(BaseComponent b : e.getKickReasonComponent()) {
+				if(b.toPlainText().toLowerCase().contains(reason)) {
+					hasReason = true;
+					break;
+				}
+			}
+			if(hasReason) break;
+		}
+		if(!hasReason) return;
+		server.getQueue().remove(p);
+	}
+	
 	
 	@EventHandler
 	public void onMessage(PluginMessageEvent e) {
@@ -168,6 +192,9 @@ public class Main extends Plugin implements Listener {
 				}
 				BungeeUtils.sendCustomData(player, "positionof", pos);
 			}
+			/*if(subchannel.equals("whitelist")) {
+				String data = in.readUTF();
+			}*/
 			
 		} catch (IOException e1) {
 			getLogger().warning("An error occured while reading data from spigot side:");
