@@ -110,7 +110,13 @@ public class Main extends Plugin implements Listener {
 		ProxiedPlayer p = e.getPlayer();
 		Server alreadyqueued = man.findPlayerInQueue(p);
 		if(alreadyqueued != null) {
-			alreadyqueued.getQueue().remove(p);
+			List<ProxiedPlayer> queue = alreadyqueued.getQueue();
+			int pos = queue.indexOf(p);
+			if(pos == 0) {
+				queue.remove(p);
+			} else if(config.getBoolean("remove-player-on-server-switch")) {
+				queue.remove(p);
+			}
 		}
 		
 		String servername = e.getPlayer().getServer().getInfo().getName();
