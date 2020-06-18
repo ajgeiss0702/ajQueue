@@ -198,9 +198,10 @@ public class Main extends Plugin implements Listener {
 				}
 				BungeeUtils.sendCustomData(player, "positionof", pos);
 			}
-			/*if(subchannel.equals("whitelist")) {
-				String data = in.readUTF();
-			}*/
+			if(subchannel.equals("inqueue")) {
+				Server server = man.findPlayerInQueue(player);
+				BungeeUtils.sendCustomData(player, "inqueue", (server != null)+"");
+			}
 			
 		} catch (IOException e1) {
 			getLogger().warning("An error occured while reading data from spigot side:");

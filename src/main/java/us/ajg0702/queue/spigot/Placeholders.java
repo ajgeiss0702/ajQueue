@@ -171,6 +171,9 @@ public class Placeholders extends PlaceholderExpansion {
     		if(identifier.equalsIgnoreCase("position") || identifier.equalsIgnoreCase("of")) {
     			return "None";
     		}
+    		if(identifier.equalsIgnoreCase("inqueue")) {
+    			return "false";
+    		}
     	}
     	
 
@@ -188,6 +191,10 @@ public class Placeholders extends PlaceholderExpansion {
     	}
     	if(identifier.equalsIgnoreCase("of")) {
     		plugin.sendMessage(player, "positionof", "");
+    		return null;
+    	}
+    	if(identifier.equalsIgnoreCase("inqueue")) {
+    		plugin.sendMessage(player, "inqueue", "");
     		return null;
     	}
         
