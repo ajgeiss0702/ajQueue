@@ -280,6 +280,7 @@ public class Manager {
 			if(s.getQueue().size() <= 0) continue;
 			if(s.isFull() && !nextplayer.hasPermission("ajqueue.joinfull")) continue;
 			
+			nextplayer.sendMessage(Main.formatMessage(msgs.get("status.sending-now").replaceAll("\\{SERVER\\}", name)));
 			nextplayer.connect(s.getInfo());
 		}
 	}
@@ -362,6 +363,7 @@ public class Manager {
 		BungeeUtils.sendCustomData(p, "position", pos+"");
 		BungeeUtils.sendCustomData(p, "positionof", len+"");
 		BungeeUtils.sendCustomData(p, "queuename", s);
+		BungeeUtils.sendCustomData(p, "inqueue", "true");
 		
 		if(list.size() <= 1) {
 			sendPlayers(s);
