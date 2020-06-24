@@ -61,6 +61,9 @@ public class Main extends JavaPlugin implements PluginMessageListener,Listener {
 	    	final String text = data.split(";time=")[0];
 	    	//getLogger().info("recieved actionbar for "+player.getName()+": "+text);
 	    	VersionSupport.sendActionBar(p, text);
+	    	
+	    	QueueActionbarUpdateEvent e = new QueueActionbarUpdateEvent(p);
+	    	Bukkit.getPluginManager().callEvent(e);
 	    	return;
 	    }
 	    if(subchannel.equals("queuename") && papi) {

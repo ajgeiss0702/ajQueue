@@ -3,6 +3,7 @@ package us.ajg0702.queue.utils;
 import java.io.File;
 import java.io.IOException;
 import java.util.LinkedHashMap;
+import java.util.regex.Matcher;
 
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.TextComponent;
@@ -91,6 +92,7 @@ public class BungeeMessages {
 		
 		
 		for(String k : d.keySet()) {
+			//pl.getLogger().info("Checking "+k);
 			if(!msgs.contains(k)) {
 				msgs.set(k, d.get(k));
 			}
@@ -113,7 +115,8 @@ public class BungeeMessages {
 		return TextComponent.fromLegacyText(m);
 	}
 	public String color(String msg) {
-		return net.md_5.bungee.api.ChatColor.translateAlternateColorCodes('&', msg);
+		
+		return net.md_5.bungee.api.ChatColor.translateAlternateColorCodes('&', msg).replaceAll(Matcher.quoteReplacement("\\n"), "\n");
 	}
 	
 	public void reload() {
