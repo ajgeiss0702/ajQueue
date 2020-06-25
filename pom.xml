@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>us.ajg0702</groupId>
   <artifactId>ajQueue</artifactId>
-  <version>1.4.3</version>
+  <version>1.4.5</version>
   <name>ajQueue</name>
   
   <repositories>
@@ -87,12 +87,10 @@
 		      <groupId>org.apache.maven.plugins</groupId>
 		      <artifactId>maven-shade-plugin</artifactId>
 		      <version>3.1.0</version>
-		      <!-- Do not include the <configuration>...</configuration> part if you are using Sponge! -->
 		      <configuration>
 		        <relocations>
 		          <relocation>
 		            <pattern>us.ajg0702.premium</pattern>
-		            <!-- Replace this with your package! -->
 		            <shadedPattern>us.ajg0702.queue</shadedPattern>
 		          </relocation>
 		        </relocations>
