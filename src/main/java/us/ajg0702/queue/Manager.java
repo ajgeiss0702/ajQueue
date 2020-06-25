@@ -278,6 +278,12 @@ public class Manager {
 				nextplayer = s.getQueue().get(0);
 			}
 			if(s.getQueue().size() <= 0) continue;
+			while(!nextplayer.isConnected()) {
+				s.getQueue().remove(nextplayer);
+				if(s.getQueue().size() <= 0) break;
+				nextplayer = s.getQueue().get(0);
+			}
+			if(s.getQueue().size() <= 0) continue;
 			if(s.isFull() && !nextplayer.hasPermission("ajqueue.joinfull")) continue;
 			
 			nextplayer.sendMessage(Main.formatMessage(msgs.get("status.sending-now").replaceAll("\\{SERVER\\}", name)));
