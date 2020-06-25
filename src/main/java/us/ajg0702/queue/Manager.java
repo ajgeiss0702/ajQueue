@@ -32,8 +32,16 @@ public class Manager {
 	private Manager(Main pl) {
 		this.pl = pl;
 		msgs = BungeeMessages.getInstance();
-		reloadServers();
 		reloadIntervals();
+		if(!pl.config.getBoolean("wait-to-load-servers")) {
+			reloadServers();
+		} else {
+			pl.getProxy().getScheduler().schedule(pl, new Runnable() {
+				public void run() {
+					reloadServers();
+				}
+			}, 0, TimeUnit.SECONDS);
+		}
 	}
 	
 	/*
@@ -49,6 +57,7 @@ public class Manager {
 	int updateId = -1;
 	int messagerId = -1;
 	int actionbarId = -1;
+	int srvRefId = -1;
 	/**
 	 * Clears all intervals and re-makes them
 	 */
@@ -65,6 +74,9 @@ public class Manager {
 		if(actionbarId != -1) {
 			pl.getProxy().getScheduler().cancel(actionbarId);
 		}
+		if(srvRefId != -1) {
+			pl.getProxy().getScheduler().cancel(srvRefId);
+		}
 		
 		sendId = pl.getProxy().getScheduler().schedule(pl, new Runnable() {
 			public void run() {
@@ -77,6 +89,7 @@ public class Manager {
 				updateServers();
 			}
 		}, 0, Math.max(pl.timeBetweenPlayers, 2), TimeUnit.SECONDS).getId();
+		//pl.getLogger().info("Time: "+pl.timeBetweenPlayers);
 		
 		messagerId = pl.getProxy().getScheduler().schedule(pl, new Runnable() {
 			public void run() {
@@ -88,6 +101,14 @@ public class Manager {
 				sendActionBars();
 			}
 		}, 0, 2, TimeUnit.SECONDS).getId();
+		
+		if(pl.config.getInt("reload-servers-interval") > 0) {
+			srvRefId = pl.getProxy().getScheduler().schedule(pl, new Runnable() {
+				public void run() {
+					updateServers();
+				}
+			}, pl.config.getInt("reload-servers-interval"),  pl.config.getInt("reload-servers-interval"), TimeUnit.SECONDS).getId();
+		}
 	}
 	
 	/**

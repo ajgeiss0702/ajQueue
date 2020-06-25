@@ -1,5 +1,5 @@
 # Dont touch this number please
-config-version: 5
+config-version: 6
 
 # The time the server will wait between sending people in the queue
 #  Default: 5
@@ -23,7 +23,7 @@ queue-servers:
 send-actionbar: true
 
 # What kick reasons should cause the player to be removed from the queue?
-# For example, if one of the below kick-reasons is 'banned' and the player gets kicked when trying to connect to
+# For example, if one of the below kick reasons is 'banned' and the player gets kicked when trying to connect to
 #  a server in a queue with a message saying "You are banned from this server!" then it will kick them from the queue too.
 kick-reasons:
 - 'banned'
@@ -36,3 +36,15 @@ kick-reasons:
 # between them without losing their queue position
 #  Default: true
 remove-player-on-server-switch: true
+
+
+# Should we wait until the server is done loading to load the servers?
+# Enable this if you have a plugin that adds servers to the server list during startup.
+#  Default: false
+wait-to-load-servers: false
+
+
+# How often (in seconds) we should check for new servers to add queues for.
+# If you dynamicly add servers, set this to something other than 0.
+# To disable, set to 0
+reload-servers-interval: 0
