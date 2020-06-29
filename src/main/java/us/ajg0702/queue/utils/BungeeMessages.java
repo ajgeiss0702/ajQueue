@@ -71,6 +71,7 @@ public class BungeeMessages {
 		
 		d.put("commands.leave-queue", "&aYou left the queue!");
 		d.put("commands.reload", "&aConfig and messages reloaded successfully!");
+		d.put("commands.joinqueue.usage", "&cUsage: /joinqueue <server>");
 		
 		d.put("noperm", "&cYou do not have permission to do this!");
 		
