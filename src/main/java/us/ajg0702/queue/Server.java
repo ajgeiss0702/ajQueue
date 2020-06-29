@@ -76,6 +76,11 @@ public class Server {
 	}
 	
 	
+	public boolean canAccess(ProxiedPlayer ply) {
+		return info.canAccess(ply);
+	}
+	
+	
 	boolean whitelisted = false;
 	List<String> whitelistedplayers = new ArrayList<>();
 	public void setWhitelisted(boolean b) {

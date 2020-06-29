@@ -158,17 +158,26 @@ public class Manager {
 					plys.remove(ply);
 					continue;
 				}
+				
 				int len = plys.size();
-				if(!s.isOnline() || s.isFull()) {
-					String or = msgs.get("status.offline.restarting");
+				if(!s.isOnline() || s.isFull() || !s.canAccess(ply)) {
+					
+					String status = msgs.get("status.offline.restarting");
+					
 					if(ot > pl.config.getInt("offline-time")) {
-						or = msgs.get("status.offline.offline");
+						status = msgs.get("status.offline.offline");
 					}
+					
+					if(!s.canAccess(ply)) {
+						status = msgs.get("status.offline.restricted");
+					}
+					
+					
 					BungeeUtils.sendCustomData(ply, "actionbar", msgs.get("spigot.actionbar.offline")
 							.replaceAll("\\{POS\\}", pos+"")
 							.replaceAll("\\{LEN\\}", len+"")
 							.replaceAll("\\{SERVER\\}", s.getName())
-							.replaceAll("\\{STATUS\\}", or)+";time="+pl.timeBetweenPlayers);
+							.replaceAll("\\{STATUS\\}", status)+";time="+pl.timeBetweenPlayers);
 				} else {
 					int time = pos*pl.timeBetweenPlayers;
 					int min = (int) Math.floor((time) / (60));
@@ -208,17 +217,25 @@ public class Manager {
 					continue;
 				}
 				int len = plys.size();
-				if(!s.isOnline() || s.isFull()) {
-					String or = msgs.get("status.offline.restarting");
+				if(!s.isOnline() || s.isFull() || !s.canAccess(ply)) {
+					
+					String status = msgs.get("status.offline.restarting");
+					
 					if(ot > pl.config.getInt("offline-time")) {
-						or = msgs.get("status.offline.offline");
+						status = msgs.get("status.offline.offline");
 					}
+					
 					if(s.isFull() && s.isOnline()) {
-						or = msgs.get("status.offline.full");
+						status = msgs.get("status.offline.full");
 					}
+					
+					if(!s.canAccess(ply)) {
+						status = msgs.get("status.offline.restricted");
+					}
+					
 					ply.sendMessage(Main.formatMessage(
 							msgs.get("status.offline.base")
-							.replaceAll("\\{STATUS\\}", or)
+							.replaceAll("\\{STATUS\\}", status)
 							.replaceAll("\\{POS\\}", pos+"")
 							.replaceAll("\\{LEN\\}", len+"")
 							.replaceAll("\\{SERVER\\}", s.getName())
@@ -292,6 +309,8 @@ public class Manager {
 			if(s.getQueue().size() <= 0) continue;
 			
 			ProxiedPlayer nextplayer = s.getQueue().get(0);
+			
+			if(!s.canAccess(nextplayer)) continue;
 			
 			while(nextplayer.getServer().getInfo().getName().equals(s.getName())) {
 				s.getQueue().remove(nextplayer);

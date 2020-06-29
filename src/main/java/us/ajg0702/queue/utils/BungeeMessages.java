@@ -55,9 +55,12 @@ public class BungeeMessages {
 		
 		
 		d.put("status.offline.base", "&cThe server you are queued for is {STATUS}. &7You are in position &f{POS}&7 of &f{LEN}&7.");
+		
 		d.put("status.offline.offline", "offline");
 		d.put("status.offline.restarting", "restarting");
 		d.put("status.offline.full", "full");
+		d.put("status.offline.restricted", "restricted");
+		
 		d.put("status.online.base", "&7You are in position &f{POS}&7 of &f{LEN}&7. Estimated time: {TIME}");
 		d.put("status.left-last-queue", "&aYou left the last queue you were in.");
 		d.put("status.now-in-queue", "&aYou are now queued for {SERVER}! &7You are in position &f{POS}&7 of &f{LEN}&7.\n&7Type &f/leavequeue&7 to leave the queue!");

@@ -3,6 +3,7 @@ package us.ajg0702.queue;
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.concurrent.Callable;
 
@@ -44,6 +45,46 @@ public class Main extends Plugin implements Listener {
 	public void onEnable() {
 		plugin = this;
 		
+		/*LinkedHashMap<String, String> d = new LinkedHashMap<>();
+		
+		
+		d.put("status.offline.base", "&cThe server you are queued for is {STATUS}. &7You are in position &f{POS}&7 of &f{LEN}&7.");
+		d.put("status.offline.offline", "offline");
+		d.put("status.offline.restarting", "restarting");
+		d.put("status.offline.full", "full");
+		d.put("status.online.base", "&7You are in position &f{POS}&7 of &f{LEN}&7. Estimated time: {TIME}");
+		d.put("status.left-last-queue", "&aYou left the last queue you were in.");
+		d.put("status.now-in-queue", "&aYou are now queued for {SERVER}! &7You are in position &f{POS}&7 of &f{LEN}&7.\n&7Type &f/leavequeue&7 to leave the queue!");
+		d.put("status.now-in-empty-queue", "");
+		d.put("status.sending-now", "&aSending you to &f{SERVER} &anow..");
+		
+		d.put("errors.server-not-exist", "&cThat server does not exist!");
+		d.put("errors.already-queued", "&cYou are already queued for that server!");
+		d.put("errors.player-only", "&cThis command can only be executed as a player!");
+		d.put("errors.already-connected", "&cYou are already connected to this server!");
+		
+		d.put("commands.leave-queue", "&aYou left the queue!");
+		d.put("commands.reload", "&aConfig and messages reloaded successfully!");
+		
+		d.put("noperm", "&cYou do not have permission to do this!");
+		
+		d.put("format.time.mins", "{m}m {s}s");
+		d.put("format.time.secs", "{s} seconds");
+		
+		d.put("list.format", "&b{SERVER} &7({COUNT}): {LIST}");
+		d.put("list.playerlist", "&9{NAME}&7, ");
+		d.put("list.total", "&7Total players in queues: &f{TOTAL}");
+		d.put("list.none", "&7None");
+		
+		d.put("spigot.actionbar.online", "&7You are queued for &f{SERVER}&7. You are in position &f{POS}&7 of &f{LEN}&7. Estimated time: {TIME}");
+		d.put("spigot.actionbar.offline", "&7You are queued for &f{SERVER}&7. &7You are in position &f{POS}&7 of &f{LEN}&7.");
+		
+		d.put("send", "&aAdded &f{PLAYER}&a to the queue for &f{SERVER}");
+		
+		d.put("placeholders.queued.none", "None");
+		d.put("placeholders.position.none", "None");
+		
+		msgs = BungeeMessages.getInstance(this, d);*/
 		msgs = BungeeMessages.getInstance(this);
 		
 		config = new BungeeConfig(this);
