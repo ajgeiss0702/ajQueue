@@ -4,7 +4,7 @@
   <groupId>us.ajg0702</groupId>
   <artifactId>ajQueue</artifactId>
   <name>ajQueue</name>
-  <version>1.4.5</version>
+  <version>1.4.6</version>
   <build>
     <resources>
       <resource>
@@ -37,6 +37,26 @@
             <relocation>
               <pattern>us.ajg0702.premium</pattern>
               <shadedPattern>us.ajg0702.queue</shadedPattern>
+            </relocation>
+          </relocations>
+        </configuration>
+      </plugin>
+      <plugin>
+        <artifactId>maven-shade-plugin</artifactId>
+        <version>3.1.0</version>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>shade</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <relocations>
+            <relocation>
+              <pattern>us.ajg0702.utils</pattern>
+              <shadedPattern>us.ajg0702.queue.utils</shadedPattern>
             </relocation>
           </relocations>
         </configuration>

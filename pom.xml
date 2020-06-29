@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>us.ajg0702</groupId>
   <artifactId>ajQueue</artifactId>
-  <version>1.4.5</version>
+  <version>1.4.6</version>
   <name>ajQueue</name>
   
   <repositories>
@@ -56,6 +56,12 @@
           <version>2.10.4</version>
           <scope>provided</scope>
         </dependency>
+        <!-- <dependency>
+        	<groupId>us.ajg0702</groupId>
+        	<artifactId>ajUtils</artifactId>
+        	<version>1.0.0</version>
+        	<scope>compile</scope>
+        </dependency>-->
  <!--       <dependency>
  			<groupId>org.bstats</groupId>
  			<artifactId>bstats-bungeecord</artifactId>
@@ -92,6 +98,27 @@
 		          <relocation>
 		            <pattern>us.ajg0702.premium</pattern>
 		            <shadedPattern>us.ajg0702.queue</shadedPattern>
+		          </relocation>
+		        </relocations>
+		      </configuration>
+		      <executions>
+		        <execution>
+		          <phase>package</phase>
+		          <goals>
+		            <goal>shade</goal>
+		          </goals>
+		        </execution>
+		      </executions>
+		    </plugin>
+		    <plugin>
+		      <groupId>org.apache.maven.plugins</groupId>
+		      <artifactId>maven-shade-plugin</artifactId>
+		      <version>3.1.0</version>
+		      <configuration>
+		        <relocations>
+		          <relocation>
+		            <pattern>us.ajg0702.utils</pattern>
+		            <shadedPattern>us.ajg0702.queue.utils</shadedPattern>
 		          </relocation>
 		        </relocations>
 		      </configuration>
