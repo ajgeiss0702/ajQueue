@@ -81,17 +81,14 @@ public class ManageCommand extends Command {
 		}
 		if(args.length == 2) {
 			
-			
-			List<String> playerNames = new ArrayList<>();
-			for(ProxiedPlayer ply : pl.getProxy().getPlayers()) {
-				if(ply == null || !ply.isConnected()) continue;
-				playerNames.add(ply.getName().toLowerCase());
+			if(!sender.hasPermission("ajqueue.send")) {
+				sender.sendMessage(msgs.getBC("noperm"));
+				return;
 			}
+			
+			List<String> playerNames = getNameList();
 			if(playerNames.contains(args[0].toLowerCase())) {
-				if(!sender.hasPermission("ajqueue.send")) {
-					sender.sendMessage(msgs.getBC("noperm"));
-					return;
-				}
+				
 				ProxiedPlayer ply = pl.getProxy().getPlayer(args[0]);
 				Manager.getInstance().addToQueue(ply, args[1]);
 				sender.sendMessage(Main.formatMessage(
@@ -104,4 +101,14 @@ public class ManageCommand extends Command {
 		}
 		
 		sender.sendMessage(Main.formatMessage("/ajqueue <reload|list|player>"));
-	}}
+	}
+	
+	private List<String> getNameList() {
+		List<String> playerNames = new ArrayList<>();
+		for(ProxiedPlayer ply : pl.getProxy().getPlayers()) {
+			if(ply == null || !ply.isConnected()) continue;
+			playerNames.add(ply.getName().toLowerCase());
+		}
+		return playerNames;
+	}
+}

@@ -3,10 +3,12 @@ package us.ajg0702.queue;
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.concurrent.Callable;
 
+import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
@@ -40,6 +42,8 @@ public class Main extends Plugin implements Listener {
 	Manager man;
 	
 	boolean isp;
+	
+	MoveCommand moveCommand;
 	
 	@Override
 	public void onEnable() {
@@ -90,7 +94,8 @@ public class Main extends Plugin implements Listener {
 		config = new BungeeConfig(this);
 		checkConfig();
 		
-		this.getProxy().getPluginManager().registerCommand(this, new MoveCommand(this));
+		moveCommand = new MoveCommand(this);
+		this.getProxy().getPluginManager().registerCommand(this, moveCommand);
 		this.getProxy().getPluginManager().registerCommand(this, new ManageCommand(this));
 		this.getProxy().getPluginManager().registerCommand(this, new LeaveCommand(this));
 		
@@ -218,7 +223,11 @@ public class Main extends Plugin implements Listener {
 			
 			if(subchannel.equals("queue")) {
 				String data = in.readUTF();
-				man.addToQueue(player, data);
+				String[] args = new String[1];
+				args[0] = data;
+				moveCommand.execute((CommandSender) player, args);
+				//man.addToQueue(player, data);
+				
 			}
 			if(subchannel.equals("queuename")) {
 				BungeeUtils.sendCustomData(player, "queuename", man.getQueuedName(player));

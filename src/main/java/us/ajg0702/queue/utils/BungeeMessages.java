@@ -90,6 +90,7 @@ public class BungeeMessages {
 		d.put("spigot.actionbar.offline", "&7You are queued for &f{SERVER}&7. &7You are in position &f{POS}&7 of &f{LEN}&7.");
 		
 		d.put("send", "&aAdded &f{PLAYER}&a to the queue for &f{SERVER}");
+		d.put("remove", "&aRemoved &f{PLAYER} from all queues they were in.");
 		
 		d.put("placeholders.queued.none", "None");
 		d.put("placeholders.position.none", "None");

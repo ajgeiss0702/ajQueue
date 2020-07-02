@@ -23,7 +23,12 @@ public class MoveCommand extends Command {
 			return;
 		}
 		ProxiedPlayer p = (ProxiedPlayer) sender;
+		
 		if(args.length > 0) {
+			if(plugin.getConfig().getBoolean("require-permission") && !p.hasPermission("ajqueue.queue."+args[0])) {
+				sender.sendMessage(msgs.getBC("noperm"));
+				return;
+			}
 			Manager.getInstance().addToQueue(p, args[0]);
 		} else if(args.length == 0) {
 			sender.sendMessage(msgs.getBC("commands.joinqueue.usage"));

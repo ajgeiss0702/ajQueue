@@ -1,5 +1,5 @@
 # Dont touch this number please
-config-version: 6
+config-version: 8
 
 # The time the server will wait between sending people in the queue
 #  Default: 5
@@ -43,8 +43,20 @@ remove-player-on-server-switch: true
 #  Default: false
 wait-to-load-servers: false
 
+# How long should we wait after the server finishes loading to load the server list?
+# Only works if the above is enabled.
+# This is in miliseconds so 1000 = 1 second
+#  Default: 500
+wait-to-load-servers-delay: 500
+
 
 # How often (in seconds) we should check for new servers to add queues for.
 # If you dynamicly add servers, set this to something other than 0.
 # To disable, set to 0
 reload-servers-interval: 0
+
+
+# Should we require permissions for players to be able to join queues?
+# If enabled, players will be required to have the permission ajqueue.queue.<server>
+#  Default: false
+require-permission: false

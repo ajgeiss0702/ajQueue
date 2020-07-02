@@ -40,7 +40,7 @@ public class Manager {
 				public void run() {
 					reloadServers();
 				}
-			}, 0, TimeUnit.SECONDS);
+			}, pl.config.getInt("wait-to-load-servers-delay"), TimeUnit.MILLISECONDS);
 		}
 	}
 	
