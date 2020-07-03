@@ -92,6 +92,9 @@ public class Server {
 	public boolean getWhitelisted() {
 		return whitelisted;
 	}
+	public boolean isWhitelisted() {
+		return whitelisted;
+	}
 	public List<String> getWhitelistedPlayers() {
 		return whitelistedplayers;
 	}

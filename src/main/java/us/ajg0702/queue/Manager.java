@@ -390,7 +390,8 @@ public class Manager {
 		}
 		int pos = list.indexOf(p)+1;
 		int len = list.size();
-		if(list.size() <= 1) {
+		if(list.size() <= 1 && server.isOnline() && server.canAccess(p) && !server.isFull() && !server.isWhitelisted()) {
+			sendPlayers(s);
 			p.sendMessage(Main.formatMessage(
 					msgs.get("status.now-in-empty-queue")
 					.replaceAll("\\{POS\\}", pos+"")
@@ -410,10 +411,6 @@ public class Manager {
 		BungeeUtils.sendCustomData(p, "positionof", len+"");
 		BungeeUtils.sendCustomData(p, "queuename", s);
 		BungeeUtils.sendCustomData(p, "inqueue", "true");
-		
-		if(list.size() <= 1) {
-			sendPlayers(s);
-		}
 	}
 	
 	/**
@@ -426,5 +423,9 @@ public class Manager {
 			if(s.getQueue().contains(p)) return s;
 		}
 		return null;
+	}
+	
+	public Server getServer(String name) {
+		return findServer(name);
 	}
 }
