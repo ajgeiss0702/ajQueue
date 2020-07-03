@@ -34,6 +34,15 @@ public class Server {
 			@Override
 			public void done(ServerPing result, Throwable error) {
 				online = error == null;
+				
+				/*if(error != null) {
+					ProxyServer.getInstance().getLogger().info("[ajQueue] [pinger] Status: "+online+".  Error: ");
+					error.printStackTrace();
+				} else {
+					ProxyServer.getInstance().getLogger().info("[ajQueue] [pinger] Status: "+online+".  motd: "+result.getDescriptionComponent());
+				}*/
+				
+				
 				if(lastUpdate == -1) {
 					lastUpdate = System.currentTimeMillis();
 					offlineTime = 0;
