@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.regex.Matcher;
 
+import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.plugin.Plugin;
@@ -72,7 +73,7 @@ public class BungeeMessages {
 		d.put("errors.player-only", "&cThis command can only be executed as a player!");
 		d.put("errors.already-connected", "&cYou are already connected to this server!");
 		
-		d.put("commands.leave-queue", "&aYou left the queue!");
+		d.put("commands.leave-queue", "&aYou left the queue for {SERVER}!");
 		d.put("commands.reload", "&aConfig and messages reloaded successfully!");
 		d.put("commands.joinqueue.usage", "&cUsage: /joinqueue <server>");
 		
@@ -115,8 +116,14 @@ public class BungeeMessages {
 		msg = color(msg);
 		return msg;
 	}
-	public BaseComponent[] getBC(String key) {
+	public BaseComponent[] getBC(String key, String... placeholders) {
 		String m = get(key);
+		for(String sr : placeholders) {
+			//ProxyServer.getInstance().getLogger().info(sr);
+			String placeholder = sr.split(":")[0];
+			String value = sr.replaceFirst(Matcher.quoteReplacement(placeholder+":"), "");
+			m = m.replaceAll("\\{"+Matcher.quoteReplacement(placeholder)+"\\}", value);
+		}
 		return TextComponent.fromLegacyText(m);
 	}
 	public String color(String msg) {

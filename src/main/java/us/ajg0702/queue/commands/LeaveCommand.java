@@ -27,7 +27,7 @@ public class LeaveCommand extends Command {
 		Server server = Manager.getInstance().findPlayerInQueue((ProxiedPlayer) sender);
 		if(server != null) {
 			server.getQueue().remove(p);
-			p.sendMessage(msgs.getBC("commands.leave-queue"));
+			p.sendMessage(msgs.getBC("commands.leave-queue", "SERVER:"+server.getName()));
 		}
 	}
 }
