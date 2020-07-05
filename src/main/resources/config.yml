@@ -1,5 +1,5 @@
 # Dont touch this number please
-config-version: 8
+config-version: 11
 
 # The time the server will wait between sending people in the queue
 #  Default: 5
@@ -60,3 +60,31 @@ reload-servers-interval: 0
 # If enabled, players will be required to have the permission ajqueue.queue.<server>
 #  Default: false
 require-permission: false
+
+
+# Should we let players join more than one queue?
+# If enabled, players will be able to be in multiple queues at once.
+#  Default: true
+allow-multiple-queues: true
+
+# If the player is queued for multiple servers, which server should we pick to use in things like placeholders and actionbars
+# Options are first and last
+#  Default: last
+multi-server-queue-pick: last
+
+
+# THIS FEATURE IS ONLY AVAILABLE ON ajQueuePlus (https://www.spigotmc.org/resources/ajqueueplus.79123/)
+# This will show players a different name than the actual bungeecord server name
+# for example, instead of showing players "event-a", this option can make it appear as "Event A"
+# With this example, you would use this: - "event-a:Event A"
+# Note that currently players still have to use the normal names in queue commands and leave commands
+server-aliases:
+- "event-a:Event A"
+
+
+# How long should we wait after a server is online before sending players?
+# The server will still show up as offline or restarting until this amount of time after its up
+# Meant to let your server 'cool down' after lag from starting up
+# In seconds
+#  Default: 1
+wait-after-online: 1

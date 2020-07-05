@@ -44,6 +44,8 @@ public class Main extends Plugin implements Listener {
 	
 	MoveCommand moveCommand;
 	
+	public AliasManager aliases;
+	
 	@Override
 	public void onEnable() {
 		plugin = this;
@@ -51,7 +53,7 @@ public class Main extends Plugin implements Listener {
 		LinkedHashMap<String, String> d = new LinkedHashMap<>();
 		
 		
-		d.put("status.offline.base", "&cThe server you are queued for is {STATUS}. &7You are in position &f{POS}&7 of &f{LEN}&7.");
+		d.put("status.offline.base", "&c{SERVER} is {STATUS}. &7You are in position &f{POS}&7 of &f{LEN}&7.");
 		
 		d.put("status.offline.offline", "offline");
 		d.put("status.offline.restarting", "restarting");
@@ -92,11 +94,17 @@ public class Main extends Plugin implements Listener {
 		d.put("placeholders.queued.none", "None");
 		d.put("placeholders.position.none", "None");
 		
+		d.put("commands.leave.more-args", "&cPlease specify which queue you want to leave! &7You are in these queues: {QUEUES}");
+		d.put("commands.leave.queues-list-format", "&f{NAME}&7, ");
+		d.put("commands.leave.not-queued", "&cYou are not queued for that server! &7You are in these queues: {QUEUES}");
+		
 		msgs = BungeeMessages.getInstance(this, d);
 		//msgs = BungeeMessages.getInstance(this);
 		
 		config = new BungeeConfig(this);
 		checkConfig();
+		
+		aliases = new AliasManager(this);
 		
 		moveCommand = new MoveCommand(this);
 		this.getProxy().getPluginManager().registerCommand(this, moveCommand);
@@ -110,12 +118,7 @@ public class Main extends Plugin implements Listener {
 		
 		timeBetweenPlayers = config.getInt("wait-time");
 		
-		try {
-			Class.forName("us.ajg0702.queue.Logic");
-			isp = true;
-		} catch(ClassNotFoundException e) {
-			isp = false;
-		}
+		isp = Logic.isp;
 		
 		man = Manager.getInstance(this);
 		
@@ -158,13 +161,11 @@ public class Main extends Plugin implements Listener {
 	@EventHandler
 	public void moveServer(ServerSwitchEvent e) {
 		ProxiedPlayer p = e.getPlayer();
-		Server alreadyqueued = man.findPlayerInQueue(p);
-		if(alreadyqueued != null) {
-			List<ProxiedPlayer> queue = alreadyqueued.getQueue();
+		List<Server> alreadyqueued = man.findPlayerInQueue(p);
+		for(Server ser : alreadyqueued) {
+			List<ProxiedPlayer> queue = ser.getQueue();
 			int pos = queue.indexOf(p);
-			if(pos == 0) {
-				queue.remove(p);
-			} else if(config.getBoolean("remove-player-on-server-switch")) {
+			if((pos == 0 && p.getServer().getInfo().equals(ser.getInfo())) || config.getBoolean("remove-player-on-server-switch")) {
 				queue.remove(p);
 			}
 		}
@@ -185,8 +186,8 @@ public class Main extends Plugin implements Listener {
 	@EventHandler
 	public void onLeave(PlayerDisconnectEvent e) {
 		ProxiedPlayer p = e.getPlayer();
-		Server server = man.findPlayerInQueue(p);
-		if(server != null) {
+		List<Server> servers = man.findPlayerInQueue(p);
+		for(Server server : servers) {
 			server.getQueue().remove(p);
 		}
 	}
@@ -194,24 +195,25 @@ public class Main extends Plugin implements Listener {
 	@EventHandler
 	public void onFailedMove(ServerKickEvent e) {
 		ProxiedPlayer p = e.getPlayer();
-		Server server = man.findPlayerInQueue(p);
-		if(server == null) return;
-		if(!(e.getKickedFrom().equals(server.getInfo()))) return;
-		if(server.getQueue().indexOf(p) != 0) return;
-		List<String> kickreasons = config.getStringList("kick-reasons");
-		boolean hasReason = false;
-		//getLogger().info(e.getKickReasonComponent());
-		for(String reason : kickreasons) {
-			for(BaseComponent b : e.getKickReasonComponent()) {
-				if(b.toPlainText().toLowerCase().contains(reason)) {
-					hasReason = true;
-					break;
+		List<Server> queuedServers = man.findPlayerInQueue(p);
+		for(Server server : queuedServers) { 
+			if(!(e.getKickedFrom().equals(server.getInfo()))) continue;
+			if(server.getQueue().indexOf(p) != 0) continue;
+			List<String> kickreasons = config.getStringList("kick-reasons");
+			boolean hasReason = false;
+			//getLogger().info(e.getKickReasonComponent());
+			for(String reason : kickreasons) {
+				for(BaseComponent b : e.getKickReasonComponent()) {
+					if(b.toPlainText().toLowerCase().contains(reason)) {
+						hasReason = true;
+						break;
+					}
 				}
+				if(hasReason) break;
 			}
-			if(hasReason) break;
+			if(!hasReason) continue;
+			server.getQueue().remove(p);
 		}
-		if(!hasReason) return;
-		server.getQueue().remove(p);
 	}
 	
 	
@@ -234,10 +236,10 @@ public class Main extends Plugin implements Listener {
 				
 			}
 			if(subchannel.equals("queuename")) {
-				BungeeUtils.sendCustomData(player, "queuename", man.getQueuedName(player));
+				BungeeUtils.sendCustomData(player, "queuename", aliases.getAlias(man.getQueuedName(player)));
 			}
 			if(subchannel.equals("position")) {
-				Server server = man.findPlayerInQueue(player);
+				Server server = man.getSingleServer(player);
 				String pos = msgs.get("placeholders.position.none");
 				if(server != null) {
 					pos = server.getQueue().indexOf(player)+1+"";
@@ -245,7 +247,7 @@ public class Main extends Plugin implements Listener {
 				BungeeUtils.sendCustomData(player, "position", pos);
 			}
 			if(subchannel.equals("positionof")) {
-				Server server = man.findPlayerInQueue(player);
+				Server server = man.getSingleServer(player);
 				String pos = msgs.get("placeholders.position.none");
 				if(server != null) {
 					pos = server.getQueue().size()+"";
@@ -253,7 +255,7 @@ public class Main extends Plugin implements Listener {
 				BungeeUtils.sendCustomData(player, "positionof", pos);
 			}
 			if(subchannel.equals("inqueue")) {
-				Server server = man.findPlayerInQueue(player);
+				Server server = man.getSingleServer(player);
 				BungeeUtils.sendCustomData(player, "inqueue", (server != null)+"");
 			}
 			

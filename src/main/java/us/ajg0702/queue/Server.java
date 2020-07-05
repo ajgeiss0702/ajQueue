@@ -7,13 +7,16 @@ import net.md_5.bungee.api.Callback;
 import net.md_5.bungee.api.ServerPing;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
+import us.ajg0702.utils.bungee.BungeeConfig;
 
 public class Server {
 	String name;
 	ServerInfo info;
+	BungeeConfig config;
 	public Server(String name, ServerInfo info) {
 		this.name = name;
 		this.info = info;
+		config = Manager.getInstance().pl.config;
 		update();
 	}
 	
@@ -70,8 +73,14 @@ public class Server {
 	public int getOfflineTime() {
 		return offlineTime;
 	}
-	
+	long lastOffline = 0;
 	public boolean isOnline() {
+		if(System.currentTimeMillis()-lastOffline <= (config.getInt("wait-after-online")*1000) && online) {
+			return false;
+		}
+		if(!online) {
+			lastOffline = System.currentTimeMillis();
+		}
 		return online;
 	}
 	public boolean isFull() {

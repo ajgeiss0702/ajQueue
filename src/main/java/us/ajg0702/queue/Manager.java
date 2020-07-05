@@ -112,16 +112,41 @@ public class Manager {
 	}
 	
 	/**
-	 * Get the name of the server the player is queued for
+	 * Get the name of the server the player is queued for.
+	 * If multiple servers are queued for, it will use the multi-server-queue-pick option in the config
 	 * @param p The player
 	 * @return The name of the server, the placeholder none message if not queued
 	 */
 	public String getQueuedName(ProxiedPlayer p) {
-		Server queued = findPlayerInQueue(p);
-		if(queued == null) {
+		List<Server> queued = findPlayerInQueue(p);
+		if(queued.size() <= 0) {
 			return msgs.get("placeholders.queued.none");
 		}
-		return queued.getName();
+		Server selected = queued.get(0);
+		
+		if(pl.config.getString("multi-server-queue-pick").equalsIgnoreCase("last")) {
+			selected = queued.get(queued.size()-1);
+		}
+		
+		return selected.getName();
+	}
+	
+	/**
+	 * Get a single server the player is queued for. Depends on the multi-server-queue-pick option in the config
+	 * @param p The player
+	 * @return The server that was chosen that the player is queued for.
+	 */
+	public Server getSingleServer(ProxiedPlayer p) {
+		List<Server> queued = findPlayerInQueue(p);
+		if(queued.size() <= 0) {
+			return null;
+		}
+		Server selected = queued.get(0);
+		
+		if(pl.config.getString("multi-server-queue-pick").equalsIgnoreCase("last")) {
+			selected = queued.get(queued.size()-1);
+		}
+		return selected;
 	}
 	
 	
@@ -147,7 +172,60 @@ public class Manager {
 	 */
 	public void sendActionBars() {
 		if(!pl.getConfig().getBoolean("send-actionbar")) return;
-		for(Server s : servers) {
+		
+		for(ProxiedPlayer p : ProxyServer.getInstance().getPlayers()) {
+			Server s = this.getSingleServer(p);
+			
+			if(s == null) continue;
+			List<ProxiedPlayer> plys = s.getQueue();
+			int pos = plys.indexOf(p)+1;
+			if(pos == 0) {
+				plys.remove(p);
+				continue;
+			}
+			
+			int len = plys.size();
+			if(!s.isOnline() || s.isFull() || !s.canAccess(p)) {
+				
+				String status = msgs.get("status.offline.restarting");
+				
+				if(s.getOfflineTime() > pl.config.getInt("offline-time")) {
+					status = msgs.get("status.offline.offline");
+				}
+				
+				if(!s.canAccess(p)) {
+					status = msgs.get("status.offline.restricted");
+				}
+				
+				
+				BungeeUtils.sendCustomData(p, "actionbar", msgs.get("spigot.actionbar.offline")
+						.replaceAll("\\{POS\\}", pos+"")
+						.replaceAll("\\{LEN\\}", len+"")
+						.replaceAll("\\{SERVER\\}", pl.aliases.getAlias(s.getName()))
+						.replaceAll("\\{STATUS\\}", status)+";time="+pl.timeBetweenPlayers);
+			} else {
+				int time = pos*pl.timeBetweenPlayers;
+				int min = (int) Math.floor((time) / (60));
+				int sec = (int) Math.floor((time % (60)));
+				String timeStr;
+	        	if(min <= 0) {
+	        		timeStr = msgs.get("format.time.secs")
+	        				.replaceAll("\\{m\\}", "0")
+	        				.replaceAll("\\{s\\}", sec+"");
+	        	} else {
+	        		timeStr = msgs.get("format.time.mins")
+	        				.replaceAll("\\{m\\}", min+"")
+	        				.replaceAll("\\{s\\}", sec+"");
+	        	}
+				BungeeUtils.sendCustomData(p, "actionbar", msgs.get("spigot.actionbar.online")
+						.replaceAll("\\{POS\\}", pos+"")
+						.replaceAll("\\{LEN\\}", len+"")
+						.replaceAll("\\{SERVER\\}", pl.aliases.getAlias(s.getName()))
+						.replaceAll("\\{TIME\\}", timeStr)+";time="+pl.timeBetweenPlayers);
+			}
+		}
+		
+		/*for(Server s : servers) {
 			int ot = s.getOfflineTime();
 			List<ProxiedPlayer> plys = s.getQueue();
 			Iterator<ProxiedPlayer> it = plys.iterator();
@@ -199,7 +277,7 @@ public class Manager {
 							.replaceAll("\\{TIME\\}", timeStr)+";time="+pl.timeBetweenPlayers);
 				}
 			}
-		}
+		}*/
 	}
 	
 	/**
@@ -238,7 +316,7 @@ public class Manager {
 							.replaceAll("\\{STATUS\\}", status)
 							.replaceAll("\\{POS\\}", pos+"")
 							.replaceAll("\\{LEN\\}", len+"")
-							.replaceAll("\\{SERVER\\}", s.getName())
+							.replaceAll("\\{SERVER\\}", pl.aliases.getAlias(s.getName()))
 						));
 				} else {
 					int time = pos*pl.timeBetweenPlayers;
@@ -259,7 +337,7 @@ public class Manager {
 							.replaceAll("\\{POS\\}", pos+"")
 							.replaceAll("\\{LEN\\}", len+"")
 							.replaceAll("\\{TIME\\}", timeStr)
-							.replaceAll("\\{SERVER\\}", s.getName())
+							.replaceAll("\\{SERVER\\}", pl.aliases.getAlias(s.getName()))
 							));
 				}
 				
@@ -326,7 +404,7 @@ public class Manager {
 			if(s.getQueue().size() <= 0) continue;
 			if(s.isFull() && !nextplayer.hasPermission("ajqueue.joinfull")) continue;
 			
-			nextplayer.sendMessage(Main.formatMessage(msgs.get("status.sending-now").replaceAll("\\{SERVER\\}", name)));
+			nextplayer.sendMessage(Main.formatMessage(msgs.get("status.sending-now").replaceAll("\\{SERVER\\}", pl.aliases.getAlias(name))));
 			nextplayer.connect(s.getInfo());
 		}
 	}
@@ -348,14 +426,18 @@ public class Manager {
 			return;
 		}
 		
-		Server beforeQueue = findPlayerInQueue(p);
-		if(beforeQueue != null) {
-			if(beforeQueue.equals(server)) {
+		List<Server> beforeQueues = findPlayerInQueue(p);
+		if(beforeQueues.size() > 0) {
+			if(beforeQueues.contains(server)) {
 				p.sendMessage(msgs.getBC("errors.already-queued"));
 				return;
 			}
-			p.sendMessage(msgs.getBC("status.left-last-queue"));
-			beforeQueue.getQueue().remove(p);
+			if(!pl.config.getBoolean("allow-multiple-queues")) {
+				p.sendMessage(msgs.getBC("status.left-last-queue"));
+				for(Server ser : beforeQueues) {
+					ser.getQueue().remove(p);
+				}
+			}
 		}
 		
 		List<ProxiedPlayer> list = server.getQueue();
@@ -396,33 +478,36 @@ public class Manager {
 					msgs.get("status.now-in-empty-queue")
 					.replaceAll("\\{POS\\}", pos+"")
 					.replaceAll("\\{LEN\\}", len+"")
-					.replaceAll("\\{SERVER\\}", s)
+					.replaceAll("\\{SERVER\\}", pl.aliases.getAlias(s))
 					));
 		} else {
 			p.sendMessage(Main.formatMessage(
 					msgs.get("status.now-in-queue")
 					.replaceAll("\\{POS\\}", pos+"")
 					.replaceAll("\\{LEN\\}", len+"")
-					.replaceAll("\\{SERVER\\}", s)
+					.replaceAll("\\{SERVER\\}", pl.aliases.getAlias(s))
 					));
 		}
 		
 		BungeeUtils.sendCustomData(p, "position", pos+"");
 		BungeeUtils.sendCustomData(p, "positionof", len+"");
-		BungeeUtils.sendCustomData(p, "queuename", s);
+		BungeeUtils.sendCustomData(p, "queuename", pl.aliases.getAlias(s));
 		BungeeUtils.sendCustomData(p, "inqueue", "true");
 	}
 	
 	/**
-	 * Finds which server the player is queued for
+	 * Finds which servers the player is queued for
 	 * @param p The player to search for
-	 * @return The server the player is queued for. Null if not in a queue
+	 * @return The servers the player is queued for.
 	 */
-	public Server findPlayerInQueue(ProxiedPlayer p) {
+	public List<Server> findPlayerInQueue(ProxiedPlayer p) {
+		List<Server> srs = new ArrayList<>();
 		for(Server s : servers) {
-			if(s.getQueue().contains(p)) return s;
+			if(s.getQueue().contains(p)) {
+				srs.add(s);
+			}
 		}
-		return null;
+		return srs;
 	}
 	
 	public Server getServer(String name) {
