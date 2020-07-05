@@ -26,17 +26,15 @@
     
     <dependencies>
         <dependency>
-            <groupId>net.md-5</groupId>
-            <artifactId>bungeecord-api</artifactId>
-            <version>1.14-SNAPSHOT</version>
-            <type>jar</type>
-            <scope>provided</scope>
+            <groupId>us.ajg0702</groupId>
+            <artifactId>ajUtils</artifactId>
+            <version>1.0.0</version>
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>net.md-5</groupId>
             <artifactId>bungeecord-api</artifactId>
             <version>1.14-SNAPSHOT</version>
-            <type>javadoc</type>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -91,8 +89,8 @@
 		      <configuration>
 		        <relocations>
 		          <relocation>
-		            <pattern>us.ajg0702.premium</pattern>
-		            <shadedPattern>us.ajg0702.queue</shadedPattern>
+		            <pattern>us.ajg0702.utils</pattern>
+		            <shadedPattern>us.ajg0702.queue.utils</shadedPattern>
 		          </relocation>
 		        </relocations>
 		      </configuration>

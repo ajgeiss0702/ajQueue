@@ -3,6 +3,7 @@ package us.ajg0702.queue;
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.concurrent.Callable;
 
@@ -20,10 +21,10 @@ import net.md_5.bungee.event.EventHandler;
 import us.ajg0702.queue.commands.LeaveCommand;
 import us.ajg0702.queue.commands.ManageCommand;
 import us.ajg0702.queue.commands.MoveCommand;
-import us.ajg0702.queue.utils.BungeeConfig;
-import us.ajg0702.queue.utils.BungeeMessages;
-import us.ajg0702.queue.utils.BungeeStats;
-import us.ajg0702.queue.utils.BungeeUtils;
+import us.ajg0702.utils.bungee.BungeeConfig;
+import us.ajg0702.utils.bungee.BungeeMessages;
+import us.ajg0702.utils.bungee.BungeeStats;
+import us.ajg0702.utils.bungee.BungeeUtils;
 
 public class Main extends Plugin implements Listener {
 	
@@ -47,13 +48,16 @@ public class Main extends Plugin implements Listener {
 	public void onEnable() {
 		plugin = this;
 		
-		/*LinkedHashMap<String, String> d = new LinkedHashMap<>();
+		LinkedHashMap<String, String> d = new LinkedHashMap<>();
 		
 		
 		d.put("status.offline.base", "&cThe server you are queued for is {STATUS}. &7You are in position &f{POS}&7 of &f{LEN}&7.");
+		
 		d.put("status.offline.offline", "offline");
 		d.put("status.offline.restarting", "restarting");
 		d.put("status.offline.full", "full");
+		d.put("status.offline.restricted", "restricted");
+		
 		d.put("status.online.base", "&7You are in position &f{POS}&7 of &f{LEN}&7. Estimated time: {TIME}");
 		d.put("status.left-last-queue", "&aYou left the last queue you were in.");
 		d.put("status.now-in-queue", "&aYou are now queued for {SERVER}! &7You are in position &f{POS}&7 of &f{LEN}&7.\n&7Type &f/leavequeue&7 to leave the queue!");
@@ -65,8 +69,9 @@ public class Main extends Plugin implements Listener {
 		d.put("errors.player-only", "&cThis command can only be executed as a player!");
 		d.put("errors.already-connected", "&cYou are already connected to this server!");
 		
-		d.put("commands.leave-queue", "&aYou left the queue!");
+		d.put("commands.leave-queue", "&aYou left the queue for {SERVER}!");
 		d.put("commands.reload", "&aConfig and messages reloaded successfully!");
+		d.put("commands.joinqueue.usage", "&cUsage: /joinqueue <server>");
 		
 		d.put("noperm", "&cYou do not have permission to do this!");
 		
@@ -82,12 +87,13 @@ public class Main extends Plugin implements Listener {
 		d.put("spigot.actionbar.offline", "&7You are queued for &f{SERVER}&7. &7You are in position &f{POS}&7 of &f{LEN}&7.");
 		
 		d.put("send", "&aAdded &f{PLAYER}&a to the queue for &f{SERVER}");
+		d.put("remove", "&aRemoved &f{PLAYER} from all queues they were in.");
 		
 		d.put("placeholders.queued.none", "None");
 		d.put("placeholders.position.none", "None");
 		
-		msgs = BungeeMessages.getInstance(this, d);*/
-		msgs = BungeeMessages.getInstance(this);
+		msgs = BungeeMessages.getInstance(this, d);
+		//msgs = BungeeMessages.getInstance(this);
 		
 		config = new BungeeConfig(this);
 		checkConfig();

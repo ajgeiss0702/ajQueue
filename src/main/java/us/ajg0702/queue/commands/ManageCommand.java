@@ -9,7 +9,7 @@ import net.md_5.bungee.api.plugin.Command;
 import us.ajg0702.queue.Main;
 import us.ajg0702.queue.Manager;
 import us.ajg0702.queue.Server;
-import us.ajg0702.queue.utils.BungeeMessages;
+import us.ajg0702.utils.bungee.BungeeMessages;
 
 public class ManageCommand extends Command {
 	

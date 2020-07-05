@@ -35,8 +35,8 @@
         <configuration>
           <relocations>
             <relocation>
-              <pattern>us.ajg0702.premium</pattern>
-              <shadedPattern>us.ajg0702.queue</shadedPattern>
+              <pattern>us.ajg0702.utils</pattern>
+              <shadedPattern>us.ajg0702.queue.utils</shadedPattern>
             </relocation>
           </relocations>
         </configuration>
@@ -110,35 +110,6 @@
       <groupId>net.md-5</groupId>
       <artifactId>bungeecord-api</artifactId>
       <version>1.14-SNAPSHOT</version>
-      <scope>provided</scope>
-      <exclusions>
-        <exclusion>
-          <artifactId>bungeecord-chat</artifactId>
-          <groupId>net.md-5</groupId>
-        </exclusion>
-        <exclusion>
-          <artifactId>bungeecord-config</artifactId>
-          <groupId>net.md-5</groupId>
-        </exclusion>
-        <exclusion>
-          <artifactId>bungeecord-event</artifactId>
-          <groupId>net.md-5</groupId>
-        </exclusion>
-        <exclusion>
-          <artifactId>bungeecord-protocol</artifactId>
-          <groupId>net.md-5</groupId>
-        </exclusion>
-        <exclusion>
-          <artifactId>guava</artifactId>
-          <groupId>com.google.guava</groupId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>net.md-5</groupId>
-      <artifactId>bungeecord-api</artifactId>
-      <version>1.14-SNAPSHOT</version>
-      <type>javadoc</type>
       <scope>provided</scope>
       <exclusions>
         <exclusion>

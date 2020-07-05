@@ -9,8 +9,8 @@ import java.util.concurrent.TimeUnit;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
-import us.ajg0702.queue.utils.BungeeMessages;
-import us.ajg0702.queue.utils.BungeeUtils;
+import us.ajg0702.utils.bungee.BungeeMessages;
+import us.ajg0702.utils.bungee.BungeeUtils;
 
 public class Manager {
 	
