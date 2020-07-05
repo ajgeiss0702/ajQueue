@@ -34,8 +34,8 @@ kick-reasons:
 # If they join another queue, they will be removed from the previous one no matter what
 # This is more meant for if you have multiple lobbies if you want to let the player switch
 # between them without losing their queue position
-#  Default: true
-remove-player-on-server-switch: true
+#  Default: false
+remove-player-on-server-switch: false
 
 
 # Should we wait until the server is done loading to load the servers?
