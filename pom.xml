@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>us.ajg0702</groupId>
   <artifactId>ajQueue</artifactId>
-  <version>1.4.10</version>
+  <version>1.5.0</version>
   <name>ajQueue</name>
   
   <repositories>
@@ -38,11 +38,6 @@
             <version>1.14-SNAPSHOT</version>
             <type>javadoc</type>
             <scope>provided</scope>
-        </dependency>
-       <dependency>
-            <groupId>us.ajg0702.premium</groupId>
-            <artifactId>ajQueuePlus</artifactId>
-            <version>1.0.0</version>
         </dependency>
         <dependency>
             <groupId>org.spigotmc</groupId>
