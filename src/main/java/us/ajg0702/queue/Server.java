@@ -12,11 +12,9 @@ import us.ajg0702.utils.bungee.BungeeConfig;
 public class Server {
 	String name;
 	ServerInfo info;
-	BungeeConfig config;
 	public Server(String name, ServerInfo info) {
 		this.name = name;
 		this.info = info;
-		config = Manager.getInstance().pl.config;
 		update();
 	}
 	
@@ -75,6 +73,7 @@ public class Server {
 	}
 	long lastOffline = 0;
 	public boolean isOnline() {
+		BungeeConfig config = Manager.getInstance().pl.config;
 		if(System.currentTimeMillis()-lastOffline <= (config.getInt("wait-after-online")*1000) && online) {
 			return false;
 		}
