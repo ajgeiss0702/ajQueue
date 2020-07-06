@@ -97,6 +97,7 @@ public class Main extends Plugin implements Listener {
 		d.put("commands.leave.more-args", "&cPlease specify which queue you want to leave! &7You are in these queues: {QUEUES}");
 		d.put("commands.leave.queues-list-format", "&f{NAME}&7, ");
 		d.put("commands.leave.not-queued", "&cYou are not queued for that server! &7You are in these queues: {QUEUES}");
+		d.put("commands.leave.no-queues", "&cYou are not queued!");
 		
 		msgs = BungeeMessages.getInstance(this, d);
 		//msgs = BungeeMessages.getInstance(this);

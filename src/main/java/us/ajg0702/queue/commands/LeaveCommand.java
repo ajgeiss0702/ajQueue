@@ -29,6 +29,10 @@ public class LeaveCommand extends Command {
 		ProxiedPlayer p = (ProxiedPlayer) sender;
 		List<Server> servers = man.findPlayerInQueue(p);
 		
+		if(servers.size() == 0) {
+			p.sendMessage(msgs.getBC("commands.leave.no-queues"));
+			return;
+		}
 		
 		if(servers.size() == 1) {
 			servers.get(0).getQueue().remove(p);
