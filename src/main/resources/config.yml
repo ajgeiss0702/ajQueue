@@ -1,5 +1,5 @@
 # Dont touch this number please
-config-version: 11
+config-version: 12
 
 # The time the server will wait between sending people in the queue
 #  Default: 5
@@ -88,3 +88,10 @@ server-aliases:
 # In seconds
 #  Default: 1
 wait-after-online: 1
+
+
+# This is for helping with finding issues with the server pinged
+# This will spam the console when ehabled
+# When this enabled, if servers are offline then it will spam errors. You can ignore them.
+#  Default: false
+pinger-debug: false

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import net.md_5.bungee.api.Callback;
+import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.ServerPing;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
@@ -36,12 +37,17 @@ public class Server {
 			public void done(ServerPing result, Throwable error) {
 				online = error == null;
 				
-				/*if(error != null) {
-					ProxyServer.getInstance().getLogger().info("[ajQueue] [pinger] Status: "+online+".  Error: ");
-					error.printStackTrace();
-				} else {
-					ProxyServer.getInstance().getLogger().info("[ajQueue] [pinger] Status: "+online+".  motd: "+result.getDescriptionComponent());
-				}*/
+				
+				if(Manager.getInstance().pl.config.getBoolean("pinger-debug")) {
+					if(error != null) {
+						ProxyServer.getInstance().getLogger().info("[ajQueue] [pinger] ["+name+"] Status: "+online+".  Error: ");
+						error.printStackTrace();
+					} else {
+						ProxyServer.getInstance().getLogger().info("[ajQueue] [pinger] ["+name+"] Status: "+online+".  motd: "
+					+result.getDescriptionComponent()+"  players:"+result.getPlayers());
+					}
+				}
+				
 				
 				
 				if(lastUpdate == -1) {
