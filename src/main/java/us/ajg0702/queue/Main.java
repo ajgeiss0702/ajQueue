@@ -68,6 +68,7 @@ public class Main extends Plugin implements Listener {
 		d.put("errors.already-queued", "&cYou are already queued for that server!");
 		d.put("errors.player-only", "&cThis command can only be executed as a player!");
 		d.put("errors.already-connected", "&cYou are already connected to this server!");
+		d.put("errors.cant-join-paused", "&cYou cannot join the queue for {SERVER} because it is paused.");
 		
 		d.put("commands.leave-queue", "&aYou left the queue for {SERVER}!");
 		d.put("commands.reload", "&aConfig and messages reloaded successfully!");

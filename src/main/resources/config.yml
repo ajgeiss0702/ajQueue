@@ -95,3 +95,8 @@ wait-after-online: 1
 # When this enabled, if servers are offline then it will spam errors. You can ignore them.
 #  Default: false
 pinger-debug: false
+
+
+# When a queue is paused, should we prevent players from joining it?
+#  Default: false
+prevent-joining-paused: false

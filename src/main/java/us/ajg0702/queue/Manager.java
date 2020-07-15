@@ -442,6 +442,11 @@ public class Manager {
 			return;
 		}
 		
+		if(server.isPaused() && pl.config.getBoolean("prevent-joining-paused")) {
+			p.sendMessage(msgs.getBC("errors.cant-join-paused", "SERVER:"+server.getName()));
+			return;
+		}
+		
 		if(p.getServer().getInfo().getName().equals(s)) {
 			p.sendMessage(msgs.getBC("errors.already-connected"));
 			return;
