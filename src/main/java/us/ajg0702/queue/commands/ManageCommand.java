@@ -96,7 +96,16 @@ public class ManageCommand extends Command {
 					sender.sendMessage(msgs.getBC(""));
 					return;
 				}
-
+				Server srv = Manager.getInstance().findServer(args[1]);
+				if(srv == null) {
+					sender.sendMessage(msgs.getBC("commands.pause.no-server", "SERVER:"+args[1]));
+					return;
+				}
+				srv.setPaused(!srv.isPaused());
+				sender.sendMessage(msgs.getBC("commands.pause.success",
+						"SERVER:"+srv.getName(),
+						"PAUSED:"+msgs.get("commands.pause.paused."+srv.isPaused())
+						));
 				return;
 			}
 			

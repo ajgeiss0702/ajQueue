@@ -197,7 +197,7 @@ public class Manager {
 			}
 			
 			int len = plys.size();
-			if(!s.isOnline() || s.isFull() || !s.canAccess(p)) {
+			if(!s.isJoinable(p)) {
 				
 				String status = msgs.get("status.offline.restarting");
 				
@@ -207,6 +207,10 @@ public class Manager {
 				
 				if(!s.canAccess(p)) {
 					status = msgs.get("status.offline.restricted");
+				}
+				
+				if(s.isPaused()) {
+					status = msgs.get("status.offline.paused");
 				}
 				
 				
@@ -307,7 +311,7 @@ public class Manager {
 					continue;
 				}
 				int len = plys.size();
-				if(!s.isOnline() || s.isFull() || !s.canAccess(ply)) {
+				if(!s.isJoinable(ply)) {
 					
 					String status = msgs.get("status.offline.restarting");
 					
@@ -321,6 +325,10 @@ public class Manager {
 					
 					if(!s.canAccess(ply)) {
 						status = msgs.get("status.offline.restricted");
+					}
+					
+					if(s.isPaused()) {
+						status = msgs.get("status.offline.paused");
 					}
 					
 					ply.sendMessage(Main.formatMessage(

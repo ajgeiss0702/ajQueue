@@ -5,9 +5,6 @@ import java.io.DataInputStream;
 import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.concurrent.Callable;
-
-import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
@@ -59,6 +56,7 @@ public class Main extends Plugin implements Listener {
 		d.put("status.offline.restarting", "restarting");
 		d.put("status.offline.full", "full");
 		d.put("status.offline.restricted", "restricted");
+		d.put("status.offline.paused", "paused");
 		
 		d.put("status.online.base", "&7You are in position &f{POS}&7 of &f{LEN}&7. Estimated time: {TIME}");
 		d.put("status.left-last-queue", "&aYou left the last queue you were in.");
@@ -101,6 +99,9 @@ public class Main extends Plugin implements Listener {
 		
 		d.put("commands.pause.more-args", "&cUsage: /ajqueue pause <server>");
 		d.put("commands.pause.no-server", "&cThat server does not exist!");
+		d.put("commands.pause.success", "&aThe queue for &f{SERVER} &ais now {PAUSED}");
+		d.put("commands.pause.paused.true", "&epaused");
+		d.put("commands.pause.paused.false", "&aun-paused");
 		
 		msgs = BungeeMessages.getInstance(this, d);
 		//msgs = BungeeMessages.getInstance(this);
