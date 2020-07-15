@@ -99,6 +99,9 @@ public class Main extends Plugin implements Listener {
 		d.put("commands.leave.not-queued", "&cYou are not queued for that server! &7You are in these queues: {QUEUES}");
 		d.put("commands.leave.no-queues", "&cYou are not queued!");
 		
+		d.put("commands.pause.more-args", "&cUsage: /ajqueue pause <server>");
+		d.put("commands.pause.no-server", "&cThat server does not exist!");
+		
 		msgs = BungeeMessages.getInstance(this, d);
 		//msgs = BungeeMessages.getInstance(this);
 		
@@ -125,12 +128,7 @@ public class Main extends Plugin implements Listener {
 		
 		
 		metrics = new BungeeStats(this, 7404);
-		metrics.addCustomChart(new BungeeStats.SimplePie("premium", new Callable<String>() {
-	        @Override
-	        public String call() throws Exception {
-	            return isp+"";
-	        }
-	    }));
+		metrics.addCustomChart(new BungeeStats.SimplePie("premium", () -> isp+""));
 		
 	}
 	
@@ -232,7 +230,7 @@ public class Main extends Plugin implements Listener {
 				String data = in.readUTF();
 				String[] args = new String[1];
 				args[0] = data;
-				moveCommand.execute((CommandSender) player, args);
+				moveCommand.execute(player, args);
 				//man.addToQueue(player, data);
 				
 			}

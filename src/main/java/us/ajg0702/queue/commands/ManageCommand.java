@@ -1,8 +1,5 @@
 package us.ajg0702.queue.commands;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Command;
@@ -10,6 +7,9 @@ import us.ajg0702.queue.Main;
 import us.ajg0702.queue.Manager;
 import us.ajg0702.queue.Server;
 import us.ajg0702.utils.bungee.BungeeMessages;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class ManageCommand extends Command {
 	
@@ -78,8 +78,29 @@ public class ManageCommand extends Command {
 				sender.sendMessage(Main.formatMessage(pl.getDescription().getVersion()));
 				return;
 			}
+			if(args[0].equalsIgnoreCase("pause")) {
+				if(!sender.hasPermission("ajqueue.pause")) {
+					sender.sendMessage(msgs.getBC("noperm"));
+					return;
+				}
+				sender.sendMessage(msgs.getBC("commands.pause.more-args"));
+			}
 		}
 		if(args.length == 2) {
+			if(args[0].equalsIgnoreCase("pause")) {
+				if(!sender.hasPermission("ajqueue.pause")) {
+					sender.sendMessage(msgs.getBC("noperm"));
+					return;
+				}
+				if(!Manager.getInstance().getServerNames().contains(args[1])) {
+					sender.sendMessage(msgs.getBC(""));
+					return;
+				}
+
+				return;
+			}
+			
+			
 			
 			if(!sender.hasPermission("ajqueue.send")) {
 				sender.sendMessage(msgs.getBC("noperm"));

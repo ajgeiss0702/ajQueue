@@ -51,6 +51,18 @@ public class Manager {
 		return servers;
 	}
 	
+	/**
+	 * Returns the name of all servers
+	 * @return The names of all servers
+	 */
+	public List<String> getServerNames() {
+		List<String> names = new ArrayList<>();
+		for(Server s : servers) {
+			names.add(s.getName());
+		}
+		return names;
+	}
+	
 	
 	
 	int sendId = -1;
@@ -384,6 +396,7 @@ public class Manager {
 			String name = s.getName();
 			if(server != null && !server.equals(name)) continue;
 			if(!s.isOnline()) continue;
+			if(s.isPaused()) continue;
 			if(s.getQueue().size() <= 0) continue;
 			
 			ProxiedPlayer nextplayer = s.getQueue().get(0);

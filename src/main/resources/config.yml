@@ -91,7 +91,7 @@ wait-after-online: 1
 
 
 # This is for helping with finding issues with the server pinged
-# This will spam the console when ehabled
+# This will spam the console when enabled
 # When this enabled, if servers are offline then it will spam errors. You can ignore them.
 #  Default: false
 pinger-debug: false

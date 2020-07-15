@@ -98,7 +98,11 @@ public class Server {
 		return queue;
 	}
 	
-	
+	/**
+	 * If the player can access the server. (Bungeecord's restricted servers)
+	 * @param ply The player
+	 * @return if the player can join based on bungeecord's restricted servers system
+	 */
 	public boolean canAccess(ProxiedPlayer ply) {
 		return info.canAccess(ply);
 	}
@@ -120,5 +124,28 @@ public class Server {
 	}
 	public List<String> getWhitelistedPlayers() {
 		return whitelistedplayers;
+	}
+	
+	/**
+	 * If the server is joinable as a player
+	 * @param p The player
+	 * @return If the player can join the server
+	 */
+	public boolean isJoinable(ProxiedPlayer p) {
+		return (!whitelisted || whitelistedplayers.contains(p.getName())) &&
+				this.isOnline() &&
+				this.canAccess(p) &&
+				this.isFull() &&
+				!this.isPaused();
+				
+	}
+	
+	
+	boolean paused = false;
+	public boolean isPaused() {
+		return paused;
+	}
+	public void setPaused(boolean to) {
+		paused = to;
 	}
 }
