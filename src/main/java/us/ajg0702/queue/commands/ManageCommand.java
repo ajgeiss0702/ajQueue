@@ -84,6 +84,7 @@ public class ManageCommand extends Command {
 					return;
 				}
 				sender.sendMessage(msgs.getBC("commands.pause.more-args"));
+				return;
 			}
 		}
 		if(args.length == 2) {
@@ -130,7 +131,7 @@ public class ManageCommand extends Command {
 			}
 		}
 		
-		sender.sendMessage(Main.formatMessage("/ajqueue <reload|list|player>"));
+		sender.sendMessage(Main.formatMessage("/ajqueue <reload|list|player|pause>"));
 	}
 	
 	private List<String> getNameList() {
