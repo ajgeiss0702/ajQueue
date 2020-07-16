@@ -100,3 +100,7 @@ pinger-debug: false
 # When a queue is paused, should we prevent players from joining it?
 #  Default: false
 prevent-joining-paused: false
+
+# When a server goes back online, should we send all players in the queue instantly?
+# Default: false
+send-all-when-back-online: false

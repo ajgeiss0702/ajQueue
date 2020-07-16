@@ -407,6 +407,15 @@ public class Manager {
 			if(s.isPaused()) continue;
 			if(s.getQueue().size() <= 0) continue;
 			
+			if(pl.config.getBoolean("send-all-when-back-online") && s.justWentOnline() && s.isOnline()) {
+				for(ProxiedPlayer p : s.getQueue()) {
+					if(s.isFull() && !p.hasPermission("ajqueue.joinfull")) break;
+					p.sendMessage(msgs.getBC("status.sending-now", "SERVER:"+pl.aliases.getAlias(name)));
+					p.connect(s.getInfo());
+				}
+				return;
+			}
+			
 			ProxiedPlayer nextplayer = s.getQueue().get(0);
 			
 			if(!s.canAccess(nextplayer)) continue;

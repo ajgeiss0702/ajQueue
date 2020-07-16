@@ -88,6 +88,12 @@ public class Server {
 		}
 		return online;
 	}
+	
+	public boolean justWentOnline() {
+		BungeeConfig config = Manager.getInstance().pl.config;
+		return System.currentTimeMillis()-lastOffline <= (config.getDouble("wait-time")) && online;
+	}
+	
 	public boolean isFull() {
 		return playercount >= maxplayers;
 	}
