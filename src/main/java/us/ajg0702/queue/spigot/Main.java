@@ -114,6 +114,20 @@ public class Main extends JavaPlugin implements PluginMessageListener,Listener {
 	    	phs.put("inqueue", data);
 	    	placeholders.responseCache.put(p, phs);
 	    }
+	    if(subchannel.equals("queuedfor")) {
+	    	String playername = in.readUTF();
+	    	String queuename = in.readUTF();
+	    	
+	    	Player p = Bukkit.getPlayer(playername);
+	    	if(p == null) return;
+	    	if(!p.isOnline()) return;
+	    	
+	    	int number = in.readInt();
+	    	HashMap<String, String> phs = placeholders.responseCache.get(p);
+	    	if(phs == null) phs = new HashMap<>();
+	    	phs.put("queuedfor_"+queuename, number+"");
+	    	placeholders.responseCache.put(p, phs);
+	    }
 	}
 	
 	

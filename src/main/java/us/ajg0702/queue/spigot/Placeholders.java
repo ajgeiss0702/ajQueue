@@ -174,6 +174,9 @@ public class Placeholders extends PlaceholderExpansion {
     		if(identifier.equalsIgnoreCase("inqueue")) {
     			return "false";
     		}
+    		if(identifier.matches("queuedfor_*.*")) {
+        		return "0";
+        	}
     	}
     	
 
@@ -195,6 +198,10 @@ public class Placeholders extends PlaceholderExpansion {
     	}
     	if(identifier.equalsIgnoreCase("inqueue")) {
     		plugin.sendMessage(player, "inqueue", "");
+    		return null;
+    	}
+    	if(identifier.matches("queuedfor_*.*")) {
+    		plugin.sendMessage(player, "queuedfor", identifier.split("_")[1]);
     		return null;
     	}
         
