@@ -262,7 +262,10 @@ public class Main extends Plugin implements Listener {
 				BungeeUtils.sendCustomData(player, "inqueue", (server != null)+"");
 			}
 			if(subchannel.equals("queuedfor")) {
-				BungeeUtils.sendCustomData(player, "queuedfor", player.getName(), in.readUTF());
+				String srv = in.readUTF();
+				Server server = man.findServer(srv);
+				if(server == null) return;
+				BungeeUtils.sendCustomData(player, "queuedfor", player.getName(), srv, server.getQueue().size()+"");
 			}
 			
 		} catch (IOException e1) {

@@ -122,7 +122,7 @@ public class Main extends JavaPlugin implements PluginMessageListener,Listener {
 	    	if(p == null) return;
 	    	if(!p.isOnline()) return;
 	    	
-	    	int number = in.readInt();
+	    	int number = Integer.valueOf(in.readUTF());
 	    	HashMap<String, String> phs = placeholders.responseCache.get(p);
 	    	if(phs == null) phs = new HashMap<>();
 	    	phs.put("queuedfor_"+queuename, number+"");
