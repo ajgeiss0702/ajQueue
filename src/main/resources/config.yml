@@ -1,5 +1,5 @@
 # Dont touch this number please
-config-version: 12
+config-version: 13
 
 # The time the server will wait between sending people in the queue
 #  Default: 5
