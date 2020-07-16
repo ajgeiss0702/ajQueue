@@ -94,13 +94,13 @@ public class Manager {
 			public void run() {
 				sendPlayers();
 			}
-		}, 2, pl.timeBetweenPlayers, TimeUnit.SECONDS).getId();
+		}, 2, Math.round(pl.timeBetweenPlayers*1000), TimeUnit.MILLISECONDS).getId();
 		
 		updateId = pl.getProxy().getScheduler().schedule(pl, new Runnable() {
 			public void run() {
 				updateServers();
 			}
-		}, 0, Math.max(pl.timeBetweenPlayers, 2), TimeUnit.SECONDS).getId();
+		}, 0, Math.max(Math.round(pl.timeBetweenPlayers), 2), TimeUnit.SECONDS).getId();
 		//pl.getLogger().info("Time: "+pl.timeBetweenPlayers);
 		
 		messagerId = pl.getProxy().getScheduler().schedule(pl, new Runnable() {
@@ -220,7 +220,7 @@ public class Manager {
 						.replaceAll("\\{SERVER\\}", pl.aliases.getAlias(s.getName()))
 						.replaceAll("\\{STATUS\\}", status)+";time="+pl.timeBetweenPlayers);
 			} else {
-				int time = pos*pl.timeBetweenPlayers;
+				int time = (int) Math.round(pos*pl.timeBetweenPlayers);
 				int min = (int) Math.floor((time) / (60));
 				int sec = (int) Math.floor((time % (60)));
 				String timeStr;
@@ -339,7 +339,7 @@ public class Manager {
 							.replaceAll("\\{SERVER\\}", pl.aliases.getAlias(s.getName()))
 						));
 				} else {
-					int time = pos*pl.timeBetweenPlayers;
+					int time = (int) Math.round(pos*pl.timeBetweenPlayers);
 					int min = (int) Math.floor((time) / (60));
 					int sec = (int) Math.floor((time % (60)));
 					String timeStr;

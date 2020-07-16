@@ -27,7 +27,7 @@ public class Main extends Plugin implements Listener {
 	
 	static Main plugin = null;
 	
-	public int timeBetweenPlayers = 5;
+	public double timeBetweenPlayers = 5.0;
 	
 	BungeeStats metrics;
 	
@@ -122,7 +122,7 @@ public class Main extends Plugin implements Listener {
 		getProxy().registerChannel("ajqueue:tospigot");
 		getProxy().registerChannel("ajqueue:tobungee");
 		
-		timeBetweenPlayers = config.getInt("wait-time");
+		timeBetweenPlayers = config.getDouble("wait-time");
 		
 		isp = Logic.isp;
 		
