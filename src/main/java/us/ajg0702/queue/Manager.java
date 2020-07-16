@@ -443,7 +443,7 @@ public class Manager {
 		}
 		
 		if(server.isPaused() && pl.config.getBoolean("prevent-joining-paused")) {
-			p.sendMessage(msgs.getBC("errors.cant-join-paused", "SERVER:"+server.getName()));
+			p.sendMessage(msgs.getBC("errors.cant-join-paused", "SERVER:"+pl.aliases.getAlias(server.getName())));
 			return;
 		}
 		
