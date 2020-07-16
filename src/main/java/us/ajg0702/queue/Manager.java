@@ -442,7 +442,7 @@ public class Manager {
 			return;
 		}
 		
-		if(p.hasPermission("ajqueue.denyjoinfron."+p.getServer().getInfo().getName())) {
+		if(p.hasPermission("ajqueue.denyjoinfrom."+p.getServer().getInfo().getName())) {
 			p.sendMessage(msgs.getBC("errors.deny-joining-from-server"));
 			return;
 		}
