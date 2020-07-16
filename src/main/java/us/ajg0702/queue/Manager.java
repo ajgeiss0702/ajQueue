@@ -442,6 +442,11 @@ public class Manager {
 			return;
 		}
 		
+		if(p.hasPermission("ajqueue.denyjoinfron."+p.getServer().getInfo().getName())) {
+			p.sendMessage(msgs.getBC("errors.deny-joining-from-server"));
+			return;
+		}
+		
 		if(server.isPaused() && pl.config.getBoolean("prevent-joining-paused")) {
 			p.sendMessage(msgs.getBC("errors.cant-join-paused", "SERVER:"+pl.aliases.getAlias(server.getName())));
 			return;
