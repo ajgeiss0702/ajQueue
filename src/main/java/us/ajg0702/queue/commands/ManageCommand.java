@@ -34,7 +34,7 @@ public class ManageCommand extends Command {
 				}
 				msgs.reload();
 				pl.getConfig().reload();
-				pl.timeBetweenPlayers = pl.getConfig().getInt("wait-time");
+				pl.timeBetweenPlayers = pl.getConfig().getDouble("wait-time");
 				Manager.getInstance().reloadIntervals();
 				Manager.getInstance().reloadServers();
 				pl.checkConfig();
