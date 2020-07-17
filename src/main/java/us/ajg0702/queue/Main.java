@@ -265,7 +265,7 @@ public class Main extends Plugin implements Listener {
 				String srv = in.readUTF();
 				Server server = man.findServer(srv);
 				if(server == null) return;
-				BungeeUtils.sendCustomData(player, "queuedfor", player.getName(), srv, server.getQueue().size()+"");
+				BungeeUtils.sendCustomData(player, "queuedfor", srv, server.getQueue().size()+"");
 			}
 			
 		} catch (IOException e1) {
