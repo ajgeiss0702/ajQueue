@@ -1,5 +1,5 @@
 # Dont touch this number please
-config-version: 13
+config-version: 14
 
 # The time the server will wait between sending people in the queue
 #  Default: 5
@@ -104,3 +104,9 @@ prevent-joining-paused: false
 # When a server goes back online, should we send all players in the queue instantly?
 # Default: false
 send-all-when-back-online: false
+
+# Require a permission for players to be able to join a queue from a server
+# If enabled, players will need the permission ajqueue.joinfrom.<server> to join queues.
+# Replace <server> with the name of the server
+#  Default: false
+joinfrom-server-permission: false

@@ -459,7 +459,7 @@ public class Manager {
 			return;
 		}
 		
-		if(p.hasPermission("ajqueue.denyjoinfrom."+p.getServer().getInfo().getName())) {
+		if(pl.config.getBoolean("joinfrom-server-permission") && !p.hasPermission("ajqueue.joinfrom."+p.getServer().getInfo().getName())) {
 			p.sendMessage(msgs.getBC("errors.deny-joining-from-server"));
 			return;
 		}
