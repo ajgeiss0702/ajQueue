@@ -500,12 +500,12 @@ public class Manager {
 			return;
 		}
 		if(pl.isp) {
-			us.ajg0702.queue.Logic.priorityLogic(list, s, p);
+			us.ajg0702.queue.Logic.priorityLogic(server.getQueue(), s, p);
 		} else {
-			if((p.hasPermission("ajqueue.priority") || p.hasPermission("ajqueue.serverpriority."+server)) && list.size() > 0) {
+			if((p.hasPermission("ajqueue.priority") || p.hasPermission("ajqueue.serverpriority."+s)) && list.size() > 0) {
 				int i = 0;
 				for(ProxiedPlayer ply : list) {
-					if(!(ply.hasPermission("ajqueue.priority") || ply.hasPermission("ajqueue.serverpriority."+server))) {
+					if(!(ply.hasPermission("ajqueue.priority") || ply.hasPermission("ajqueue.serverpriority."+s))) {
 						list.add(i, p);
 						break;
 					}
