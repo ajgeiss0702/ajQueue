@@ -141,9 +141,16 @@ public class Server {
 		return (!whitelisted || whitelistedplayers.contains(p.getName())) &&
 				this.isOnline() &&
 				this.canAccess(p) &&
-				this.isFull() &&
+				!this.isFull() &&
 				!this.isPaused();
 				
+	}
+	public String getJoinableDebug(ProxiedPlayer p) {
+		return (!whitelisted || whitelistedplayers.contains(p.getName())) + "\n" +
+				this.isOnline() +"\n"+
+				this.canAccess(p) +"\n"+
+				!this.isFull() +"\n"+
+				!this.isPaused();
 	}
 	
 	

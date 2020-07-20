@@ -70,6 +70,11 @@ public class ManageCommand extends Command {
 				sender.sendMessage(Main.formatMessage(pl.isp()+""));
 				return;
 			}
+			if(args[0].equalsIgnoreCase("statusdebug")) {
+				Server s = Manager.getInstance().getSingleServer((ProxiedPlayer) sender);
+				if(s == null) return;
+				sender.sendMessage(Main.formatMessage(s.getJoinableDebug((ProxiedPlayer) sender)));
+			}
 			if(args[0].equalsIgnoreCase("player")) {
 				sender.sendMessage(Main.formatMessage("/ajQueue <player> <server>"));
 				return;

@@ -199,7 +199,11 @@ public class Manager {
 			int len = plys.size();
 			if(!s.isJoinable(p)) {
 				
-				String status = msgs.get("status.offline.restarting");
+				String status = "unknown";
+				
+				if(!s.isOnline()) {
+					status = msgs.get("status.offline.restarting");
+				}
 				
 				if(s.getOfflineTime() > pl.config.getInt("offline-time")) {
 					status = msgs.get("status.offline.offline");
@@ -207,6 +211,10 @@ public class Manager {
 				
 				if(!s.canAccess(p)) {
 					status = msgs.get("status.offline.restricted");
+				}
+				
+				if(s.isFull()) {
+					status = msgs.get("status.offline.full");
 				}
 				
 				if(s.isPaused()) {
