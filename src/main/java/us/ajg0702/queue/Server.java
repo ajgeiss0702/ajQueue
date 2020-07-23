@@ -146,11 +146,11 @@ public class Server {
 				
 	}
 	public String getJoinableDebug(ProxiedPlayer p) {
-		return (!whitelisted || whitelistedplayers.contains(p.getName())) + "\n" +
-				this.isOnline() +"\n"+
-				this.canAccess(p) +"\n"+
-				!this.isFull() +"\n"+
-				!this.isPaused();
+		return "whitelist: "+(!whitelisted || whitelistedplayers.contains(p.getName())) + "\n" +
+				"online: "+this.isOnline() +"\n"+
+				"canaccess: "+this.canAccess(p) +"\n"+
+				"full: "+ !this.isFull() +"\n"+
+				"paused: "+!this.isPaused();
 	}
 	
 	
