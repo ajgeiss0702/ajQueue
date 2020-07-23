@@ -203,13 +203,6 @@ public class Manager {
 				
 				String status = "unknown";
 				
-				if(!s.isOnline()) {
-					status = msgs.get("status.offline.restarting");
-				}
-				
-				if(s.getOfflineTime() > pl.config.getInt("offline-time")) {
-					status = msgs.get("status.offline.offline");
-				}
 				
 				if(!s.canAccess(p)) {
 					status = msgs.get("status.offline.restricted");
@@ -221,6 +214,14 @@ public class Manager {
 				
 				if(s.isPaused()) {
 					status = msgs.get("status.offline.paused");
+				}
+				
+				if(!s.isOnline()) {
+					status = msgs.get("status.offline.restarting");
+				}
+				
+				if(s.getOfflineTime() > pl.config.getInt("offline-time")) {
+					status = msgs.get("status.offline.offline");
 				}
 				
 				
