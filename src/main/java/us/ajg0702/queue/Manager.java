@@ -7,6 +7,8 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import net.md_5.bungee.api.ProxyServer;
+import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import us.ajg0702.utils.bungee.BungeeMessages;
@@ -522,12 +524,10 @@ public class Manager {
 		int len = list.size();
 		if(list.size() <= 1 && server.isOnline() && server.canAccess(p) && !server.isFull() && !server.isWhitelisted()) {
 			sendPlayers(s);
-			p.sendMessage(Main.formatMessage(
-					msgs.get("status.now-in-empty-queue")
-					.replaceAll("\\{POS\\}", pos+"")
-					.replaceAll("\\{LEN\\}", len+"")
-					.replaceAll("\\{SERVER\\}", pl.aliases.getAlias(s))
-					));
+			BaseComponent[] m = msgs.getBC("status.now-in-empty-queue", "POS:"+pos, "LEN:"+len, "SERVER:"+pl.aliases.getAlias(s));
+			if(TextComponent.toPlainText(m).length() > 0) {
+				p.sendMessage(m);
+			}
 		} else {
 			p.sendMessage(Main.formatMessage(
 					msgs.get("status.now-in-queue")
