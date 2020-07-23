@@ -16,13 +16,17 @@ public class Commands implements CommandExecutor {
 
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-		if(!(sender instanceof Player)) return true;
-		Player player = (Player) sender;
+		if(!(sender instanceof Player) && !(args.length > 1)) return true;
+		Player player = null;
+		if(sender instanceof Player) {
+			player = (Player) sender;
+		}
 		if(args.length < 1) return false;
 		
 		String srvname = args[0];
 		
 		if(args.length > 1) {
+			pl.getLogger().info("sending player to queue");
 			if(!sender.hasPermission("ajqueue.send")) {
 				sender.sendMessage(color("&cYou do not have permission to do this!"));
 				return true;
