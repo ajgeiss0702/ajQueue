@@ -1,6 +1,8 @@
 package us.ajg0702.queue;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
 import net.md_5.bungee.api.Callback;
@@ -10,20 +12,31 @@ import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import us.ajg0702.utils.bungee.BungeeConfig;
 
-public class Server {
+public class QueueServer {
+	
 	String name;
-	ServerInfo info;
-	public Server(String name, ServerInfo info) {
+	List<ServerInfo> servers;
+	
+	public QueueServer(String name, ServerInfo info) {
 		this.name = name;
-		this.info = info;
+		this.servers = Arrays.asList(info);
 		update();
+	}
+	public QueueServer(String name, List<ServerInfo> infos) {
+		this.name = name;
+		this.servers = infos;
+		update();
+	}
+	
+	public void setInfos(List<ServerInfo> infos) {
+		servers = infos;
 	}
 	
 	public String getName() {
 		return name;
 	}
-	public ServerInfo getInfo() {
-		return info;
+	public List<ServerInfo> getInfos() {
+		return servers;
 	}
 	
 	int offlineTime = 0;
@@ -31,47 +44,65 @@ public class Server {
 	int playercount = 0;
 	int maxplayers = 0;
 	long lastUpdate = -1;
+	HashMap<ServerInfo, ServerPing> pings = new HashMap<>();
 	public void update() {
-		info.ping(new Callback<ServerPing>() {
-			@Override
-			public void done(ServerPing result, Throwable error) {
-				online = error == null;
-				
-				
-				if(Manager.getInstance().pl.config.getBoolean("pinger-debug")) {
-					if(error != null) {
-						ProxyServer.getInstance().getLogger().info("[ajQueue] [pinger] ["+name+"] Status: "+online+".  Error: ");
-						error.printStackTrace();
-					} else {
-						ProxyServer.getInstance().getLogger().info("[ajQueue] [pinger] ["+name+"] Status: "+online+".  motd: "
-					+result.getDescriptionComponent()+"  players:"+result.getPlayers());
+		pings = new HashMap<>();
+		for(final ServerInfo info : getInfos()) {
+			info.ping(new Callback<ServerPing>() {
+				@Override
+				public void done(ServerPing result, Throwable error) {
+					boolean online = error == null;
+					
+					
+					if(Manager.getInstance().pl.config.getBoolean("pinger-debug")) {
+						if(error != null) {
+							ProxyServer.getInstance().getLogger().info("[ajQueue] [pinger] ["+name+"] Status: "+online+".  Error: ");
+							error.printStackTrace();
+						} else {
+							ProxyServer.getInstance().getLogger().info("[ajQueue] [pinger] ["+name+"] Status: "+online+".  motd: "
+						+result.getDescriptionComponent()+"  players:"+result.getPlayers());
+						}
 					}
+					
+					
+					pings.put(info, online ? result : null);
+					if(pings.size() == servers.size()) allDonePing();
 				}
-				
-				
-				
-				if(lastUpdate == -1) {
-					lastUpdate = System.currentTimeMillis();
-					offlineTime = 0;
-				} else {
-					int timesincelast = Math.round((System.currentTimeMillis() - lastUpdate)/1000);
-					lastUpdate = System.currentTimeMillis();
-					if(!online) {
-						offlineTime += timesincelast;
-					} else {
-						offlineTime = 0;
-					}
-				}
-				if(!online) {
-					playercount = 0;
-					maxplayers = 0;
-					return;
-				}
-				
-				playercount = result.getPlayers().getOnline();
-				maxplayers = result.getPlayers().getMax();
+			});
+		}
+	}
+	
+	public HashMap<ServerInfo, ServerPing> getLastPings() {
+		return pings;
+	}
+	
+	private void allDonePing() {
+		int onlineCount = 0;
+		playercount = 0;
+		maxplayers = 0;
+		for(ServerInfo info : pings.keySet()) {
+			ServerPing ping = pings.get(info);
+			if(ping == null) {
+				continue;
 			}
-		});
+			onlineCount++;
+			playercount += ping.getPlayers().getOnline();
+			maxplayers += ping.getPlayers().getMax();
+		}
+		online = onlineCount > 0;
+		
+		if(lastUpdate == -1) {
+			lastUpdate = System.currentTimeMillis();
+			offlineTime = 0;
+		} else {
+			int timesincelast = Math.round((System.currentTimeMillis() - lastUpdate)/1000);
+			lastUpdate = System.currentTimeMillis();
+			if(!online) {
+				offlineTime += timesincelast;
+			} else {
+				offlineTime = 0;
+			}
+		}
 	}
 	
 	public int getOfflineTime() {
@@ -110,7 +141,14 @@ public class Server {
 	 * @return if the player can join based on bungeecord's restricted servers system
 	 */
 	public boolean canAccess(ProxiedPlayer ply) {
-		return info.canAccess(ply);
+		boolean ca = false;
+		for(ServerInfo si : servers) {
+			if(si.canAccess(ply)) {
+				ca = true;
+				break;
+			}
+		}
+		return ca;
 	}
 	
 	
