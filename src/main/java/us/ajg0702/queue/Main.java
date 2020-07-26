@@ -163,11 +163,11 @@ public class Main extends Plugin implements Listener {
 	@EventHandler
 	public void moveServer(ServerSwitchEvent e) {
 		ProxiedPlayer p = e.getPlayer();
-		List<Server> alreadyqueued = man.findPlayerInQueue(p);
-		for(Server ser : alreadyqueued) {
+		List<QueueServer> alreadyqueued = man.findPlayerInQueue(p);
+		for(QueueServer ser : alreadyqueued) {
 			List<ProxiedPlayer> queue = ser.getQueue();
 			int pos = queue.indexOf(p);
-			if((pos == 0 && p.getServer().getInfo().equals(ser.getInfo())) || config.getBoolean("remove-player-on-server-switch")) {
+			if((pos == 0 && ser.getInfos().contains(p.getServer().getInfo())) || config.getBoolean("remove-player-on-server-switch")) {
 				queue.remove(p);
 			}
 		}
@@ -189,8 +189,8 @@ public class Main extends Plugin implements Listener {
 	public void onLeave(PlayerDisconnectEvent e) {
 		ProxiedPlayer p = e.getPlayer();
 		if(p.hasPermission("ajqueue.stay-queued-on-leave")) return;
-		List<Server> servers = man.findPlayerInQueue(p);
-		for(Server server : servers) {
+		List<QueueServer> servers = man.findPlayerInQueue(p);
+		for(QueueServer server : servers) {
 			server.getQueue().remove(p);
 		}
 	}
@@ -198,9 +198,9 @@ public class Main extends Plugin implements Listener {
 	@EventHandler
 	public void onFailedMove(ServerKickEvent e) {
 		ProxiedPlayer p = e.getPlayer();
-		List<Server> queuedServers = man.findPlayerInQueue(p);
-		for(Server server : queuedServers) { 
-			if(!(e.getKickedFrom().equals(server.getInfo()))) continue;
+		List<QueueServer> queuedServers = man.findPlayerInQueue(p);
+		for(QueueServer server : queuedServers) { 
+			if(!(server.getInfos().contains(e.getKickedFrom()))) continue;
 			if(server.getQueue().indexOf(p) != 0) continue;
 			List<String> kickreasons = config.getStringList("kick-reasons");
 			boolean hasReason = false;
@@ -243,7 +243,7 @@ public class Main extends Plugin implements Listener {
 				BungeeUtils.sendCustomData(player, "queuename", aliases.getAlias(man.getQueuedName(player)));
 			}
 			if(subchannel.equals("position")) {
-				Server server = man.getSingleServer(player);
+				QueueServer server = man.getSingleServer(player);
 				String pos = msgs.get("placeholders.position.none");
 				if(server != null) {
 					pos = server.getQueue().indexOf(player)+1+"";
@@ -251,7 +251,7 @@ public class Main extends Plugin implements Listener {
 				BungeeUtils.sendCustomData(player, "position", pos);
 			}
 			if(subchannel.equals("positionof")) {
-				Server server = man.getSingleServer(player);
+				QueueServer server = man.getSingleServer(player);
 				String pos = msgs.get("placeholders.position.none");
 				if(server != null) {
 					pos = server.getQueue().size()+"";
@@ -259,12 +259,12 @@ public class Main extends Plugin implements Listener {
 				BungeeUtils.sendCustomData(player, "positionof", pos);
 			}
 			if(subchannel.equals("inqueue")) {
-				Server server = man.getSingleServer(player);
+				QueueServer server = man.getSingleServer(player);
 				BungeeUtils.sendCustomData(player, "inqueue", (server != null)+"");
 			}
 			if(subchannel.equals("queuedfor")) {
 				String srv = in.readUTF();
-				Server server = man.findServer(srv);
+				QueueServer server = man.findServer(srv);
 				if(server == null) return;
 				BungeeUtils.sendCustomData(player, "queuedfor", srv, server.getQueue().size()+"");
 			}

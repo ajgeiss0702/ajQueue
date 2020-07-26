@@ -5,7 +5,7 @@ import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Command;
 import us.ajg0702.queue.Main;
 import us.ajg0702.queue.Manager;
-import us.ajg0702.queue.Server;
+import us.ajg0702.queue.QueueServer;
 import us.ajg0702.utils.bungee.BungeeMessages;
 
 import java.util.ArrayList;
@@ -44,7 +44,7 @@ public class ManageCommand extends Command {
 			}
 			if(args[0].equalsIgnoreCase("list")) {
 				int total = 0;
-				for(Server server : Manager.getInstance().getServers()) {
+				for(QueueServer server : Manager.getInstance().getServers()) {
 					
 					String msg = msgs.get("list.format").replaceAll("\\{SERVER\\}", server.getName());
 					String playerlist = "";
@@ -71,7 +71,7 @@ public class ManageCommand extends Command {
 				return;
 			}
 			if(args[0].equalsIgnoreCase("statusdebug")) {
-				Server s = Manager.getInstance().getSingleServer((ProxiedPlayer) sender);
+				QueueServer s = Manager.getInstance().getSingleServer((ProxiedPlayer) sender);
 				if(s == null) return;
 				sender.sendMessage(Main.formatMessage(s.getJoinableDebug((ProxiedPlayer) sender)));
 			}
@@ -102,7 +102,7 @@ public class ManageCommand extends Command {
 					sender.sendMessage(msgs.getBC(""));
 					return;
 				}
-				Server srv = Manager.getInstance().findServer(args[1]);
+				QueueServer srv = Manager.getInstance().findServer(args[1]);
 				if(srv == null) {
 					sender.sendMessage(msgs.getBC("commands.pause.no-server", "SERVER:"+args[1]));
 					return;

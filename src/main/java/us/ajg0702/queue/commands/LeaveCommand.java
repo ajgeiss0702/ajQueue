@@ -7,7 +7,7 @@ import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Command;
 import us.ajg0702.queue.Main;
 import us.ajg0702.queue.Manager;
-import us.ajg0702.queue.Server;
+import us.ajg0702.queue.QueueServer;
 import us.ajg0702.utils.bungee.BungeeMessages;
 
 public class LeaveCommand extends Command {
@@ -27,7 +27,7 @@ public class LeaveCommand extends Command {
 		}
 		Manager man = Manager.getInstance();
 		ProxiedPlayer p = (ProxiedPlayer) sender;
-		List<Server> servers = man.findPlayerInQueue(p);
+		List<QueueServer> servers = man.findPlayerInQueue(p);
 		
 		if(servers.size() == 0) {
 			p.sendMessage(msgs.getBC("commands.leave.no-queues"));
@@ -47,7 +47,7 @@ public class LeaveCommand extends Command {
 		}
 		
 		String leaving = args[0];
-		Server leavingsrv = man.getServer(leaving);
+		QueueServer leavingsrv = man.getServer(leaving);
 		if(leavingsrv == null) {
 			p.sendMessage(msgs.getBC("commands.leave.not-queued", "QUEUES:"+getQueueList(servers)));
 			return;
@@ -62,9 +62,9 @@ public class LeaveCommand extends Command {
 		
 	}
 	
-	private String getQueueList(List<Server> servers) {
+	private String getQueueList(List<QueueServer> servers) {
 		String queueList = "";
-		for(Server server : servers) {
+		for(QueueServer server : servers) {
 			queueList += msgs.get("commands.leave.queues-list-format").replaceAll("\\{NAME\\}", server.getName());
 		}
 		if(queueList.length() > 2) {

@@ -1,12 +1,14 @@
 package us.ajg0702.queue;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import net.md_5.bungee.api.ProxyServer;
+import net.md_5.bungee.api.ServerPing;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.config.ServerInfo;
@@ -49,7 +51,7 @@ public class Manager {
 	/*
 	 * Returns all servers
 	 */
-	public List<Server> getServers() {
+	public List<QueueServer> getServers() {
 		return servers;
 	}
 	
@@ -59,7 +61,7 @@ public class Manager {
 	 */
 	public List<String> getServerNames() {
 		List<String> names = new ArrayList<>();
-		for(Server s : servers) {
+		for(QueueServer s : servers) {
 			names.add(s.getName());
 		}
 		return names;
@@ -132,11 +134,11 @@ public class Manager {
 	 * @return The name of the server, the placeholder none message if not queued
 	 */
 	public String getQueuedName(ProxiedPlayer p) {
-		List<Server> queued = findPlayerInQueue(p);
+		List<QueueServer> queued = findPlayerInQueue(p);
 		if(queued.size() <= 0) {
 			return msgs.get("placeholders.queued.none");
 		}
-		Server selected = queued.get(0);
+		QueueServer selected = queued.get(0);
 		
 		if(pl.config.getString("multi-server-queue-pick").equalsIgnoreCase("last")) {
 			selected = queued.get(queued.size()-1);
@@ -150,12 +152,12 @@ public class Manager {
 	 * @param p The player
 	 * @return The server that was chosen that the player is queued for.
 	 */
-	public Server getSingleServer(ProxiedPlayer p) {
-		List<Server> queued = findPlayerInQueue(p);
+	public QueueServer getSingleServer(ProxiedPlayer p) {
+		List<QueueServer> queued = findPlayerInQueue(p);
 		if(queued.size() <= 0) {
 			return null;
 		}
-		Server selected = queued.get(0);
+		QueueServer selected = queued.get(0);
 		
 		if(pl.config.getString("multi-server-queue-pick").equalsIgnoreCase("last")) {
 			selected = queued.get(queued.size()-1);
@@ -166,17 +168,52 @@ public class Manager {
 	
 	
 	
-	List<Server> servers = new ArrayList<>();
+	List<QueueServer> servers = new ArrayList<>();
 	/**
 	 * Checks servers that are in bungeecord and adds any it doesnt
 	 * know about.
+	 * 
+	 * Also creates/edits server groups
 	 */
 	public void reloadServers() {
 		Map<String, ServerInfo> svs = ProxyServer.getInstance().getServers();
 		for(String name : svs.keySet()) {
 			if(findServer(name) != null) continue;
 			ServerInfo info = svs.get(name);
-			servers.add(new Server(name, info));
+			servers.add(new QueueServer(name, info));
+		}
+		
+		List<String> groupsraw = pl.config.getStringList("server-groups");
+		for(String groupraw : groupsraw) {
+			if(groupraw.isEmpty()) {
+				pl.getLogger().warning("Empty group string! If you dont want server groups, set server-groups like this: server-groups: []");
+				continue;
+			}
+			
+			String groupname = groupraw.split(":")[0];
+			String[] serversraw = groupraw.split(":")[1].split(",");
+			
+			if(getServer(groupname) != null) {
+				pl.getLogger().warning("The name of a group ('"+groupname+"') cannot be the same as the name of a server!");
+				continue;
+			}
+			
+			List<ServerInfo> servers = new ArrayList<>();
+			
+			for(String serverraw : serversraw) {
+				ServerInfo si = svs.get(serverraw);
+				if(si == null) {
+					pl.getLogger().warning("Could not find server named '"+serverraw+"' in servergroup '"+groupname+"'!");
+					continue;
+				}
+			}
+			
+			if(servers.size() == 0) {
+				pl.getLogger().warning("Server group '"+groupname+"' has no servers! Ignoring it.");
+				continue;
+			}
+			
+			this.servers.add(new QueueServer(groupname, servers));
 		}
 	}
 	
@@ -188,7 +225,7 @@ public class Manager {
 		if(!pl.getConfig().getBoolean("send-actionbar")) return;
 		
 		for(ProxiedPlayer p : ProxyServer.getInstance().getPlayers()) {
-			Server s = this.getSingleServer(p);
+			QueueServer s = this.getSingleServer(p);
 			
 			if(s == null) continue;
 			List<ProxiedPlayer> plys = s.getQueue();
@@ -312,7 +349,7 @@ public class Manager {
 	 * along with their time remaining
 	 */
 	public void sendMessages() {
-		for(Server s : servers) {
+		for(QueueServer s : servers) {
 			int ot = s.getOfflineTime();
 			List<ProxiedPlayer> plys = s.getQueue();
 			for(ProxiedPlayer ply : plys) {
@@ -381,8 +418,8 @@ public class Manager {
 	 * @param name Name of the server
 	 * @return The server if it exists (otherwise null)
 	 */
-	public Server findServer(String name) {
-		for(Server server : servers) {
+	public QueueServer findServer(String name) {
+		for(QueueServer server : servers) {
 			if(server.getName().equals(name)) {
 				return server;
 			}
@@ -394,7 +431,7 @@ public class Manager {
 	 * Updates info about servers.
 	 */
 	public void updateServers() {
-		Iterator<Server> it = servers.iterator();
+		Iterator<QueueServer> it = servers.iterator();
 		while(it.hasNext()) {
 			it.next().update();
 		}
@@ -411,7 +448,7 @@ public class Manager {
 	 * @param server The server to send the first player in the queue. null for all servers.
 	 */
 	public void sendPlayers(String server) {
-		for(Server s : servers) {
+		for(QueueServer s : servers) {
 			String name = s.getName();
 			if(server != null && !server.equals(name)) continue;
 			if(!s.isOnline()) continue;
@@ -419,10 +456,36 @@ public class Manager {
 			if(s.getQueue().size() <= 0) continue;
 			
 			if(pl.config.getBoolean("send-all-when-back-online") && s.justWentOnline() && s.isOnline()) {
+				
+				
 				for(ProxiedPlayer p : s.getQueue()) {
-					if(s.isFull() && !p.hasPermission("ajqueue.joinfull")) break;
+					
+					if(s.isFull() && !p.hasPermission("ajqueue.joinfull")) continue;
+					
+					HashMap<ServerInfo, ServerPing> serverInfos = s.getLastPings();
+					ServerInfo selected = null;
+					int selectednum = 0;
+					for(ServerInfo si : serverInfos.keySet()) {
+						ServerPing sp = serverInfos.get(si);
+						int online = sp.getPlayers().getOnline();
+						if(selected == null) {
+							selected = si;
+							selectednum = online;
+							continue;
+						}
+						if(selectednum > online && findServer(si.getName()).isJoinable(p)) {
+							selected = si;
+							selectednum = online;
+							continue;
+						}
+					}
+					if(selected == null) {
+						pl.getLogger().severe("Could not find ideal server for server/group '"+s.getName()+"'!");
+						continue;
+					}
+					
 					p.sendMessage(msgs.getBC("status.sending-now", "SERVER:"+pl.aliases.getAlias(name)));
-					p.connect(s.getInfo());
+					p.connect(selected);
 				}
 				return;
 			}
@@ -446,7 +509,28 @@ public class Manager {
 			if(s.isFull() && !nextplayer.hasPermission("ajqueue.joinfull")) continue;
 			
 			nextplayer.sendMessage(Main.formatMessage(msgs.get("status.sending-now").replaceAll("\\{SERVER\\}", pl.aliases.getAlias(name))));
-			nextplayer.connect(s.getInfo());
+			HashMap<ServerInfo, ServerPing> serverInfos = s.getLastPings();
+			ServerInfo selected = null;
+			int selectednum = 0;
+			for(ServerInfo si : serverInfos.keySet()) {
+				ServerPing sp = serverInfos.get(si);
+				int online = sp.getPlayers().getOnline();
+				if(selected == null) {
+					selected = si;
+					selectednum = online;
+					continue;
+				}
+				if(selectednum > online && findServer(si.getName()).isJoinable(nextplayer)) {
+					selected = si;
+					selectednum = online;
+					continue;
+				}
+			}
+			if(selected == null) {
+				pl.getLogger().severe("Could not find ideal server for server/group '"+s.getName()+"'!");
+				continue;
+			}
+			nextplayer.connect(selected);
 		}
 	}
 	
@@ -456,7 +540,7 @@ public class Manager {
 	 * @param s The name of the server
 	 */
 	public void addToQueue(ProxiedPlayer p, String s) {
-		Server server = findServer(s);
+		QueueServer server = findServer(s);
 		if(server == null) {
 			p.sendMessage(msgs.getBC("errors.server-not-exist"));
 			return;
@@ -477,7 +561,7 @@ public class Manager {
 			return;
 		}
 		
-		List<Server> beforeQueues = findPlayerInQueue(p);
+		List<QueueServer> beforeQueues = findPlayerInQueue(p);
 		if(beforeQueues.size() > 0) {
 			if(beforeQueues.contains(server)) {
 				p.sendMessage(msgs.getBC("errors.already-queued"));
@@ -485,7 +569,7 @@ public class Manager {
 			}
 			if(!pl.config.getBoolean("allow-multiple-queues")) {
 				p.sendMessage(msgs.getBC("status.left-last-queue"));
-				for(Server ser : beforeQueues) {
+				for(QueueServer ser : beforeQueues) {
 					ser.getQueue().remove(p);
 				}
 			}
@@ -549,9 +633,9 @@ public class Manager {
 	 * @param p The player to search for
 	 * @return The servers the player is queued for.
 	 */
-	public List<Server> findPlayerInQueue(ProxiedPlayer p) {
-		List<Server> srs = new ArrayList<>();
-		for(Server s : servers) {
+	public List<QueueServer> findPlayerInQueue(ProxiedPlayer p) {
+		List<QueueServer> srs = new ArrayList<>();
+		for(QueueServer s : servers) {
 			if(s.getQueue().contains(p)) {
 				srs.add(s);
 			}
@@ -559,7 +643,7 @@ public class Manager {
 		return srs;
 	}
 	
-	public Server getServer(String name) {
+	public QueueServer getServer(String name) {
 		return findServer(name);
 	}
 }

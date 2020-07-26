@@ -78,6 +78,7 @@ multi-server-queue-pick: last
 # for example, instead of showing players "event-a", this option can make it appear as "Event A"
 # With this example, you would use this: - "event-a:Event A"
 # Note that currently players still have to use the normal names in queue commands and leave commands
+#  Format: "realname:Alias"
 server-aliases:
 - "event-a:Event A"
 
@@ -110,3 +111,10 @@ send-all-when-back-online: false
 # Replace <server> with the name of the server
 #  Default: false
 joinfrom-server-permission: false
+
+# Server groups are a group of servers that you can queue for. It will send you to the server that is the least full.
+# If all servers in the group are full, it will act the same as it would when a single server is full.
+# Same if all servers are offline. It will only send players to servers that are online.
+#  Format: "groupname:server1,server2,etc"
+server-groups:
+- "lobbys:lobby-1,lobby-2,lobby-3"
