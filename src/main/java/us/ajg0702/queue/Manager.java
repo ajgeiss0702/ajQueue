@@ -79,18 +79,23 @@ public class Manager {
 	 */
 	public void reloadIntervals() {
 		if(sendId != -1) {
+			sendId = -1;
 			pl.getProxy().getScheduler().cancel(sendId);
 		}
 		if(updateId != -1) {
+			updateId = -1;
 			pl.getProxy().getScheduler().cancel(updateId);
 		}
 		if(messagerId != -1) {
+			messagerId = -1;
 			pl.getProxy().getScheduler().cancel(messagerId);
 		}
 		if(actionbarId != -1) {
+			actionbarId = -1;
 			pl.getProxy().getScheduler().cancel(actionbarId);
 		}
 		if(srvRefId != -1) {
+			srvRefId = -1;
 			pl.getProxy().getScheduler().cancel(srvRefId);
 		}
 		
