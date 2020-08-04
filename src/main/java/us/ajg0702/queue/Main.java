@@ -99,7 +99,7 @@ public class Main extends Plugin implements Listener {
 		d.put("commands.leave.not-queued", "&cYou are not queued for that server! &7You are in these queues: {QUEUES}");
 		d.put("commands.leave.no-queues", "&cYou are not queued!");
 		
-		d.put("commands.pause.more-args", "&cUsage: /ajqueue pause <server>");
+		d.put("commands.pause.more-args", "&cUsage: /ajqueue pause <server> [on/off]");
 		d.put("commands.pause.no-server", "&cThat server does not exist!");
 		d.put("commands.pause.success", "&aThe queue for &f{SERVER} &ais now {PAUSED}");
 		d.put("commands.pause.paused.true", "&epaused");

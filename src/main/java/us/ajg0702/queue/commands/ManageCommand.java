@@ -135,6 +135,29 @@ public class ManageCommand extends Command {
 				return;
 			}
 		}
+		if(args.length == 3) {
+			if(args[0].equalsIgnoreCase("pause")) {
+				if(!sender.hasPermission("ajqueue.pause")) {
+					sender.sendMessage(msgs.getBC("noperm"));
+					return;
+				}
+				if(!Manager.getInstance().getServerNames().contains(args[1])) {
+					sender.sendMessage(msgs.getBC(""));
+					return;
+				}
+				QueueServer srv = Manager.getInstance().findServer(args[1]);
+				if(srv == null) {
+					sender.sendMessage(msgs.getBC("commands.pause.no-server", "SERVER:"+args[1]));
+					return;
+				}
+				srv.setPaused(args[2].equalsIgnoreCase("on"));
+				sender.sendMessage(msgs.getBC("commands.pause.success",
+						"SERVER:"+srv.getName(),
+						"PAUSED:"+msgs.get("commands.pause.paused."+srv.isPaused())
+						));
+				return;
+			}
+		}
 		
 		sender.sendMessage(Main.formatMessage("/ajqueue <reload|list|player|pause>"));
 	}
