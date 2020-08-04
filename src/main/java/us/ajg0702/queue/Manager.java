@@ -211,6 +211,7 @@ public class Manager {
 					pl.getLogger().warning("Could not find server named '"+serverraw+"' in servergroup '"+groupname+"'!");
 					continue;
 				}
+				servers.add(si);
 			}
 			
 			if(servers.size() == 0) {
