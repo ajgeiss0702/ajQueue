@@ -26,7 +26,7 @@ public class Commands implements CommandExecutor {
 		String srvname = args[0];
 		
 		if(args.length > 1) {
-			pl.getLogger().info("sending player to queue");
+			pl.getLogger().info("Sending "+args[0]+" to queue");
 			if(!sender.hasPermission("ajqueue.send")) {
 				sender.sendMessage(color("&cYou do not have permission to do this!"));
 				return true;

@@ -1,5 +1,5 @@
 # Dont touch this number please
-config-version: 14
+config-version: 15
 
 # The time the server will wait between sending people in the queue
 #  Default: 5
@@ -118,3 +118,8 @@ joinfrom-server-permission: false
 #  Format: "groupname:server1,server2,etc"
 server-groups:
 - "lobbys:lobby-1,lobby-2,lobby-3"
+
+
+# Should we allow tab-completing in the /queue command?
+#  Default: true
+tab-complete-queues: true

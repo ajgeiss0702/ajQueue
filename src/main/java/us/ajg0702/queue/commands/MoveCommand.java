@@ -1,13 +1,16 @@
 package us.ajg0702.queue.commands;
 
+import java.util.ArrayList;
+
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Command;
+import net.md_5.bungee.api.plugin.TabExecutor;
 import us.ajg0702.queue.Main;
 import us.ajg0702.queue.Manager;
 import us.ajg0702.utils.bungee.BungeeMessages;
 
-public class MoveCommand extends Command {
+public class MoveCommand extends Command implements TabExecutor {
 	Main plugin;
 	BungeeMessages msgs;
 	public MoveCommand(Main pl) {
@@ -39,4 +42,15 @@ public class MoveCommand extends Command {
 			}*/
 		}
     }
+
+	@Override
+	public Iterable<String> onTabComplete(CommandSender sender, String[] args) {
+		if(!plugin.getConfig().getBoolean("tab-complete-queues")) {
+			return new ArrayList<>();
+		}
+		if(args.length == 1) {
+			return Manager.getInstance().getServerNames();
+		}
+		return null;
+	}
 }
