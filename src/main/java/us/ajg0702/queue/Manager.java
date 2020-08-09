@@ -56,8 +56,8 @@ public class Manager {
 	}
 	
 	/**
-	 * Returns the name of all servers
-	 * @return The names of all servers
+	 * Returns the name of all servers and groups
+	 * @return The names of all servers and groups
 	 */
 	public List<String> getServerNames() {
 		List<String> names = new ArrayList<>();
@@ -79,24 +79,24 @@ public class Manager {
 	 */
 	public void reloadIntervals() {
 		if(sendId != -1) {
-			sendId = -1;
 			pl.getProxy().getScheduler().cancel(sendId);
+			sendId = -1;
 		}
 		if(updateId != -1) {
-			updateId = -1;
 			pl.getProxy().getScheduler().cancel(updateId);
+			updateId = -1;
 		}
 		if(messagerId != -1) {
-			messagerId = -1;
 			pl.getProxy().getScheduler().cancel(messagerId);
+			messagerId = -1;
 		}
 		if(actionbarId != -1) {
-			actionbarId = -1;
 			pl.getProxy().getScheduler().cancel(actionbarId);
+			actionbarId = -1;
 		}
 		if(srvRefId != -1) {
-			srvRefId = -1;
 			pl.getProxy().getScheduler().cancel(srvRefId);
+			srvRefId = -1;
 		}
 		
 		sendId = pl.getProxy().getScheduler().schedule(pl, new Runnable() {
