@@ -520,6 +520,7 @@ public class Manager {
 			int selectednum = 0;
 			for(ServerInfo si : serverInfos.keySet()) {
 				ServerPing sp = serverInfos.get(si);
+				if(sp == null) continue;
 				int online = sp.getPlayers().getOnline();
 				if(selected == null) {
 					selected = si;
@@ -593,7 +594,7 @@ public class Manager {
 			return;
 		}
 		if(pl.isp) {
-			us.ajg0702.queue.Logic.priorityLogic(server.getQueue(), s, p);
+			Logic.priorityLogic(server.getQueue(), s, p);
 		} else {
 			if((p.hasPermission("ajqueue.priority") || p.hasPermission("ajqueue.serverpriority."+s)) && list.size() > 0) {
 				int i = 0;
