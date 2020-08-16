@@ -18,11 +18,21 @@ public class QueueServer {
 	List<ServerInfo> servers;
 	
 	public QueueServer(String name, ServerInfo info) {
+		if(Manager.getInstance() == null || Manager.getInstance().pl.config == null) {
+			ProxyServer.getInstance().getLogger()
+			.warning("[ajQueue] Something tried to load a QueueServer too early! The plugin hasnt fully loaded yet!");
+			return;
+		}
 		this.name = name;
 		this.servers = Arrays.asList(info);
 		update();
 	}
 	public QueueServer(String name, List<ServerInfo> infos) {
+		if(Manager.getInstance() == null || Manager.getInstance().pl.config == null) {
+			ProxyServer.getInstance().getLogger()
+			.warning("[ajQueue] Something tried to load a QueueServer too early! The plugin hasnt fully loaded yet!");
+			return;
+		}
 		this.name = name;
 		this.servers = infos;
 		update();
@@ -51,10 +61,15 @@ public class QueueServer {
 			info.ping(new Callback<ServerPing>() {
 				@Override
 				public void done(ServerPing result, Throwable error) {
+					if(Manager.getInstance() == null || Manager.getInstance().pl.config == null) {
+						ProxyServer.getInstance().getLogger()
+						.warning("[ajQueue] Something used update() too early! The plugin hasnt fully loaded yet!");
+						return;
+					}
 					boolean online = error == null;
+					BungeeConfig config = Manager.getInstance().pl.config;
 					
-					
-					if(Manager.getInstance().pl.config.getBoolean("pinger-debug")) {
+					if(config.getBoolean("pinger-debug")) {
 						if(error != null) {
 							ProxyServer.getInstance().getLogger().info("[ajQueue] [pinger] ["+name+"] Status: "+online+".  Error: ");
 							error.printStackTrace();
