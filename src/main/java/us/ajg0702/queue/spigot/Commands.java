@@ -39,7 +39,12 @@ public class Commands implements CommandExecutor {
 			player = tply;
 			srvname = args[1];
 		}
-		this.pl.sendMessage(player, "queue", srvname);
+		if(pl.config.getBoolean("send-queue-commands-in-batches")) {
+			pl.queuebatch.put(player, srvname);
+		} else {
+			pl.sendMessage(player, "queue", srvname);
+		}
+		
 		return true;
 	}
 	
