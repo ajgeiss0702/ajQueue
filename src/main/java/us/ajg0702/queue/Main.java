@@ -5,6 +5,8 @@ import java.io.DataInputStream;
 import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.List;
+
+import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
@@ -238,6 +240,19 @@ public class Main extends Plugin implements Listener {
 				moveCommand.execute(player, args);
 				//man.addToQueue(player, data);
 				
+			}
+			if(subchannel.equals("massqueue")) {
+				String data = in.readUTF();
+				String[] parts = data.split(",");
+				for(String part : parts) {
+					String[] pparts = part.split(":");
+					String pname = pparts[0];
+					String pserver = pparts[1];
+					ProxiedPlayer p = ProxyServer.getInstance().getPlayer(pname);
+					String[] args = new String[1];
+					args[0] = pserver;
+					moveCommand.execute(p, args);
+				}
 			}
 			if(subchannel.equals("queuename")) {
 				BungeeUtils.sendCustomData(player, "queuename", aliases.getAlias(man.getQueuedName(player)));

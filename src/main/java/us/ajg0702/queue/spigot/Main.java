@@ -10,6 +10,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.plugin.messaging.PluginMessageListener;
 
+import com.google.common.collect.Iterables;
 import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
@@ -20,6 +21,9 @@ public class Main extends JavaPlugin implements PluginMessageListener,Listener {
 	
 	boolean papi = false;
 	Placeholders placeholders;
+	
+	Config config;
+	
 	public void onEnable() {
 		getServer().getMessenger().registerIncomingPluginChannel(this, "ajqueue:tospigot", this);
 		getServer().getMessenger().registerOutgoingPluginChannel(this, "ajqueue:tobungee");
@@ -36,13 +40,27 @@ public class Main extends JavaPlugin implements PluginMessageListener,Listener {
 			getLogger().info("Registered PlaceholderAPI placeholders");
 		}
 		
-		getLogger().info("Spigot side enabled! v"+getDescription().getVersion());
-		/*Bukkit.getScheduler().runTaskTimer(this, new Runnable() {
+		Bukkit.getScheduler().runTaskTimer(this, new Runnable() {
 			public void run() {
-				sendMessage
+				if(Bukkit.getOnlinePlayers().size() <= 0) return;
+				String msg = "";
+				for(Player p : queuebatch.keySet()) {
+					msg += p.getName()+":"+queuebatch.get(p)+",";
+				}
+				if(msg.length() > 1) {
+					msg = msg.substring(0, msg.length()-1);
+				}
+				queuebatch.clear();
+				sendMessage("massqueue", msg);
 			}
-		}, 0, 2*20);*/
+		}, 2*20, 20);
+		
+		config = new Config(this);
+		
+		getLogger().info("Spigot side enabled! v"+getDescription().getVersion());
 	}
+	
+	HashMap<Player, String> queuebatch = new HashMap<>();
 
 	@Override
 	public void onPluginMessageReceived(String channel, Player player, byte[] message) {
@@ -138,6 +156,15 @@ public class Main extends JavaPlugin implements PluginMessageListener,Listener {
 		out.writeUTF(data);
 		
 		player.sendPluginMessage(this, "ajqueue:tobungee", out.toByteArray());
+	}
+	
+	public void sendMessage(String subchannel, String data) {
+		ByteArrayDataOutput out = ByteStreams.newDataOutput();
+		out.writeUTF(subchannel);
+		out.writeUTF(data);
+		
+		Bukkit.getOnlinePlayers().iterator().next()
+		.sendPluginMessage(this, "ajqueue:tobungee", out.toByteArray());
 	}
 	
 	@EventHandler
