@@ -1,5 +1,5 @@
 # Dont touch this number please
-config-version: 15
+config-version: 16
 
 # The time the server will wait between sending people in the queue
 #  Default: 5
@@ -123,3 +123,12 @@ server-groups:
 # Should we allow tab-completing in the /queue command?
 #  Default: true
 tab-complete-queues: true
+
+# Should we have no wait time for these servers?
+# If the server is joinable, the plugin will attempt to send players who join these queues as soon as they join.
+# If the server is not immidiatly joinable, they will have to wait for the normal wait-time
+# This also works with group
+# NOTE: Server names are caps sensitive
+send-instantly:
+- "lobbys"
+
