@@ -18,20 +18,15 @@ public class QueueServer {
 	List<ServerInfo> servers;
 	
 	public QueueServer(String name, ServerInfo info) {
-		if(Manager.getInstance() == null || Manager.getInstance().pl.config == null) {
-			ProxyServer.getInstance().getLogger()
-			.warning("[ajQueue] Something tried to load a QueueServer too early! The plugin hasnt fully loaded yet!");
-			return;
-		}
-		this.name = name;
-		this.servers = Arrays.asList(info);
-		update();
+		init(name, Arrays.asList(info));
 	}
 	public QueueServer(String name, List<ServerInfo> infos) {
-		if(Manager.getInstance() == null || Manager.getInstance().pl.config == null) {
+		init(name, infos);
+	}
+	private void init(String name, List<ServerInfo> infos) {
+		if(Manager.getInstance() == null || Main.plugin.getConfig() == null) {
 			ProxyServer.getInstance().getLogger()
-			.warning("[ajQueue] Something tried to load a QueueServer too early! The plugin hasnt fully loaded yet!");
-			return;
+			.warning("[ajQueue] Something is loading a QueueServer too early! The plugin hasnt fully loaded yet!");
 		}
 		this.name = name;
 		this.servers = infos;
@@ -61,13 +56,13 @@ public class QueueServer {
 			info.ping(new Callback<ServerPing>() {
 				@Override
 				public void done(ServerPing result, Throwable error) {
-					if(Manager.getInstance() == null || Manager.getInstance().pl.config == null) {
+					if(Manager.getInstance() == null || Main.plugin.getConfig() == null) {
 						ProxyServer.getInstance().getLogger()
 						.warning("[ajQueue] Something used update() too early! The plugin hasnt fully loaded yet!");
 						return;
 					}
 					boolean online = error == null;
-					BungeeConfig config = Manager.getInstance().pl.config;
+					BungeeConfig config = Main.plugin.getConfig();
 					
 					if(config.getBoolean("pinger-debug")) {
 						if(error != null) {
@@ -125,7 +120,7 @@ public class QueueServer {
 	}
 	long lastOffline = 0;
 	public boolean isOnline() {
-		BungeeConfig config = Manager.getInstance().pl.config;
+		BungeeConfig config = Main.plugin.getConfig();
 		if(System.currentTimeMillis()-lastOffline <= (config.getInt("wait-after-online")*1000) && online) {
 			return false;
 		}
@@ -136,7 +131,7 @@ public class QueueServer {
 	}
 	
 	public boolean justWentOnline() {
-		BungeeConfig config = Manager.getInstance().pl.config;
+		BungeeConfig config = Main.plugin.getConfig();
 		return System.currentTimeMillis()-lastOffline <= (config.getDouble("wait-time")) && online;
 	}
 	

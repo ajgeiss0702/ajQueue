@@ -185,10 +185,14 @@ public class Manager {
 	 * Also creates/edits server groups
 	 */
 	public void reloadServers() {
+		if(pl.config == null) {
+			pl.getLogger().warning("[MAN] Config is null");
+		}
 		Map<String, ServerInfo> svs = ProxyServer.getInstance().getServers();
 		for(String name : svs.keySet()) {
 			if(findServer(name) != null) continue;
 			ServerInfo info = svs.get(name);
+			//pl.getLogger().info("Adding server "+name);
 			servers.add(new QueueServer(name, info));
 		}
 		
@@ -362,10 +366,12 @@ public class Manager {
 		for(QueueServer s : servers) {
 			int ot = s.getOfflineTime();
 			List<ProxiedPlayer> plys = s.getQueue();
-			for(ProxiedPlayer ply : plys) {
+			Iterator<ProxiedPlayer> it = plys.iterator();
+			while(it.hasNext()) {
+				ProxiedPlayer ply = it.next();
 				int pos = plys.indexOf(ply)+1;
 				if(pos == 0) {
-					plys.remove(ply);
+					it.remove();
 					continue;
 				}
 				int len = plys.size();
@@ -389,6 +395,8 @@ public class Manager {
 						status = msgs.get("status.offline.paused");
 					}
 					
+					if(status.isEmpty()) return;
+					
 					ply.sendMessage(Main.formatMessage(
 							msgs.get("status.offline.base")
 							.replaceAll("\\{STATUS\\}", status)
@@ -397,6 +405,7 @@ public class Manager {
 							.replaceAll("\\{SERVER\\}", pl.aliases.getAlias(s.getName()))
 						));
 				} else {
+					if(msgs.get("spigot.actionbar.offline").isEmpty()) return;
 					int time = (int) Math.round(pos*pl.timeBetweenPlayers);
 					int min = (int) Math.floor((time) / (60));
 					int sec = (int) Math.floor((time % (60)));
@@ -430,6 +439,7 @@ public class Manager {
 	 */
 	public QueueServer findServer(String name) {
 		for(QueueServer server : servers) {
+			if(server == null) continue;
 			if(server.getName().equals(name)) {
 				return server;
 			}

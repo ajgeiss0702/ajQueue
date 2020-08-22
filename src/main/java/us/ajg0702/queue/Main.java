@@ -49,6 +49,9 @@ public class Main extends Plugin implements Listener {
 	public void onEnable() {
 		plugin = this;
 		
+		config = new BungeeConfig(this);
+		checkConfig();
+		
 		LinkedHashMap<String, String> d = new LinkedHashMap<>();
 		
 		
@@ -110,9 +113,6 @@ public class Main extends Plugin implements Listener {
 		msgs = BungeeMessages.getInstance(this, d);
 		//msgs = BungeeMessages.getInstance(this);
 		
-		config = new BungeeConfig(this);
-		checkConfig();
-		
 		aliases = new AliasManager(this);
 		
 		moveCommand = new MoveCommand(this);
@@ -144,6 +144,9 @@ public class Main extends Plugin implements Listener {
 	
 	
 	public void checkConfig() {
+		if(config == null) {
+			getLogger().warning("Config is null!");
+		}
 		List<String> svs = getConfig().getStringList("queue-servers");
 		for(String s : svs) {
 			if(!s.contains(":")) {
