@@ -38,7 +38,11 @@ public class Manager {
 		msgs = BungeeMessages.getInstance();
 		reloadIntervals();
 		if(!pl.config.getBoolean("wait-to-load-servers")) {
-			reloadServers();
+			pl.getProxy().getScheduler().schedule(pl, new Runnable() {
+				public void run() {
+					reloadServers();
+				}
+			}, 0, TimeUnit.MILLISECONDS);
 		} else {
 			pl.getProxy().getScheduler().schedule(pl, new Runnable() {
 				public void run() {
