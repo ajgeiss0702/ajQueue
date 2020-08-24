@@ -440,7 +440,7 @@ public class Manager {
 	public QueueServer findServer(String name) {
 		for(QueueServer server : servers) {
 			if(server == null) continue;
-			if(server.getName().equals(name)) {
+			if(server.getName().equalsIgnoreCase(name)) {
 				return server;
 			}
 		}
