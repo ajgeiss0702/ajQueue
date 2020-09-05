@@ -42,7 +42,7 @@ public class Main extends JavaPlugin implements PluginMessageListener,Listener {
 		
 		Bukkit.getScheduler().runTaskTimer(this, new Runnable() {
 			public void run() {
-				if(Bukkit.getOnlinePlayers().size() <= 0) return;
+				if(Bukkit.getOnlinePlayers().size() <= 0 || queuebatch.size() <= 0) return;
 				String msg = "";
 				for(Player p : queuebatch.keySet()) {
 					msg += p.getName()+":"+queuebatch.get(p)+",";

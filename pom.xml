@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>us.ajg0702</groupId>
   <artifactId>ajQueue</artifactId>
-  <version>1.6.8</version>
+  <version>1.6.9</version>
   <name>ajQueue</name>
   
   <repositories>
@@ -22,9 +22,19 @@
  			 <id>CodeMC</id>
  			 <url>https://repo.codemc.org/repository/maven-public</url>
 		</repository>
+		<repository>
+  		  <id>jitpack.io</id>
+  		  <url>https://jitpack.io</url>
+ 		</repository>
     </repositories>
     
     <dependencies>
+    	<dependency>
+  		  <groupId>com.github.MyzelYam</groupId>
+  		  <artifactId>PremiumVanishAPI</artifactId>
+  		  <version>2.0.3</version>
+  		  <scope>provided</scope>
+  		</dependency>
         <dependency>
             <groupId>us.ajg0702</groupId>
             <artifactId>ajUtils</artifactId>

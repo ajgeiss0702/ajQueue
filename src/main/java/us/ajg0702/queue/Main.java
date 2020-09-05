@@ -249,6 +249,7 @@ public class Main extends Plugin implements Listener {
 				String[] parts = data.split(",");
 				for(String part : parts) {
 					String[] pparts = part.split(":");
+					if(pparts.length < 2) continue;
 					String pname = pparts[0];
 					String pserver = pparts[1];
 					ProxiedPlayer p = ProxyServer.getInstance().getPlayer(pname);
