@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.ServerPing;
 import net.md_5.bungee.api.chat.BaseComponent;
@@ -276,11 +277,16 @@ public class Manager {
 				}
 				
 				
-				BungeeUtils.sendCustomData(p, "actionbar", msgs.get("spigot.actionbar.offline")
+				/*BungeeUtils.sendCustomData(p, "actionbar", msgs.get("spigot.actionbar.offline")
 						.replaceAll("\\{POS\\}", pos+"")
 						.replaceAll("\\{LEN\\}", len+"")
 						.replaceAll("\\{SERVER\\}", pl.aliases.getAlias(s.getName()))
-						.replaceAll("\\{STATUS\\}", status)+";time="+pl.timeBetweenPlayers);
+						.replaceAll("\\{STATUS\\}", status)+";time="+pl.timeBetweenPlayers);*/
+				p.sendMessage(ChatMessageType.ACTION_BAR, msgs.getBC("spigot.actionbar.offline", 
+						"POS:"+pos,
+						"LEN:"+len,
+						"SERVER:"+pl.aliases.getAlias(s.getName()),
+						"STATUS:"+status));
 			} else {
 				int time = (int) Math.round(pos*pl.timeBetweenPlayers);
 				int min = (int) Math.floor((time) / (60));
@@ -295,11 +301,16 @@ public class Manager {
 	        				.replaceAll("\\{m\\}", min+"")
 	        				.replaceAll("\\{s\\}", sec+"");
 	        	}
-				BungeeUtils.sendCustomData(p, "actionbar", msgs.get("spigot.actionbar.online")
+				/*BungeeUtils.sendCustomData(p, "actionbar", msgs.get("spigot.actionbar.online")
 						.replaceAll("\\{POS\\}", pos+"")
 						.replaceAll("\\{LEN\\}", len+"")
 						.replaceAll("\\{SERVER\\}", pl.aliases.getAlias(s.getName()))
-						.replaceAll("\\{TIME\\}", timeStr)+";time="+pl.timeBetweenPlayers);
+						.replaceAll("\\{TIME\\}", timeStr)+";time="+pl.timeBetweenPlayers);*/
+	        	p.sendMessage(ChatMessageType.ACTION_BAR, msgs.getBC("spigot.actionbar.online", 
+						"POS:"+pos,
+						"LEN:"+len,
+						"SERVER:"+pl.aliases.getAlias(s.getName()),
+						"TIME:"+timeStr));
 			}
 		}
 		
@@ -364,7 +375,6 @@ public class Manager {
 	 */
 	public void sendMessages() {
 		for(QueueServer s : servers) {
-			int ot = s.getOfflineTime();
 			List<ProxiedPlayer> plys = s.getQueue();
 			Iterator<ProxiedPlayer> it = plys.iterator();
 			while(it.hasNext()) {
@@ -374,61 +384,72 @@ public class Manager {
 					it.remove();
 					continue;
 				}
-				int len = plys.size();
-				if(!s.isJoinable(ply)) {
-					
-					String status = msgs.get("status.offline.restarting");
-					
-					if(ot > pl.config.getInt("offline-time")) {
-						status = msgs.get("status.offline.offline");
-					}
-					
-					if(s.isFull() && s.isOnline()) {
-						status = msgs.get("status.offline.full");
-					}
-					
-					if(!s.canAccess(ply)) {
-						status = msgs.get("status.offline.restricted");
-					}
-					
-					if(s.isPaused()) {
-						status = msgs.get("status.offline.paused");
-					}
-					
-					if(status.isEmpty()) return;
-					
-					ply.sendMessage(Main.formatMessage(
-							msgs.get("status.offline.base")
-							.replaceAll("\\{STATUS\\}", status)
-							.replaceAll("\\{POS\\}", pos+"")
-							.replaceAll("\\{LEN\\}", len+"")
-							.replaceAll("\\{SERVER\\}", pl.aliases.getAlias(s.getName()))
-						));
-				} else {
-					if(msgs.get("spigot.actionbar.offline").isEmpty()) return;
-					int time = (int) Math.round(pos*pl.timeBetweenPlayers);
-					int min = (int) Math.floor((time) / (60));
-					int sec = (int) Math.floor((time % (60)));
-					String timeStr;
-		        	if(min <= 0) {
-		        		timeStr = msgs.get("format.time.secs")
-		        				.replaceAll("\\{m\\}", "0")
-		        				.replaceAll("\\{s\\}", sec+"");
-		        	} else {
-		        		timeStr = msgs.get("format.time.mins")
-		        				.replaceAll("\\{m\\}", min+"")
-		        				.replaceAll("\\{s\\}", sec+"");
-		        	}
-					ply.sendMessage(Main.formatMessage(
-							msgs.get("status.online.base")
-							.replaceAll("\\{POS\\}", pos+"")
-							.replaceAll("\\{LEN\\}", len+"")
-							.replaceAll("\\{TIME\\}", timeStr)
-							.replaceAll("\\{SERVER\\}", pl.aliases.getAlias(s.getName()))
-							));
-				}
-				
+				sendMessage(ply, s);
 			}
+		}
+	}
+	/**
+	 * Sends a status message to a player
+	 * @param ply The player to send the message to
+	 * @param s The QueueServer the message should be about
+	 */
+	public void sendMessage(ProxiedPlayer ply, QueueServer s) {
+		List<ProxiedPlayer> plys = s.getQueue();
+		int pos = plys.indexOf(ply)+1;
+		if(pos == 0) return;
+		int len = plys.size();
+		int ot = s.getOfflineTime();
+		if(!s.isJoinable(ply)) {
+			
+			String status = msgs.get("status.offline.restarting");
+			
+			if(ot > pl.config.getInt("offline-time")) {
+				status = msgs.get("status.offline.offline");
+			}
+			
+			if(s.isFull() && s.isOnline()) {
+				status = msgs.get("status.offline.full");
+			}
+			
+			if(!s.canAccess(ply)) {
+				status = msgs.get("status.offline.restricted");
+			}
+			
+			if(s.isPaused()) {
+				status = msgs.get("status.offline.paused");
+			}
+			
+			if(status.isEmpty()) return;
+			
+			ply.sendMessage(Main.formatMessage(
+					msgs.get("status.offline.base")
+					.replaceAll("\\{STATUS\\}", status)
+					.replaceAll("\\{POS\\}", pos+"")
+					.replaceAll("\\{LEN\\}", len+"")
+					.replaceAll("\\{SERVER\\}", pl.aliases.getAlias(s.getName()))
+				));
+		} else {
+			if(msgs.get("spigot.actionbar.offline").isEmpty()) return;
+			int time = (int) Math.round(pos*pl.timeBetweenPlayers);
+			int min = (int) Math.floor((time) / (60));
+			int sec = (int) Math.floor((time % (60)));
+			String timeStr;
+        	if(min <= 0) {
+        		timeStr = msgs.get("format.time.secs")
+        				.replaceAll("\\{m\\}", "0")
+        				.replaceAll("\\{s\\}", sec+"");
+        	} else {
+        		timeStr = msgs.get("format.time.mins")
+        				.replaceAll("\\{m\\}", min+"")
+        				.replaceAll("\\{s\\}", sec+"");
+        	}
+			ply.sendMessage(Main.formatMessage(
+					msgs.get("status.online.base")
+					.replaceAll("\\{POS\\}", pos+"")
+					.replaceAll("\\{LEN\\}", len+"")
+					.replaceAll("\\{TIME\\}", timeStr)
+					.replaceAll("\\{SERVER\\}", pl.aliases.getAlias(s.getName()))
+					));
 		}
 	}
 	

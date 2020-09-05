@@ -19,7 +19,7 @@ queue-servers:
 - 'survivalqueue:survival'
 
 # Should the plugin send an actionbar to the player?
-# Requires this plugin to be installed on the server the player is on for it to work
+# The actionbar contains some info such as which server they are queued for, what position they are in, estimated time remaining, etc.
 send-actionbar: true
 
 # What kick reasons should cause the player to be removed from the queue?
