@@ -198,6 +198,7 @@ public class Main extends Plugin implements Listener {
 		for(QueueServer server : servers) {
 			server.getQueue().remove(p);
 		}
+		man.sendingNowAntiSpam.remove(p);
 	}
 	
 	@EventHandler
