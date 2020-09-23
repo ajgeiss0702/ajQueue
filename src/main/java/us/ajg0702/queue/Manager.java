@@ -484,6 +484,9 @@ public class Manager {
 	public void sendPlayers() {
 		sendPlayers(null);
 	}
+	
+	HashMap<ProxiedPlayer, Long> sendingNowAntiSpam = new HashMap<>();
+	
 	/**
 	 * Attempts to send the first player in this queue
 	 * @param server The server to send the first player in the queue. null for all servers.
@@ -506,18 +509,22 @@ public class Manager {
 					HashMap<ServerInfo, ServerPing> serverInfos = s.getLastPings();
 					ServerInfo selected = null;
 					int selectednum = 0;
-					for(ServerInfo si : serverInfos.keySet()) {
-						ServerPing sp = serverInfos.get(si);
-						int online = sp.getPlayers().getOnline();
-						if(selected == null) {
-							selected = si;
-							selectednum = online;
-							continue;
-						}
-						if(selectednum > online && findServer(si.getName()).isJoinable(p)) {
-							selected = si;
-							selectednum = online;
-							continue;
+					if(serverInfos.keySet().size() == 1) {
+						selected = serverInfos.keySet().iterator().next();
+					} else {
+						for(ServerInfo si : serverInfos.keySet()) {
+							ServerPing sp = serverInfos.get(si);
+							int online = sp.getPlayers().getOnline();
+							if(selected == null) {
+								selected = si;
+								selectednum = online;
+								continue;
+							}
+							if(selectednum > online && findServer(si.getName()).isJoinable(p)) {
+								selected = si;
+								selectednum = online;
+								continue;
+							}
 						}
 					}
 					if(selected == null) {
@@ -549,23 +556,35 @@ public class Manager {
 			if(s.getQueue().size() <= 0) continue;
 			if(s.isFull() && !nextplayer.hasPermission("ajqueue.joinfull")) continue;
 			
-			nextplayer.sendMessage(Main.formatMessage(msgs.get("status.sending-now").replaceAll("\\{SERVER\\}", pl.aliases.getAlias(name))));
+			
+			if(!sendingNowAntiSpam.containsKey(nextplayer)) {
+				sendingNowAntiSpam.put(nextplayer, (long) 0);
+			}
+			if(System.currentTimeMillis() - sendingNowAntiSpam.get(nextplayer) >= 5000) {
+				nextplayer.sendMessage(msgs.getBC("status.sending-now", "SERVER:"+pl.aliases.getAlias(s.getName())));
+				sendingNowAntiSpam.put(nextplayer, System.currentTimeMillis());
+			}
+			
+			
 			HashMap<ServerInfo, ServerPing> serverInfos = s.getLastPings();
 			ServerInfo selected = null;
 			int selectednum = 0;
-			for(ServerInfo si : serverInfos.keySet()) {
-				ServerPing sp = serverInfos.get(si);
-				if(sp == null) continue;
-				int online = sp.getPlayers().getOnline();
-				if(selected == null) {
-					selected = si;
-					selectednum = online;
-					continue;
-				}
-				if(selectednum > online && findServer(si.getName()).isJoinable(nextplayer)) {
-					selected = si;
-					selectednum = online;
-					continue;
+			if(serverInfos.keySet().size() == 1) {
+				selected = serverInfos.keySet().iterator().next();
+			} else {
+				for(ServerInfo si : serverInfos.keySet()) {
+					ServerPing sp = serverInfos.get(si);
+					int online = sp.getPlayers().getOnline();
+					if(selected == null) {
+						selected = si;
+						selectednum = online;
+						continue;
+					}
+					if(selectednum > online && findServer(si.getName()).isJoinable(nextplayer)) {
+						selected = si;
+						selectednum = online;
+						continue;
+					}
 				}
 			}
 			if(selected == null) {
