@@ -6,5 +6,5 @@ name: ajQueue
 softdepend: [PlaceholderAPI]
 commands:
    move:
-      aliases: [server, queue]
+      aliases: [server, queue, joinq, joinqueue]
       description: Queue for a server
