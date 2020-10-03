@@ -539,8 +539,16 @@ public class Manager {
 			}
 			
 			ProxiedPlayer nextplayer = s.getQueue().get(0);
+			if(nextplayer == null) {
+				if(s.getQueue().size() > 0) {
+					s.getQueue().remove(0);
+				}
+				continue;
+			}
 			
 			if(!s.canAccess(nextplayer)) continue;
+			
+			
 			
 			while(nextplayer.getServer().getInfo().getName().equals(s.getName())) {
 				s.getQueue().remove(nextplayer);
