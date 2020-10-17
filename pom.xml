@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>us.ajg0702</groupId>
   <artifactId>ajQueue</artifactId>
-  <version>1.6.9</version>
+  <version>1.6.10</version>
   <name>ajQueue</name>
   
   <repositories>
@@ -29,6 +29,13 @@
     </repositories>
     
     <dependencies>
+		<dependency>
+			<groupId>redis.clients</groupId>
+			<artifactId>jedis</artifactId>
+			<version>3.3.0</version>
+			<scope>compile</scope>
+		</dependency>
+
     	<dependency>
   		  <groupId>com.github.MyzelYam</groupId>
   		  <artifactId>PremiumVanishAPI</artifactId>
@@ -120,8 +127,8 @@
 		      <configuration>
 		        <relocations>
 		          <relocation>
-		            <pattern>us.ajg0702.utils</pattern>
-		            <shadedPattern>us.ajg0702.queue.utils</shadedPattern>
+		            <pattern>redis.clients.jedis</pattern>
+		            <shadedPattern>us.ajg0702.queue.jedis</shadedPattern>
 		          </relocation>
 		        </relocations>
 		      </configuration>
