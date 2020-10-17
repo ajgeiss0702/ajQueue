@@ -132,3 +132,8 @@ tab-complete-queues: true
 send-instantly:
 - "lobbys"
 
+# Should we log to the bungeecord console when a player fails to get sent to a server from the queue?
+# Enable this if you are having an issue with one player stopping the queue
+#  Default: false
+send-fail-debug: false
+

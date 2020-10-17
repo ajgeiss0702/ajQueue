@@ -220,8 +220,12 @@ public class Main extends Plugin implements Listener {
 				}
 				if(hasReason) break;
 			}
-			if(!hasReason) continue;
-			server.getQueue().remove(p);
+			if(hasReason) {
+				server.getQueue().remove(p);
+			}
+			if(config.getBoolean("send-fail-debug")) {
+				getLogger().warning("Failed to send "+p.getName()+" to "+e.getKickedFrom().getName()+" because "+e.getKickReasonComponent().toString());
+			}
 		}
 	}
 	

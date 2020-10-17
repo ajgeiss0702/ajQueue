@@ -53,6 +53,9 @@ public class QueueServer {
 	public void update() {
 		pings = new HashMap<>();
 		for(final ServerInfo info : getInfos()) {
+			if(Main.plugin.getConfig().getBoolean("pinger-debug")) {
+				Main.plugin.getLogger().info("[pinger] ["+info.getName()+"] sending ping");
+			}
 			info.ping(new Callback<ServerPing>() {
 				@Override
 				public void done(ServerPing result, Throwable error) {

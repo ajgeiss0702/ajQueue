@@ -549,6 +549,25 @@ public class Manager {
 			if(!s.canAccess(nextplayer)) continue;
 			
 			
+			/*if(nextplayer == null) {
+				pl.getLogger().info("nextplayer is null");
+			}
+			if(nextplayer.getServer() == null) {
+				pl.getLogger().info("getServer is null");
+			}
+			if(nextplayer.getServer().getInfo() == null) {
+				pl.getLogger().info("getInfo is null");
+			}
+			if(nextplayer.getServer().getInfo().getName() == null) {
+				pl.getLogger().info("getName is null");
+			}
+			if(s == null) {
+				pl.getLogger().info("s is null");
+			}
+			if(s.getName() == null) {
+				pl.getLogger().info("s.getName() is null");
+			}*/
+			
 			
 			while(nextplayer.getServer().getInfo().getName().equals(s.getName())) {
 				s.getQueue().remove(nextplayer);
