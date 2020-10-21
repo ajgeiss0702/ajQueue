@@ -111,7 +111,6 @@ public class Main extends Plugin implements Listener {
 		d.put("commands.pause.paused.false", "&aun-paused");
 		
 		msgs = BungeeMessages.getInstance(this, d);
-		//msgs = BungeeMessages.getInstance(this);
 		
 		aliases = new AliasManager(this);
 		

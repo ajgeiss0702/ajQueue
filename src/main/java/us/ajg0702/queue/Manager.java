@@ -277,11 +277,6 @@ public class Manager {
 				}
 				
 				
-				/*BungeeUtils.sendCustomData(p, "actionbar", msgs.get("spigot.actionbar.offline")
-						.replaceAll("\\{POS\\}", pos+"")
-						.replaceAll("\\{LEN\\}", len+"")
-						.replaceAll("\\{SERVER\\}", pl.aliases.getAlias(s.getName()))
-						.replaceAll("\\{STATUS\\}", status)+";time="+pl.timeBetweenPlayers);*/
 				p.sendMessage(ChatMessageType.ACTION_BAR, msgs.getBC("spigot.actionbar.offline", 
 						"POS:"+pos,
 						"LEN:"+len,
@@ -301,11 +296,6 @@ public class Manager {
 	        				.replaceAll("\\{m\\}", min+"")
 	        				.replaceAll("\\{s\\}", sec+"");
 	        	}
-				/*BungeeUtils.sendCustomData(p, "actionbar", msgs.get("spigot.actionbar.online")
-						.replaceAll("\\{POS\\}", pos+"")
-						.replaceAll("\\{LEN\\}", len+"")
-						.replaceAll("\\{SERVER\\}", pl.aliases.getAlias(s.getName()))
-						.replaceAll("\\{TIME\\}", timeStr)+";time="+pl.timeBetweenPlayers);*/
 	        	p.sendMessage(ChatMessageType.ACTION_BAR, msgs.getBC("spigot.actionbar.online", 
 						"POS:"+pos,
 						"LEN:"+len,
@@ -314,59 +304,6 @@ public class Manager {
 			}
 		}
 		
-		/*for(Server s : servers) {
-			int ot = s.getOfflineTime();
-			List<ProxiedPlayer> plys = s.getQueue();
-			Iterator<ProxiedPlayer> it = plys.iterator();
-			while(it.hasNext()) {
-				ProxiedPlayer ply = it.next();
-				int pos = plys.indexOf(ply)+1;
-				if(pos == 0) {
-					plys.remove(ply);
-					continue;
-				}
-				
-				int len = plys.size();
-				if(!s.isOnline() || s.isFull() || !s.canAccess(ply)) {
-					
-					String status = msgs.get("status.offline.restarting");
-					
-					if(ot > pl.config.getInt("offline-time")) {
-						status = msgs.get("status.offline.offline");
-					}
-					
-					if(!s.canAccess(ply)) {
-						status = msgs.get("status.offline.restricted");
-					}
-					
-					
-					BungeeUtils.sendCustomData(ply, "actionbar", msgs.get("spigot.actionbar.offline")
-							.replaceAll("\\{POS\\}", pos+"")
-							.replaceAll("\\{LEN\\}", len+"")
-							.replaceAll("\\{SERVER\\}", s.getName())
-							.replaceAll("\\{STATUS\\}", status)+";time="+pl.timeBetweenPlayers);
-				} else {
-					int time = pos*pl.timeBetweenPlayers;
-					int min = (int) Math.floor((time) / (60));
-					int sec = (int) Math.floor((time % (60)));
-					String timeStr;
-		        	if(min <= 0) {
-		        		timeStr = msgs.get("format.time.secs")
-		        				.replaceAll("\\{m\\}", "0")
-		        				.replaceAll("\\{s\\}", sec+"");
-		        	} else {
-		        		timeStr = msgs.get("format.time.mins")
-		        				.replaceAll("\\{m\\}", min+"")
-		        				.replaceAll("\\{s\\}", sec+"");
-		        	}
-					BungeeUtils.sendCustomData(ply, "actionbar", msgs.get("spigot.actionbar.online")
-							.replaceAll("\\{POS\\}", pos+"")
-							.replaceAll("\\{LEN\\}", len+"")
-							.replaceAll("\\{SERVER\\}", s.getName())
-							.replaceAll("\\{TIME\\}", timeStr)+";time="+pl.timeBetweenPlayers);
-				}
-			}
-		}*/
 	}
 	
 	/**
