@@ -110,6 +110,8 @@ public class Main extends Plugin implements Listener {
 		d.put("commands.pause.paused.true", "&epaused");
 		d.put("commands.pause.paused.false", "&aun-paused");
 		
+		d.put("max-tries-reached", "&cUnable to connect to {SERVER}. Max retries reached.");
+		
 		msgs = BungeeMessages.getInstance(this, d);
 		
 		aliases = new AliasManager(this);
@@ -173,6 +175,7 @@ public class Main extends Plugin implements Listener {
 			int pos = queue.indexOf(p);
 			if((pos == 0 && ser.getInfos().contains(p.getServer().getInfo())) || config.getBoolean("remove-player-on-server-switch")) {
 				queue.remove(p);
+				Manager.getInstance().sendingAttempts.remove(p);
 			}
 		}
 		

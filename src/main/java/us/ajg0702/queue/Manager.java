@@ -460,6 +460,7 @@ public class Manager {
 	}
 	
 	HashMap<ProxiedPlayer, Long> sendingNowAntiSpam = new HashMap<>();
+	HashMap<ProxiedPlayer, Integer> sendingAttempts = new HashMap<>(); 
 	
 	/**
 	 * Attempts to send the first player in this queue
@@ -537,6 +538,17 @@ public class Manager {
 			if(s.getQueue().size() <= 0) continue;
 			if(s.isFull() && !nextplayer.hasPermission("ajqueue.joinfull")) continue;
 			
+			int tries = sendingAttempts.get(nextplayer) == null ? 0 : sendingAttempts.get(nextplayer);
+			int maxTries = pl.config.getInt("max-tries");
+			if(tries >= maxTries && maxTries > 0) {
+				s.getQueue().remove(nextplayer);
+				sendingAttempts.remove(nextplayer);
+				nextplayer.sendMessage(msgs.getBC("max-tries-reached", "SERVER:"+pl.aliases.getAlias(s.getName())));
+				continue;
+			}
+			tries++;
+			pl.getLogger().info(tries+" tries");
+			sendingAttempts.put(nextplayer, tries);
 			
 			if(!sendingNowAntiSpam.containsKey(nextplayer)) {
 				sendingNowAntiSpam.put(nextplayer, (long) 0);
