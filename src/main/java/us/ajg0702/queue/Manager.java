@@ -14,6 +14,7 @@ import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
+import us.ajg0702.utils.GenUtils;
 import us.ajg0702.utils.bungee.BungeeMessages;
 import us.ajg0702.utils.bungee.BungeeUtils;
 
@@ -416,6 +417,42 @@ public class Manager {
 	}
 	
 	/**
+	 * Gets the ideal server in a server group.
+	 */
+	public ServerInfo getIdealServer(QueueServer s, ProxiedPlayer p) {
+		HashMap<ServerInfo, ServerPing> serverInfos = s.getLastPings();
+		ServerInfo selected = null;
+		int selectednum = 0;
+		if(serverInfos.keySet().size() == 1) {
+			selected = serverInfos.keySet().iterator().next();
+		} else {
+			for(ServerInfo si : serverInfos.keySet()) {
+				ServerPing sp = serverInfos.get(si);
+				int online = sp.getPlayers().getOnline();
+				if(selected == null) {
+					selected = si;
+					selectednum = online;
+					continue;
+				}
+				if(selectednum > online && findServer(si.getName()).isJoinable(p)) {
+					selected = si;
+					selectednum = online;
+					continue;
+				}
+			}
+		}
+		if(selected == null && serverInfos.size() > 0) {
+			selected = serverInfos.keySet().iterator().next();
+		}
+		if(selected == null) {
+			pl.getLogger().warning("Unable to find ideal server, using random server from group.");
+			int r = GenUtils.randomInt(0, s.getInfos().size()-1);
+			selected = s.getInfos().get(r);
+		}
+		return selected;
+	}
+	
+	/**
 	 * Attempts to send the first player in all queues
 	 */
 	public void sendPlayers() {
@@ -443,27 +480,7 @@ public class Manager {
 					
 					if(s.isFull() && !p.hasPermission("ajqueue.joinfull")) continue;
 					
-					HashMap<ServerInfo, ServerPing> serverInfos = s.getLastPings();
-					ServerInfo selected = null;
-					int selectednum = 0;
-					if(serverInfos.keySet().size() == 1) {
-						selected = serverInfos.keySet().iterator().next();
-					} else {
-						for(ServerInfo si : serverInfos.keySet()) {
-							ServerPing sp = serverInfos.get(si);
-							int online = sp.getPlayers().getOnline();
-							if(selected == null) {
-								selected = si;
-								selectednum = online;
-								continue;
-							}
-							if(selectednum > online && findServer(si.getName()).isJoinable(p)) {
-								selected = si;
-								selectednum = online;
-								continue;
-							}
-						}
-					}
+					ServerInfo selected = getIdealServer(s, p);
 					if(selected == null) {
 						pl.getLogger().severe("Could not find ideal server for server/group '"+s.getName()+"'!");
 						continue;
@@ -530,27 +547,8 @@ public class Manager {
 			}
 			
 			
-			HashMap<ServerInfo, ServerPing> serverInfos = s.getLastPings();
-			ServerInfo selected = null;
-			int selectednum = 0;
-			if(serverInfos.keySet().size() == 1) {
-				selected = serverInfos.keySet().iterator().next();
-			} else {
-				for(ServerInfo si : serverInfos.keySet()) {
-					ServerPing sp = serverInfos.get(si);
-					int online = sp.getPlayers().getOnline();
-					if(selected == null) {
-						selected = si;
-						selectednum = online;
-						continue;
-					}
-					if(selectednum > online && findServer(si.getName()).isJoinable(nextplayer)) {
-						selected = si;
-						selectednum = online;
-						continue;
-					}
-				}
-			}
+			
+			ServerInfo selected = getIdealServer(s, nextplayer);
 			if(selected == null) {
 				pl.getLogger().severe("Could not find ideal server for server/group '"+s.getName()+"'!");
 				continue;
