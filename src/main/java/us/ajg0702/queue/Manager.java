@@ -547,7 +547,6 @@ public class Manager {
 				continue;
 			}
 			tries++;
-			pl.getLogger().info(tries+" tries");
 			sendingAttempts.put(nextplayer, tries);
 			
 			if(!sendingNowAntiSpam.containsKey(nextplayer)) {
