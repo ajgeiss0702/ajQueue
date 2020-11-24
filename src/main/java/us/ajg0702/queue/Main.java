@@ -226,7 +226,11 @@ public class Main extends Plugin implements Listener {
 				server.getQueue().remove(p);
 			}
 			if(config.getBoolean("send-fail-debug")) {
-				getLogger().warning("Failed to send "+p.getName()+" to "+e.getKickedFrom().getName()+" because "+e.getKickReasonComponent().toString());
+				String r = "";
+				for(BaseComponent b : e.getKickReasonComponent()) {
+					r += b.toPlainText();
+				}
+				getLogger().warning("Failed to send "+p.getName()+" to "+e.getKickedFrom().getName()+" because "+r);
 			}
 		}
 	}

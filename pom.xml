@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>us.ajg0702</groupId>
   <artifactId>ajQueue</artifactId>
-  <version>1.6.11</version>
+  <version>1.6.13</version>
   <name>ajQueue</name>
   
   <repositories>
@@ -129,6 +129,14 @@
 		          <relocation>
 		            <pattern>redis.clients.jedis</pattern>
 		            <shadedPattern>us.ajg0702.queue.jedis</shadedPattern>
+		          </relocation>
+		          <relocation>
+		            <pattern>org.slf4j</pattern>
+		            <shadedPattern>us.ajg0702.queue.slf4j</shadedPattern>
+		          </relocation>
+		          <relocation>
+		            <pattern>org.apache.commons</pattern>
+		            <shadedPattern>us.ajg0702.queue.apache.commons</shadedPattern>
 		          </relocation>
 		        </relocations>
 		      </configuration>
