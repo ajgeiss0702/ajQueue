@@ -2,9 +2,9 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>us.ajg0702</groupId>
   <artifactId>ajQueue</artifactId>
-  <version>1.6.13</version>
+  <version>1.6.14</version>
   <name>ajQueue</name>
-  
+
   <repositories>
 		<repository>
             <id>spigotmc-repo</id>
@@ -27,7 +27,7 @@
   		  <url>https://jitpack.io</url>
  		</repository>
     </repositories>
-    
+
     <dependencies>
 		<dependency>
 			<groupId>redis.clients</groupId>
@@ -79,7 +79,7 @@
 	 		<scope>compile</scope>
 		</dependency>-->
     </dependencies>
-  
+
 	<build>
 		<resources>
 			<resource>
@@ -87,8 +87,8 @@
 				<filtering>true</filtering>
            </resource>
         </resources>
-        
-        
+
+
         <plugins>
 		 	<plugin>
 		      <groupId>org.apache.maven.plugins</groupId>
@@ -176,5 +176,5 @@
 			  </plugin>
 		 </plugins>
 	 </build>
-	 
+
 </project>
