@@ -3,6 +3,7 @@ package us.ajg0702.queue;
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 
@@ -211,19 +212,15 @@ public class Main extends Plugin implements Listener {
 			if(!(server.getInfos().contains(e.getKickedFrom()))) continue;
 			if(server.getQueue().indexOf(p) != 0) continue;
 			List<String> kickreasons = config.getStringList("kick-reasons");
-			boolean hasReason = false;
 			//getLogger().info(e.getKickReasonComponent());
-			for(String reason : kickreasons) {
-				for(BaseComponent b : e.getKickReasonComponent()) {
-					if(b.toPlainText().toLowerCase().contains(reason)) {
-						hasReason = true;
-						break;
-					}
-				}
-				if(hasReason) break;
+			String plainReason = "";
+			for(BaseComponent b : e.getKickReasonComponent()) {
+				plainReason += b.toPlainText();
 			}
-			if(hasReason) {
-				server.getQueue().remove(p);
+			for(String reason : kickreasons) {
+				if(plainReason.toLowerCase().contains(reason.toLowerCase())) {
+					server.getQueue().remove(p);
+				}
 			}
 			if(config.getBoolean("send-fail-debug")) {
 				String r = "";
@@ -231,6 +228,15 @@ public class Main extends Plugin implements Listener {
 					r += b.toPlainText();
 				}
 				getLogger().warning("Failed to send "+p.getName()+" to "+e.getKickedFrom().getName()+" because "+r);
+			}
+			
+			if(plainReason.toLowerCase().contains("whitelist") && plainReason.contains("&ajq;")) {
+				String rawlist = plainReason.split("&ajq;")[1];
+				List<String> list = new ArrayList<>();
+				for(String s : rawlist.split(",")) {
+					list.add(s);
+				}
+				
 			}
 		}
 	}
