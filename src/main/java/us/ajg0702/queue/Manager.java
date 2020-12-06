@@ -85,23 +85,33 @@ public class Manager {
 	 */
 	public void reloadIntervals() {
 		if(sendId != -1) {
-			pl.getProxy().getScheduler().cancel(sendId);
+			try {
+				pl.getProxy().getScheduler().cancel(sendId);
+			} catch(IllegalArgumentException e) {}
 			sendId = -1;
 		}
 		if(updateId != -1) {
-			pl.getProxy().getScheduler().cancel(updateId);
+			try {
+				pl.getProxy().getScheduler().cancel(updateId);
+			} catch(IllegalArgumentException e) {}
 			updateId = -1;
 		}
 		if(messagerId != -1) {
-			pl.getProxy().getScheduler().cancel(messagerId);
+			try {
+				pl.getProxy().getScheduler().cancel(messagerId);
+			} catch(IllegalArgumentException e) {}
 			messagerId = -1;
 		}
 		if(actionbarId != -1) {
-			pl.getProxy().getScheduler().cancel(actionbarId);
+			try {
+				pl.getProxy().getScheduler().cancel(actionbarId);
+			} catch(IllegalArgumentException e) {}
 			actionbarId = -1;
 		}
 		if(srvRefId != -1) {
-			pl.getProxy().getScheduler().cancel(srvRefId);
+			try {
+				pl.getProxy().getScheduler().cancel(srvRefId);
+			} catch(IllegalArgumentException e) {}
 			srvRefId = -1;
 		}
 		
