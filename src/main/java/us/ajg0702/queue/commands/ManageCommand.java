@@ -99,7 +99,7 @@ public class ManageCommand extends Command {
 					return;
 				}
 				if(!Manager.getInstance().getServerNames().contains(args[1])) {
-					sender.sendMessage(msgs.getBC(""));
+					sender.sendMessage(msgs.getBC("errors.server-not-exist"));
 					return;
 				}
 				QueueServer srv = Manager.getInstance().findServer(args[1]);
