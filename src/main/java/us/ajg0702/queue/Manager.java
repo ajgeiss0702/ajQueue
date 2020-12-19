@@ -481,7 +481,6 @@ public class Manager {
 			String name = s.getName();
 			if(server != null && !server.equals(name)) continue;
 			if(!s.isOnline()) continue;
-			if(s.isPaused()) continue;
 			if(s.getQueue().size() <= 0) continue;
 			
 			if(pl.config.getBoolean("send-all-when-back-online") && s.justWentOnline() && s.isOnline()) {
@@ -547,6 +546,11 @@ public class Manager {
 			}
 			if(s.getQueue().size() <= 0) continue;
 			if(s.isFull() && !nextplayer.hasPermission("ajqueue.joinfull")) continue;
+			
+			if(pl.config.getBoolean("enable-bypasspaused-permission")) {
+				if(s.isPaused() && !nextplayer.hasPermission("ajqueue.bypasspaused")) continue;
+			} else if(s.isPaused()) { continue; }
+			
 			
 			int tries = sendingAttempts.get(nextplayer) == null ? 0 : sendingAttempts.get(nextplayer);
 			int maxTries = pl.config.getInt("max-tries");
