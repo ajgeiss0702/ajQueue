@@ -154,6 +154,7 @@ public class QueueServer {
 	 * @return if the player can join based on bungeecord's restricted servers system
 	 */
 	public boolean canAccess(ProxiedPlayer ply) {
+		if(ply == null) return true;
 		boolean ca = false;
 		for(ServerInfo si : servers) {
 			if(si.canAccess(ply)) {

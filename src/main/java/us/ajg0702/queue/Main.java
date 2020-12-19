@@ -19,6 +19,7 @@ import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.event.EventHandler;
 import us.ajg0702.queue.commands.LeaveCommand;
+import us.ajg0702.queue.commands.ListCommand;
 import us.ajg0702.queue.commands.ManageCommand;
 import us.ajg0702.queue.commands.MoveCommand;
 import us.ajg0702.utils.bungee.BungeeConfig;
@@ -111,6 +112,9 @@ public class Main extends Plugin implements Listener {
 		d.put("commands.pause.paused.true", "&epaused");
 		d.put("commands.pause.paused.false", "&aun-paused");
 		
+		d.put("commands.listqueues.header", "&9Queues:");
+		d.put("commands.listqueues.format", "{COLOR}{NAME}&7: {COUNT} queued");
+		
 		d.put("max-tries-reached", "&cUnable to connect to {SERVER}. Max retries reached.");
 		
 		msgs = BungeeMessages.getInstance(this, d);
@@ -121,6 +125,7 @@ public class Main extends Plugin implements Listener {
 		this.getProxy().getPluginManager().registerCommand(this, moveCommand);
 		this.getProxy().getPluginManager().registerCommand(this, new ManageCommand(this));
 		this.getProxy().getPluginManager().registerCommand(this, new LeaveCommand(this));
+		this.getProxy().getPluginManager().registerCommand(this, new ListCommand(this));
 		
 		this.getProxy().getPluginManager().registerListener(this, this);
 		
