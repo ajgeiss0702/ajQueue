@@ -121,6 +121,9 @@ public class Placeholders extends PlaceholderExpansion {
     @Override
     public String onPlaceholderRequest(Player player, final String identifier){
     	//Bukkit.getLogger().info("itentifier: "+identifier);
+
+
+        if(player == null) return "No player";
         
         
     	String noc = "_nocache";
