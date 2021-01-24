@@ -1,5 +1,5 @@
 # Dont touch this number please
-config-version: 18
+config-version: 19
 
 # The time the server will wait between sending people in the queue
 #  Default: 5
@@ -139,8 +139,8 @@ send-fail-debug: false
 
 # After how many (unsuccessfull) attempts of sending the player should we remove them from the queue?
 # Set to -1 to disable
-#  Default: -1
-max-tries: -1
+#  Default: 10
+max-tries: 10
 
 # Should we enable the ajqueue.bypasspaused permission?
 # If enabled, anyone with the permission ajqueue.bypasspaused will be able to join paused servers
