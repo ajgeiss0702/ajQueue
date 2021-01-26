@@ -152,4 +152,10 @@ enable-bypasspaused-permission: false
 #  Default: true
 check-last-player-sent-time: true
 
+# Should we send debug info to the console when priority queue is used?
+# This will print several lines to the console when a player joins a queue,
+# so you should probably only use this for debugging purposes
+#  Default: false
+priority-queue-debug: false
+
 
