@@ -112,6 +112,8 @@ public class Main extends Plugin implements Listener {
 		d.put("commands.pause.paused.true", "&epaused");
 		d.put("commands.pause.paused.false", "&aun-paused");
 		
+		d.put("commands.send.player-not-found", "&cThat player could not be found. Make sure they are online!");
+		
 		d.put("commands.listqueues.header", "&9Queues:");
 		d.put("commands.listqueues.format", "{COLOR}{NAME}&7: {COUNT} queued");
 		

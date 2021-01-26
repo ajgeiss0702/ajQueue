@@ -3,15 +3,17 @@ package us.ajg0702.queue.commands;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Command;
+import net.md_5.bungee.api.plugin.TabExecutor;
 import us.ajg0702.queue.Main;
 import us.ajg0702.queue.Manager;
 import us.ajg0702.queue.QueueServer;
 import us.ajg0702.utils.bungee.BungeeMessages;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
-public class ManageCommand extends Command {
+public class ManageCommand extends Command implements TabExecutor {
 	
 	Main pl;
 	BungeeMessages msgs;
@@ -79,8 +81,12 @@ public class ManageCommand extends Command {
 				if(s == null) return;
 				sender.sendMessage(Main.formatMessage(s.getJoinableDebug((ProxiedPlayer) sender)));
 			}
-			if(args[0].equalsIgnoreCase("player")) {
-				sender.sendMessage(Main.formatMessage("/ajQueue <player> <server>"));
+			if(args[0].equalsIgnoreCase("send")) {
+				if(!sender.hasPermission("ajqueue.send")) {
+					sender.sendMessage(msgs.getBC("noperm"));
+					return;
+				}
+				sender.sendMessage(Main.formatMessage("/ajQueue send <player> <server>"));
 				return;
 			}
 			if(args[0].equalsIgnoreCase("version")) {
@@ -118,24 +124,12 @@ public class ManageCommand extends Command {
 						));
 				return;
 			}
-			
-			
-			
-			if(!sender.hasPermission("ajqueue.send")) {
-				sender.sendMessage(msgs.getBC("noperm"));
-				return;
-			}
-			
-			List<String> playerNames = getNameList();
-			if(playerNames.contains(args[0].toLowerCase())) {
-				
-				ProxiedPlayer ply = pl.getProxy().getPlayer(args[0]);
-				Manager.getInstance().addToQueue(ply, args[1]);
-				sender.sendMessage(Main.formatMessage(
-						msgs.get("send")
-						.replaceAll("\\{PLAYER\\}", ply.getDisplayName())
-						.replaceAll("\\{SERVER\\}", args[1]))
-					);
+			if(args[0].equalsIgnoreCase("send")) {
+				if(!sender.hasPermission("ajqueue.send")) {
+					sender.sendMessage(msgs.getBC("noperm"));
+					return;
+				}
+				sender.sendMessage(Main.formatMessage("/ajQueue send <player> <server>"));
 				return;
 			}
 		}
@@ -161,9 +155,31 @@ public class ManageCommand extends Command {
 						));
 				return;
 			}
+			if(args[0].equalsIgnoreCase("send")) {
+				if(!sender.hasPermission("ajqueue.send")) {
+					sender.sendMessage(msgs.getBC("noperm"));
+					return;
+				}
+				
+				List<String> playerNames = getNameList();
+				if(playerNames.contains(args[1].toLowerCase())) {
+					
+					ProxiedPlayer ply = pl.getProxy().getPlayer(args[1]);
+					Manager.getInstance().addToQueue(ply, args[2]);
+					sender.sendMessage(Main.formatMessage(
+							msgs.get("send")
+							.replaceAll("\\{PLAYER\\}", ply.getDisplayName())
+							.replaceAll("\\{SERVER\\}", args[2]))
+						);
+					return;
+				} else {
+					sender.sendMessage(msgs.getBC("commands.send.player-not-found"));
+					return;
+				}
+			}
 		}
 		
-		sender.sendMessage(Main.formatMessage("/ajqueue <reload|list|player|pause>"));
+		sender.sendMessage(Main.formatMessage("/ajqueue <reload|list|send|pause>"));
 	}
 	
 	private List<String> getNameList() {
@@ -173,5 +189,29 @@ public class ManageCommand extends Command {
 			playerNames.add(ply.getName().toLowerCase());
 		}
 		return playerNames;
+	}
+	
+	@Override
+	public Iterable<String> onTabComplete(CommandSender sender, String[] args) {
+		if(args.length == 1) {
+			return Arrays.asList("reload", "list", "send", "pause");
+		}
+		if(args.length == 2) {
+			if(args[0].equalsIgnoreCase("send")) {
+				return getNameList();
+			}
+			if(args[0].equalsIgnoreCase("pause")) {
+				return Manager.getInstance().getServerNames();
+			}
+		}
+		if(args.length == 3) {
+			if(args[0].equalsIgnoreCase("send")) {
+				return Manager.getInstance().getServerNames();
+			}
+			if(args[0].equalsIgnoreCase("pause")) {
+				return Arrays.asList("on", "off", "true", "false");
+			}
+		}
+		return null;
 	}
 }
