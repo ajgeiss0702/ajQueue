@@ -438,6 +438,8 @@ public class Manager {
 		} else {
 			for(ServerInfo si : serverInfos.keySet()) {
 				ServerPing sp = serverInfos.get(si);
+				if(sp == null) continue;
+				if(sp.getPlayers() == null) continue;
 				int online = sp.getPlayers().getOnline();
 				if(selected == null) {
 					selected = si;
