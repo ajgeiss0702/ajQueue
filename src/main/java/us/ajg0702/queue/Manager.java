@@ -657,8 +657,15 @@ public class Manager {
 		}
 		int pos = list.indexOf(p)+1;
 		int len = list.size();
-		boolean sendInstant = pl.config.getStringList("send-instantly").indexOf(server.getName()) != -1;
-		if((list.size() <= 1 || sendInstant) && server.canAccess(p)) {
+		
+		
+		boolean sendInstant = pl.config.getStringList("send-instantly").indexOf(server.getName()) != -1 && server.canAccess(p);
+		boolean sendInstantp = list.size() <= 1 && server.canAccess(p);
+		boolean timeGood = pl.config.getBoolean("check-last-player-sent-time") ?
+				System.currentTimeMillis() - server.getLastSentTime() > Math.floor(pl.getConfig().getDouble("wait-time")*1000)
+				: true;
+		
+		if(sendInstant || (sendInstantp && timeGood)) {
 			sendPlayers(s);
 			BaseComponent[] m = msgs.getBC("status.now-in-empty-queue", "POS:"+pos, "LEN:"+len, "SERVER:"+pl.aliases.getAlias(s));
 			if(TextComponent.toPlainText(m).length() > 0) {

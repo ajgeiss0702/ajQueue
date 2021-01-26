@@ -181,6 +181,7 @@ public class Main extends Plugin implements Listener {
 			int pos = queue.indexOf(p);
 			if((pos == 0 && ser.getInfos().contains(p.getServer().getInfo())) || config.getBoolean("remove-player-on-server-switch")) {
 				queue.remove(p);
+				ser.setLastSentTime(System.currentTimeMillis());
 				Manager.getInstance().sendingAttempts.remove(p);
 			}
 		}

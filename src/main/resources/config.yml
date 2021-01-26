@@ -1,5 +1,5 @@
 # Dont touch this number please
-config-version: 19
+config-version: 20
 
 # The time the server will wait between sending people in the queue
 #  Default: 5
@@ -146,3 +146,10 @@ max-tries: 10
 # If enabled, anyone with the permission ajqueue.bypasspaused will be able to join paused servers
 #  Default: false
 enable-bypasspaused-permission: false
+
+
+# Should we check to make sure that people dont get sent quicker than wait-time?
+#  Default: true
+check-last-player-sent-time: true
+
+

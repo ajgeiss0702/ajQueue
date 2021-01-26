@@ -166,6 +166,15 @@ public class QueueServer {
 	}
 	
 	
+	long lastSent = 0;
+	public long getLastSentTime() {
+		return lastSent;
+	}
+	public void setLastSentTime(long newLastSent) {
+		lastSent = newLastSent;
+	}
+	
+	
 	boolean whitelisted = false;
 	List<String> whitelistedplayers = new ArrayList<>();
 	public void setWhitelisted(boolean b) {
