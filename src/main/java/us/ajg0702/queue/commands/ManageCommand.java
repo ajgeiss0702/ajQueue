@@ -43,6 +43,10 @@ public class ManageCommand extends Command {
 				
 			}
 			if(args[0].equalsIgnoreCase("list")) {
+				if(!sender.hasPermission("ajqueue.list")) {
+					sender.sendMessage(msgs.getBC("noperm"));
+					return;
+				}
 				int total = 0;
 				for(QueueServer server : Manager.getInstance().getServers()) {
 					
