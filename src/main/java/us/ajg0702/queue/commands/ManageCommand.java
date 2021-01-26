@@ -150,7 +150,7 @@ public class ManageCommand extends Command {
 					sender.sendMessage(msgs.getBC("commands.pause.no-server", "SERVER:"+args[1]));
 					return;
 				}
-				srv.setPaused(args[2].equalsIgnoreCase("on"));
+				srv.setPaused(args[2].equalsIgnoreCase("on") || args[2].equalsIgnoreCase("true"));
 				sender.sendMessage(msgs.getBC("commands.pause.success",
 						"SERVER:"+srv.getName(),
 						"PAUSED:"+msgs.get("commands.pause.paused."+srv.isPaused())
