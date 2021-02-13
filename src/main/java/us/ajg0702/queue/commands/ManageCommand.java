@@ -140,7 +140,7 @@ public class ManageCommand extends Command implements TabExecutor {
 					return;
 				}
 				if(!Manager.getInstance().getServerNames().contains(args[1])) {
-					sender.sendMessage(msgs.getBC(""));
+					sender.sendMessage(msgs.getBC("commands.pause.no-server", "SERVER:"+args[1]));
 					return;
 				}
 				QueueServer srv = Manager.getInstance().findServer(args[1]);
