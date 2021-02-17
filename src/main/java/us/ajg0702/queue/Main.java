@@ -204,7 +204,7 @@ public class Main extends Plugin implements Listener {
 	@EventHandler
 	public void onLeave(PlayerDisconnectEvent e) {
 		ProxiedPlayer p = e.getPlayer();
-		if(p.hasPermission("ajqueue.stay-queued-on-leave")) return;
+		//if(p.hasPermission("ajqueue.stay-queued-on-leave")) return;
 		List<QueueServer> servers = man.findPlayerInQueue(p);
 		for(QueueServer server : servers) {
 			server.getQueue().remove(p);
