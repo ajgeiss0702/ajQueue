@@ -211,7 +211,8 @@ public class QueueServer {
 				"online: "+this.isOnline() +"\n"+
 				"canaccess: "+this.canAccess(p) +"\n"+
 				"full: "+ !this.isFull() +"\n"+
-				"paused: "+!this.isPaused();
+				"paused: "+!this.isPaused()+"\n"+
+				"- joinable: "+isJoinable(p);
 	}
 	
 	

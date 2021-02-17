@@ -681,19 +681,21 @@ public class Manager {
 		int len = list.size();
 		
 		
-		boolean sendInstant = pl.config.getStringList("send-instantly").indexOf(server.getName()) != -1 && server.canAccess(p);
+		boolean sendInstant = pl.config.getStringList("send-instantly").indexOf(server.getName()) != -1 || server.isJoinable(p);
 		boolean sendInstantp = list.size() <= 1 && server.canAccess(p);
 		boolean timeGood = pl.config.getBoolean("check-last-player-sent-time") ?
 				System.currentTimeMillis() - server.getLastSentTime() > Math.floor(pl.getConfig().getDouble("wait-time")*1000)
 				: true;
 		
-		if(sendInstant || (sendInstantp && timeGood)) {
+		if((sendInstant && (sendInstantp && timeGood))) {
 			sendPlayers(s);
+			//p.sendMessage(Main.formatMessage("sending instant"));
 			BaseComponent[] m = msgs.getBC("status.now-in-empty-queue", "POS:"+pos, "LEN:"+len, "SERVER:"+pl.aliases.getAlias(s));
 			if(TextComponent.toPlainText(m).length() > 0) {
 				p.sendMessage(m);
 			}
 		} else {
+			//p.sendMessage(Main.formatMessage("now in queue, not send instant"));
 			p.sendMessage(Main.formatMessage(
 					msgs.get("status.now-in-queue")
 					.replaceAll("\\{POS\\}", pos+"")
@@ -701,6 +703,7 @@ public class Manager {
 					.replaceAll("\\{SERVER\\}", pl.aliases.getAlias(s))
 					));
 		}
+		//p.sendMessage(Main.formatMessage(sendInstant+" && ("+sendInstantp+" && " + timeGood+")"));
 		
 		BungeeUtils.sendCustomData(p, "position", pos+"");
 		BungeeUtils.sendCustomData(p, "positionof", len+"");
