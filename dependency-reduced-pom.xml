@@ -4,7 +4,7 @@
   <groupId>us.ajg0702</groupId>
   <artifactId>ajQueue</artifactId>
   <name>ajQueue</name>
-  <version>1.8.0</version>
+  <version>1.9.0</version>
   <build>
     <resources>
       <resource>
