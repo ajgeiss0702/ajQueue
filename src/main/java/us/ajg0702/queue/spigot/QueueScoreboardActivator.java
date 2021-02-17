@@ -4,7 +4,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 
-public class QueueActionbarUpdateEvent extends Event {
+public class QueueScoreboardActivator extends Event {
 	private static final HandlerList HANDLERS = new HandlerList();
 
     public HandlerList getHandlers() {
@@ -17,7 +17,7 @@ public class QueueActionbarUpdateEvent extends Event {
     
     Player ply;
     
-    public QueueActionbarUpdateEvent(Player p) {
+    public QueueScoreboardActivator(Player p) {
     	this.ply = p;
     }
     

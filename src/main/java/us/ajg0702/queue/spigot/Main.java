@@ -10,7 +10,6 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.plugin.messaging.PluginMessageListener;
 
-import com.google.common.collect.Iterables;
 import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
@@ -80,9 +79,16 @@ public class Main extends JavaPlugin implements PluginMessageListener,Listener {
 	    	//getLogger().info("recieved actionbar for "+player.getName()+": "+text);
 	    	VersionSupport.sendActionBar(p, text);
 	    	
-	    	QueueActionbarUpdateEvent e = new QueueActionbarUpdateEvent(p);
-	    	Bukkit.getPluginManager().callEvent(e);
+	    	/*QueueActionbarUpdateEvent e = new QueueActionbarUpdateEvent(p);
+	    	Bukkit.getPluginManager().callEvent(e);*/
 	    	return;
+	    }
+	    if(subchannel.equals("inqueueevent")) {
+	    	String playername = in.readUTF();
+	    	Player p = Bukkit.getPlayer(playername);
+	    	if(p == null) return;
+	    	QueueScoreboardActivator e = new QueueScoreboardActivator(p);
+	    	Bukkit.getPluginManager().callEvent(e);
 	    }
 	    if(subchannel.equals("queuename") && papi) {
 	    	String playername = in.readUTF();

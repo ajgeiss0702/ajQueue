@@ -80,6 +80,7 @@ public class Manager {
 	int messagerId = -1;
 	int actionbarId = -1;
 	int srvRefId = -1;
+	int queueEventId = -1;
 	/**
 	 * Clears all intervals and re-makes them
 	 */
@@ -114,6 +115,18 @@ public class Manager {
 			} catch(IllegalArgumentException e) {}
 			srvRefId = -1;
 		}
+		if(queueEventId != -1) {
+			try {
+				pl.getProxy().getScheduler().cancel(queueEventId);
+			} catch(IllegalArgumentException e) {}
+			queueEventId = -1;
+		}
+		
+		queueEventId = pl.getProxy().getScheduler().schedule(pl, new Runnable() {
+			public void run() {
+				sendQueueEvents();
+			}
+		}, 2, 2, TimeUnit.SECONDS).getId();
 		
 		sendId = pl.getProxy().getScheduler().schedule(pl, new Runnable() {
 			public void run() {
@@ -315,6 +328,15 @@ public class Manager {
 			}
 		}
 		
+	}
+	
+	
+	public void sendQueueEvents() {
+		for(QueueServer s : servers) {
+			for(ProxiedPlayer p : s.getQueue()) {
+				BungeeUtils.sendCustomData(p, "inqueueevent", "true");
+			}
+		}
 	}
 	
 	/**
@@ -684,6 +706,7 @@ public class Manager {
 		BungeeUtils.sendCustomData(p, "positionof", len+"");
 		BungeeUtils.sendCustomData(p, "queuename", pl.aliases.getAlias(s));
 		BungeeUtils.sendCustomData(p, "inqueue", "true");
+		BungeeUtils.sendCustomData(p, "inqueueevent", "true");
 	}
 	
 	/**
