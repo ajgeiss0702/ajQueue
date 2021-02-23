@@ -51,6 +51,6 @@ public class MoveCommand extends Command implements TabExecutor {
 		if(args.length == 1) {
 			return Manager.getInstance().getServerNames();
 		}
-		return null;
+		return new ArrayList<>();
 	}
 }
