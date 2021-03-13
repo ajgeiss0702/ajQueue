@@ -15,13 +15,14 @@ repositories {
     maven { url = uri("http://repo.extendedclip.com/content/repositories/placeholderapi/") }
     maven { url = uri("https://repo.codemc.org/repository/maven-public") }
     maven { url = uri("https://oss.sonatype.org/content/repositories/snapshots") }
+    maven { url = uri("https://repo.codemc.io/repository/nms/") }
 
 }
 
 dependencies {
     compileOnly("com.github.MyzelYam:PremiumVanishAPI:2.0.3")
     compileOnly("net.md-5:bungeecord-api:1.14-SNAPSHOT")
-    compileOnly("org.spigotmc:spigot-api:1.16.4-RO.1-SNAPSHOT")
+    compileOnly(group = "org.spigotmc", name = "spigot", version = "1.16.4-R0.1-SNAPSHOT")
     compileOnly("me.clip:placeholderapi:2.10.4")
 
     implementation("us.ajg0702:ajUtils:1.0.0")
