@@ -15,6 +15,7 @@ build:
     - build/libs
 
 pages:
+  image: gradle:6.8.3-jdk15
   script:
   - gradle javadoc
   - mv build/docs/javadoc public
