@@ -447,9 +447,12 @@ public class Manager {
 			it.next().update();
 		}
 	}
-	
+
 	/**
 	 * Gets the ideal server in a server group.
+	 * @param s The group to check
+	 * @param p The player to check
+	 * @return the ideal server
 	 */
 	public ServerInfo getIdealServer(QueueServer s, ProxiedPlayer p) {
 		HashMap<ServerInfo, ServerPing> serverInfos = s.getLastPings();

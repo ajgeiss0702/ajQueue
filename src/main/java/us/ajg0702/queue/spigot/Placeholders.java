@@ -112,7 +112,7 @@ public class Placeholders extends PlaceholderExpansion {
      * <br>Since version 2.9.1 can you use OfflinePlayers in your requests.
      *
      * @param  player
-     *         A {@link org.bukkit.PkPlayer Player}.
+     *         A org.bukkit.PkPlayer Player.
      * @param  identifier
      *         A String containing the identifier/value.
      *
