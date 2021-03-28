@@ -632,7 +632,7 @@ public class Manager {
 		}
 		
 		if(p.getServer().getInfo().getName().equals(s)) {
-			p.sendMessage(msgs.getBC("errors.already-connected"));
+			p.sendMessage(msgs.getBC("errors.already-connected", "SERVER:"+pl.aliases.getAlias(server.getName())));
 			return;
 		}
 		
@@ -643,7 +643,7 @@ public class Manager {
 				return;
 			}
 			if(!pl.config.getBoolean("allow-multiple-queues")) {
-				p.sendMessage(msgs.getBC("status.left-last-queue"));
+				p.sendMessage(msgs.getBC("status.left-last-queue", "SERVER:"+pl.aliases.getAlias(server.getName())));
 				for(QueueServer ser : beforeQueues) {
 					ser.getQueue().remove(p);
 				}
