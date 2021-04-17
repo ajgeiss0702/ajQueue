@@ -1,4 +1,4 @@
 name: ajQueue
-version: ${project.version}
+version: "@VERSION@"
 main: us.ajg0702.queue.Main
 author: ajgeiss0702
