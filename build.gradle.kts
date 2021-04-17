@@ -1,10 +1,11 @@
 plugins {
     java
     id("com.github.johnrengelman.shadow").version("6.1.0")
+    `maven-publish`
 }
-
+ 
 group = "us.ajg0702"
-version = "1.9.0"
+version = "1.9.1"
 
 repositories {
     mavenCentral()
@@ -26,6 +27,7 @@ dependencies {
     compileOnly("me.clip:placeholderapi:2.10.4")
 
     implementation("us.ajg0702:ajUtils:1.0.0")
+    implementation("org.bstats:bstats-bungeecord:2.2.1")
 }
 
 tasks.withType<ProcessResources> {
@@ -39,5 +41,18 @@ tasks.withType<ProcessResources> {
 
 tasks.shadowJar {
     relocate("us.ajg0702.utils", "us.ajg0702.queue.utils")
+    relocate("org.bstats", "us.ajg0702.bstats")
     archiveFileName.set("${baseName}-${version}.${extension}")
+}
+
+publishing {
+    publications {
+        create<MavenPublication>("maven") {
+            groupId = project.group.toString();
+            artifactId = project.name
+            version = project.version.toString()
+
+            from(components["java"])
+        }
+    }
 }

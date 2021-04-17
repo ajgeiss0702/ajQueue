@@ -1,0 +1,24 @@
+image: gradle:6.8.2-jdk8
+
+# Cache downloaded dependencies and plugins between builds.
+# To keep cache across branches add 'key: "$CI_JOB_NAME"'
+cache:
+  paths:
+    - .gradle
+
+
+build:
+  script:
+  - gradle shadowJar
+  artifacts:
+    paths:
+    - build/libs
+
+pages:
+  image: gradle:6.8.3-jdk15
+  script:
+  - gradle javadoc
+  - mv build/docs/javadoc public
+  artifacts:
+    paths:
+    - public

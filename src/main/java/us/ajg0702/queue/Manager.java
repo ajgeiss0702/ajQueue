@@ -447,9 +447,12 @@ public class Manager {
 			it.next().update();
 		}
 	}
-	
+
 	/**
 	 * Gets the ideal server in a server group.
+	 * @param s The group to check
+	 * @param p The player to check
+	 * @return the ideal server
 	 */
 	public ServerInfo getIdealServer(QueueServer s, ProxiedPlayer p) {
 		HashMap<ServerInfo, ServerPing> serverInfos = s.getLastPings();
@@ -629,7 +632,7 @@ public class Manager {
 		}
 		
 		if(p.getServer().getInfo().getName().equals(s)) {
-			p.sendMessage(msgs.getBC("errors.already-connected"));
+			p.sendMessage(msgs.getBC("errors.already-connected", "SERVER:"+pl.aliases.getAlias(server.getName())));
 			return;
 		}
 		
@@ -640,7 +643,7 @@ public class Manager {
 				return;
 			}
 			if(!pl.config.getBoolean("allow-multiple-queues")) {
-				p.sendMessage(msgs.getBC("status.left-last-queue"));
+				p.sendMessage(msgs.getBC("status.left-last-queue", "SERVER:"+pl.aliases.getAlias(server.getName())));
 				for(QueueServer ser : beforeQueues) {
 					ser.getQueue().remove(p);
 				}
@@ -662,18 +665,24 @@ public class Manager {
 			Logic.priorityLogic(server.getQueue(), s, p);
 		} else {
 			if((p.hasPermission("ajqueue.priority") || p.hasPermission("ajqueue.serverpriority."+s)) && list.size() > 0) {
+				//p.sendMessage(Main.formatMessage("in priority"));
 				int i = 0;
 				for(ProxiedPlayer ply : list) {
 					if(!(ply.hasPermission("ajqueue.priority") || ply.hasPermission("ajqueue.serverpriority."+s))) {
+						//p.sendMessage(Main.formatMessage("Adding beind: "+i));
 						list.add(i, p);
 						break;
 					}
 					i++;
 				}
+				//p.sendMessage(Main.formatMessage("after loop"));
 				if(list.size() == 0) {
+					list.add(p);
+				} else if(!list.contains(p)) {
 					list.add(p);
 				}
 			} else {
+				//p.sendMessage(Main.formatMessage("normal add"));
 				list.add(p);
 			}
 		}
