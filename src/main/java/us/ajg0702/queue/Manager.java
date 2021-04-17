@@ -665,18 +665,24 @@ public class Manager {
 			Logic.priorityLogic(server.getQueue(), s, p);
 		} else {
 			if((p.hasPermission("ajqueue.priority") || p.hasPermission("ajqueue.serverpriority."+s)) && list.size() > 0) {
+				//p.sendMessage(Main.formatMessage("in priority"));
 				int i = 0;
 				for(ProxiedPlayer ply : list) {
 					if(!(ply.hasPermission("ajqueue.priority") || ply.hasPermission("ajqueue.serverpriority."+s))) {
+						//p.sendMessage(Main.formatMessage("Adding beind: "+i));
 						list.add(i, p);
 						break;
 					}
 					i++;
 				}
+				//p.sendMessage(Main.formatMessage("after loop"));
 				if(list.size() == 0) {
+					list.add(p);
+				} else if(!list.contains(p)) {
 					list.add(p);
 				}
 			} else {
+				//p.sendMessage(Main.formatMessage("normal add"));
 				list.add(p);
 			}
 		}
