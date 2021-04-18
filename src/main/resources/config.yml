@@ -1,5 +1,5 @@
 # Dont touch this number please
-config-version: 20
+config-version: 21
 
 # The time the server will wait between sending people in the queue
 #  Default: 5
@@ -147,7 +147,6 @@ max-tries: 10
 #  Default: false
 enable-bypasspaused-permission: false
 
-
 # Should we check to make sure that people dont get sent quicker than wait-time?
 #  Default: true
 check-last-player-sent-time: true
@@ -158,4 +157,18 @@ check-last-player-sent-time: true
 #  Default: false
 priority-queue-debug: false
 
+# When a player is kicked from a server, should we automatically add that player to the queue?
+# You will still need to use another plugin to make sure the player doesnt get kicked from bungee completly.
+#  Default: false
+auto-add-to-queue-on-kick: false
+# The delay for the above option.
+# In seconds, decimals supported.
+auto-add-to-queue-on-kick-delay: 1
 
+# With what kick reasons should we auto-add the player to the queue
+# This wont work if auto-add-to-queue-on-kick is disabled.
+# If you set it to [], then all kick messages will cause the player to be added to the queue
+# This works on contains, so you dont have to include the whole kick message, just a few words.
+auto-add-kick-reasons:
+- "restarting"
+- "closed"

@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.chat.BaseComponent;
@@ -216,7 +217,33 @@ public class Main extends Plugin implements Listener {
 	public void onFailedMove(ServerKickEvent e) {
 		ProxiedPlayer p = e.getPlayer();
 		List<QueueServer> queuedServers = man.findPlayerInQueue(p);
-		for(QueueServer server : queuedServers) { 
+
+
+		if(!queuedServers.contains(man.getServer(e.getKickedFrom().getName())) && config.getBoolean("auto-add-to-queue-on-kick")) {
+
+			String plainReason = "";
+			for(BaseComponent b : e.getKickReasonComponent()) {
+				plainReason += b.toPlainText();
+			}
+
+			List<String> reasons = config.getStringList("auto-add-kick-reasons");
+			boolean shouldqueue = false;
+			for(String reason : reasons) {
+				if(plainReason.toLowerCase().contains(reason.toLowerCase())) {
+					shouldqueue = true;
+					return;
+				}
+			}
+			if(shouldqueue || reasons.isEmpty()) {
+				plugin.getProxy().getScheduler().schedule(this, () -> {
+					man.addToQueue(p, e.getKickedFrom().getName());
+				}, (long) (config.getDouble("auto-add-to-queue-on-kick-delay")*1000), TimeUnit.MILLISECONDS);
+			}
+
+		}
+
+
+		for(QueueServer server : queuedServers) {
 			if(!(server.getInfos().contains(e.getKickedFrom()))) continue;
 			if(server.getQueue().indexOf(p) != 0) continue;
 			List<String> kickreasons = config.getStringList("kick-reasons");
