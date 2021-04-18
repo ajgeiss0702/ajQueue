@@ -16,10 +16,16 @@ public class Commands implements CommandExecutor {
 
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-		if(!(sender instanceof Player) && !(args.length > 1)) return true;
-		Player player = null;
-		if(sender instanceof Player) {
-			player = (Player) sender;
+		if(!(sender instanceof Player)) return true;
+		Player player = (Player) sender;
+		if(command.getName().equals("leavequeue")) {
+			StringBuilder arg = new StringBuilder();
+			for(String a : args) {
+				arg.append(" ");
+				arg.append(a);
+			}
+			pl.sendMessage(player, "leavequeue", arg.toString());
+			return true;
 		}
 		if(args.length < 1) return false;
 		

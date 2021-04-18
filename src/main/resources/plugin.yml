@@ -8,3 +8,6 @@ commands:
    move:
       aliases: [server, queue, joinq, joinqueue]
       description: Queue for a server
+   leavequeue:
+      aliases: [leaveq]
+      description: Leaves a queue
