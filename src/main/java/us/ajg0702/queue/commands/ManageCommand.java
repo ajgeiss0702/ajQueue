@@ -1,6 +1,7 @@
 package us.ajg0702.queue.commands;
 
 import net.md_5.bungee.api.CommandSender;
+import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Command;
 import net.md_5.bungee.api.plugin.TabExecutor;
@@ -109,7 +110,7 @@ public class ManageCommand extends Command implements TabExecutor {
 					return;
 				}
 				if(!Manager.getInstance().getServerNames().contains(args[1])) {
-					sender.sendMessage(msgs.getBC("errors.server-not-exist"));
+					sender.sendMessage(msgs.getBC("errors.server-not-exist", "SERVER:"+args[1]));
 					return;
 				}
 				QueueServer srv = Manager.getInstance().findServer(args[1]);
@@ -160,8 +161,13 @@ public class ManageCommand extends Command implements TabExecutor {
 					sender.sendMessage(msgs.getBC("noperm"));
 					return;
 				}
+
+				if(Manager.getInstance().getServer(args[2]) == null) {
+					sender.sendMessage(msgs.getBC("errors.server-not-exist", "SERVER:"+args[2]));
+					return;
+				}
 				
-				List<String> playerNames = getNameList();
+				List<String> playerNames = getNameList(true);
 				if(playerNames.contains(args[1].toLowerCase())) {
 					
 					ProxiedPlayer ply = pl.getProxy().getPlayer(args[1]);
@@ -172,6 +178,21 @@ public class ManageCommand extends Command implements TabExecutor {
 							.replaceAll("\\{SERVER\\}", args[2]))
 						);
 					return;
+				} else if(pl.getProxy().getServers().keySet().contains(args[1])) {
+
+					ServerInfo from = pl.getProxy().getServerInfo(args[1]);
+					if(from == null) {
+						sender.sendMessage(msgs.getBC("errors.server-not-exist", "SERVER:"+args[1]));
+						return;
+					}
+					List<ProxiedPlayer> players = new ArrayList<>(from.getPlayers());
+					for(ProxiedPlayer ply : players) {
+						Manager.getInstance().addToQueue(ply, args[2]);
+					}
+
+					sender.sendMessage(msgs.getBC("send", "PLAYER:"+args[1], "SERVER:"+args[2]));
+					return;
+
 				} else {
 					sender.sendMessage(msgs.getBC("commands.send.player-not-found"));
 					return;
@@ -182,11 +203,15 @@ public class ManageCommand extends Command implements TabExecutor {
 		sender.sendMessage(Main.formatMessage("/ajqueue <reload|list|send|pause>"));
 	}
 	
-	private List<String> getNameList() {
+	private List<String> getNameList(boolean lowercase) {
 		List<String> playerNames = new ArrayList<>();
 		for(ProxiedPlayer ply : pl.getProxy().getPlayers()) {
 			if(ply == null || !ply.isConnected()) continue;
-			playerNames.add(ply.getName().toLowerCase());
+			if(lowercase) {
+				playerNames.add(ply.getName().toLowerCase());
+			} else {
+				playerNames.add(ply.getName());
+			}
 		}
 		return playerNames;
 	}
@@ -198,7 +223,9 @@ public class ManageCommand extends Command implements TabExecutor {
 		}
 		if(args.length == 2) {
 			if(args[0].equalsIgnoreCase("send")) {
-				return getNameList();
+				List<String> options = new ArrayList<>(pl.getProxy().getServers().keySet());
+				options.addAll(getNameList(false));
+				return options;
 			}
 			if(args[0].equalsIgnoreCase("pause")) {
 				return Manager.getInstance().getServerNames();
@@ -212,6 +239,6 @@ public class ManageCommand extends Command implements TabExecutor {
 				return Arrays.asList("on", "off", "true", "false");
 			}
 		}
-		return null;
+		return new ArrayList<>();
 	}
 }
