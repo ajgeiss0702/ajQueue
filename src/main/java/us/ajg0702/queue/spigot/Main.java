@@ -28,6 +28,7 @@ public class Main extends JavaPlugin implements PluginMessageListener,Listener {
 		getServer().getMessenger().registerOutgoingPluginChannel(this, "ajqueue:tobungee");
 		
 		this.getCommand("move").setExecutor(new Commands(this));
+		this.getCommand("leavequeue").setExecutor(new Commands(this));
 		
 		Bukkit.getPluginManager().registerEvents(this, this);
 		

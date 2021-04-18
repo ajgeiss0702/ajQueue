@@ -312,6 +312,13 @@ public class Main extends Plugin implements Listener {
 				if(server == null) return;
 				BungeeUtils.sendCustomData(player, "queuedfor", srv, server.getQueue().size()+"");
 			}
+			if(subchannel.equals("leavequeue")) {
+				String arg = "";
+				try {
+					arg = in.readUTF();
+				} catch(Exception ignored) {}
+				getProxy().getPluginManager().dispatchCommand(player, "leavequeue"+arg);
+			}
 			
 		} catch (IOException e1) {
 			getLogger().warning("An error occured while reading data from spigot side:");
