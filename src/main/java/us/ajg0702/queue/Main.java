@@ -231,7 +231,7 @@ public class Main extends Plugin implements Listener {
 			for(String reason : reasons) {
 				if(plainReason.toLowerCase().contains(reason.toLowerCase())) {
 					shouldqueue = true;
-					return;
+					break;
 				}
 			}
 			if(shouldqueue || reasons.isEmpty()) {
