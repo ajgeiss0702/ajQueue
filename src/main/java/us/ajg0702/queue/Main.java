@@ -281,6 +281,7 @@ public class Main extends Plugin implements Listener {
 	public void onMessage(PluginMessageEvent e) {
 		//getLogger().info("Recieved message of "+e.getTag());
 		if(!e.getTag().equals("ajqueue:tobungee")) return;
+		if(!(e.getReceiver() instanceof ProxiedPlayer)) return;
 		e.setCancelled(true);
 		DataInputStream in = new DataInputStream(new ByteArrayInputStream(e.getData()));
 		try {
