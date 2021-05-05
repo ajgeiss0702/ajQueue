@@ -16,9 +16,9 @@ public class Commands implements CommandExecutor {
 
 	@Override
 	public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-		if(!(sender instanceof Player)) return true;
 		Player player = (Player) sender;
 		if(command.getName().equals("leavequeue")) {
+			if(!(sender instanceof Player)) return true;
 			StringBuilder arg = new StringBuilder();
 			for(String a : args) {
 				arg.append(" ");
