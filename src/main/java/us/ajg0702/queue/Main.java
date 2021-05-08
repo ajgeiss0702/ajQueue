@@ -280,6 +280,10 @@ public class Main extends Plugin implements Listener {
 	@EventHandler
 	public void onMessage(PluginMessageEvent e) {
 		//getLogger().info("Recieved message of "+e.getTag());
+		if(e.getTag().equals("ajqueue:tospigot")) {
+			e.setCancelled(true);
+			return;
+		}
 		if(!e.getTag().equals("ajqueue:tobungee")) return;
 		if(!(e.getReceiver() instanceof ProxiedPlayer)) return;
 		e.setCancelled(true);
