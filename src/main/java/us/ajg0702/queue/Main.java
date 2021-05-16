@@ -231,7 +231,7 @@ public class Main extends Plugin implements Listener {
 			for(String reason : reasons) {
 				if(plainReason.toLowerCase().contains(reason.toLowerCase())) {
 					shouldqueue = true;
-					return;
+					break;
 				}
 			}
 			if(shouldqueue || reasons.isEmpty()) {
@@ -280,7 +280,12 @@ public class Main extends Plugin implements Listener {
 	@EventHandler
 	public void onMessage(PluginMessageEvent e) {
 		//getLogger().info("Recieved message of "+e.getTag());
+		if(e.getTag().equals("ajqueue:tospigot")) {
+			e.setCancelled(true);
+			return;
+		}
 		if(!e.getTag().equals("ajqueue:tobungee")) return;
+		if(!(e.getReceiver() instanceof ProxiedPlayer)) return;
 		e.setCancelled(true);
 		DataInputStream in = new DataInputStream(new ByteArrayInputStream(e.getData()));
 		try {
