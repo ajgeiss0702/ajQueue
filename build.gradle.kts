@@ -43,7 +43,7 @@ tasks.withType<ProcessResources> {
 tasks.shadowJar {
     relocate("us.ajg0702.utils", "us.ajg0702.queue.utils")
     relocate("org.bstats", "us.ajg0702.bstats")
-    archiveFileName.set("${baseName}-${version}.${extension}")
+    archiveFileName.set("${archiveBaseName}-${archiveVersion}.${archiveExtension}")
 }
 
 publishing {
@@ -55,7 +55,7 @@ publishing {
 
     repositories {
         val mavenUrl = "https://gitlab.com/api/v4/projects/18580345/packages/maven"
-        val mavenSnapshotUrl = "https://gitlab.com/api/v4/projects/18580345/packages/maven"
+        //val mavenSnapshotUrl = "https://gitlab.com/api/v4/projects/18580345/packages/maven"
 
         maven {
             url = uri(mavenUrl)
