@@ -119,6 +119,7 @@ public class Main extends Plugin implements Listener {
 		d.put("commands.listqueues.format", "{COLOR}{NAME}&7: {COUNT} queued");
 		
 		d.put("max-tries-reached", "&cUnable to connect to {SERVER}. Max retries reached.");
+		d.put("auto-queued", "&aYou've been auto-queued for {SERVER} because you were kicked.");
 		
 		msgs = BungeeMessages.getInstance(this, d);
 		
@@ -215,7 +216,7 @@ public class Main extends Plugin implements Listener {
 	
 	@EventHandler
 	public void onFailedMove(ServerKickEvent e) {
-		ProxiedPlayer p = e.getPlayer();
+		final ProxiedPlayer p = e.getPlayer();
 		List<QueueServer> queuedServers = man.findPlayerInQueue(p);
 
 
@@ -236,7 +237,11 @@ public class Main extends Plugin implements Listener {
 			}
 			if(shouldqueue || reasons.isEmpty()) {
 				plugin.getProxy().getScheduler().schedule(this, () -> {
-					man.addToQueue(p, e.getKickedFrom().getName());
+					if(!p.isConnected()) return;
+
+					String toName = e.getKickedFrom().getName();
+					p.sendMessage(msgs.getBC("auto-queued", "SERVER:"+toName));
+					man.addToQueue(p, toName);
 				}, (long) (config.getDouble("auto-add-to-queue-on-kick-delay")*1000), TimeUnit.MILLISECONDS);
 			}
 

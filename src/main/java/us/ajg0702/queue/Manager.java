@@ -615,11 +615,13 @@ public class Manager {
 	 * @param s The name of the server
 	 */
 	public void addToQueue(ProxiedPlayer p, String s) {
+		if(p == null || s == null) return;
 		QueueServer server = findServer(s);
 		if(server == null) {
 			p.sendMessage(msgs.getBC("errors.server-not-exist"));
 			return;
 		}
+		if(!p.isConnected()) return;
 		
 		if(pl.config.getBoolean("joinfrom-server-permission") && !p.hasPermission("ajqueue.joinfrom."+p.getServer().getInfo().getName())) {
 			p.sendMessage(msgs.getBC("errors.deny-joining-from-server"));
