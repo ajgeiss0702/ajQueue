@@ -5,7 +5,7 @@ plugins {
 }
  
 group = "us.ajg0702"
-version = "1.9.3"
+version = "1.9.4"
 
 repositories {
     mavenCentral()
@@ -30,6 +30,7 @@ dependencies {
     implementation("org.bstats:bstats-bungeecord:2.2.1")
 }
 
+
 tasks.withType<ProcessResources> {
     include("**/*.yml")
     filter<org.apache.tools.ant.filters.ReplaceTokens>(
@@ -47,12 +48,9 @@ tasks.shadowJar {
 
 publishing {
     publications {
-        create<MavenPublication>("maven") {
-            groupId = project.group.toString();
-            artifactId = project.name
-            version = project.version.toString()
-
-            from(components["java"])
+        create<MavenPublication>("mavenJava") {
+            //artifact(tasks["sourcesJar"])
+            artifact(tasks["jar"])
         }
     }
 }
