@@ -5,20 +5,53 @@ image: gradle:6.8.2-jdk8
 cache:
   paths:
     - .gradle
+    - ~/.gradle
 
 
 build:
+  stage: build
   script:
-  - gradle shadowJar
+    - rm -rf build
+    - gradle shadowJar
   artifacts:
     paths:
-    - build/libs
+      - build/libs
 
 pages:
+  stage: build
   image: gradle:6.8.3-jdk15
+  only:
+    - master
   script:
-  - gradle javadoc
-  - mv build/docs/javadoc public
+    - gradle javadoc
+    - mv build/docs/javadoc public
   artifacts:
     paths:
-    - public
+      - public
+
+test:
+  stage: test
+  dependencies:
+    - build
+  script:
+    - gradle test
+
+deploy to maven repo:
+  stage: deploy
+  only:
+    - master
+  dependencies:
+    - build
+  script:
+    - gradle publish
+
+upload to updater:
+  stage: deploy
+  only:
+    - master
+  dependencies:
+    - build
+  script:
+    - cd build/libs
+    - files=(*)
+    - curl -i -F "submit=true" -F "secret=$UPLOAD_SECRET" -F "file=@${files[0]}" https://ajg0702.us/pl/updater/upload.php
