@@ -49,8 +49,24 @@ tasks.shadowJar {
 publishing {
     publications {
         create<MavenPublication>("mavenJava") {
-            //artifact(tasks["sourcesJar"])
             artifact(tasks["jar"])
+        }
+    }
+
+    repositories {
+        val mavenUrl = "https://gitlab.com/api/v4/projects/18580345/packages/maven"
+        val mavenSnapshotUrl = "https://gitlab.com/api/v4/projects/18580345/packages/maven"
+
+        maven {
+            url = uri(mavenUrl)
+            name = "Gitlab"
+            credentials(HttpHeaderCredentials::class.java) {
+                name = "Private-Token"
+                value = System.getenv("CI_JOB_TOKEN")
+            }
+            authentication {
+                container(HttpHeaderAuthentication::class.java)
+            }
         }
     }
 }

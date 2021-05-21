@@ -36,6 +36,15 @@ test:
   script:
     - gradle test
 
+deploy to maven repo:
+  stage: deploy
+  only:
+    - master
+  dependencies:
+    - build
+  script:
+    - gradle publish
+
 upload to updater:
   stage: deploy
   only:
