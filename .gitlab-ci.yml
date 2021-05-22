@@ -12,7 +12,7 @@ build:
   stage: build
   script:
     - rm -rf build
-    - gradle shadowJar
+    - ./gradlew shadowJar
   artifacts:
     paths:
       - build/libs
@@ -23,7 +23,7 @@ pages:
   only:
     - master
   script:
-    - gradle javadoc
+    - ./gradlew javadoc
     - mv build/docs/javadoc public
   artifacts:
     paths:
@@ -34,7 +34,7 @@ test:
   dependencies:
     - build
   script:
-    - gradle test
+    - ./gradlew test
 
 deploy to maven repo:
   stage: deploy
@@ -43,7 +43,7 @@ deploy to maven repo:
   dependencies:
     - build
   script:
-    - gradle publish
+    - ./gradlew publish
 
 upload to updater:
   stage: deploy
