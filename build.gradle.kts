@@ -61,7 +61,7 @@ publishing {
             url = uri(mavenUrl)
             name = "GitLab"
 
-            credentials(HttpHeaderCredentials::class.java) {
+            credentials(HttpHeaderCredentials::class) {
                 name = "Job-Token"
                 value = System.getenv("CI_JOB_TOKEN")
             }
