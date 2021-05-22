@@ -60,12 +60,12 @@ publishing {
         maven {
             url = uri(mavenUrl)
             name = "Gitlab"
+            credentials(HttpHeaderCredentials::class.java) {
+                name = "Job-Token"
+                value = System.getenv("CI_JOB_TOKEN")
+            }
             authentication {
-                //container(HttpHeaderAuthentication::class.java)
-                credentials(HttpHeaderCredentials::class.java) {
-                    name = "Job-Token"
-                    value = System.getenv("CI_JOB_TOKEN")
-                }
+                container(HttpHeaderAuthentication::class.java)
             }
         }
     }
