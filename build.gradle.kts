@@ -62,12 +62,11 @@ publishing {
             name = "GitLab"
 
             credentials(HttpHeaderCredentials::class.java) {
-
                 name = "Job-Token"
                 value = System.getenv("CI_JOB_TOKEN")
             }
             authentication {
-                HttpHeaderAuthentication::class.java
+                credentials
             }
         }
     }
