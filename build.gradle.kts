@@ -63,7 +63,7 @@ publishing {
 
             credentials(HttpHeaderCredentials::class) {
                 name = "Job-Token"
-                value = "a"//System.getenv("CI_JOB_TOKEN")
+                value = System.getenv("CI_JOB_TOKEN")
             }
             authentication {
                 getCredentials(HttpHeaderCredentials::class)
