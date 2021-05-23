@@ -3,7 +3,7 @@ plugins {
     id("com.github.johnrengelman.shadow").version("6.1.0")
     `maven-publish`
 }
- 
+
 group = "us.ajg0702"
 version = "1.9.4"
 
@@ -59,13 +59,14 @@ publishing {
 
         maven {
             url = uri(mavenUrl)
-            name = "Gitlab"
-            credentials(HttpHeaderCredentials::class.java) {
+            name = "GitLab"
+
+            credentials(HttpHeaderCredentials::class) {
                 name = "Job-Token"
-                value = System.getenv("CI_JOB_TOKEN")
+                value = "a"//System.getenv("CI_JOB_TOKEN")
             }
             authentication {
-                container(HttpHeaderAuthentication::class.java)
+                getCredentials(HttpHeaderCredentials::class)
             }
         }
     }
