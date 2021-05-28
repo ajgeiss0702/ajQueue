@@ -332,9 +332,10 @@ public class Manager {
 	
 	
 	public void sendQueueEvents() {
-		for(QueueServer s : servers) {
-			for(ProxiedPlayer p : s.getQueue()) {
-				BungeeUtils.sendCustomData(p, "inqueueevent", "true");
+		for(Iterator<QueueServer> it = servers.iterator(); it.hasNext();) {
+			QueueServer s = it.next();
+			for(Iterator<ProxiedPlayer> pit = s.getQueue().iterator(); pit.hasNext();) {
+				BungeeUtils.sendCustomData(pit.next(), "inqueueevent", "true");
 			}
 		}
 	}
