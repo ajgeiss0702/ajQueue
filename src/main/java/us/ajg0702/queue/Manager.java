@@ -332,9 +332,10 @@ public class Manager {
 	
 	
 	public void sendQueueEvents() {
-		for(QueueServer s : servers) {
-			for(ProxiedPlayer p : s.getQueue()) {
-				BungeeUtils.sendCustomData(p, "inqueueevent", "true");
+		for(Iterator<QueueServer> it = servers.iterator(); it.hasNext();) {
+			QueueServer s = it.next();
+			for(Iterator<ProxiedPlayer> pit = s.getQueue().iterator(); pit.hasNext();) {
+				BungeeUtils.sendCustomData(pit.next(), "inqueueevent", "true");
 			}
 		}
 	}
@@ -558,15 +559,14 @@ public class Manager {
 			if(s.getName() == null) {
 				pl.getLogger().info("s.getName() is null");
 			}*/
-			
-			
-			while(nextplayer.getServer().getInfo().getName().equals(s.getName())) {
+
+			if(s.getQueue().size() <= 0) continue;
+			while(!nextplayer.isConnected()) {
 				s.getQueue().remove(nextplayer);
 				if(s.getQueue().size() <= 0) break;
 				nextplayer = s.getQueue().get(0);
 			}
-			if(s.getQueue().size() <= 0) continue;
-			while(!nextplayer.isConnected()) {
+			while(nextplayer.getServer().getInfo().getName().equals(s.getName())) {
 				s.getQueue().remove(nextplayer);
 				if(s.getQueue().size() <= 0) break;
 				nextplayer = s.getQueue().get(0);
