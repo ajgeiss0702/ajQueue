@@ -614,7 +614,7 @@ public class Manager {
 	 * @param p The player
 	 * @param s The name of the server
 	 */
-	public void addToQueue(ProxiedPlayer p, String s) {
+	public synchronized void addToQueue(ProxiedPlayer p, String s) {
 		if(p == null || s == null) return;
 		QueueServer server = findServer(s);
 		if(server == null) {

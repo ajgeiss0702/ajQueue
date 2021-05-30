@@ -45,6 +45,7 @@ public class Main extends JavaPlugin implements PluginMessageListener,Listener {
 				if(Bukkit.getOnlinePlayers().size() <= 0 || queuebatch.size() <= 0) return;
 				String msg = "";
 				for(Player p : queuebatch.keySet()) {
+					if(p == null || !p.isOnline()) continue;
 					msg += p.getName()+":"+queuebatch.get(p)+",";
 				}
 				if(msg.length() > 1) {
