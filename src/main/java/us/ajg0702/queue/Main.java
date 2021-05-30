@@ -243,6 +243,7 @@ public class Main extends Plugin implements Listener {
 					p.sendMessage(msgs.getBC("auto-queued", "SERVER:"+toName));
 					man.addToQueue(p, toName);
 				}, (long) (config.getDouble("auto-add-to-queue-on-kick-delay")*1000), TimeUnit.MILLISECONDS);
+				return;
 			}
 
 		}
