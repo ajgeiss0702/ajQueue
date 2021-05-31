@@ -65,9 +65,6 @@ publishing {
                 name = "Job-Token"
                 value = System.getenv("CI_JOB_TOKEN")
             }
-            authentication {
-                getCredentials(HttpHeaderCredentials::class)
-            }
         }
     }
 }
