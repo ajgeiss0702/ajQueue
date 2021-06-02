@@ -54,19 +54,18 @@ publishing {
     }
 
     repositories {
-        val mavenUrl = "https://gitlab.com/api/v4/projects/18580345/packages/maven"
-        //val mavenSnapshotUrl = "https://gitlab.com/api/v4/projects/18580345/packages/maven"
 
-        maven {
-            url = uri(mavenUrl)
-            name = "GitLab"
+        val mavenUrl = "https://repo.ajg0702.us/releases"
 
-            credentials(HttpHeaderCredentials::class) {
-                name = "Job-Token"
-                value = System.getenv("CI_JOB_TOKEN")
-            }
-            authentication {
-                getCredentials(HttpHeaderCredentials::class)
+        if(!System.getenv("REPO_TOKEN").isNullOrEmpty()) {
+            maven {
+                url = uri(mavenUrl)
+                name = "ajRepo"
+
+                credentials {
+                    username = "plugins"
+                    password = System.getenv("REPO_TOKEN")
+                }
             }
         }
     }
