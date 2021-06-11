@@ -13,7 +13,7 @@ repositories {
     maven { url = uri("https://jitpack.io") }
     maven { url = uri("https://gitlab.com/api/v4/projects/19978391/packages/maven") }
     maven { url = uri("https://hub.spigotmc.org/nexus/content/repositories/snapshots/") }
-    maven { url = uri("http://repo.extendedclip.com/content/repositories/placeholderapi/") }
+    maven { url = uri("https://repo.extendedclip.com/content/repositories/placeholderapi/") }
     maven { url = uri("https://repo.codemc.org/repository/maven-public") }
     maven { url = uri("https://oss.sonatype.org/content/repositories/snapshots") }
     maven { url = uri("https://repo.codemc.io/repository/nms/") }
