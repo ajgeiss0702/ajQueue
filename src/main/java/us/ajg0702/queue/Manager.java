@@ -209,7 +209,7 @@ public class Manager {
 	 * 
 	 * Also creates/edits server groups
 	 */
-	public void reloadServers() {
+	public synchronized void reloadServers() {
 		if(pl.config == null) {
 			pl.getLogger().warning("[MAN] Config is null");
 		}
@@ -260,7 +260,7 @@ public class Manager {
 	 * Sends actionbar updates to all players in all queues with their
 	 * position in the queue and time remaining
 	 */
-	public void sendActionBars() {
+	public synchronized void sendActionBars() {
 		if(!pl.getConfig().getBoolean("send-actionbar")) return;
 		
 		for(ProxiedPlayer p : ProxyServer.getInstance().getPlayers()) {
@@ -331,7 +331,7 @@ public class Manager {
 	}
 	
 	
-	public void sendQueueEvents() {
+	public synchronized void sendQueueEvents() {
 		for(Iterator<QueueServer> it = servers.iterator(); it.hasNext();) {
 			QueueServer s = it.next();
 			for(Iterator<ProxiedPlayer> pit = s.getQueue().iterator(); pit.hasNext();) {
@@ -344,7 +344,7 @@ public class Manager {
 	 * Sends the message to the player updating them on their position in the queue
 	 * along with their time remaining
 	 */
-	public void sendMessages() {
+	public synchronized void sendMessages() {
 		for(QueueServer s : servers) {
 			List<ProxiedPlayer> plys = s.getQueue();
 			Iterator<ProxiedPlayer> it = plys.iterator();
@@ -364,7 +364,7 @@ public class Manager {
 	 * @param ply The player to send the message to
 	 * @param s The QueueServer the message should be about
 	 */
-	public void sendMessage(ProxiedPlayer ply, QueueServer s) {
+	public synchronized void sendMessage(ProxiedPlayer ply, QueueServer s) {
 		List<ProxiedPlayer> plys = s.getQueue();
 		int pos = plys.indexOf(ply)+1;
 		if(pos == 0) return;
@@ -442,7 +442,7 @@ public class Manager {
 	/**
 	 * Updates info about servers.
 	 */
-	public void updateServers() {
+	public synchronized void updateServers() {
 		Iterator<QueueServer> it = servers.iterator();
 		while(it.hasNext()) {
 			it.next().update();
