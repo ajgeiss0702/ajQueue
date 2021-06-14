@@ -23,7 +23,7 @@ repositories {
 dependencies {
     compileOnly("com.github.MyzelYam:PremiumVanishAPI:2.0.3")
     compileOnly("net.md-5:bungeecord-api:1.14-SNAPSHOT")
-    compileOnly(group = "org.spigotmc", name = "spigot", version = "1.16.4-R0.1-SNAPSHOT")
+    compileOnly(group = "org.spigotmc", name = "spigot", version = "1.16.5-R0.1-SNAPSHOT")
     compileOnly("me.clip:placeholderapi:2.10.4")
 
     implementation("us.ajg0702:ajUtils:1.0.0")
