@@ -5,7 +5,7 @@ plugins {
 }
 
 group = "us.ajg0702"
-version = "1.9.6"
+version = "1.9.7"
 
 repositories {
     mavenCentral()
@@ -13,7 +13,7 @@ repositories {
     maven { url = uri("https://jitpack.io") }
     maven { url = uri("https://gitlab.com/api/v4/projects/19978391/packages/maven") }
     maven { url = uri("https://hub.spigotmc.org/nexus/content/repositories/snapshots/") }
-    maven { url = uri("http://repo.extendedclip.com/content/repositories/placeholderapi/") }
+    maven { url = uri("https://repo.extendedclip.com/content/repositories/placeholderapi/") }
     maven { url = uri("https://repo.codemc.org/repository/maven-public") }
     maven { url = uri("https://oss.sonatype.org/content/repositories/snapshots") }
     maven { url = uri("https://repo.codemc.io/repository/nms/") }
@@ -23,7 +23,7 @@ repositories {
 dependencies {
     compileOnly("com.github.MyzelYam:PremiumVanishAPI:2.0.3")
     compileOnly("net.md-5:bungeecord-api:1.14-SNAPSHOT")
-    compileOnly(group = "org.spigotmc", name = "spigot", version = "1.16.4-R0.1-SNAPSHOT")
+    compileOnly(group = "org.spigotmc", name = "spigot", version = "1.16.5-R0.1-SNAPSHOT")
     compileOnly("me.clip:placeholderapi:2.10.4")
 
     implementation("us.ajg0702:ajUtils:1.0.0")
