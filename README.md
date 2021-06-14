@@ -5,6 +5,3 @@ This is the source code for ajQueue. If you make changes, open a merge request a
 
 ## My dumb code
 If you say my code is ugly, fix it and open a merge reguest before making fun of it ;)
-
-## ajQueuePlus
-The source code for ajQueuePlus will probably stay private.
