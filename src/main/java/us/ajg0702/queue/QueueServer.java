@@ -144,7 +144,7 @@ public class QueueServer {
 	
 	
 	List<ProxiedPlayer> queue = new ArrayList<>();
-	public List<ProxiedPlayer> getQueue() {
+	public synchronized List<ProxiedPlayer> getQueue() {
 		return queue;
 	}
 	

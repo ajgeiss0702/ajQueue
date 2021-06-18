@@ -335,7 +335,10 @@ public class Manager {
 		for(Iterator<QueueServer> it = servers.iterator(); it.hasNext();) {
 			QueueServer s = it.next();
 			for(Iterator<ProxiedPlayer> pit = s.getQueue().iterator(); pit.hasNext();) {
-				BungeeUtils.sendCustomData(pit.next(), "inqueueevent", "true");
+				ProxiedPlayer player = pit.next();
+				if(player == null) continue;
+				if(!player.isConnected()) continue;
+				BungeeUtils.sendCustomData(player, "inqueueevent", "true");
 			}
 		}
 	}
