@@ -65,7 +65,7 @@ public class Main extends Plugin implements Listener {
 		
 		d.put("status.online.base", "&7You are in position &f{POS}&7 of &f{LEN}&7. Estimated time: {TIME}");
 		d.put("status.left-last-queue", "&aYou left the last queue you were in.");
-		d.put("status.now-in-queue", "&aYou are now queued for {SERVER}! &7You are in position &f{POS}&7 of &f{LEN}&7.\n&7Type &f/leavequeue&7 to leave the queue!");
+		d.put("status.now-in-queue", "&aYou are now queued for {SERVER}! &7You are in position &f{POS}&7 of &f{LEN}&7.\n&7Type &f/leavequeue&7 or &f<click:run_command:/leavequeue {SERVERNAME}>click here</click>&7 to leave the queue!");
 		d.put("status.now-in-empty-queue", "");
 		d.put("status.sending-now", "&aSending you to &f{SERVER} &anow..");
 		
@@ -113,7 +113,7 @@ public class Main extends Plugin implements Listener {
 		d.put("commands.send.player-not-found", "&cThat player could not be found. Make sure they are online!");
 		
 		d.put("commands.listqueues.header", "&9Queues:");
-		d.put("commands.listqueues.format", "{COLOR}{NAME}&7: {COUNT} queued");
+		d.put("commands.listqueues.format", "<hover:show_text:'&7Status: {STATUS}'>{COLOR}{NAME}&7: {COUNT} queued</hover>");
 		
 		d.put("max-tries-reached", "&cUnable to connect to {SERVER}. Max retries reached.");
 		d.put("auto-queued", "&aYou've been auto-queued for {SERVER} because you were kicked.");

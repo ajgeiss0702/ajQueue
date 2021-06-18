@@ -277,29 +277,8 @@ public class Manager {
 			int len = plys.size();
 			if(!s.isJoinable(p)) {
 				
-				String status = "unknown";
-				
-				
-				if(!s.canAccess(p)) {
-					status = msgs.getString("status.offline.restricted");
-				}
-				
-				if(s.isFull()) {
-					status = msgs.getString("status.offline.full");
-				}
-				
-				if(s.isPaused()) {
-					status = msgs.getString("status.offline.paused");
-				}
-				
-				if(!s.isOnline()) {
-					status = msgs.getString("status.offline.restarting");
-				}
-				
-				if(s.getOfflineTime() > pl.config.getInt("offline-time")) {
-					status = msgs.getString("status.offline.offline");
-				}
-				
+				String status = s.getStatusString(p);
+
 				
 				p.sendMessage(ChatMessageType.ACTION_BAR, msgs.getBC("spigot.actionbar.offline", 
 						"POS:"+pos,
@@ -375,23 +354,7 @@ public class Manager {
 		int ot = s.getOfflineTime();
 		if(!s.isJoinable(ply)) {
 			
-			String status = msgs.getString("status.offline.restarting");
-			
-			if(ot > pl.config.getInt("offline-time")) {
-				status = msgs.getString("status.offline.offline");
-			}
-			
-			if(s.isFull() && s.isOnline()) {
-				status = msgs.getString("status.offline.full");
-			}
-			
-			if(!s.canAccess(ply)) {
-				status = msgs.getString("status.offline.restricted");
-			}
-			
-			if(s.isPaused()) {
-				status = msgs.getString("status.offline.paused");
-			}
+			String status = s.getStatusString(ply);
 			
 			if(status.isEmpty()) return;
 			
@@ -709,7 +672,8 @@ public class Manager {
 			p.sendMessage(msgs.getBC("status.now-in-queue",
 					"POS:"+pos,
 					"LEN:"+len,
-					"SERVER:"+pl.aliases.getAlias(server.getName())
+					"SERVER:"+pl.aliases.getAlias(server.getName()),
+					"SERVERNAME:"+server.getName()
 					));
 		}
 		//p.sendMessage(Main.formatMessage(sendInstant+" && ("+sendInstantp+" && " + timeGood+")"));

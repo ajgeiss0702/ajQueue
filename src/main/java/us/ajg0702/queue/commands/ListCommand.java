@@ -1,6 +1,7 @@
 package us.ajg0702.queue.commands;
 
 import net.md_5.bungee.api.CommandSender;
+import net.md_5.bungee.api.chat.BaseComponent;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Command;
@@ -8,6 +9,9 @@ import us.ajg0702.queue.Main;
 import us.ajg0702.queue.Manager;
 import us.ajg0702.queue.QueueServer;
 import us.ajg0702.utils.bungee.BungeeMessages;
+
+import java.util.ArrayList;
+import java.util.Arrays;
 
 public class ListCommand extends Command {
 	Main pl;
@@ -31,7 +35,7 @@ public class ListCommand extends Command {
 			spp = (ProxiedPlayer) sender;
 		}
 		
-		String m = msgs.get("commands.listqueues.header");
+		ArrayList<BaseComponent> m = new ArrayList<>(Arrays.asList(msgs.getBC("commands.listqueues.header")));
 		for(QueueServer s : Manager.getInstance().getServers()) {
 			String color = "&a";
 			if(!s.isOnline()) {
@@ -39,13 +43,17 @@ public class ListCommand extends Command {
 			} else if(!s.isJoinable(spp)) {
 				color = "&e";
 			}
-			m += "\n"+msgs.get("commands.listqueues.format")
-					.replaceAll("\\{COLOR\\}", msgs.color(color))
-					.replaceAll("\\{NAME\\}", s.getName())
-					.replaceAll("\\{COUNT\\}", s.getQueue().size()+"");
+
+			m.addAll(Arrays.asList(TextComponent.fromLegacyText("\n")));
+			m.addAll(Arrays.asList(msgs.getBC("commands.listqueues.format",
+					"COLOR:" + msgs.color(color),
+					"NAME:" + s.getName(),
+					"COUNT:" + s.getQueue().size(),
+					"STATUS:" + s.getStatusString(spp)
+			)));
 		}
 		
-		sender.sendMessage(TextComponent.fromLegacyText(m));
+		sender.sendMessage(m.toArray(new BaseComponent[m.size()-1]));
 		
 	}
 }

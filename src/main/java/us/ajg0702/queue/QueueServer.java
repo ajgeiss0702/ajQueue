@@ -11,6 +11,7 @@ import net.md_5.bungee.api.ServerPing;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import us.ajg0702.utils.bungee.BungeeConfig;
+import us.ajg0702.utils.bungee.BungeeMessages;
 
 public class QueueServer {
 	
@@ -83,6 +84,33 @@ public class QueueServer {
 				}
 			});
 		}
+	}
+
+	public String getStatusString(ProxiedPlayer p) {
+		BungeeMessages msgs = Main.plugin.msgs;
+
+		if(getOfflineTime() > Main.plugin.getConfig().getInt("offline-time")) {
+			return msgs.getString("status.offline.offline");
+		}
+
+		if(!isOnline()) {
+			return msgs.getString("status.offline.restarting");
+		}
+
+		if(isPaused()) {
+			return msgs.getString("status.offline.paused");
+		}
+
+		if(isFull()) {
+			return msgs.getString("status.offline.full");
+		}
+
+		if(p != null && !canAccess(p)) {
+			return msgs.getString("status.offline.restricted");
+		}
+
+
+		return "Online";
 	}
 	
 	public HashMap<ServerInfo, ServerPing> getLastPings() {
