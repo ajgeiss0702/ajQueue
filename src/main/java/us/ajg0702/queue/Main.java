@@ -23,10 +23,7 @@ import us.ajg0702.queue.commands.LeaveCommand;
 import us.ajg0702.queue.commands.ListCommand;
 import us.ajg0702.queue.commands.ManageCommand;
 import us.ajg0702.queue.commands.MoveCommand;
-import us.ajg0702.utils.bungee.BungeeConfig;
-import us.ajg0702.utils.bungee.BungeeMessages;
-import us.ajg0702.utils.bungee.BungeeStats;
-import us.ajg0702.utils.bungee.BungeeUtils;
+import us.ajg0702.utils.bungee.*;
 
 public class Main extends Plugin implements Listener {
 	

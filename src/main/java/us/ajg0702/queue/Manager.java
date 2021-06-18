@@ -170,7 +170,7 @@ public class Manager {
 	public String getQueuedName(ProxiedPlayer p) {
 		List<QueueServer> queued = findPlayerInQueue(p);
 		if(queued.size() <= 0) {
-			return msgs.get("placeholders.queued.none");
+			return msgs.getString("placeholders.queued.none");
 		}
 		QueueServer selected = queued.get(0);
 		
@@ -281,23 +281,23 @@ public class Manager {
 				
 				
 				if(!s.canAccess(p)) {
-					status = msgs.get("status.offline.restricted");
+					status = msgs.getString("status.offline.restricted");
 				}
 				
 				if(s.isFull()) {
-					status = msgs.get("status.offline.full");
+					status = msgs.getString("status.offline.full");
 				}
 				
 				if(s.isPaused()) {
-					status = msgs.get("status.offline.paused");
+					status = msgs.getString("status.offline.paused");
 				}
 				
 				if(!s.isOnline()) {
-					status = msgs.get("status.offline.restarting");
+					status = msgs.getString("status.offline.restarting");
 				}
 				
 				if(s.getOfflineTime() > pl.config.getInt("offline-time")) {
-					status = msgs.get("status.offline.offline");
+					status = msgs.getString("status.offline.offline");
 				}
 				
 				
@@ -308,15 +308,15 @@ public class Manager {
 						"STATUS:"+status));
 			} else {
 				int time = (int) Math.round(pos*pl.timeBetweenPlayers);
-				int min = (int) Math.floor((time) / (60));
-				int sec = (int) Math.floor((time % (60)));
+				int min = (int) Math.floor((time) / (60.0));
+				int sec = (int) Math.floor((time % (60.0)));
 				String timeStr;
 	        	if(min <= 0) {
-	        		timeStr = msgs.get("format.time.secs")
+	        		timeStr = msgs.getString("format.time.secs")
 	        				.replaceAll("\\{m\\}", "0")
 	        				.replaceAll("\\{s\\}", sec+"");
 	        	} else {
-	        		timeStr = msgs.get("format.time.mins")
+	        		timeStr = msgs.getString("format.time.mins")
 	        				.replaceAll("\\{m\\}", min+"")
 	        				.replaceAll("\\{s\\}", sec+"");
 	        	}
@@ -375,54 +375,52 @@ public class Manager {
 		int ot = s.getOfflineTime();
 		if(!s.isJoinable(ply)) {
 			
-			String status = msgs.get("status.offline.restarting");
+			String status = msgs.getString("status.offline.restarting");
 			
 			if(ot > pl.config.getInt("offline-time")) {
-				status = msgs.get("status.offline.offline");
+				status = msgs.getString("status.offline.offline");
 			}
 			
 			if(s.isFull() && s.isOnline()) {
-				status = msgs.get("status.offline.full");
+				status = msgs.getString("status.offline.full");
 			}
 			
 			if(!s.canAccess(ply)) {
-				status = msgs.get("status.offline.restricted");
+				status = msgs.getString("status.offline.restricted");
 			}
 			
 			if(s.isPaused()) {
-				status = msgs.get("status.offline.paused");
+				status = msgs.getString("status.offline.paused");
 			}
 			
 			if(status.isEmpty()) return;
 			
-			ply.sendMessage(Main.formatMessage(
-					msgs.get("status.offline.base")
-					.replaceAll("\\{STATUS\\}", status)
-					.replaceAll("\\{POS\\}", pos+"")
-					.replaceAll("\\{LEN\\}", len+"")
-					.replaceAll("\\{SERVER\\}", pl.aliases.getAlias(s.getName()))
+			ply.sendMessage(msgs.getBC("status.offline.base",
+					"STATUS:"+status,
+					"POS:"+pos,
+					"LEN:"+len,
+					"SERVER:"+pl.aliases.getAlias(s.getName())
 				));
 		} else {
-			if(msgs.get("spigot.actionbar.offline").isEmpty()) return;
+			if(msgs.getString("spigot.actionbar.offline").isEmpty()) return;
 			int time = (int) Math.round(pos*pl.timeBetweenPlayers);
 			int min = (int) Math.floor((time) / (60));
 			int sec = (int) Math.floor((time % (60)));
 			String timeStr;
         	if(min <= 0) {
-        		timeStr = msgs.get("format.time.secs")
+        		timeStr = msgs.getString("format.time.secs")
         				.replaceAll("\\{m\\}", "0")
         				.replaceAll("\\{s\\}", sec+"");
         	} else {
-        		timeStr = msgs.get("format.time.mins")
+        		timeStr = msgs.getString("format.time.mins")
         				.replaceAll("\\{m\\}", min+"")
         				.replaceAll("\\{s\\}", sec+"");
         	}
-			ply.sendMessage(Main.formatMessage(
-					msgs.get("status.online.base")
-					.replaceAll("\\{POS\\}", pos+"")
-					.replaceAll("\\{LEN\\}", len+"")
-					.replaceAll("\\{TIME\\}", timeStr)
-					.replaceAll("\\{SERVER\\}", pl.aliases.getAlias(s.getName()))
+			ply.sendMessage(msgs.getBC("status.online.base",
+					"TIME:"+timeStr,
+					"POS:"+pos,
+					"LEN:"+len,
+					"SERVER:"+pl.aliases.getAlias(s.getName())
 					));
 		}
 	}
@@ -659,10 +657,9 @@ public class Manager {
 		if(list.indexOf(p) != -1) {
 			int pos = list.indexOf(p)+1;
 			int len = list.size();
-			p.sendMessage(Main.formatMessage(
-					msgs.get("errors.already-queued")
-					.replaceAll("\\{POS\\}", pos+"")
-					.replaceAll("\\{LEN\\}", len+"")
+			p.sendMessage(msgs.getBC("errors.already-queued",
+					"POS:"+pos,
+					"LEN:"+len
 					));
 			return;
 		}
@@ -709,12 +706,10 @@ public class Manager {
 				p.sendMessage(m);
 			}
 		} else {
-			//p.sendMessage(Main.formatMessage("now in queue, not send instant"));
-			p.sendMessage(Main.formatMessage(
-					msgs.get("status.now-in-queue")
-					.replaceAll("\\{POS\\}", pos+"")
-					.replaceAll("\\{LEN\\}", len+"")
-					.replaceAll("\\{SERVER\\}", pl.aliases.getAlias(s))
+			p.sendMessage(msgs.getBC("status.now-in-queue",
+					"POS:"+pos,
+					"LEN:"+len,
+					"SERVER:"+pl.aliases.getAlias(server.getName())
 					));
 		}
 		//p.sendMessage(Main.formatMessage(sendInstant+" && ("+sendInstantp+" && " + timeGood+")"));
