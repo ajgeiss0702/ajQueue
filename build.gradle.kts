@@ -18,7 +18,7 @@ repositories {
     maven { url = uri("https://repo.codemc.org/repository/maven-public") }
     maven { url = uri("https://oss.sonatype.org/content/repositories/snapshots") }
     maven { url = uri("https://repo.codemc.io/repository/nms/") }
-
+    maven { url = uri("https://repo.ajg0702.us") }
 }
 
 dependencies {
