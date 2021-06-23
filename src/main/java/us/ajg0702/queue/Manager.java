@@ -40,17 +40,9 @@ public class Manager {
 		msgs = BungeeMessages.getInstance();
 		reloadIntervals();
 		if(!pl.config.getBoolean("wait-to-load-servers")) {
-			pl.getProxy().getScheduler().schedule(pl, new Runnable() {
-				public void run() {
-					reloadServers();
-				}
-			}, 0, TimeUnit.MILLISECONDS);
+			pl.getProxy().getScheduler().schedule(pl, this::reloadServers, 0, TimeUnit.MILLISECONDS);
 		} else {
-			pl.getProxy().getScheduler().schedule(pl, new Runnable() {
-				public void run() {
-					reloadServers();
-				}
-			}, pl.config.getInt("wait-to-load-servers-delay"), TimeUnit.MILLISECONDS);
+			pl.getProxy().getScheduler().schedule(pl, this::reloadServers, pl.config.getInt("wait-to-load-servers-delay"), TimeUnit.MILLISECONDS);
 		}
 	}
 	
@@ -88,76 +80,52 @@ public class Manager {
 		if(sendId != -1) {
 			try {
 				pl.getProxy().getScheduler().cancel(sendId);
-			} catch(IllegalArgumentException e) {}
+			} catch(IllegalArgumentException ignored) {}
 			sendId = -1;
 		}
 		if(updateId != -1) {
 			try {
 				pl.getProxy().getScheduler().cancel(updateId);
-			} catch(IllegalArgumentException e) {}
+			} catch(IllegalArgumentException ignored) {}
 			updateId = -1;
 		}
 		if(messagerId != -1) {
 			try {
 				pl.getProxy().getScheduler().cancel(messagerId);
-			} catch(IllegalArgumentException e) {}
+			} catch(IllegalArgumentException ignored) {}
 			messagerId = -1;
 		}
 		if(actionbarId != -1) {
 			try {
 				pl.getProxy().getScheduler().cancel(actionbarId);
-			} catch(IllegalArgumentException e) {}
+			} catch(IllegalArgumentException ignored) {}
 			actionbarId = -1;
 		}
 		if(srvRefId != -1) {
 			try {
 				pl.getProxy().getScheduler().cancel(srvRefId);
-			} catch(IllegalArgumentException e) {}
+			} catch(IllegalArgumentException ignored) {}
 			srvRefId = -1;
 		}
 		if(queueEventId != -1) {
 			try {
 				pl.getProxy().getScheduler().cancel(queueEventId);
-			} catch(IllegalArgumentException e) {}
+			} catch(IllegalArgumentException ignored) {}
 			queueEventId = -1;
 		}
 		
-		queueEventId = pl.getProxy().getScheduler().schedule(pl, new Runnable() {
-			public void run() {
-				sendQueueEvents();
-			}
-		}, 2, 2, TimeUnit.SECONDS).getId();
+		queueEventId = pl.getProxy().getScheduler().schedule(pl, this::sendQueueEvents, 2, 2, TimeUnit.SECONDS).getId();
 		
-		sendId = pl.getProxy().getScheduler().schedule(pl, new Runnable() {
-			public void run() {
-				sendPlayers();
-			}
-		}, 2, Math.round(pl.timeBetweenPlayers*1000), TimeUnit.MILLISECONDS).getId();
+		sendId = pl.getProxy().getScheduler().schedule(pl, this::sendPlayers, 2, Math.round(pl.timeBetweenPlayers*1000), TimeUnit.MILLISECONDS).getId();
 		
-		updateId = pl.getProxy().getScheduler().schedule(pl, new Runnable() {
-			public void run() {
-				updateServers();
-			}
-		}, 0, Math.max(Math.round(pl.timeBetweenPlayers), 2), TimeUnit.SECONDS).getId();
+		updateId = pl.getProxy().getScheduler().schedule(pl, this::updateServers, 0, Math.max(Math.round(pl.timeBetweenPlayers), 2), TimeUnit.SECONDS).getId();
 		//pl.getLogger().info("Time: "+pl.timeBetweenPlayers);
 		
-		messagerId = pl.getProxy().getScheduler().schedule(pl, new Runnable() {
-			public void run() {
-				sendMessages();
-			}
-		}, 0, pl.getConfig().getInt("message-time"), TimeUnit.SECONDS).getId();
-		actionbarId = pl.getProxy().getScheduler().schedule(pl, new Runnable() {
-			public void run() {
-				sendActionBars();
-			}
-		}, 0, 2, TimeUnit.SECONDS).getId();
+		messagerId = pl.getProxy().getScheduler().schedule(pl, this::sendMessages, 0, pl.getConfig().getInt("message-time"), TimeUnit.SECONDS).getId();
+		actionbarId = pl.getProxy().getScheduler().schedule(pl, this::sendActionBars, 0, 2, TimeUnit.SECONDS).getId();
 		
 		if(pl.config.getInt("reload-servers-interval") > 0) {
-			srvRefId = pl.getProxy().getScheduler().schedule(pl, new Runnable() {
-				public void run() {
-					updateServers();
-				}
-			}, pl.config.getInt("reload-servers-interval"),  pl.config.getInt("reload-servers-interval"), TimeUnit.SECONDS).getId();
+			srvRefId = pl.getProxy().getScheduler().schedule(pl, this::updateServers, pl.config.getInt("reload-servers-interval"),  pl.config.getInt("reload-servers-interval"), TimeUnit.SECONDS).getId();
 		}
 	}
 	
@@ -292,12 +260,12 @@ public class Manager {
 				String timeStr;
 	        	if(min <= 0) {
 	        		timeStr = msgs.getString("format.time.secs")
-	        				.replaceAll("\\{m\\}", "0")
-	        				.replaceAll("\\{s\\}", sec+"");
+	        				.replaceAll("\\{m}", "0")
+	        				.replaceAll("\\{s}", sec+"");
 	        	} else {
 	        		timeStr = msgs.getString("format.time.mins")
-	        				.replaceAll("\\{m\\}", min+"")
-	        				.replaceAll("\\{s\\}", sec+"");
+	        				.replaceAll("\\{m}", min+"")
+	        				.replaceAll("\\{s}", sec+"");
 	        	}
 	        	p.sendMessage(ChatMessageType.ACTION_BAR, msgs.getBC("spigot.actionbar.online", 
 						"POS:"+pos,
@@ -311,12 +279,10 @@ public class Manager {
 	
 	
 	public synchronized void sendQueueEvents() {
-		for(Iterator<QueueServer> it = servers.iterator(); it.hasNext();) {
-			QueueServer s = it.next();
-			for(Iterator<ProxiedPlayer> pit = s.getQueue().iterator(); pit.hasNext();) {
-				ProxiedPlayer player = pit.next();
-				if(player == null) continue;
-				if(!player.isConnected()) continue;
+		for (QueueServer s : servers) {
+			for (ProxiedPlayer player : s.getQueue()) {
+				if (player == null) continue;
+				if (!player.isConnected()) continue;
 				BungeeUtils.sendCustomData(player, "inqueueevent", "true");
 			}
 		}
@@ -351,7 +317,6 @@ public class Manager {
 		int pos = plys.indexOf(ply)+1;
 		if(pos == 0) return;
 		int len = plys.size();
-		int ot = s.getOfflineTime();
 		if(!s.isJoinable(ply)) {
 			
 			String status = s.getStatusString(ply);
@@ -367,17 +332,17 @@ public class Manager {
 		} else {
 			if(msgs.getString("spigot.actionbar.offline").isEmpty()) return;
 			int time = (int) Math.round(pos*pl.timeBetweenPlayers);
-			int min = (int) Math.floor((time) / (60));
-			int sec = (int) Math.floor((time % (60)));
+			int min = (int) Math.floor((time) / (60.0));
+			int sec = (int) Math.floor((time % (60.0)));
 			String timeStr;
         	if(min <= 0) {
         		timeStr = msgs.getString("format.time.secs")
-        				.replaceAll("\\{m\\}", "0")
-        				.replaceAll("\\{s\\}", sec+"");
+        				.replaceAll("\\{m}", "0")
+        				.replaceAll("\\{s}", sec+"");
         	} else {
         		timeStr = msgs.getString("format.time.mins")
-        				.replaceAll("\\{m\\}", min+"")
-        				.replaceAll("\\{s\\}", sec+"");
+        				.replaceAll("\\{m}", min+"")
+        				.replaceAll("\\{s}", sec+"");
         	}
 			ply.sendMessage(msgs.getBC("status.online.base",
 					"TIME:"+timeStr,
@@ -407,9 +372,8 @@ public class Manager {
 	 * Updates info about servers.
 	 */
 	public synchronized void updateServers() {
-		Iterator<QueueServer> it = servers.iterator();
-		while(it.hasNext()) {
-			it.next().update();
+		for (QueueServer server : servers) {
+			server.update();
 		}
 	}
 
@@ -439,7 +403,6 @@ public class Manager {
 				if(selectednum > online && findServer(si.getName()).isJoinable(p)) {
 					selected = si;
 					selectednum = online;
-					continue;
 				}
 			}
 		}
@@ -503,26 +466,7 @@ public class Manager {
 			}
 			
 			if(!s.canAccess(nextplayer)) continue;
-			
-			
-			/*if(nextplayer == null) {
-				pl.getLogger().info("nextplayer is null");
-			}
-			if(nextplayer.getServer() == null) {
-				pl.getLogger().info("getServer is null");
-			}
-			if(nextplayer.getServer().getInfo() == null) {
-				pl.getLogger().info("getInfo is null");
-			}
-			if(nextplayer.getServer().getInfo().getName() == null) {
-				pl.getLogger().info("getName is null");
-			}
-			if(s == null) {
-				pl.getLogger().info("s is null");
-			}
-			if(s.getName() == null) {
-				pl.getLogger().info("s.getName() is null");
-			}*/
+
 
 			if(s.getQueue().size() <= 0) continue;
 			while(!nextplayer.isConnected()) {
@@ -617,7 +561,7 @@ public class Manager {
 		}
 		
 		List<ProxiedPlayer> list = server.getQueue();
-		if(list.indexOf(p) != -1) {
+		if(list.contains(p)) {
 			int pos = list.indexOf(p)+1;
 			int len = list.size();
 			p.sendMessage(msgs.getBC("errors.already-queued",
@@ -655,11 +599,9 @@ public class Manager {
 		int len = list.size();
 		
 		
-		boolean sendInstant = pl.config.getStringList("send-instantly").indexOf(server.getName()) != -1 || server.isJoinable(p);
+		boolean sendInstant = pl.config.getStringList("send-instantly").contains(server.getName()) || server.isJoinable(p);
 		boolean sendInstantp = list.size() <= 1 && server.canAccess(p);
-		boolean timeGood = pl.config.getBoolean("check-last-player-sent-time") ?
-				System.currentTimeMillis() - server.getLastSentTime() > Math.floor(pl.getConfig().getDouble("wait-time")*1000)
-				: true;
+		boolean timeGood = !pl.config.getBoolean("check-last-player-sent-time") || System.currentTimeMillis() - server.getLastSentTime() > Math.floor(pl.getConfig().getDouble("wait-time") * 1000);
 		
 		if((sendInstant && (sendInstantp && timeGood))) {
 			sendPlayers(s);

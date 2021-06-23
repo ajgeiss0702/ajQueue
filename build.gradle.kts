@@ -22,13 +22,19 @@ repositories {
 }
 
 dependencies {
+    testImplementation("junit:junit:4.12")
+    testImplementation("net.kyori:adventure-text-serializer-bungeecord:4.0.0-SNAPSHOT")
+    testImplementation("net.kyori:adventure-text-serializer-plain:4.0.0-SNAPSHOT")
+
     compileOnly("com.github.MyzelYam:PremiumVanishAPI:2.0.3")
     compileOnly("net.md-5:bungeecord-api:1.14-SNAPSHOT")
     compileOnly(group = "org.spigotmc", name = "spigot", version = "1.16.5-R0.1-SNAPSHOT")
     compileOnly("me.clip:placeholderapi:2.10.4")
+    compileOnly("net.kyori:adventure-text-serializer-bungeecord:4.0.0-SNAPSHOT")
 
     implementation("us.ajg0702:ajUtils:1.0.4")
     implementation("org.bstats:bstats-bungeecord:2.2.1")
+    implementation("net.kyori:adventure-text-serializer-plain:4.0.0-SNAPSHOT")
 }
 
 

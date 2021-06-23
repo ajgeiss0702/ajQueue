@@ -1,9 +1,6 @@
 package us.ajg0702.queue;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 import net.md_5.bungee.api.Callback;
 import net.md_5.bungee.api.ProxyServer;
@@ -19,7 +16,7 @@ public class QueueServer {
 	List<ServerInfo> servers;
 	
 	public QueueServer(String name, ServerInfo info) {
-		init(name, Arrays.asList(info));
+		init(name, Collections.singletonList(info));
 	}
 	public QueueServer(String name, List<ServerInfo> infos) {
 		init(name, infos);
@@ -57,31 +54,28 @@ public class QueueServer {
 			if(Main.plugin.getConfig().getBoolean("pinger-debug")) {
 				Main.plugin.getLogger().info("[pinger] ["+info.getName()+"] sending ping");
 			}
-			info.ping(new Callback<ServerPing>() {
-				@Override
-				public void done(ServerPing result, Throwable error) {
-					if(Manager.getInstance() == null || Main.plugin.getConfig() == null) {
-						ProxyServer.getInstance().getLogger()
-						.warning("[ajQueue] Something used update() too early! The plugin hasnt fully loaded yet!");
-						return;
-					}
-					boolean online = error == null;
-					BungeeConfig config = Main.plugin.getConfig();
-					
-					if(config.getBoolean("pinger-debug")) {
-						if(error != null) {
-							ProxyServer.getInstance().getLogger().info("[ajQueue] [pinger] ["+name+"] Status: "+online+".  Error: ");
-							error.printStackTrace();
-						} else {
-							ProxyServer.getInstance().getLogger().info("[ajQueue] [pinger] ["+name+"] Status: "+online+".  motd: "
-						+result.getDescriptionComponent()+"  players:"+result.getPlayers());
-						}
-					}
-					
-					
-					pings.put(info, online ? result : null);
-					if(pings.size() == servers.size()) allDonePing();
+			info.ping((result, error) -> {
+				if(Manager.getInstance() == null || Main.plugin.getConfig() == null) {
+					ProxyServer.getInstance().getLogger()
+					.warning("[ajQueue] Something used update() too early! The plugin hasnt fully loaded yet!");
+					return;
 				}
+				boolean online = error == null;
+				BungeeConfig config = Main.plugin.getConfig();
+
+				if(config.getBoolean("pinger-debug")) {
+					if(error != null) {
+						ProxyServer.getInstance().getLogger().info("[ajQueue] [pinger] ["+name+"] Status: offline.  Error: ");
+						error.printStackTrace();
+					} else {
+						ProxyServer.getInstance().getLogger().info("[ajQueue] [pinger] ["+name+"] Status: online.  motd: "
+					+result.getDescriptionComponent()+"  players:"+result.getPlayers());
+					}
+				}
+
+
+				pings.put(info, online ? result : null);
+				if(pings.size() == servers.size()) allDonePing();
 			});
 		}
 	}
@@ -136,7 +130,7 @@ public class QueueServer {
 			lastUpdate = System.currentTimeMillis();
 			offlineTime = 0;
 		} else {
-			int timesincelast = Math.round((System.currentTimeMillis() - lastUpdate)/1000);
+			int timesincelast = (int) Math.round((System.currentTimeMillis() - lastUpdate*1.0)/1000);
 			lastUpdate = System.currentTimeMillis();
 			if(!online) {
 				offlineTime += timesincelast;

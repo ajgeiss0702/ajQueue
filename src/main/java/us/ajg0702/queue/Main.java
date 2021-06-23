@@ -191,7 +191,7 @@ public class Main extends Plugin implements Listener {
 		List<String> svs = config.getStringList("queue-servers");
 		for(String s : svs) {
 			if(!s.contains(":")) continue;
-			String[] parts = s.split("\\:");
+			String[] parts = s.split(":");
 			String from = parts[0];
 			String to = parts[1];
 			if(from.equalsIgnoreCase(servername)) {
@@ -219,15 +219,15 @@ public class Main extends Plugin implements Listener {
 
 		if(!queuedServers.contains(man.getServer(e.getKickedFrom().getName())) && config.getBoolean("auto-add-to-queue-on-kick")) {
 
-			String plainReason = "";
+			StringBuilder plainReason = new StringBuilder();
 			for(BaseComponent b : e.getKickReasonComponent()) {
-				plainReason += b.toPlainText();
+				plainReason.append(b.toPlainText());
 			}
 
 			List<String> reasons = config.getStringList("auto-add-kick-reasons");
 			boolean shouldqueue = false;
 			for(String reason : reasons) {
-				if(plainReason.toLowerCase().contains(reason.toLowerCase())) {
+				if(plainReason.toString().toLowerCase().contains(reason.toLowerCase())) {
 					shouldqueue = true;
 					break;
 				}
@@ -251,30 +251,21 @@ public class Main extends Plugin implements Listener {
 			if(server.getQueue().indexOf(p) != 0) continue;
 			List<String> kickreasons = config.getStringList("kick-reasons");
 			//getLogger().info(e.getKickReasonComponent());
-			String plainReason = "";
+			StringBuilder plainReason = new StringBuilder();
 			for(BaseComponent b : e.getKickReasonComponent()) {
-				plainReason += b.toPlainText();
+				plainReason.append(b.toPlainText());
 			}
 			for(String reason : kickreasons) {
-				if(plainReason.toLowerCase().contains(reason.toLowerCase())) {
+				if(plainReason.toString().toLowerCase().contains(reason.toLowerCase())) {
 					server.getQueue().remove(p);
 				}
 			}
 			if(config.getBoolean("send-fail-debug")) {
-				String r = "";
+				StringBuilder r = new StringBuilder();
 				for(BaseComponent b : e.getKickReasonComponent()) {
-					r += b.toPlainText();
+					r.append(b.toPlainText());
 				}
 				getLogger().warning("Failed to send "+p.getName()+" to "+e.getKickedFrom().getName()+" because "+r);
-			}
-			
-			if(plainReason.toLowerCase().contains("whitelist") && plainReason.contains("&ajq;")) {
-				String rawlist = plainReason.split("&ajq;")[1];
-				List<String> list = new ArrayList<>();
-				for(String s : rawlist.split(",")) {
-					list.add(s);
-				}
-				
 			}
 		}
 	}
@@ -323,7 +314,7 @@ public class Main extends Plugin implements Listener {
 			}
 			if(subchannel.equals("position")) {
 				QueueServer server = man.getSingleServer(player);
-				String pos = msgs.get("placeholders.position.none");
+				String pos = msgs.getString("placeholders.position.none");
 				if(server != null) {
 					pos = server.getQueue().indexOf(player)+1+"";
 				}
@@ -331,7 +322,7 @@ public class Main extends Plugin implements Listener {
 			}
 			if(subchannel.equals("positionof")) {
 				QueueServer server = man.getSingleServer(player);
-				String pos = msgs.get("placeholders.position.none");
+				String pos = msgs.getString("placeholders.position.none");
 				if(server != null) {
 					pos = server.getQueue().size()+"";
 				}
