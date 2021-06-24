@@ -33,13 +33,8 @@ public class MoveCommand extends Command implements TabExecutor {
 				return;
 			}
 			Manager.getInstance().addToQueue(p, args[0]);
-		} else if(args.length == 0) {
+		} else {
 			sender.sendMessage(msgs.getBC("commands.joinqueue.usage"));
-			/*Server server = Manager.getInstance().findPlayerInQueue((ProxiedPlayer) sender);
-			if(server != null) {
-				server.getQueue().remove(p);
-				p.sendMessage(msgs.getBC("commands.leave-queue"));
-			}*/
 		}
     }
 

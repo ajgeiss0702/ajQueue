@@ -63,13 +63,13 @@ public class LeaveCommand extends Command {
 	}
 	
 	private String getQueueList(List<QueueServer> servers) {
-		String queueList = "";
+		StringBuilder queueList = new StringBuilder();
 		for(QueueServer server : servers) {
-			queueList += msgs.get("commands.leave.queues-list-format").replaceAll("\\{NAME\\}", server.getName());
+			queueList.append(msgs.getString("commands.leave.queues-list-format").replaceAll("\\{NAME\\}", server.getName()));
 		}
 		if(queueList.length() > 2) {
-			queueList = queueList.substring(0, queueList.length()-2);
+			queueList = new StringBuilder(queueList.substring(0, queueList.length() - 2));
 		}
-		return queueList;
+		return queueList.toString();
 	}
 }

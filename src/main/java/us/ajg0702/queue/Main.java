@@ -23,10 +23,7 @@ import us.ajg0702.queue.commands.LeaveCommand;
 import us.ajg0702.queue.commands.ListCommand;
 import us.ajg0702.queue.commands.ManageCommand;
 import us.ajg0702.queue.commands.MoveCommand;
-import us.ajg0702.utils.bungee.BungeeConfig;
-import us.ajg0702.utils.bungee.BungeeMessages;
-import us.ajg0702.utils.bungee.BungeeStats;
-import us.ajg0702.utils.bungee.BungeeUtils;
+import us.ajg0702.utils.bungee.*;
 
 public class Main extends Plugin implements Listener {
 	
@@ -68,7 +65,7 @@ public class Main extends Plugin implements Listener {
 		
 		d.put("status.online.base", "&7You are in position &f{POS}&7 of &f{LEN}&7. Estimated time: {TIME}");
 		d.put("status.left-last-queue", "&aYou left the last queue you were in.");
-		d.put("status.now-in-queue", "&aYou are now queued for {SERVER}! &7You are in position &f{POS}&7 of &f{LEN}&7.\n&7Type &f/leavequeue&7 to leave the queue!");
+		d.put("status.now-in-queue", "&aYou are now queued for {SERVER}! &7You are in position &f{POS}&7 of &f{LEN}&7.\n&7Type &f/leavequeue&7 or &f<click:run_command:/leavequeue {SERVERNAME}>click here</click>&7 to leave the queue!");
 		d.put("status.now-in-empty-queue", "");
 		d.put("status.sending-now", "&aSending you to &f{SERVER} &anow..");
 		
@@ -116,7 +113,7 @@ public class Main extends Plugin implements Listener {
 		d.put("commands.send.player-not-found", "&cThat player could not be found. Make sure they are online!");
 		
 		d.put("commands.listqueues.header", "&9Queues:");
-		d.put("commands.listqueues.format", "{COLOR}{NAME}&7: {COUNT} queued");
+		d.put("commands.listqueues.format", "<hover:show_text:'&7Status: {STATUS}'>{COLOR}{NAME}&7: {COUNT} queued</hover>");
 		
 		d.put("max-tries-reached", "&cUnable to connect to {SERVER}. Max retries reached.");
 		d.put("auto-queued", "&aYou've been auto-queued for {SERVER} because you were kicked.");
@@ -194,7 +191,7 @@ public class Main extends Plugin implements Listener {
 		List<String> svs = config.getStringList("queue-servers");
 		for(String s : svs) {
 			if(!s.contains(":")) continue;
-			String[] parts = s.split("\\:");
+			String[] parts = s.split(":");
 			String from = parts[0];
 			String to = parts[1];
 			if(from.equalsIgnoreCase(servername)) {
@@ -222,15 +219,15 @@ public class Main extends Plugin implements Listener {
 
 		if(!queuedServers.contains(man.getServer(e.getKickedFrom().getName())) && config.getBoolean("auto-add-to-queue-on-kick")) {
 
-			String plainReason = "";
+			StringBuilder plainReason = new StringBuilder();
 			for(BaseComponent b : e.getKickReasonComponent()) {
-				plainReason += b.toPlainText();
+				plainReason.append(b.toPlainText());
 			}
 
 			List<String> reasons = config.getStringList("auto-add-kick-reasons");
 			boolean shouldqueue = false;
 			for(String reason : reasons) {
-				if(plainReason.toLowerCase().contains(reason.toLowerCase())) {
+				if(plainReason.toString().toLowerCase().contains(reason.toLowerCase())) {
 					shouldqueue = true;
 					break;
 				}
@@ -254,30 +251,21 @@ public class Main extends Plugin implements Listener {
 			if(server.getQueue().indexOf(p) != 0) continue;
 			List<String> kickreasons = config.getStringList("kick-reasons");
 			//getLogger().info(e.getKickReasonComponent());
-			String plainReason = "";
+			StringBuilder plainReason = new StringBuilder();
 			for(BaseComponent b : e.getKickReasonComponent()) {
-				plainReason += b.toPlainText();
+				plainReason.append(b.toPlainText());
 			}
 			for(String reason : kickreasons) {
-				if(plainReason.toLowerCase().contains(reason.toLowerCase())) {
+				if(plainReason.toString().toLowerCase().contains(reason.toLowerCase())) {
 					server.getQueue().remove(p);
 				}
 			}
 			if(config.getBoolean("send-fail-debug")) {
-				String r = "";
+				StringBuilder r = new StringBuilder();
 				for(BaseComponent b : e.getKickReasonComponent()) {
-					r += b.toPlainText();
+					r.append(b.toPlainText());
 				}
 				getLogger().warning("Failed to send "+p.getName()+" to "+e.getKickedFrom().getName()+" because "+r);
-			}
-			
-			if(plainReason.toLowerCase().contains("whitelist") && plainReason.contains("&ajq;")) {
-				String rawlist = plainReason.split("&ajq;")[1];
-				List<String> list = new ArrayList<>();
-				for(String s : rawlist.split(",")) {
-					list.add(s);
-				}
-				
 			}
 		}
 	}
@@ -326,7 +314,7 @@ public class Main extends Plugin implements Listener {
 			}
 			if(subchannel.equals("position")) {
 				QueueServer server = man.getSingleServer(player);
-				String pos = msgs.get("placeholders.position.none");
+				String pos = msgs.getString("placeholders.position.none");
 				if(server != null) {
 					pos = server.getQueue().indexOf(player)+1+"";
 				}
@@ -334,7 +322,7 @@ public class Main extends Plugin implements Listener {
 			}
 			if(subchannel.equals("positionof")) {
 				QueueServer server = man.getSingleServer(player);
-				String pos = msgs.get("placeholders.position.none");
+				String pos = msgs.getString("placeholders.position.none");
 				if(server != null) {
 					pos = server.getQueue().size()+"";
 				}

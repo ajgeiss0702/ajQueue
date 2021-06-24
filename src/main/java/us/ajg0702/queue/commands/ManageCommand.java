@@ -1,6 +1,11 @@
 package us.ajg0702.queue.commands;
 
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.PatternReplacementResult;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import net.md_5.bungee.api.CommandSender;
+import net.md_5.bungee.api.chat.BaseComponent;
+import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.plugin.Command;
@@ -13,6 +18,7 @@ import us.ajg0702.utils.bungee.BungeeMessages;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Pattern;
 
 public class ManageCommand extends Command implements TabExecutor {
 	
@@ -52,25 +58,43 @@ public class ManageCommand extends Command implements TabExecutor {
 				}
 				int total = 0;
 				for(QueueServer server : Manager.getInstance().getServers()) {
-					
-					String msg = msgs.get("list.format").replaceAll("\\{SERVER\\}", server.getName());
-					String playerlist = "";
+
+					Component msg = msgs.getComponent("list.format",
+							"SERVER:"+server.getName()
+					);
+					Component playerList = Component.empty();
 					List<ProxiedPlayer> players = server.getQueue();
-					if(msg.contains("{LIST}")) {
-						for(ProxiedPlayer p : players) {
-							playerlist += msgs.get("list.playerlist").replaceAll("\\{NAME\\}", p.getDisplayName());
-						}
-						if(playerlist.equalsIgnoreCase("")) {
-							playerlist = msgs.get("list.none")+", ";
-						}
-						playerlist = playerlist.substring(0, playerlist.length()-2);
-						msg = msg.replaceAll("\\{LIST\\}", playerlist);
+					boolean none = true;
+					for(ProxiedPlayer p : players) {
+						playerList = playerList.append(msgs.getComponent("list.playerlist",
+								"NAME:" + p.getDisplayName()
+						));
+						none = false;
 					}
+					if(none) {
+						playerList = playerList.append(msgs.getComponent("list.none"));
+						playerList = playerList.append(Component.text(", "));
+					}
+					Component finalPlayerList = playerList;
+					msg = msg.replaceText(b -> b.match(Pattern.compile("\\{LIST}")).replacement(finalPlayerList));
+					char[] commaCountString = PlainTextComponentSerializer.plainText().serialize(msg).toCharArray();
+					int commas = 0;
+					for(Character fChar : commaCountString) {
+						if(fChar == ',') commas++;
+					}
+
+					int finalCommas = commas;
+					msg = msg.replaceText(b -> b.match(",(?!.*,)").replacement("").condition((r, c, re) -> {
+						if(c == finalCommas) {
+							return PatternReplacementResult.REPLACE;
+						}
+						return PatternReplacementResult.CONTINUE;
+					}));
 					total += players.size();
-					msg = msg.replaceAll("\\{COUNT\\}", players.size()+"");
-					sender.sendMessage(Main.formatMessage(msg));
+					msg = msg.replaceText(b -> b.match(Pattern.compile("\\{COUNT}")).replacement(players.size()+""));
+					sender.sendMessage(msgs.getBC(msg));
 				}
-				sender.sendMessage(Main.formatMessage(msgs.get("list.total").replaceAll("\\{TOTAL\\}", total+"")));
+				sender.sendMessage(msgs.getBC("list.total", "TOTAL:"+total));
 				return;
 			}
 			if(args[0].equalsIgnoreCase("p")) {
@@ -121,7 +145,7 @@ public class ManageCommand extends Command implements TabExecutor {
 				srv.setPaused(!srv.isPaused());
 				sender.sendMessage(msgs.getBC("commands.pause.success",
 						"SERVER:"+srv.getName(),
-						"PAUSED:"+msgs.get("commands.pause.paused."+srv.isPaused())
+						"PAUSED:"+msgs.getString("commands.pause.paused."+srv.isPaused())
 						));
 				return;
 			}
@@ -152,7 +176,7 @@ public class ManageCommand extends Command implements TabExecutor {
 				srv.setPaused(args[2].equalsIgnoreCase("on") || args[2].equalsIgnoreCase("true"));
 				sender.sendMessage(msgs.getBC("commands.pause.success",
 						"SERVER:"+srv.getName(),
-						"PAUSED:"+msgs.get("commands.pause.paused."+srv.isPaused())
+						"PAUSED:"+msgs.getString("commands.pause.paused."+srv.isPaused())
 						));
 				return;
 			}
@@ -172,13 +196,12 @@ public class ManageCommand extends Command implements TabExecutor {
 					
 					ProxiedPlayer ply = pl.getProxy().getPlayer(args[1]);
 					Manager.getInstance().addToQueue(ply, args[2]);
-					sender.sendMessage(Main.formatMessage(
-							msgs.get("send")
-							.replaceAll("\\{PLAYER\\}", ply.getDisplayName())
-							.replaceAll("\\{SERVER\\}", args[2]))
-						);
+					sender.sendMessage(msgs.getBC("send",
+							"PLAYER:"+ply.getDisplayName(),
+							"SERVER:"+args[2])
+					);
 					return;
-				} else if(pl.getProxy().getServers().keySet().contains(args[1])) {
+				} else if(pl.getProxy().getServers().containsKey(args[1])) {
 
 					ServerInfo from = pl.getProxy().getServerInfo(args[1]);
 					if(from == null) {
