@@ -111,6 +111,22 @@ public interface QueueServer {
     boolean isFull();
 
     /**
+     * Removes a player from the queue
+     * @param player The player to remove
+     */
+    void removePlayer(QueuePlayer player);
+
+    /**
+     * Adds a player to a queue
+     * NOTE: It is reccomended to use QueueManager#addToQueue
+     * @param player The QueuePlayer that is being added
+     */
+    void addPlayer(QueuePlayer player);
+
+
+
+
+    /**
      * elliot is bad
      * @return true because elliot is bad
      */

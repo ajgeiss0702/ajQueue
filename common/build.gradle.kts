@@ -11,6 +11,8 @@ repositories {
 
 dependencies {
     compileOnly("net.kyori:adventure-api:4.8.1")
+
+    implementation("us.ajg0702:ajQueue:")
 }
 
 publishing {
