@@ -34,5 +34,26 @@ public interface QueueManager {
      */
     ImmutableList<String> getServerNames();
 
+    /**
+     * Get a single server the player is queued for. Depends on the multi-server-queue-pick option in the config
+     * @param player The player
+     * @return The server that was chosen that the player is queued for.
+     */
+    QueueServer getSingleServer(AdaptedPlayer player);
 
+    /**
+     * Get the name of the server the player is queued for.
+     * If multiple servers are queued for, it will use the multi-server-queue-pick option in the config
+     * @param player The player
+     * @return The name of the server, the placeholder none message if not queued
+     */
+    String getQueuedName(AdaptedPlayer player);
+
+    /**
+     * Checks servers that are in bungeecord and adds any it doesnt
+     * know about.
+     *
+     * Also creates/edits server groups
+     */
+    void reloadServers();
 }
