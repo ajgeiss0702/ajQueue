@@ -37,11 +37,7 @@ repositories {
 dependencies {
     testImplementation("junit:junit:4.12")
 
-    compileOnly("me.clip:placeholderapi:2.10.4")
-    compileOnly("net.kyori:adventure-text-serializer-bungeecord:4.0.0-SNAPSHOT")
-
-    implementation("us.ajg0702:ajUtils:1.0.4")
-    implementation("net.kyori:adventure-text-serializer-plain:4.0.0-SNAPSHOT")
+    implementation(project(":common"))
 }
 
 
@@ -58,6 +54,7 @@ tasks.shadowJar {
     relocate("us.ajg0702.utils", "us.ajg0702.queue.utils")
     relocate("org.bstats", "us.ajg0702.bstats")
     relocate("net.kyori", "us.ajg0702.queue.kyori")
+    relocate("org.spongepowered.configurate", "us.ajg0702.queue.configurate")
     archiveFileName.set("${archiveBaseName.get()}-${archiveVersion.get()}.${archiveExtension.get()}")
 }
 

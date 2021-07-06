@@ -2,6 +2,7 @@ package us.ajg0702.queue.api;
 
 import com.google.common.collect.ImmutableList;
 import us.ajg0702.queue.api.players.AdaptedPlayer;
+import us.ajg0702.queue.api.players.QueuePlayer;
 import us.ajg0702.queue.api.queues.QueueServer;
 
 public interface QueueManager {
@@ -56,4 +57,57 @@ public interface QueueManager {
      * Also creates/edits server groups
      */
     void reloadServers();
+
+    /**
+     * Sends queue status action bars to players in queues
+     */
+    void sendActionBars();
+
+    /**
+     * Tell the spigot sides to call the queue scoreboard event
+     */
+    void sendQueueEvents();
+
+    /**
+     * Sends chat queue status messages to players in queues
+     */
+    void sendMessages();
+
+    /**
+     * Send a chat queue status message to a specific player in a specific queue
+     * @param player The player that is in the queue
+     */
+    void sendMessage(QueuePlayer player);
+
+    /**
+     * Find a server by its name
+     * @param name The name to look for
+     * @return The QueueServer if found, null if not
+     */
+    QueueServer findServer(String name);
+
+    /**
+     * Attempts to send the first player in all queues to the server they are queued for
+     */
+    void sendPlayers();
+
+    /**
+     * Attempts to send the first player in a specific queue
+     * @param server The queue that we should try to send.
+     */
+    void sendPlayers(QueueServer server);
+
+    /**
+     * Finds QueuePlayers that represent this player
+     * @param p The player to look up
+     * @return A list of QueuePlayers that represent this player
+     */
+    ImmutableList<QueuePlayer> findPlayerInQueues(AdaptedPlayer p);
+
+    /**
+     * Gets all of the queues the player is currently queued for
+     * @param p The player
+     * @return A list of QueueServers that this player is queued for
+     */
+    ImmutableList<QueueServer> getPlayerQueues(AdaptedPlayer p);
 }

@@ -10,7 +10,7 @@ repositories {
 }
 
 dependencies {
-    compileOnly("net.kyori:adventure-api:4.8.1")
+    implementation("net.kyori:adventure-api:4.8.1")
     compileOnly("com.google.guava:guava:30.1.1-jre")
 }
 

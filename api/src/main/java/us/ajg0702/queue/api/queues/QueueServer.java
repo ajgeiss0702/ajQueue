@@ -117,11 +117,51 @@ public interface QueueServer {
     void removePlayer(QueuePlayer player);
 
     /**
-     * Adds a player to a queue
+     * Removes a player from the queue
+     * @param player The player to remove
+     */
+    void removePlayer(AdaptedPlayer player);
+
+    /**
+     * Adds a player to the end of the queue
      * NOTE: It is reccomended to use QueueManager#addToQueue
-     * @param player The QueuePlayer that is being added
+     * @param player The QueuePlayer t add
      */
     void addPlayer(QueuePlayer player);
+
+    /**
+     * Adds a player to the specified position in the queue
+     * NOTE: It is reccomended to use QueueManager#addToQueue
+     * @param player The QueuePlayer to add
+     * @param position The position to add them
+     */
+    void addPlayer(QueuePlayer player, int position);
+
+    /**
+     * Sends the first player in the queue to the server
+     */
+    void sendPlayer();
+
+    /**
+     * Gets the name of the server/group
+     * @return The name of the server/group
+     */
+    String getName();
+
+
+    /**
+     * If the player can access the server. (Bungeecord's restricted servers)
+     * If on a platform that doesnt have restricted servers, this will always return true.
+     * @param ply The player
+     * @return True if the player can join based on bungeecord's restricted servers system
+     */
+    boolean canAccess(AdaptedPlayer ply);
+
+    /**
+     * The alias of this server. For displaying.
+     * @return The alias of this server
+     */
+    String getAlias();
 
 
 
