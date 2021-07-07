@@ -1,6 +1,7 @@
 package us.ajg0702.queue.api.players;
 
 import net.kyori.adventure.text.Component;
+import us.ajg0702.queue.api.server.AdaptedServer;
 import us.ajg0702.queue.api.util.Handle;
 
 import java.util.UUID;
@@ -21,6 +22,12 @@ public interface AdaptedPlayer extends Handle {
      * @param message The message to send
      */
     void sendMessage(Component message);
+
+    /**
+     * Sends an actionbar message to the player
+     * @param message The message to send
+     */
+    void sendActionBar(Component message);
 
     /**
      * Send a player a message from a string
@@ -47,4 +54,10 @@ public interface AdaptedPlayer extends Handle {
      * @return The player's uuid
      */
     UUID getUniqueId();
+
+    /**
+     * Sends the player to a different server.
+     * Does not use the queue.
+     */
+    void connect(AdaptedServer server);
 }

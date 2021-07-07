@@ -50,7 +50,7 @@ public class QueuePlayerImpl implements QueuePlayer {
 
     @Override
     public void setPlayer(AdaptedPlayer player) {
-        if(!player.getUniqueId().equals(getUniqueId())) {
+        if(player != null && !player.getUniqueId().equals(getUniqueId())) {
             throw new IllegalArgumentException("UUIDs do not match");
         }
         this.player = player;

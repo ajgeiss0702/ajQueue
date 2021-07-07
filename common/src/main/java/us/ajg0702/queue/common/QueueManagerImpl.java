@@ -5,13 +5,14 @@ import us.ajg0702.queue.api.QueueManager;
 import us.ajg0702.queue.api.players.AdaptedPlayer;
 import us.ajg0702.queue.api.players.QueuePlayer;
 import us.ajg0702.queue.api.queues.QueueServer;
+import us.ajg0702.queue.api.server.AdaptedServer;
+import us.ajg0702.queue.api.server.AdaptedServerInfo;
 import us.ajg0702.queue.common.players.QueuePlayerImpl;
 import us.ajg0702.utils.bungee.BungeeUtils;
 import us.ajg0702.utils.common.Messages;
+import us.ajg0702.utils.common.TimeUtils;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class QueueManagerImpl implements QueueManager {
 
@@ -93,7 +94,7 @@ public class QueueManagerImpl implements QueueManager {
         int pos = queuePlayer.getPosition();
         int len = list.size();
 
-        boolean sendInstant = main.getConfig().getStringList("send-instantly").contains(server.getName()) || server.isJoinable(p);
+        boolean sendInstant = main.getConfig().getStringList("send-instantly").contains(server.getName()) || server.isJoinable(player);
         boolean sendInstantp = list.size() <= 1 && server.canAccess(player);
         boolean timeGood = !main.getConfig().getBoolean("check-last-player-sent-time") || System.currentTimeMillis() - server.getLastSentTime() > Math.floor(main.getConfig().getDouble("wait-time") * 1000);
 
@@ -175,75 +176,253 @@ public class QueueManagerImpl implements QueueManager {
                 continue;
             }
 
-            String groupname = groupraw.split(":")[0];
+            String groupName = groupraw.split(":")[0];
             String[] serversraw = groupraw.split(":")[1].split(",");
 
-            if(findServer(groupname) != null) {
-                main.getLogger().warning("The name of a group ('"+groupname+"') cannot be the same as the name of a server!");
+            if(findServer(groupName) != null) {
+                main.getLogger().warning("The name of a group ('"+groupName+"') cannot be the same as the name of a server!");
                 continue;
             }
 
+            List<AdaptedServer> groupServers = new ArrayList<>();
 
             for(String serverraw : serversraw) {
-                ServerInfo si = svs.get(serverraw);
-                if(si == null) {
-                    pl.getLogger().warning("Could not find server named '"+serverraw+"' in servergroup '"+groupname+"'!");
+                QueueServer found = findServer(serverraw);
+                if(found == null) {
+                    main.getLogger().warning("Could not find server named '"+serverraw+"' in servergroup '"+groupName+"'!");
                     continue;
                 }
-                servers.add(si);
+                if(found.isGroup()) continue;
+
+                groupServers.add(found.getServers().get(0));
             }
 
             if(servers.size() == 0) {
-                pl.getLogger().warning("Server group '"+groupname+"' has no servers! Ignoring it.");
+                main.getLogger().warning("Server group '"+groupName+"' has no servers! Ignoring it.");
                 continue;
             }
 
-            this.servers.add(new QueueServer(groupname, servers));
+            this.servers.add(main.getServerBuilder().buildGroup(groupName, groupServers));
         }
     }
 
     @Override
     public void sendActionBars() {
+        if(!main.getConfig().getBoolean("send-actionbar")) return;
 
+        for(QueueServer server : servers) {
+            String status = server.getStatusString();
+            for(QueuePlayer queuePlayer : server.getQueue()) {
+                if(!getSingleServer(queuePlayer.getPlayer()).equals(server)) continue;
+
+                int pos = queuePlayer.getPosition();
+                if(pos == 0) {
+                    server.removePlayer(queuePlayer);
+                    continue;
+                }
+
+                AdaptedPlayer player = queuePlayer.getPlayer();
+                if(player == null) continue;
+
+                if(!server.isJoinable(player)) {
+                    queuePlayer.getPlayer().sendActionBar(msgs.getComponent("spigot.actionbar.offline",
+                            "POS:"+pos,
+                            "LEN:"+server.getQueue().size(),
+                            "SERVER:"+server.getAlias(),
+                            "STATUS:"+status
+                    ));
+                } else {
+                    int time = (int) Math.round(pos * main.getTimeBetweenPlayers());
+                    player.sendActionBar(msgs.getComponent("spigot.actionbar.online",
+                            "POS:"+pos,
+                            "LEN:"+server.getQueue().size(),
+                            "SERVER:"+server.getAlias(),
+                            "TIME:"+ TimeUtils.timeString(time, msgs.getString("format.time.mins"), msgs.getString("format.time.secs"))
+                    ));
+                }
+            }
+        }
     }
 
     @Override
     public void sendQueueEvents() {
-
+        for (QueueServer s : servers) {
+            for (QueuePlayer queuePlayer : s.getQueue()) {
+                AdaptedPlayer player =  queuePlayer.getPlayer();
+                if (player == null || !player.isConnected()) continue;
+                main.getPlatformMethods().sendPluginMessage(player, "inqueueevent", "true");
+            }
+        }
     }
 
     @Override
     public void sendMessages() {
-
+        for(QueueServer server : servers) {
+            for(QueuePlayer queuePlayer : server.getQueue()) {
+                sendMessage(queuePlayer);
+            }
+        }
     }
 
     @Override
-    public void sendMessage(QueuePlayer player) {
+    public void sendMessage(QueuePlayer queuePlayer) {
+        AdaptedPlayer player = queuePlayer.getPlayer();
+        if(player == null || !player.isConnected()) return;
 
+        QueueServer server = queuePlayer.getQueueServer();
+
+        int pos = queuePlayer.getPosition();
+        int len = server.getQueue().size();
+
+        if(server.isJoinable(player)) {
+            String status = server.getStatusString(player);
+
+            if(msgs.getString("status.offline.base").isEmpty()) return;
+
+            player.sendMessage(msgs.getComponent("status.offline.base",
+                    "STATUS:"+status,
+                    "POS:"+pos,
+                    "LEN:"+len,
+                    "SERVER:"+server.getAlias()
+                    ));
+        } else {
+            if(msgs.getString("status.online.base").isEmpty()) return;
+            int time = (int) Math.round(pos * main.getTimeBetweenPlayers());
+            player.sendMessage(msgs.getComponent("status.online.base",
+                    "TIME:" + TimeUtils.timeString(time, msgs.getString("format.time.mins"), msgs.getString("format.time.secs")),
+                    "POS:"+pos,
+                    "LEN:"+len,
+                    "SERVER:"+server.getAlias()
+                    ));
+        }
     }
 
     @Override
     public QueueServer findServer(String name) {
+        for(QueueServer server : servers) {
+            if(server == null) continue;
+            if(server.getName().equalsIgnoreCase(name)) {
+                return server;
+            }
+        }
         return null;
     }
 
     @Override
     public void sendPlayers() {
-
+        sendPlayers(null);
     }
 
-    @Override
-    public void sendPlayers(QueueServer server) {
+    HashMap<AdaptedPlayer, Long> sendingNowAntiSpam = new HashMap<>();
+    HashMap<QueuePlayer, Integer> sendingAttempts = new HashMap<>();
 
+    @Override
+    public void sendPlayers(QueueServer queueServer) {
+        List<QueueServer> sendingServers;
+        if(queueServer == null) {
+            sendingServers = new ArrayList<>(servers);
+        } else {
+            sendingServers = Collections.singletonList(queueServer);
+        }
+
+        for(QueueServer server : sendingServers) {
+            if(!server.isOnline()) continue;
+            if(server.getQueue().size() == 0) continue;
+
+            if(main.getConfig().getBoolean("send-all-when-back-online") && server.justWentOnline() && server.isOnline()) {
+                for(QueuePlayer p : server.getQueue()) {
+                    AdaptedPlayer player = p.getPlayer();
+                    if(player == null) continue;
+
+                    if(server.isFull() && !p.getPlayer().hasPermission("ajqueue.joinfull")) continue;
+
+                    AdaptedServer selected = server.getIdealServer(player);
+                    if(selected == null) {
+                        main.getLogger().severe("Could not find ideal server for server/group '"+server.getName()+"'!");
+                        continue;
+                    }
+
+                    player.sendMessage(msgs.getComponent("status.sending-now", "SERVER:"+server.getAlias()));
+                    player.connect(selected);
+                }
+                return;
+            }
+
+            QueuePlayer nextQueuePlayer = server.getQueue().get(0);
+            AdaptedPlayer nextPlayer = nextQueuePlayer.getPlayer();
+
+            // If the first person int the queue is offline or already in the server, find the next online player in the queue
+            int i = 0;
+            while((nextPlayer == null || server.getServerNames().contains(nextPlayer.getServerName())) && i < server.getQueue().size()) {
+                if(nextPlayer != null) { // Remove them if they are already in the server
+                    server.removePlayer(nextQueuePlayer);
+                } else {
+                    i++;
+                }
+                nextQueuePlayer = server.getQueue().get(i);
+                nextPlayer = nextQueuePlayer.getPlayer();
+            }
+
+            if(nextPlayer == null) continue; // None of the players in the queue are online
+
+            if(!server.canAccess(nextPlayer)) continue;
+
+            if(server.isFull() && !nextPlayer.hasPermission("ajqueue.joinfull")) continue;
+
+            if(main.getConfig().getBoolean("enable-bypasspaused-permission")) {
+                if(server.isPaused() && !nextPlayer.hasPermission("ajqueue.bypasspaused")) continue;
+            } else if(server.isPaused()) { continue; }
+
+
+            int tries = sendingAttempts.get(nextQueuePlayer) == null ? 0 : sendingAttempts.get(nextQueuePlayer);
+            int maxTries = main.getConfig().getInt("max-tries");
+            if(tries >= maxTries && maxTries > 0) {
+                server.removePlayer(nextQueuePlayer);
+                sendingAttempts.remove(nextQueuePlayer);
+                nextPlayer.sendMessage(msgs.getComponent("max-tries-reached", "SERVER:"+server.getAlias()));
+                continue;
+            }
+            tries++;
+            sendingAttempts.put(nextQueuePlayer, tries);
+
+            if(!sendingNowAntiSpam.containsKey(nextPlayer)) {
+                sendingNowAntiSpam.put(nextPlayer, (long) 0);
+            }
+            if(System.currentTimeMillis() - sendingNowAntiSpam.get(nextPlayer) >= 5000) {
+                nextPlayer.sendMessage(msgs.getComponent("status.sending-now", "SERVER:"+server.getAlias()));
+                sendingNowAntiSpam.put(nextPlayer, System.currentTimeMillis());
+            }
+
+            AdaptedServer selected = server.getIdealServer(nextPlayer);
+            if(selected == null) {
+                main.getLogger().severe("Could not find ideal server for server/group '"+server.getName()+"'");
+                continue;
+            }
+            nextPlayer.connect(selected);
+        }
     }
 
     @Override
     public ImmutableList<QueuePlayer> findPlayerInQueues(AdaptedPlayer p) {
-        return null;
+        List<QueuePlayer> srs = new ArrayList<>();
+        for(QueueServer s : servers) {
+            QueuePlayer player = s.findPlayer(p);
+            if(player != null) {
+                srs.add(player);
+            }
+        }
+        return ImmutableList.copyOf(srs);
     }
 
     @Override
     public ImmutableList<QueueServer> getPlayerQueues(AdaptedPlayer p) {
-        return null;
+        List<QueueServer> srs = new ArrayList<>();
+        for(QueueServer s : servers) {
+            QueuePlayer player = s.findPlayer(p);
+            if(player != null) {
+                srs.add(s);
+            }
+        }
+        return ImmutableList.copyOf(srs);
     }
 }

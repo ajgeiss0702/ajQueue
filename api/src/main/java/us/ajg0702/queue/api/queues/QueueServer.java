@@ -3,6 +3,7 @@ package us.ajg0702.queue.api.queues;
 import com.google.common.collect.ImmutableList;
 import us.ajg0702.queue.api.players.AdaptedPlayer;
 import us.ajg0702.queue.api.players.QueuePlayer;
+import us.ajg0702.queue.api.server.AdaptedServer;
 
 import java.util.List;
 import java.util.UUID;
@@ -163,7 +164,33 @@ public interface QueueServer {
      */
     String getAlias();
 
+    /**
+     * Get the servers that this QueueServer represents
+     * @return A list of servers that this QueueServer represents
+     */
+    ImmutableList<AdaptedServer> getServers();
 
+    /**
+     * Gets the names of the servers in this group
+     * @return A list of names
+     */
+    ImmutableList<String> getServerNames();
+
+
+    /**
+     * Returns if this server is a group
+     * @return True if this server is a group
+     */
+    boolean isGroup();
+
+    /**
+     * Finds the player in this queue and returns the representative QueuePlayer
+     * @return The QueuePlayer representing the player, null if not found
+     */
+    QueuePlayer findPlayer(AdaptedPlayer player);
+
+
+    AdaptedServer getIdealServer(AdaptedPlayer player);
 
 
     /**

@@ -75,9 +75,9 @@ public interface QueueManager {
 
     /**
      * Send a chat queue status message to a specific player in a specific queue
-     * @param player The player that is in the queue
+     * @param queuePlayer The player that is in the queue
      */
-    void sendMessage(QueuePlayer player);
+    void sendMessage(QueuePlayer queuePlayer);
 
     /**
      * Find a server by its name
