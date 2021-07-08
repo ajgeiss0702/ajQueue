@@ -4,7 +4,9 @@ import com.google.common.collect.ImmutableList;
 import us.ajg0702.queue.api.players.AdaptedPlayer;
 import us.ajg0702.queue.api.players.QueuePlayer;
 import us.ajg0702.queue.api.server.AdaptedServer;
+import us.ajg0702.queue.api.server.AdaptedServerPing;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
@@ -48,7 +50,7 @@ public interface QueueServer {
      * Gets how long since the last person was sent
      * @return The number of miliseconds since the last person was sent
      */
-    int getLastSentTime();
+    long getLastSentTime();
 
 
 
@@ -190,7 +192,18 @@ public interface QueueServer {
     QueuePlayer findPlayer(AdaptedPlayer player);
 
 
+    /**
+     * Gets the most ideal server in this group to join
+     * @param player The player that would be joining
+     * @return The ideal server to join
+     */
     AdaptedServer getIdealServer(AdaptedPlayer player);
+
+    /**
+     * Gets the last server pings
+     * @return The last server pings for this server/group
+     */
+    HashMap<AdaptedServer, AdaptedServerPing> getLastPings();
 
 
     /**

@@ -13,6 +13,12 @@ public interface AdaptedServer {
     AdaptedServerInfo getServerInfo();
 
     /**
+     * Gets the server's name
+     * @return the server's name
+     */
+    String getName();
+
+    /**
      * Pings the server and gets info back
      * @return A CompletableFuture with the ServerPing
      */

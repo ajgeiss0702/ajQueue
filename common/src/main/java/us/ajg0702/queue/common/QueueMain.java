@@ -1,9 +1,6 @@
 package us.ajg0702.queue.common;
 
-import us.ajg0702.queue.api.AliasManager;
-import us.ajg0702.queue.api.Logic;
-import us.ajg0702.queue.api.PlatformMethods;
-import us.ajg0702.queue.api.ServerBuilder;
+import us.ajg0702.queue.api.*;
 import us.ajg0702.utils.common.Config;
 import us.ajg0702.utils.common.Messages;
 
@@ -54,5 +51,10 @@ public class QueueMain {
     private ServerBuilder serverBuilder;
     public ServerBuilder getServerBuilder() {
         return serverBuilder;
+    }
+
+    private QueueManager queueManager;
+    public QueueManager getQueueManager() {
+        return queueManager;
     }
 }
