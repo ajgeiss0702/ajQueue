@@ -18,6 +18,8 @@ allprojects {
         reports.html.isEnabled = false
         reports.junitXml.isEnabled = false
     }
+
+
 }
 
 repositories {
@@ -41,14 +43,7 @@ dependencies {
 }
 
 
-tasks.withType<ProcessResources> {
-    include("**/*.yml")
-    filter<org.apache.tools.ant.filters.ReplaceTokens>(
-            "tokens" to mapOf(
-                    "VERSION" to project.version.toString()
-            )
-    )
-}
+
 
 tasks.shadowJar {
     relocate("us.ajg0702.utils", "us.ajg0702.queue.utils")
