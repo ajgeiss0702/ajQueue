@@ -1,10 +1,11 @@
 package us.ajg0702.queue.api.server;
 
 import us.ajg0702.queue.api.players.AdaptedPlayer;
+import us.ajg0702.queue.api.util.Handle;
 
 import java.util.concurrent.CompletableFuture;
 
-public interface AdaptedServer {
+public interface AdaptedServer extends Handle {
 
     /**
      * Gets the ServerInfo for this server

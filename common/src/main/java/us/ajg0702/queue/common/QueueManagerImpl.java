@@ -115,7 +115,7 @@ public class QueueManagerImpl implements QueueManager {
             ));
         }
 
-        main.getPlatformMethods().sendJoinQueueChannelMessages();
+        main.getPlatformMethods().sendJoinQueueChannelMessages(server, queuePlayer);
         return true;
     }
 

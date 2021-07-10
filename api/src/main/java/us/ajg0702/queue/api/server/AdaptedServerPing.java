@@ -1,8 +1,9 @@
 package us.ajg0702.queue.api.server;
 
 import net.kyori.adventure.text.Component;
+import us.ajg0702.queue.api.util.Handle;
 
-public interface AdaptedServerPing {
+public interface AdaptedServerPing extends Handle {
     /**
      * Gets the component of the description (aka MOTD)
      * @return A compoent of the description

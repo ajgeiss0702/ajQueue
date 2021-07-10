@@ -1,6 +1,9 @@
 package us.ajg0702.queue.api;
 
 import us.ajg0702.queue.api.players.AdaptedPlayer;
+import us.ajg0702.queue.api.players.QueuePlayer;
+import us.ajg0702.queue.api.queues.QueueServer;
+import us.ajg0702.queue.api.server.AdaptedServer;
 
 public interface PlatformMethods {
     /**
@@ -10,7 +13,7 @@ public interface PlatformMethods {
      *         BungeeUtils.sendCustomData(p, "inqueue", "true");
      *         BungeeUtils.sendCustomData(p, "inqueueevent", "true");
      */
-    void sendJoinQueueChannelMessages();
+    void sendJoinQueueChannelMessages(QueueServer queueServer, QueuePlayer queuePlayer);
 
     /**
      * Sends a plugin message on the plugin messaging channel
