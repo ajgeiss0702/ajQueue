@@ -1,5 +1,6 @@
 package us.ajg0702.queue.api.players;
 
+import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import us.ajg0702.queue.api.server.AdaptedServer;
 import us.ajg0702.queue.api.util.Handle;
@@ -9,7 +10,7 @@ import java.util.UUID;
 /**
  * Represents a cross-platform player
  */
-public interface AdaptedPlayer extends Handle {
+public interface AdaptedPlayer extends Handle, Audience {
 
     /**
      * Check if the plauer is currently connected

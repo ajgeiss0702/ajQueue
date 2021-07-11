@@ -1,5 +1,6 @@
 package us.ajg0702.queue.api;
 
+import us.ajg0702.queue.api.commands.ICommandSender;
 import us.ajg0702.queue.api.players.AdaptedPlayer;
 import us.ajg0702.queue.api.players.QueuePlayer;
 import us.ajg0702.queue.api.queues.QueueServer;
@@ -22,5 +23,12 @@ public interface PlatformMethods {
      * @param data The data
      */
     void sendPluginMessage(AdaptedPlayer player, String channel, String... data);
+
+    /**
+     * Converts a command sender to an AdaptedPlayer
+     * @param sender the commandsender
+     * @return the AdaptedPlayer
+     */
+    AdaptedPlayer senderToPlayer(ICommandSender sender);
 
 }

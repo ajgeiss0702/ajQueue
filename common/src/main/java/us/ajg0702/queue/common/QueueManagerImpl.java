@@ -6,13 +6,14 @@ import us.ajg0702.queue.api.players.AdaptedPlayer;
 import us.ajg0702.queue.api.players.QueuePlayer;
 import us.ajg0702.queue.api.queues.QueueServer;
 import us.ajg0702.queue.api.server.AdaptedServer;
-import us.ajg0702.queue.api.server.AdaptedServerInfo;
+import us.ajg0702.queue.api.server.ServerBuilder;
 import us.ajg0702.queue.common.players.QueuePlayerImpl;
-import us.ajg0702.utils.bungee.BungeeUtils;
 import us.ajg0702.utils.common.Messages;
 import us.ajg0702.utils.common.TimeUtils;
 
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 public class QueueManagerImpl implements QueueManager {
 
@@ -24,6 +25,16 @@ public class QueueManagerImpl implements QueueManager {
     public QueueManagerImpl(QueueMain main) {
         this.main = main;
         this.msgs = main.getMessages();
+
+        CompletableFuture<ServerBuilder> serverBuilderFuture = main.getFutureServerBuilder();
+        serverBuilderFuture.thenRunAsync(() -> {
+            try {
+                servers = serverBuilderFuture.get().buildServers();
+                // TODO: groups
+            } catch (InterruptedException | ExecutionException e) {
+                e.printStackTrace();
+            }
+        });
     }
 
     @Override
@@ -107,12 +118,14 @@ public class QueueManagerImpl implements QueueManager {
                         "SERVER:"+server.getAlias()));
             }
         } else {
-            player.sendMessage(msgs.getComponent("status.now-in-queue",
-                    "POS:"+pos,
-                    "LEN:"+len,
-                    "SERVER:"+server.getAlias(),
-                    "SERVERNAME:"+server.getName()
-            ));
+            player.sendMessage(
+                    msgs.getComponent("status.now-in-queue",
+                      "POS:"+pos,
+                       "LEN:"+len,
+                        "SERVER:"+server.getAlias(),
+                       "SERVERNAME:"+server.getName()
+                    )
+            );
         }
 
         main.getPlatformMethods().sendJoinQueueChannelMessages(server, queuePlayer);
@@ -167,7 +180,7 @@ public class QueueManagerImpl implements QueueManager {
 
         servers.clear();
 
-        servers.addAll(main.getServerBuilder().getServers());
+        servers.addAll(main.getServerBuilder().buildServers());
 
         List<String> groupsraw = main.getConfig().getStringList("server-groups");
         for(String groupraw : groupsraw) {

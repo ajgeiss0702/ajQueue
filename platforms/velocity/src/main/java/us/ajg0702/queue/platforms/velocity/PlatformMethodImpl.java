@@ -1,10 +1,13 @@
 package us.ajg0702.queue.platforms.velocity;
 
+import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
 import us.ajg0702.queue.api.PlatformMethods;
+import us.ajg0702.queue.api.commands.ICommandSender;
 import us.ajg0702.queue.api.players.AdaptedPlayer;
 import us.ajg0702.queue.api.players.QueuePlayer;
 import us.ajg0702.queue.api.queues.QueueServer;
+import us.ajg0702.queue.platforms.velocity.players.VelocityPlayer;
 
 import java.util.logging.Logger;
 
@@ -28,5 +31,10 @@ public class PlatformMethodImpl implements PlatformMethods {
     @Override
     public void sendPluginMessage(AdaptedPlayer player, String channel, String... data) {
 
+    }
+
+    @Override
+    public AdaptedPlayer senderToPlayer(ICommandSender sender) {
+        return new VelocityPlayer((Player) sender.getHandle());
     }
 }

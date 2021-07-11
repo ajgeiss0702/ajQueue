@@ -3,6 +3,7 @@ package us.ajg0702.queue.platforms.velocity.players;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ServerConnection;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
+import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import us.ajg0702.queue.api.players.AdaptedPlayer;
 import us.ajg0702.queue.api.server.AdaptedServer;
@@ -10,7 +11,7 @@ import us.ajg0702.queue.api.server.AdaptedServer;
 import java.util.Optional;
 import java.util.UUID;
 
-public class VelocityPlayer implements AdaptedPlayer {
+public class VelocityPlayer implements AdaptedPlayer, Audience {
 
     Player handle;
 

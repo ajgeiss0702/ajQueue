@@ -1,12 +1,20 @@
 package us.ajg0702.queue.common;
 
 import org.spongepowered.configurate.ConfigurateException;
-import us.ajg0702.queue.api.*;
+import us.ajg0702.queue.api.AliasManager;
+import us.ajg0702.queue.api.Logic;
+import us.ajg0702.queue.api.PlatformMethods;
+import us.ajg0702.queue.api.QueueManager;
+import us.ajg0702.queue.api.server.ServerBuilder;
+import us.ajg0702.queue.logic.LogicGetter;
 import us.ajg0702.utils.common.Config;
 import us.ajg0702.utils.common.Messages;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.logging.Logger;
 
 public class QueueMain {
@@ -41,19 +49,35 @@ public class QueueMain {
         return getLogic().isPremium();
     }
 
-    private PlatformMethods platformMethods;
+    private final PlatformMethods platformMethods;
     public PlatformMethods getPlatformMethods() {
         return platformMethods;
     }
 
-    private Logger logger;
+    private final Logger logger;
     public Logger getLogger() {
         return logger;
     }
 
+    private List<CompletableFuture<ServerBuilder>> serverCompletableFutures = new ArrayList<>();
     private ServerBuilder serverBuilder;
     public ServerBuilder getServerBuilder() {
         return serverBuilder;
+    }
+    public CompletableFuture<ServerBuilder> getFutureServerBuilder() {
+        CompletableFuture<ServerBuilder> completableFuture = new CompletableFuture<>();
+        if(serverBuilder != null) {
+            completableFuture.complete(serverBuilder);
+        }
+        serverCompletableFutures.add(completableFuture);
+        return completableFuture;
+    }
+    public void setServerBuilder(ServerBuilder serverBuilder) {
+        if(this.serverBuilder != null) throw new IllegalStateException("SeverBuilder already set");
+        this.serverBuilder = serverBuilder;
+        for(CompletableFuture<ServerBuilder> future : serverCompletableFutures) {
+            future.complete(serverBuilder);
+        }
     }
 
     private QueueManager queueManager;
@@ -62,10 +86,15 @@ public class QueueMain {
     }
 
 
-    public QueueMain(Logger logger, ServerBuilder serverBuilder, PlatformMethods platformMethods, File dataFolder) {
+    private File dataFolder;
+
+
+    public QueueMain(Logger logger, PlatformMethods platformMethods, File dataFolder) {
         this.logger = logger;
-        this.serverBuilder = serverBuilder;
         this.platformMethods = platformMethods;
+        this.dataFolder = dataFolder;
+
+        constructMessages();
 
         try {
             config = new Config(dataFolder, logger);
@@ -79,7 +108,14 @@ public class QueueMain {
 
         queueManager = new QueueManagerImpl(this);
 
+        logic = new LogicGetter().constructLogic();
+        aliasManager = new LogicGetter().constructAliasManager(config);
 
+
+
+    }
+
+    private void constructMessages() {
         LinkedHashMap<String, String> d = new LinkedHashMap<>();
 
         d.put("status.offline.base", "&c{SERVER} is {STATUS}. &7You are in position &f{POS}&7 of &f{LEN}&7.");
