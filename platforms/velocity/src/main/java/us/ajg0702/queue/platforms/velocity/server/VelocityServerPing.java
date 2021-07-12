@@ -27,14 +27,14 @@ public class VelocityServerPing implements AdaptedServerPing {
     @Override
     public int getPlayerCount() {
         Optional<ServerPing.Players> players = handle.getPlayers();
-        if(players.isPresent()) return 0;
+        if(!players.isPresent()) return 0;
         return players.get().getOnline();
     }
 
     @Override
     public int getMaxPlayers() {
         Optional<ServerPing.Players> players = handle.getPlayers();
-        if(players.isPresent()) return 0;
+        if(!players.isPresent()) return 0;
         return players.get().getMax();
     }
 

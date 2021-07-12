@@ -28,6 +28,7 @@ public class QueuePlayerImpl implements QueuePlayer {
 
     @Override
     public UUID getUniqueId() {
+        if(uuid == null) throw new IllegalStateException("Why is my UUID null??");
         return uuid;
     }
 

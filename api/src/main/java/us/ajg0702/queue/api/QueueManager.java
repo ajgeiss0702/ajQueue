@@ -80,6 +80,11 @@ public interface QueueManager {
     void sendMessage(QueuePlayer queuePlayer);
 
     /**
+     * Updates info about the servers
+     */
+    void updateServers();
+
+    /**
      * Find a server by its name
      * @param name The name to look for
      * @return The QueueServer if found, null if not

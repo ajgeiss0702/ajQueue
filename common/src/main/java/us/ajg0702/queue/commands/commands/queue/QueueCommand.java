@@ -9,6 +9,7 @@ import us.ajg0702.queue.common.QueueMain;
 import us.ajg0702.utils.common.Messages;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class QueueCommand extends BaseCommand {
@@ -26,7 +27,11 @@ public class QueueCommand extends BaseCommand {
 
     @Override
     public ImmutableList<String> getAliases() {
-        return ImmutableList.of("move", "server", "joinqueue", "joinq");
+        List<String> aliases = new ArrayList<>(Arrays.asList("move", "joinqueue", "joinq"));
+        if(main.getConfig().getBoolean("enable-server-command")) {
+            aliases.add("server");
+        }
+        return ImmutableList.copyOf(aliases);
     }
 
     @Override

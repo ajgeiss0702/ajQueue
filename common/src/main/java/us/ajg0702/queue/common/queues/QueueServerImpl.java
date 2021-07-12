@@ -117,8 +117,12 @@ public class QueueServerImpl implements QueueServer {
                 ping = futurePing.get(5, TimeUnit.SECONDS);
             } catch (InterruptedException | ExecutionException | TimeoutException e) {
                 if(main.getConfig().getBoolean("pinger-debug")) {
-                    main.getLogger().info("[pinger] ["+server.getServerInfo().getName()+"] sending ping");
+                    main.getLogger().info("[pinger] ["+server.getServerInfo().getName()+"] offline:");
+                    e.printStackTrace();
                 }
+            }
+            if(ping != null && main.getConfig().getBoolean("pinger-debug")) {
+                main.getLogger().info("[pinger] ["+server.getServerInfo().getName()+"] online. motd: "+ping.getPlainDescription()+"  players: "+ping.getPlayerCount()+"/"+ping.getMaxPlayers());
             }
 
             pings.put(server, ping);
@@ -297,11 +301,18 @@ public class QueueServerImpl implements QueueServer {
     }
 
     @Override
-    public QueuePlayer findPlayer(AdaptedPlayer player) {
+    public synchronized QueuePlayer findPlayer(AdaptedPlayer player) {
         for(QueuePlayer queuePlayer : queue) {
             AdaptedPlayer queuedPlayer = queuePlayer.getPlayer();
             if(queuedPlayer == null) continue;
-            if(queuedPlayer.getUniqueId().equals(player.getUniqueId())) {
+            if(
+                    queuedPlayer
+                            .getUniqueId()
+                            .equals(
+                                    player
+                                            .getUniqueId()
+                            )
+            ) {
                 return queuePlayer;
             }
         }

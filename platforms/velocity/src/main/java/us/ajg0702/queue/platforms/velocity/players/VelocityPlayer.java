@@ -1,11 +1,11 @@
 package us.ajg0702.queue.platforms.velocity.players;
 
 import com.velocitypowered.api.proxy.Player;
-import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.proxy.ServerConnection;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import us.ajg0702.queue.api.players.AdaptedPlayer;
 import us.ajg0702.queue.api.server.AdaptedServer;
 
@@ -27,6 +27,7 @@ public class VelocityPlayer implements AdaptedPlayer, Audience {
 
     @Override
     public void sendMessage(Component message) {
+        if(PlainTextComponentSerializer.plainText().serialize(message).isEmpty()) return;
         handle.sendMessage(message);
     }
 

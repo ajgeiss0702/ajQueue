@@ -19,7 +19,7 @@ import java.util.concurrent.ExecutionException;
 
 public class QueueManagerImpl implements QueueManager {
 
-    private List<QueueServer> servers;
+    private List<QueueServer> servers = new ArrayList<>();
 
     private final QueueMain main;
     private final Messages msgs;
@@ -130,6 +130,9 @@ public class QueueManagerImpl implements QueueManager {
             );
         }
 
+        if(!server.isJoinable(player)) {
+            sendMessage(queuePlayer);
+        }
         main.getPlatformMethods().sendJoinQueueChannelMessages(server, queuePlayer);
         return true;
     }
@@ -272,10 +275,15 @@ public class QueueManagerImpl implements QueueManager {
 
     @Override
     public void sendMessages() {
-        for(QueueServer server : servers) {
-            for(QueuePlayer queuePlayer : server.getQueue()) {
-                sendMessage(queuePlayer);
+        if(servers == null) return;
+        try {
+            for(QueueServer server : servers) {
+                for(QueuePlayer queuePlayer : server.getQueue()) {
+                    sendMessage(queuePlayer);
+                }
             }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
@@ -289,7 +297,7 @@ public class QueueManagerImpl implements QueueManager {
         int pos = queuePlayer.getPosition();
         int len = server.getQueue().size();
 
-        if(server.isJoinable(player)) {
+        if(!server.isJoinable(player)) {
             String status = server.getStatusString(player);
 
             if(msgs.getString("status.offline.base").isEmpty()) return;
@@ -309,6 +317,17 @@ public class QueueManagerImpl implements QueueManager {
                     "LEN:"+len,
                     "SERVER:"+server.getAlias()
                     ));
+        }
+    }
+
+    @Override
+    public void updateServers() {
+        try {
+            for(QueueServer server : servers) {
+                server.updatePing();
+            }
+        } catch(Exception e) {
+            e.printStackTrace();
         }
     }
 
@@ -360,22 +379,30 @@ public class QueueManagerImpl implements QueueManager {
                     player.sendMessage(msgs.getComponent("status.sending-now", "SERVER:"+server.getAlias()));
                     player.connect(selected);
                 }
-                return;
+                continue;
             }
 
             QueuePlayer nextQueuePlayer = server.getQueue().get(0);
             AdaptedPlayer nextPlayer = nextQueuePlayer.getPlayer();
+
 
             // If the first person int the queue is offline or already in the server, find the next online player in the queue
             int i = 0;
             while((nextPlayer == null || server.getServerNames().contains(nextPlayer.getServerName())) && i < server.getQueue().size()) {
                 if(nextPlayer != null) { // Remove them if they are already in the server
                     server.removePlayer(nextQueuePlayer);
+                    if(server.getQueue().size() > i) {
+                        nextQueuePlayer = server.getQueue().get(i);
+                        nextPlayer = nextQueuePlayer.getPlayer();
+                    } else {
+                        nextPlayer = null;
+                        break;
+                    }
                 } else {
                     i++;
+                    nextQueuePlayer = server.getQueue().get(i);
+                    nextPlayer = nextQueuePlayer.getPlayer();
                 }
-                nextQueuePlayer = server.getQueue().get(i);
-                nextPlayer = nextQueuePlayer.getPlayer();
             }
 
             if(nextPlayer == null) continue; // None of the players in the queue are online
@@ -387,7 +414,6 @@ public class QueueManagerImpl implements QueueManager {
             if(main.getConfig().getBoolean("enable-bypasspaused-permission")) {
                 if(server.isPaused() && !nextPlayer.hasPermission("ajqueue.bypasspaused")) continue;
             } else if(server.isPaused()) { continue; }
-
 
             int tries = sendingAttempts.get(nextQueuePlayer) == null ? 0 : sendingAttempts.get(nextQueuePlayer);
             int maxTries = main.getConfig().getInt("max-tries");

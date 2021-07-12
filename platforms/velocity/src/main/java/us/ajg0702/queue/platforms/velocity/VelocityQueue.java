@@ -9,6 +9,8 @@ import com.velocitypowered.api.plugin.annotation.DataDirectory;
 import com.velocitypowered.api.proxy.ProxyServer;
 import us.ajg0702.queue.commands.BaseCommand;
 import us.ajg0702.queue.commands.commands.leavequeue.LeaveCommand;
+import us.ajg0702.queue.commands.commands.listqueues.ListCommand;
+import us.ajg0702.queue.commands.commands.manage.ManageCommand;
 import us.ajg0702.queue.commands.commands.queue.QueueCommand;
 import us.ajg0702.queue.common.QueueMain;
 import us.ajg0702.queue.platforms.velocity.commands.VelocityCommand;
@@ -59,7 +61,9 @@ public class VelocityQueue  {
 
         List<BaseCommand> commands = Arrays.asList(
                 new QueueCommand(main),
-                new LeaveCommand(main)
+                new LeaveCommand(main),
+                new ListCommand(main),
+                new ManageCommand(main)
         );
 
         for(BaseCommand command : commands) {

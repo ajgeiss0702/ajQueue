@@ -14,7 +14,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.*;
 import java.util.logging.Logger;
 
 public class QueueMain {
@@ -23,6 +23,9 @@ public class QueueMain {
     private double timeBetweenPlayers;
     public double getTimeBetweenPlayers() {
         return timeBetweenPlayers;
+    }
+    public void setTimeBetweenPlayers() {
+        this.timeBetweenPlayers = config.getDouble("wait-time");
     }
 
     private Config config;
@@ -57,6 +60,11 @@ public class QueueMain {
     private final Logger logger;
     public Logger getLogger() {
         return logger;
+    }
+
+    private final TaskManager taskManager = new TaskManager(this);
+    public TaskManager getTaskManager() {
+        return taskManager;
     }
 
     private List<CompletableFuture<ServerBuilder>> serverCompletableFutures = new ArrayList<>();
@@ -104,14 +112,14 @@ public class QueueMain {
             return;
         }
 
-        timeBetweenPlayers = config.getDouble("wait-time");
+        setTimeBetweenPlayers();
 
         queueManager = new QueueManagerImpl(this);
 
         logic = new LogicGetter().constructLogic();
         aliasManager = new LogicGetter().constructAliasManager(config);
 
-
+        taskManager.rescheduleTasks();
 
     }
 

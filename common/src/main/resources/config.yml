@@ -1,5 +1,5 @@
 # Dont touch this number please
-config-version: 21
+config-version: 22
 
 # The time the server will wait between sending people in the queue
 #  Default: 5
@@ -172,3 +172,8 @@ auto-add-to-queue-on-kick-delay: 1
 auto-add-kick-reasons:
   - "restarting"
   - "closed"
+
+# Should we enable the server command being a queue command?
+# This may require extra setup on bungeecord. See the wiki:
+# https://wiki.ajg0702.us/ajqueue/setup/replacing-server-command
+enable-server-command: false

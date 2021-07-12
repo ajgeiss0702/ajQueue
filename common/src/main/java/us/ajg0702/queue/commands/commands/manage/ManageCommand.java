@@ -1,6 +1,7 @@
 package us.ajg0702.queue.commands.commands.manage;
 
 import com.google.common.collect.ImmutableList;
+import net.kyori.adventure.text.Component;
 import us.ajg0702.queue.api.commands.ICommandSender;
 import us.ajg0702.queue.api.commands.ISubCommand;
 import us.ajg0702.queue.commands.BaseCommand;
@@ -9,7 +10,9 @@ import us.ajg0702.queue.common.QueueMain;
 import us.ajg0702.utils.common.Messages;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 
 public class ManageCommand extends BaseCommand {
 
@@ -18,7 +21,8 @@ public class ManageCommand extends BaseCommand {
     public ManageCommand(QueueMain main) {
         this.main = main;
 
-
+        addSubCommand(new Reload(main));
+        addSubCommand(new Tasks(main));
     }
 
 
@@ -56,11 +60,31 @@ public class ManageCommand extends BaseCommand {
 
     @Override
     public void execute(ICommandSender sender, String[] args) {
-
+        if(args.length > 0) {
+            for(ISubCommand subCommand : subCommands) {
+                if(args[0].equalsIgnoreCase(subCommand.getName()) || subCommand.getAliases().contains(args[0].toLowerCase(Locale.ROOT))) {
+                    subCommand.execute(sender, Arrays.copyOfRange(args, 1, args.length));
+                    return;
+                }
+            }
+        }
+        sender.sendMessage(Component.text("/ajQueue <reload|list|send|pause>"));
     }
 
     @Override
     public List<String> autoComplete(ICommandSender sender, String[] args) {
-        return null;
+        if(args.length > 0) {
+            for(ISubCommand subCommand : subCommands) {
+                if(args[0].equalsIgnoreCase(subCommand.getName()) || subCommand.getAliases().contains(args[0].toLowerCase(Locale.ROOT))) {
+                    return subCommand.autoComplete(sender, Arrays.copyOfRange(args, 1, args.length));
+                }
+            }
+        }
+        List<String> commands = new ArrayList<>();
+        for(ISubCommand subCommand : subCommands) {
+            commands.add(subCommand.getName());
+            commands.addAll(subCommand.getAliases());
+        }
+        return commands;
     }
 }
