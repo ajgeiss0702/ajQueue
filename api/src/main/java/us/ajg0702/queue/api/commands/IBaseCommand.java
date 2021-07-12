@@ -19,7 +19,7 @@ public interface IBaseCommand {
 
     void addSubCommand(ISubCommand subCommand);
 
-    void execute(ICommandSender ssender, String[] args);
+    void execute(ICommandSender sender, String[] args);
 
     List<String> autoComplete(ICommandSender sender, String[] args);
 }

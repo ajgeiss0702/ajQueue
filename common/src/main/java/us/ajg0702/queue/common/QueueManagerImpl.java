@@ -1,6 +1,8 @@
 package us.ajg0702.queue.common;
 
 import com.google.common.collect.ImmutableList;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.event.ClickEvent;
 import us.ajg0702.queue.api.QueueManager;
 import us.ajg0702.queue.api.players.AdaptedPlayer;
 import us.ajg0702.queue.api.players.QueuePlayer;

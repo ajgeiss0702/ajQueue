@@ -8,6 +8,7 @@ import com.velocitypowered.api.plugin.Plugin;
 import com.velocitypowered.api.plugin.annotation.DataDirectory;
 import com.velocitypowered.api.proxy.ProxyServer;
 import us.ajg0702.queue.commands.BaseCommand;
+import us.ajg0702.queue.commands.commands.leavequeue.LeaveCommand;
 import us.ajg0702.queue.commands.commands.queue.QueueCommand;
 import us.ajg0702.queue.common.QueueMain;
 import us.ajg0702.queue.platforms.velocity.commands.VelocityCommand;
@@ -56,7 +57,10 @@ public class VelocityQueue  {
         CommandManager commandManager = proxyServer.getCommandManager();
 
 
-        List<BaseCommand> commands = Arrays.asList(new QueueCommand(main));
+        List<BaseCommand> commands = Arrays.asList(
+                new QueueCommand(main),
+                new LeaveCommand(main)
+        );
 
         for(BaseCommand command : commands) {
             commandManager.register(

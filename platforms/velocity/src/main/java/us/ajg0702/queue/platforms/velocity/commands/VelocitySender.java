@@ -3,6 +3,7 @@ package us.ajg0702.queue.platforms.velocity.commands;
 import com.velocitypowered.api.command.CommandSource;
 import com.velocitypowered.api.proxy.ConsoleCommandSource;
 import com.velocitypowered.api.proxy.ProxyServer;
+import net.kyori.adventure.text.Component;
 import us.ajg0702.queue.api.commands.ICommandSender;
 
 public class VelocitySender implements ICommandSender {
@@ -21,6 +22,11 @@ public class VelocitySender implements ICommandSender {
     @Override
     public boolean isPlayer() {
         return !(handle instanceof ConsoleCommandSource);
+    }
+
+    @Override
+    public void sendMessage(Component message) {
+        handle.sendMessage(message);
     }
 
     @Override
