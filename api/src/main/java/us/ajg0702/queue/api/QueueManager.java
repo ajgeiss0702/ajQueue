@@ -21,6 +21,7 @@ public interface QueueManager {
      * @param serverName The name of the server or group to add the player too
      * @return True if adding was successfull, false if not.
      */
+    @SuppressWarnings("UnusedReturnValue")
     boolean addToQueue(AdaptedPlayer player, String serverName);
 
     /**

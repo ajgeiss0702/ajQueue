@@ -2,6 +2,7 @@ package us.ajg0702.queue.platforms.velocity;
 
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
+import net.kyori.adventure.text.Component;
 import us.ajg0702.queue.api.PlatformMethods;
 import us.ajg0702.queue.api.commands.ICommandSender;
 import us.ajg0702.queue.api.players.AdaptedPlayer;
@@ -13,8 +14,8 @@ import java.util.logging.Logger;
 
 public class PlatformMethodImpl implements PlatformMethods {
 
-    ProxyServer proxyServer;
-    Logger logger;
+    final ProxyServer proxyServer;
+    final Logger logger;
 
     public PlatformMethodImpl(ProxyServer proxyServer, Logger logger) {
         this.proxyServer = proxyServer;
@@ -25,7 +26,7 @@ public class PlatformMethodImpl implements PlatformMethods {
     public void sendJoinQueueChannelMessages(QueueServer queueServer, QueuePlayer queuePlayer) {
         AdaptedPlayer player = queuePlayer.getPlayer();
         if(player == null) return;
-
+        player.sendMessage(Component.text());
     }
 
     @Override

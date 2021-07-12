@@ -38,7 +38,7 @@ public class ServerBuilderImpl implements ServerBuilder {
     @Override
     public AdaptedServer getServer(String name) {
         Optional<RegisteredServer> serverOptional = proxyServer.getServer(name);
-        if(serverOptional.isPresent()) return null;
+        if(serverOptional.isEmpty()) return null;
         return new VelocityServer(serverOptional.get());
     }
 

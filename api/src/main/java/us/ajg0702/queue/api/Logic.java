@@ -4,7 +4,7 @@ import us.ajg0702.queue.api.players.AdaptedPlayer;
 import us.ajg0702.queue.api.players.QueuePlayer;
 import us.ajg0702.queue.api.queues.QueueServer;
 
-import java.util.List;
+@SuppressWarnings({"SameReturnValue", "unused"})
 
 public interface Logic {
     /**
@@ -15,7 +15,6 @@ public interface Logic {
 
     /**
      * The priority logic that is executed if the plugin is premium.
-     * @param list The current queue
      * @param server The server/group name that is being queued for
      * @param player The player that is being queued
      */

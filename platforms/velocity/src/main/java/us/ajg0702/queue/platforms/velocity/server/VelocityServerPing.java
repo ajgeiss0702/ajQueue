@@ -5,8 +5,6 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import us.ajg0702.queue.api.server.AdaptedServerPing;
 
-import java.util.Optional;
-
 public class VelocityServerPing implements AdaptedServerPing {
 
     private final ServerPing handle;
@@ -26,16 +24,12 @@ public class VelocityServerPing implements AdaptedServerPing {
 
     @Override
     public int getPlayerCount() {
-        Optional<ServerPing.Players> players = handle.getPlayers();
-        if(!players.isPresent()) return 0;
-        return players.get().getOnline();
+        return handle.getPlayers().map(ServerPing.Players::getOnline).orElse(0);
     }
 
     @Override
     public int getMaxPlayers() {
-        Optional<ServerPing.Players> players = handle.getPlayers();
-        if(!players.isPresent()) return 0;
-        return players.get().getMax();
+        return handle.getPlayers().map(ServerPing.Players::getMax).orElse(0);
     }
 
     @Override

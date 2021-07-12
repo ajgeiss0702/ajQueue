@@ -5,7 +5,6 @@ import net.kyori.adventure.text.Component;
 import us.ajg0702.queue.api.commands.ICommandSender;
 import us.ajg0702.queue.api.commands.ISubCommand;
 import us.ajg0702.queue.commands.BaseCommand;
-import us.ajg0702.queue.commands.SubCommand;
 import us.ajg0702.queue.common.QueueMain;
 import us.ajg0702.utils.common.Messages;
 
@@ -16,7 +15,7 @@ import java.util.Locale;
 
 public class ManageCommand extends BaseCommand {
 
-    QueueMain main;
+    final QueueMain main;
 
     public ManageCommand(QueueMain main) {
         this.main = main;
@@ -36,7 +35,7 @@ public class ManageCommand extends BaseCommand {
         return ImmutableList.of("ajq");
     }
 
-    List<ISubCommand> subCommands = new ArrayList<>();
+    final List<ISubCommand> subCommands = new ArrayList<>();
 
     @Override
     public ImmutableList<ISubCommand> getSubCommands() {

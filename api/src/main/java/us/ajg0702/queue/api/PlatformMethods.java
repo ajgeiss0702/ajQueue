@@ -4,7 +4,6 @@ import us.ajg0702.queue.api.commands.ICommandSender;
 import us.ajg0702.queue.api.players.AdaptedPlayer;
 import us.ajg0702.queue.api.players.QueuePlayer;
 import us.ajg0702.queue.api.queues.QueueServer;
-import us.ajg0702.queue.api.server.AdaptedServer;
 
 public interface PlatformMethods {
     /**
@@ -22,6 +21,7 @@ public interface PlatformMethods {
      * @param channel The (sub)channel
      * @param data The data
      */
+    @SuppressWarnings("EmptyMethod")
     void sendPluginMessage(AdaptedPlayer player, String channel, String... data);
 
     /**

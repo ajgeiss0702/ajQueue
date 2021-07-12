@@ -1,5 +1,6 @@
 package us.ajg0702.queue.api;
 
+@SuppressWarnings("unused")
 public interface AliasManager {
     /**
      * Gets an alias from the server/group's name

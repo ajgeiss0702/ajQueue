@@ -11,7 +11,6 @@ import us.ajg0702.queue.common.QueueMain;
 import us.ajg0702.utils.common.Messages;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class ListCommand extends BaseCommand {
@@ -48,11 +47,6 @@ public class ListCommand extends BaseCommand {
     }
 
     @Override
-    public void addSubCommand(ISubCommand subCommand) {
-
-    }
-
-    @Override
     public void execute(ICommandSender sender, String[] args) {
         if(!checkPermission(sender)) return;
 
@@ -63,9 +57,7 @@ public class ListCommand extends BaseCommand {
 
 
         Component m = main.getMessages().getComponent("commands.listqueues.header");
-        boolean none = true;
         for(QueueServer s : main.getQueueManager().getServers()) {
-            none = false;
             String color = "&a";
             if(!s.isOnline()) {
                 color = "&c";

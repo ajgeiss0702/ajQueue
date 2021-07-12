@@ -2,6 +2,7 @@ package us.ajg0702.queue.api.players;
 
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
+import org.jetbrains.annotations.NotNull;
 import us.ajg0702.queue.api.server.AdaptedServer;
 import us.ajg0702.queue.api.util.Handle;
 
@@ -10,25 +11,27 @@ import java.util.UUID;
 /**
  * Represents a cross-platform player
  */
+@SuppressWarnings("unused")
 public interface AdaptedPlayer extends Handle, Audience {
 
     /**
      * Check if the plauer is currently connected
      * @return True if connected, false if not
      */
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     boolean isConnected();
 
     /**
      * Send a player a message from a Component
      * @param message The message to send
      */
-    void sendMessage(Component message);
+    void sendMessage(@NotNull Component message);
 
     /**
      * Sends an actionbar message to the player
      * @param message The message to send
      */
-    void sendActionBar(Component message);
+    void sendActionBar(@NotNull Component message);
 
     /**
      * Send a player a message from a string

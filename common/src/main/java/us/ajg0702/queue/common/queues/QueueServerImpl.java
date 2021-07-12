@@ -5,7 +5,6 @@ import us.ajg0702.queue.api.players.AdaptedPlayer;
 import us.ajg0702.queue.api.players.QueuePlayer;
 import us.ajg0702.queue.api.queues.QueueServer;
 import us.ajg0702.queue.api.server.AdaptedServer;
-import us.ajg0702.queue.api.server.AdaptedServerInfo;
 import us.ajg0702.queue.api.server.AdaptedServerPing;
 import us.ajg0702.queue.common.QueueMain;
 import us.ajg0702.utils.common.GenUtils;
@@ -33,7 +32,7 @@ public class QueueServerImpl implements QueueServer {
 
     private final QueueMain main;
 
-    private HashMap<AdaptedServer, AdaptedServerPing> pings = new HashMap<>();
+    private final HashMap<AdaptedServer, AdaptedServerPing> pings = new HashMap<>();
 
     private final List<AdaptedServer> servers;
 
@@ -165,7 +164,11 @@ public class QueueServerImpl implements QueueServer {
 
     @Override
     public long getLastSentTime() {
-        return lastSentTime;
+        return System.currentTimeMillis() - lastSentTime;
+    }
+    @Override
+    public void setLastSentTime(long lastSentTime) {
+        this.lastSentTime = lastSentTime;
     }
 
     @Override

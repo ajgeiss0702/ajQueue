@@ -8,8 +8,8 @@ import java.util.List;
 
 public class VelocityCommand implements RawCommand {
 
-    QueueMain main;
-    BaseCommand command;
+    final QueueMain main;
+    final BaseCommand command;
 
     public VelocityCommand(QueueMain main, BaseCommand command) {
         this.main = main;

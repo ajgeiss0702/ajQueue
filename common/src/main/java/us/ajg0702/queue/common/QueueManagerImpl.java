@@ -1,8 +1,6 @@
 package us.ajg0702.queue.common;
 
 import com.google.common.collect.ImmutableList;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.event.ClickEvent;
 import us.ajg0702.queue.api.QueueManager;
 import us.ajg0702.queue.api.players.AdaptedPlayer;
 import us.ajg0702.queue.api.players.QueuePlayer;
@@ -347,8 +345,8 @@ public class QueueManagerImpl implements QueueManager {
         sendPlayers(null);
     }
 
-    HashMap<AdaptedPlayer, Long> sendingNowAntiSpam = new HashMap<>();
-    HashMap<QueuePlayer, Integer> sendingAttempts = new HashMap<>();
+    final HashMap<AdaptedPlayer, Long> sendingNowAntiSpam = new HashMap<>();
+    final HashMap<QueuePlayer, Integer> sendingAttempts = new HashMap<>();
 
     @Override
     public void sendPlayers(QueueServer queueServer) {
@@ -439,6 +437,7 @@ public class QueueManagerImpl implements QueueManager {
                 main.getLogger().severe("Could not find ideal server for server/group '"+server.getName()+"'");
                 continue;
             }
+            server.setLastSentTime(System.currentTimeMillis());
             nextPlayer.connect(selected);
         }
     }

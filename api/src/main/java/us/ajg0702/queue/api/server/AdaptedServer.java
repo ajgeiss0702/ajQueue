@@ -5,6 +5,7 @@ import us.ajg0702.queue.api.util.Handle;
 
 import java.util.concurrent.CompletableFuture;
 
+@SuppressWarnings("unused")
 public interface AdaptedServer extends Handle {
 
     /**
@@ -32,6 +33,7 @@ public interface AdaptedServer extends Handle {
      * @param player The player to check
      * @return False if the server is restricted and the player does not have permission to join.
      */
+    @SuppressWarnings("SameReturnValue")
     boolean canAccess(AdaptedPlayer player);
 
 }

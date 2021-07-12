@@ -32,12 +32,12 @@ import java.util.logging.Logger;
 )
 
 public class VelocityQueue  {
-    ProxyServer proxyServer;
-    Logger logger;
+    final ProxyServer proxyServer;
+    final Logger logger;
 
     QueueMain main;
 
-    File dataFolder;
+    final File dataFolder;
 
     @Inject
     public VelocityQueue(ProxyServer proxyServer, Logger logger, @DataDirectory Path dataFolder) {

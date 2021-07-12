@@ -48,11 +48,6 @@ public class LeaveCommand extends BaseCommand {
     }
 
     @Override
-    public void addSubCommand(ISubCommand subCommand) {
-
-    }
-
-    @Override
     public void execute(ICommandSender sender, String[] args) {
         System.out.println("leave command");
         if(!sender.isPlayer()) {

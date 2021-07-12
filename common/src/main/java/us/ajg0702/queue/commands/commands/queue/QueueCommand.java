@@ -50,11 +50,6 @@ public class QueueCommand extends BaseCommand {
     }
 
     @Override
-    public void addSubCommand(ISubCommand subCommand) {
-
-    }
-
-    @Override
     public void execute(ICommandSender sender, String[] args) {
         if(!checkPermission(sender)) return;
         if(!sender.isPlayer()) {

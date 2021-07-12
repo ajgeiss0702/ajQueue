@@ -1,6 +1,5 @@
 package us.ajg0702.queue.common;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.Executors;
@@ -10,10 +9,10 @@ import java.util.concurrent.TimeUnit;
 
 public class TaskManager {
 
-    ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
-    ScheduledExecutorService updateExecutor = Executors.newScheduledThreadPool(1);
+    final ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
+    final ScheduledExecutorService updateExecutor = Executors.newScheduledThreadPool(1);
 
-    QueueMain main;
+    final QueueMain main;
     public TaskManager(QueueMain main) {
         this.main = main;
     }
@@ -39,7 +38,6 @@ public class TaskManager {
 
         sendTask = scheduleAtFixedRate(
                 main.getQueueManager()::sendPlayers,
-                0L,
                 (long) (main.getConfig().getDouble("wait-time")*1000L),
                 TimeUnit.MILLISECONDS
         );
@@ -53,21 +51,18 @@ public class TaskManager {
 
         messageTask = scheduleAtFixedRate(
                 main.getQueueManager()::sendMessages,
-                0L,
                 main.getConfig().getInt("message-time"),
                 TimeUnit.SECONDS
         );
 
         actionBarTask = scheduleAtFixedRate(
                 main.getQueueManager()::sendActionBars,
-                0L,
                 2L,
                 TimeUnit.SECONDS
         );
 
         queueEventTask = scheduleAtFixedRate(
                 main.getQueueManager()::sendQueueEvents,
-                0L,
                 2L,
                 TimeUnit.SECONDS
         );
@@ -75,7 +70,6 @@ public class TaskManager {
         if(main.getConfig().getInt("reload-servers-interval") > 0) {
             reloadServerTask = scheduleAtFixedRate(
                     main.getQueueManager()::reloadServers,
-                    0L,
                     main.getConfig().getInt("reload-servers-interval"),
                     TimeUnit.SECONDS
             );
@@ -105,8 +99,8 @@ public class TaskManager {
         }
     }
 
-    private ScheduledFuture<?> scheduleAtFixedRate(Runnable command, long initialDelay, long period, TimeUnit unit) {
-        return scheduleAtFixedRate(executor, command, initialDelay, period, unit);
+    private ScheduledFuture<?> scheduleAtFixedRate(Runnable command, long period, TimeUnit unit) {
+        return scheduleAtFixedRate(executor, command, 0, period, unit);
     }
 
 

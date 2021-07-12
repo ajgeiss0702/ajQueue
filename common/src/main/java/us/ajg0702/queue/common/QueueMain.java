@@ -67,7 +67,7 @@ public class QueueMain {
         return taskManager;
     }
 
-    private List<CompletableFuture<ServerBuilder>> serverCompletableFutures = new ArrayList<>();
+    private final List<CompletableFuture<ServerBuilder>> serverCompletableFutures = new ArrayList<>();
     private ServerBuilder serverBuilder;
     public ServerBuilder getServerBuilder() {
         return serverBuilder;
@@ -94,7 +94,7 @@ public class QueueMain {
     }
 
 
-    private File dataFolder;
+    private final File dataFolder;
 
 
     public QueueMain(Logger logger, PlatformMethods platformMethods, File dataFolder) {

@@ -6,6 +6,7 @@ import com.velocitypowered.api.proxy.server.RegisteredServer;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
+import org.jetbrains.annotations.NotNull;
 import us.ajg0702.queue.api.players.AdaptedPlayer;
 import us.ajg0702.queue.api.server.AdaptedServer;
 
@@ -14,7 +15,7 @@ import java.util.UUID;
 
 public class VelocityPlayer implements AdaptedPlayer, Audience {
 
-    Player handle;
+    final Player handle;
 
     public VelocityPlayer(Player player) {
         handle = player;
@@ -26,13 +27,13 @@ public class VelocityPlayer implements AdaptedPlayer, Audience {
     }
 
     @Override
-    public void sendMessage(Component message) {
+    public void sendMessage(@NotNull Component message) {
         if(PlainTextComponentSerializer.plainText().serialize(message).isEmpty()) return;
         handle.sendMessage(message);
     }
 
     @Override
-    public void sendActionBar(Component message) {
+    public void sendActionBar(@NotNull Component message) {
         handle.sendActionBar(message);
     }
 
@@ -49,7 +50,7 @@ public class VelocityPlayer implements AdaptedPlayer, Audience {
     @Override
     public String getServerName() {
         Optional<ServerConnection> serverConnection = handle.getCurrentServer();
-        if(!serverConnection.isPresent()) return "none";
+        if(serverConnection.isEmpty()) return "none";
         ServerConnection connection = serverConnection.get();
         return connection.getServerInfo().getName();
     }

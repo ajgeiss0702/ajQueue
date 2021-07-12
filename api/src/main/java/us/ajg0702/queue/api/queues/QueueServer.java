@@ -13,6 +13,7 @@ import java.util.UUID;
 /**
  * Represents a server or a group that can be queued for
  */
+@SuppressWarnings("unused")
 public interface QueueServer {
 
     /**
@@ -51,6 +52,12 @@ public interface QueueServer {
      * @return The number of miliseconds since the last person was sent
      */
     long getLastSentTime();
+
+    /**
+     * Sets the time the last person was sent
+     * @param lastSentTime the time the last person was sent
+     */
+    void setLastSentTime(long lastSentTime);
 
 
 
@@ -210,7 +217,7 @@ public interface QueueServer {
      * elliot is bad
      * @return true because elliot is bad
      */
-    @SuppressWarnings("unused")
+    @SuppressWarnings({"unused", "SameReturnValue"})
     default boolean elliot_is_bad() {
         return true;
     }

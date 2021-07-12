@@ -5,7 +5,6 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.spongepowered.configurate.ConfigurateException;
 import us.ajg0702.queue.api.commands.ICommandSender;
-import us.ajg0702.queue.api.commands.ISubCommand;
 import us.ajg0702.queue.commands.SubCommand;
 import us.ajg0702.queue.common.QueueMain;
 import us.ajg0702.utils.common.Messages;
@@ -15,7 +14,7 @@ import java.util.List;
 
 public class Reload extends SubCommand {
 
-    QueueMain main;
+    final QueueMain main;
     public Reload(QueueMain main) {
         this.main = main;
     }
@@ -38,11 +37,6 @@ public class Reload extends SubCommand {
     @Override
     public Messages getMessages() {
         return main.getMessages();
-    }
-
-    @Override
-    public void addSubCommand(ISubCommand subCommand) {
-
     }
 
     @Override

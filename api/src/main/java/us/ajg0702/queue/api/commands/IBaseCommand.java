@@ -5,6 +5,7 @@ import us.ajg0702.utils.common.Messages;
 
 import java.util.List;
 
+@SuppressWarnings("unused")
 public interface IBaseCommand {
 
     String getName();
