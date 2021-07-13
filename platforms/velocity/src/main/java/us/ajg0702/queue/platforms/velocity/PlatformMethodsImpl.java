@@ -44,9 +44,9 @@ public class PlatformMethodsImpl implements PlatformMethods {
     @Override
     public String getPluginVersion() {
         Optional<PluginContainer> plugin = proxyServer.getPluginManager().getPlugin("ajqueue");
-        if(plugin.isEmpty()) return "?E";
+        if(!plugin.isPresent()) return "?E";
         Optional<String> version = plugin.get().getDescription().getVersion();
-        if(version.isEmpty()) return "?V";
+        if(!version.isPresent()) return "?V";
         return version.get();
     }
 }
