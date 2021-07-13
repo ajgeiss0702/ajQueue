@@ -51,7 +51,7 @@ public class VelocityQueue  {
     public void onProxyInit(ProxyInitializeEvent e) {
         main = new QueueMain(
                 logger,
-                new PlatformMethodImpl(proxyServer, logger),
+                new PlatformMethodsImpl(proxyServer, logger),
                 dataFolder
         );
         main.setServerBuilder(new ServerBuilderImpl(main, proxyServer));

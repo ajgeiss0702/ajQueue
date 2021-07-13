@@ -22,6 +22,8 @@ public class ManageCommand extends BaseCommand {
 
         addSubCommand(new Reload(main));
         addSubCommand(new Tasks(main));
+        addSubCommand(new Version(main));
+        addSubCommand(new Pause(main));
     }
 
 
@@ -72,12 +74,13 @@ public class ManageCommand extends BaseCommand {
 
     @Override
     public List<String> autoComplete(ICommandSender sender, String[] args) {
-        if(args.length > 0) {
+        if(args.length > 1) {
             for(ISubCommand subCommand : subCommands) {
                 if(args[0].equalsIgnoreCase(subCommand.getName()) || subCommand.getAliases().contains(args[0].toLowerCase(Locale.ROOT))) {
                     return subCommand.autoComplete(sender, Arrays.copyOfRange(args, 1, args.length));
                 }
             }
+            return new ArrayList<>();
         }
         List<String> commands = new ArrayList<>();
         for(ISubCommand subCommand : subCommands) {

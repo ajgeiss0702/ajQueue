@@ -1,5 +1,6 @@
 package us.ajg0702.queue.platforms.velocity;
 
+import com.velocitypowered.api.plugin.PluginContainer;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
 import net.kyori.adventure.text.Component;
@@ -10,14 +11,15 @@ import us.ajg0702.queue.api.players.QueuePlayer;
 import us.ajg0702.queue.api.queues.QueueServer;
 import us.ajg0702.queue.platforms.velocity.players.VelocityPlayer;
 
+import java.util.Optional;
 import java.util.logging.Logger;
 
-public class PlatformMethodImpl implements PlatformMethods {
+public class PlatformMethodsImpl implements PlatformMethods {
 
     final ProxyServer proxyServer;
     final Logger logger;
 
-    public PlatformMethodImpl(ProxyServer proxyServer, Logger logger) {
+    public PlatformMethodsImpl(ProxyServer proxyServer, Logger logger) {
         this.proxyServer = proxyServer;
         this.logger = logger;
     }
@@ -37,5 +39,14 @@ public class PlatformMethodImpl implements PlatformMethods {
     @Override
     public AdaptedPlayer senderToPlayer(ICommandSender sender) {
         return new VelocityPlayer((Player) sender.getHandle());
+    }
+
+    @Override
+    public String getPluginVersion() {
+        Optional<PluginContainer> plugin = proxyServer.getPluginManager().getPlugin("ajqueue");
+        if(plugin.isEmpty()) return "?E";
+        Optional<String> version = plugin.get().getDescription().getVersion();
+        if(version.isEmpty()) return "?V";
+        return version.get();
     }
 }

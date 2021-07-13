@@ -31,4 +31,6 @@ public interface PlatformMethods {
      */
     AdaptedPlayer senderToPlayer(ICommandSender sender);
 
+    String getPluginVersion();
+
 }
