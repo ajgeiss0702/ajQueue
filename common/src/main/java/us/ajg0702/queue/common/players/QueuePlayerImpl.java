@@ -16,6 +16,7 @@ public class QueuePlayerImpl implements QueuePlayer {
     private final int highestPriority;
 
     private final UUID uuid;
+    private final String name;
 
     public QueuePlayerImpl(AdaptedPlayer player, QueueServer server, int highestPriority) {
         this.player = player;
@@ -24,6 +25,7 @@ public class QueuePlayerImpl implements QueuePlayer {
         this.highestPriority = highestPriority;
 
         uuid = player.getUniqueId();
+        name = player.getName();
     }
 
     @Override
@@ -65,5 +67,10 @@ public class QueuePlayerImpl implements QueuePlayer {
     @Override
     public boolean hasPriority() {
         return highestPriority > 0;
+    }
+
+    @Override
+    public String getName() {
+        return name;
     }
 }

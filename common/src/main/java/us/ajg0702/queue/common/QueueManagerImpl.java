@@ -138,7 +138,10 @@ public class QueueManagerImpl implements QueueManager {
     @Override
     public boolean addToQueue(AdaptedPlayer player, String serverName) {
         QueueServer server = findServer(serverName);
-        if(server == null) return false;
+        if(server == null) {
+            player.sendMessage(msgs.getComponent("errors.server-not-exist", "SERVER:"+serverName));
+            return false;
+        }
         return addToQueue(player, server);
     }
 

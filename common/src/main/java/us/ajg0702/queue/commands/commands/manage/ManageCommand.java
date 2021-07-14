@@ -24,6 +24,9 @@ public class ManageCommand extends BaseCommand {
         addSubCommand(new Tasks(main));
         addSubCommand(new Version(main));
         addSubCommand(new Pause(main));
+        addSubCommand(new ISP(main));
+        addSubCommand(new QueueList(main));
+        addSubCommand(new Send(main));
     }
 
 

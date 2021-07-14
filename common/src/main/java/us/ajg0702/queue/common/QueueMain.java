@@ -1,10 +1,7 @@
 package us.ajg0702.queue.common;
 
 import org.spongepowered.configurate.ConfigurateException;
-import us.ajg0702.queue.api.AliasManager;
-import us.ajg0702.queue.api.Logic;
-import us.ajg0702.queue.api.PlatformMethods;
-import us.ajg0702.queue.api.QueueManager;
+import us.ajg0702.queue.api.*;
 import us.ajg0702.queue.api.server.ServerBuilder;
 import us.ajg0702.queue.logic.LogicGetter;
 import us.ajg0702.utils.common.Config;
@@ -65,6 +62,11 @@ public class QueueMain {
     private final TaskManager taskManager = new TaskManager(this);
     public TaskManager getTaskManager() {
         return taskManager;
+    }
+
+    private final EventHandler eventHandler = new EventHandlerImpl(this);
+    public EventHandler getEventHandler() {
+        return eventHandler;
     }
 
     private final List<CompletableFuture<ServerBuilder>> serverCompletableFutures = new ArrayList<>();

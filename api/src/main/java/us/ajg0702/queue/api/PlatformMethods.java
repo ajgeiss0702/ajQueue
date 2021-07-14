@@ -1,9 +1,12 @@
 package us.ajg0702.queue.api;
 
+import us.ajg0702.queue.api.commands.IBaseCommand;
 import us.ajg0702.queue.api.commands.ICommandSender;
 import us.ajg0702.queue.api.players.AdaptedPlayer;
 import us.ajg0702.queue.api.players.QueuePlayer;
 import us.ajg0702.queue.api.queues.QueueServer;
+
+import java.util.List;
 
 public interface PlatformMethods {
     /**
@@ -33,4 +36,14 @@ public interface PlatformMethods {
 
     String getPluginVersion();
 
+    List<AdaptedPlayer> getOnlinePlayers();
+    List<String> getPlayerNames(boolean lowercase);
+    AdaptedPlayer getPlayer(String name);
+
+    List<String> getServerNames();
+
+
+    List<IBaseCommand> getCommands();
+
+    ICommandSender constructSender(AdaptedPlayer player);
 }

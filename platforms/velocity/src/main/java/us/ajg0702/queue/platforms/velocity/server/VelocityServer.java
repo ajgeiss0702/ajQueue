@@ -1,12 +1,17 @@
 package us.ajg0702.queue.platforms.velocity.server;
 
+import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
 import com.velocitypowered.api.proxy.server.ServerPing;
 import us.ajg0702.queue.api.players.AdaptedPlayer;
 import us.ajg0702.queue.api.server.AdaptedServer;
 import us.ajg0702.queue.api.server.AdaptedServerInfo;
 import us.ajg0702.queue.api.server.AdaptedServerPing;
+import us.ajg0702.queue.platforms.velocity.players.VelocityPlayer;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
@@ -46,6 +51,15 @@ public class VelocityServer implements AdaptedServer {
     @Override
     public boolean canAccess(AdaptedPlayer player) {
         return true;
+    }
+
+    @Override
+    public List<AdaptedPlayer> getPlayers() {
+        List<AdaptedPlayer> players = new ArrayList<>();
+        for(Player player : handle.getPlayersConnected()) {
+            players.add(new VelocityPlayer(player));
+        }
+        return players;
     }
 
     @Override

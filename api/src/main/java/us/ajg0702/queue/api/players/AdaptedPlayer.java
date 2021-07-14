@@ -64,4 +64,10 @@ public interface AdaptedPlayer extends Handle, Audience {
      * Does not use the queue.
      */
     void connect(AdaptedServer server);
+
+    /**
+     * Gets the player's username
+     * @return the player's username
+     */
+    String getName();
 }

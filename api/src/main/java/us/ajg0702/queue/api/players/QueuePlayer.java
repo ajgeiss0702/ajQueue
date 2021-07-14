@@ -50,4 +50,10 @@ public interface QueuePlayer {
      * Gets if this player has priority
      */
     boolean hasPriority();
+
+    /**
+     * Gets the player's username
+     * @return the player's username
+     */
+    String getName();
 }
