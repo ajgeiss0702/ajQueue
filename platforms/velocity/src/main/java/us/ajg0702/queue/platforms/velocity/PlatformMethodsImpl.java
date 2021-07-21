@@ -1,8 +1,12 @@
 package us.ajg0702.queue.platforms.velocity;
 
+import com.google.common.io.ByteArrayDataOutput;
+import com.google.common.io.ByteStreams;
 import com.velocitypowered.api.plugin.PluginContainer;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
+import com.velocitypowered.api.proxy.messages.ChannelIdentifier;
+import com.velocitypowered.api.proxy.messages.MinecraftChannelIdentifier;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
 import net.kyori.adventure.text.Component;
 import us.ajg0702.queue.api.PlatformMethods;
@@ -42,6 +46,14 @@ public class PlatformMethodsImpl implements PlatformMethods {
     public void sendPluginMessage(AdaptedPlayer player, String channel, String... data) {
         if(player == null) return;
         Player velocityPlayer = ((VelocityPlayer) player).getHandle();
+        ByteArrayDataOutput out = ByteStreams.newDataOutput();
+        out.writeUTF( channel );
+        out.writeUTF(player.getName());
+        for(String s : data) {
+            out.writeUTF( s );
+        }
+
+        velocityPlayer.sendPluginMessage(MinecraftChannelIdentifier.from("ajqueue:tospigot"), out.toByteArray());
     }
 
     @Override

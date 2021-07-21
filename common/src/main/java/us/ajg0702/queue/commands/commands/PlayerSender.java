@@ -7,22 +7,22 @@ public class PlayerSender implements ICommandSender {
 
     final AdaptedPlayer handle;
 
-    public VelocitySender(CommandSource handle) {
+    public PlayerSender(AdaptedPlayer handle) {
         this.handle = handle;
     }
 
     @Override
     public boolean hasPermission(String permission) {
-        return false;
+        return handle.hasPermission(permission);
     }
 
     @Override
     public boolean isPlayer() {
-        return false;
+        return true;
     }
 
     @Override
-    public Object getHandle() {
+    public AdaptedPlayer getHandle() {
         return null;
     }
 }

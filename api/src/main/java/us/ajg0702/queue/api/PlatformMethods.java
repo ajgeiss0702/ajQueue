@@ -44,6 +44,4 @@ public interface PlatformMethods {
 
 
     List<IBaseCommand> getCommands();
-
-    ICommandSender constructSender(AdaptedPlayer player);
 }

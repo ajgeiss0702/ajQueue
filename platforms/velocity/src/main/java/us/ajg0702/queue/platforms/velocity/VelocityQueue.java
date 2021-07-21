@@ -85,6 +85,7 @@ public class VelocityQueue  {
 
     @Subscribe
     public void onPluginMessage(PluginMessageEvent e) {
+        System.out.println("Recieved message: "+e.getIdentifier().getId());
         if(e.getIdentifier().getId().equals("ajqueue:tospigot")) {
             e.setResult(PluginMessageEvent.ForwardResult.handled());
             return;

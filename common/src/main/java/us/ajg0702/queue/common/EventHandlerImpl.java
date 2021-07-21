@@ -1,8 +1,10 @@
 package us.ajg0702.queue.common;
 
 import us.ajg0702.queue.api.EventHandler;
+import us.ajg0702.queue.api.commands.IBaseCommand;
 import us.ajg0702.queue.api.players.AdaptedPlayer;
-import us.ajg0702.utils.bungee.BungeeUtils;
+import us.ajg0702.queue.api.queues.QueueServer;
+import us.ajg0702.queue.commands.commands.PlayerSender;
 
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
@@ -17,6 +19,8 @@ public class EventHandlerImpl implements EventHandler {
 
     @Override
     public void handleMessage(AdaptedPlayer recievingPlayer, byte[] data) {
+        IBaseCommand moveCommand = main.getPlatformMethods().getCommands().get(0);
+        IBaseCommand leaveCommand = main.getPlatformMethods().getCommands().get(1);
         DataInputStream in = new DataInputStream(new ByteArrayInputStream(data));
         try {
             String subchannel = in.readUTF();
@@ -25,63 +29,63 @@ public class EventHandlerImpl implements EventHandler {
                 String rawData = in.readUTF();
                 String[] args = new String[1];
                 args[0] = rawData;
-                main.getPlatformMethods().getCommands().get(0).execute(new , args);
+                moveCommand.execute(new PlayerSender(recievingPlayer), args);
                 //man.addToQueue(player, data);
 
             }
             if(subchannel.equals("massqueue")) {
-                String data = in.readUTF();
-                String[] parts = data.split(",");
+                String inData = in.readUTF();
+                String[] parts = inData.split(",");
                 for(String part : parts) {
                     String[] pparts = part.split(":");
                     if(pparts.length < 2) continue;
                     String pname = pparts[0];
                     String pserver = pparts[1];
-                    ProxiedPlayer p = ProxyServer.getInstance().getPlayer(pname);
+                    AdaptedPlayer p = main.getPlatformMethods().getPlayer(pname);
                     String[] args = new String[1];
                     args[0] = pserver;
-                    moveCommand.execute(p, args);
+                    moveCommand.execute(new PlayerSender(p), args);
                 }
             }
             if(subchannel.equals("queuename")) {
-                BungeeUtils.sendCustomData(player, "queuename", aliases.getAlias(man.getQueuedName(player)));
+                main.getPlatformMethods().sendPluginMessage(recievingPlayer, "queuename", main.getQueueManager().getQueuedName(recievingPlayer));
             }
             if(subchannel.equals("position")) {
-                QueueServer server = man.getSingleServer(player);
-                String pos = msgs.getString("placeholders.position.none");
+                QueueServer server = main.getQueueManager().getSingleServer(recievingPlayer);
+                String pos = main.getMessages().getString("placeholders.position.none");
                 if(server != null) {
-                    pos = server.getQueue().indexOf(player)+1+"";
+                    pos = server.getQueue().indexOf(server.findPlayer(recievingPlayer))+1+"";
                 }
-                BungeeUtils.sendCustomData(player, "position", pos);
+                main.getPlatformMethods().sendPluginMessage(recievingPlayer, "position", pos);
             }
             if(subchannel.equals("positionof")) {
-                QueueServer server = man.getSingleServer(player);
-                String pos = msgs.getString("placeholders.position.none");
+                QueueServer server = main.getQueueManager().getSingleServer(recievingPlayer);
+                String pos = main.getMessages().getString("placeholders.position.none");
                 if(server != null) {
                     pos = server.getQueue().size()+"";
                 }
-                BungeeUtils.sendCustomData(player, "positionof", pos);
+                main.getPlatformMethods().sendPluginMessage(recievingPlayer, "positionof", pos);
             }
             if(subchannel.equals("inqueue")) {
-                QueueServer server = man.getSingleServer(player);
-                BungeeUtils.sendCustomData(player, "inqueue", (server != null)+"");
+                QueueServer server = main.getQueueManager().getSingleServer(recievingPlayer);
+                main.getPlatformMethods().sendPluginMessage(recievingPlayer, "inqueue", (server != null)+"");
             }
             if(subchannel.equals("queuedfor")) {
                 String srv = in.readUTF();
-                QueueServer server = man.findServer(srv);
+                QueueServer server = main.getQueueManager().findServer(srv);
                 if(server == null) return;
-                BungeeUtils.sendCustomData(player, "queuedfor", srv, server.getQueue().size()+"");
+                main.getPlatformMethods().sendPluginMessage(recievingPlayer, "queuedfor", srv, server.getQueue().size()+"");
             }
             if(subchannel.equals("leavequeue")) {
-                String arg = "";
+                String[] args = new String[1];
                 try {
-                    arg = in.readUTF();
+                    args[0] = in.readUTF();
                 } catch(Exception ignored) {}
-                getProxy().getPluginManager().dispatchCommand(player, "leavequeue"+arg);
+                leaveCommand.execute(new PlayerSender(recievingPlayer), args);
             }
 
         } catch (IOException e1) {
-            getLogger().warning("An error occured while reading data from spigot side:");
+            main.getLogger().warning("An error occured while reading data from spigot side:");
             e1.printStackTrace();
         }
     }

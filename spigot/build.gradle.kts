@@ -8,6 +8,10 @@ group = "us.ajg0702.queue.spigot"
 repositories {
     mavenCentral()
 
+    maven { url = uri("https://repo.extendedclip.com/content/repositories/placeholderapi/") }
+
+    maven { url = uri("https://repo.codemc.io/repository/nms/") }
+
     maven { url = uri("https://repo.ajg0702.us") }
 }
 
@@ -16,6 +20,18 @@ dependencies {
     compileOnly("com.google.guava:guava:30.1.1-jre")
 
     compileOnly("us.ajg0702:ajUtils:1.1.6")
+
+    compileOnly(group = "org.spigotmc", name = "spigot", version = "1.16.5-R0.1-SNAPSHOT")
+    compileOnly("me.clip:placeholderapi:2.10.4")
+}
+
+tasks.withType<ProcessResources> {
+    include("**/*.yml")
+    filter<org.apache.tools.ant.filters.ReplaceTokens>(
+        "tokens" to mapOf(
+            "VERSION" to project.version.toString()
+        )
+    )
 }
 
 publishing {

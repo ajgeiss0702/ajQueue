@@ -22,6 +22,7 @@ dependencies {
     //implementation("net.kyori:adventure-text-minimessage:4.1.0-SNAPSHOT")
 
     implementation(project(":platforms:velocity"))
+    implementation(project(":spigot"))
 }
 
 tasks.shadowJar {

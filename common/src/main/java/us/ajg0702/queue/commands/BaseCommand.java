@@ -1,6 +1,7 @@
 package us.ajg0702.queue.commands;
 
 import com.google.common.collect.ImmutableList;
+import net.kyori.adventure.text.Component;
 import us.ajg0702.queue.api.commands.IBaseCommand;
 import us.ajg0702.queue.api.commands.ICommandSender;
 import us.ajg0702.queue.api.commands.ISubCommand;
@@ -41,7 +42,7 @@ public class BaseCommand implements IBaseCommand {
 
     @Override
     public void execute(ICommandSender sender, String[] args) {
-
+        sender.sendMessage(Component.text("Unimplemented command"));
     }
 
     public boolean checkPermission(ICommandSender sender) {
