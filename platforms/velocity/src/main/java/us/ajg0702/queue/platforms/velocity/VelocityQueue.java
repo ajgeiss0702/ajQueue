@@ -77,7 +77,7 @@ public class VelocityQueue  {
         CommandManager commandManager = proxyServer.getCommandManager();
 
 
-        proxyServer.getChannelRegistrar().register(MinecraftChannelIdentifier.from("ajqueue:tospigot"));
+        proxyServer.getChannelRegistrar().register(MinecraftChannelIdentifier.create("ajqueue", "tospigot"));
         proxyServer.getChannelRegistrar().register(MinecraftChannelIdentifier.from("ajqueue:toproxy"));
 
 
