@@ -49,13 +49,10 @@ public class LeaveCommand extends BaseCommand {
 
     @Override
     public void execute(ICommandSender sender, String[] args) {
-        System.out.println("leave command");
         if(!sender.isPlayer()) {
-            System.out.println("not player");
             sender.sendMessage(getMessages().getComponent("errors.player-only"));
             return;
         }
-        System.out.println("player");
         AdaptedPlayer player = main.getPlatformMethods().senderToPlayer(sender);
         List<QueueServer> servers = main.getQueueManager().getPlayerQueues(player);
 
@@ -64,7 +61,6 @@ public class LeaveCommand extends BaseCommand {
             return;
         }
 
-        System.out.println("0");
 
         if(servers.size() == 1) {
             servers.get(0).removePlayer(player);
@@ -72,7 +68,6 @@ public class LeaveCommand extends BaseCommand {
             return;
         }
 
-        System.out.println("1");
 
         if(args.length <= 0) {
             sender.sendMessage(getMessages().getComponent("commands.leave.more-args", "QUEUES:"+getQueueList(servers)));
@@ -91,7 +86,6 @@ public class LeaveCommand extends BaseCommand {
             return;
         }
 
-        System.out.println("2");
 
         leavingServer.removePlayer(queuePlayer);
         sender.sendMessage(getMessages().getComponent("commands.leave-queue", "SERVER:"+leavingServer.getAlias()));

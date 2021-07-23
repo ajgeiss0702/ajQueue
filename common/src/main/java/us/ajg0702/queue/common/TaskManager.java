@@ -9,12 +9,18 @@ import java.util.concurrent.TimeUnit;
 
 public class TaskManager {
 
+
     final ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
     final ScheduledExecutorService updateExecutor = Executors.newScheduledThreadPool(1);
 
     final QueueMain main;
     public TaskManager(QueueMain main) {
         this.main = main;
+    }
+
+    public void shutdown() {
+        executor.shutdown();
+        updateExecutor.shutdown();
     }
 
     public String taskStatus() {

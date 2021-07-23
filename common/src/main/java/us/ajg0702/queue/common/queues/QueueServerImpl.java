@@ -304,18 +304,13 @@ public class QueueServerImpl implements QueueServer {
     }
 
     @Override
-    public synchronized QueuePlayer findPlayer(AdaptedPlayer player) {
+    public QueuePlayer findPlayer(AdaptedPlayer player) {
+        return findPlayer(player.getUniqueId());
+    }
+    @Override
+    public synchronized QueuePlayer findPlayer(UUID uuid) {
         for(QueuePlayer queuePlayer : queue) {
-            AdaptedPlayer queuedPlayer = queuePlayer.getPlayer();
-            if(queuedPlayer == null) continue;
-            if(
-                    queuedPlayer
-                            .getUniqueId()
-                            .equals(
-                                    player
-                                            .getUniqueId()
-                            )
-            ) {
+            if(queuePlayer.getUniqueId().toString().equals(uuid.toString())) {
                 return queuePlayer;
             }
         }

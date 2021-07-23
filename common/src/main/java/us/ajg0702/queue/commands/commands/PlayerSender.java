@@ -23,6 +23,6 @@ public class PlayerSender implements ICommandSender {
 
     @Override
     public AdaptedPlayer getHandle() {
-        return null;
+        return handle;
     }
 }

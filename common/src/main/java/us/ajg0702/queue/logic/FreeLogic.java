@@ -15,4 +15,9 @@ public class FreeLogic implements Logic {
     public QueuePlayer priorityLogic(QueueServer server, AdaptedPlayer player) {
         return null;
     }
+
+    @Override
+    public boolean playerDisconnectedTooLong(QueuePlayer player) {
+        return true;
+    }
 }

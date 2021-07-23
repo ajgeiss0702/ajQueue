@@ -56,4 +56,10 @@ public interface QueuePlayer {
      * @return the player's username
      */
     String getName();
+
+    /**
+     * Returns the number of miliseconds since this player was online
+     * @return The number of miliseconds since this player was online
+     */
+    long getTimeSinceOnline();
 }

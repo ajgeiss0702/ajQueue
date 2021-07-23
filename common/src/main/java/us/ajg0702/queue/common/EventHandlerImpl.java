@@ -1,10 +1,13 @@
 package us.ajg0702.queue.common;
 
+import com.google.common.collect.ImmutableList;
 import us.ajg0702.queue.api.EventHandler;
 import us.ajg0702.queue.api.commands.IBaseCommand;
 import us.ajg0702.queue.api.players.AdaptedPlayer;
+import us.ajg0702.queue.api.players.QueuePlayer;
 import us.ajg0702.queue.api.queues.QueueServer;
 import us.ajg0702.queue.commands.commands.PlayerSender;
+import us.ajg0702.queue.common.players.QueuePlayerImpl;
 
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
@@ -30,8 +33,6 @@ public class EventHandlerImpl implements EventHandler {
                 String[] args = new String[1];
                 args[0] = rawData;
                 moveCommand.execute(new PlayerSender(recievingPlayer), args);
-                //man.addToQueue(player, data);
-
             }
             if(subchannel.equals("massqueue")) {
                 String inData = in.readUTF();
@@ -87,6 +88,26 @@ public class EventHandlerImpl implements EventHandler {
         } catch (IOException e1) {
             main.getLogger().warning("An error occured while reading data from spigot side:");
             e1.printStackTrace();
+        }
+    }
+
+
+    @Override
+    public void onPlayerJoin(AdaptedPlayer player) {
+        ImmutableList<QueuePlayer> queues = main.getQueueManager().findPlayerInQueues(player);
+        for(QueuePlayer queuePlayer : queues) {
+            queuePlayer.setPlayer(player);
+        }
+        if(queues.size() > 0) {
+            main.getQueueManager().sendMessage(main.getQueueManager().getSingleServer(player).findPlayer(player));
+        }
+    }
+
+    @Override
+    public void onPlayerLeave(AdaptedPlayer player) {
+        ImmutableList<QueuePlayer> queues = main.getQueueManager().findPlayerInQueues(player);
+        for(QueuePlayer queuePlayer : queues) {
+            ((QueuePlayerImpl) queuePlayer).setLeaveTime(System.currentTimeMillis());
         }
     }
 }

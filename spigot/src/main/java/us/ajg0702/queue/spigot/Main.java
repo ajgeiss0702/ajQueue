@@ -10,6 +10,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.plugin.messaging.PluginMessageListener;
+import org.jetbrains.annotations.NotNull;
 import us.ajg0702.queue.spigot.utils.VersionSupport;
 
 import java.util.HashMap;
@@ -23,7 +24,7 @@ public class Main extends JavaPlugin implements PluginMessageListener,Listener {
 	
 	public void onEnable() {
 		getServer().getMessenger().registerIncomingPluginChannel(this, "ajqueue:tospigot", this);
-		getServer().getMessenger().registerOutgoingPluginChannel(this, "ajqueue:tobungee");
+		getServer().getMessenger().registerOutgoingPluginChannel(this, "ajqueue:toproxy");
 		
 		this.getCommand("move").setExecutor(new Commands(this));
 		this.getCommand("leavequeue").setExecutor(new Commands(this));
@@ -62,8 +63,12 @@ public class Main extends JavaPlugin implements PluginMessageListener,Listener {
 	HashMap<Player, String> queuebatch = new HashMap<>();
 
 	@Override
-	public void onPluginMessageReceived(String channel, Player player, byte[] message) {
-		if (!channel.equals("ajqueue:tospigot")) return;
+	public void onPluginMessageReceived(@NotNull String channel, @NotNull Player player, @NotNull byte[] message) {
+		if (!channel.equals("ajqueue:tospigot")) {
+			getLogger().info("Skipping message: "+channel);
+			return;
+		}
+		getLogger().info("Processing message: "+channel);
 		
 		ByteArrayDataInput in = ByteStreams.newDataInput(message);
 		
@@ -161,7 +166,7 @@ public class Main extends JavaPlugin implements PluginMessageListener,Listener {
 		out.writeUTF(subchannel);
 		out.writeUTF(data);
 		
-		player.sendPluginMessage(this, "ajqueue:tobungee", out.toByteArray());
+		player.sendPluginMessage(this, "ajqueue:toproxy", out.toByteArray());
 	}
 	
 	public void sendMessage(String subchannel, String data) {
@@ -170,7 +175,7 @@ public class Main extends JavaPlugin implements PluginMessageListener,Listener {
 		out.writeUTF(data);
 		
 		Bukkit.getOnlinePlayers().iterator().next()
-		.sendPluginMessage(this, "ajqueue:tobungee", out.toByteArray());
+		.sendPluginMessage(this, "ajqueue:toproxy", out.toByteArray());
 	}
 	
 	@EventHandler

@@ -198,6 +198,12 @@ public interface QueueServer {
      */
     QueuePlayer findPlayer(AdaptedPlayer player);
 
+    /**
+     * Finds the player with this uuid in this queue and returns the representative QueuePlayer
+     * @return The QueuePlayer representing the player, null if not found
+     */
+    QueuePlayer findPlayer(UUID uuid);
+
 
     /**
      * Gets the most ideal server in this group to join

@@ -47,7 +47,7 @@ public class QueuePlayerImpl implements QueuePlayer {
     @Nullable
     @Override
     public AdaptedPlayer getPlayer() {
-        if(!player.isConnected()) return null;
+        if(player != null && !player.isConnected()) player = null;
         return player;
     }
 
@@ -72,5 +72,21 @@ public class QueuePlayerImpl implements QueuePlayer {
     @Override
     public String getName() {
         return name;
+    }
+
+
+
+    @Override
+    public long getTimeSinceOnline() {
+        if(player != null && player.isConnected()) {
+            return 0;
+        }
+        return System.currentTimeMillis()-leaveTime;
+    }
+
+
+    private long leaveTime = 0;
+    public void setLeaveTime(long leaveTime) {
+        this.leaveTime = leaveTime;
     }
 }

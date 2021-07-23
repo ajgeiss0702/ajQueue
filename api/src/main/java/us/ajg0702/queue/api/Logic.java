@@ -19,4 +19,11 @@ public interface Logic {
      * @param player The player that is being queued
      */
     QueuePlayer priorityLogic(QueueServer server, AdaptedPlayer player);
+
+    /**
+     * The logic for checking if a player has been disconnected for too long
+     * @param player The player to check
+     * @return true if the player has been disconnected for too long and should be removed from the queue
+     */
+    boolean playerDisconnectedTooLong(QueuePlayer player);
 }

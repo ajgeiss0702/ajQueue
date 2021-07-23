@@ -8,6 +8,7 @@ import us.ajg0702.queue.api.queues.QueueServer;
 import us.ajg0702.queue.api.server.AdaptedServer;
 import us.ajg0702.queue.api.server.ServerBuilder;
 import us.ajg0702.queue.common.players.QueuePlayerImpl;
+import us.ajg0702.utils.bungee.BungeeUtils;
 import us.ajg0702.utils.common.Messages;
 import us.ajg0702.utils.common.TimeUtils;
 
@@ -131,7 +132,11 @@ public class QueueManagerImpl implements QueueManager {
         if(!server.isJoinable(player)) {
             sendMessage(queuePlayer);
         }
-        main.getPlatformMethods().sendJoinQueueChannelMessages(server, queuePlayer);
+        main.getPlatformMethods().sendPluginMessage(player, "position", pos+"");
+        main.getPlatformMethods().sendPluginMessage(player, "positionof", len+"");
+        main.getPlatformMethods().sendPluginMessage(player, "queuename", server.getAlias());
+        main.getPlatformMethods().sendPluginMessage(player, "inqueue", "true");
+        main.getPlatformMethods().sendPluginMessage(player, "inqueueevent", "true");
         return true;
     }
 
@@ -232,7 +237,6 @@ public class QueueManagerImpl implements QueueManager {
         for(QueueServer server : servers) {
             String status = server.getStatusString();
             for(QueuePlayer queuePlayer : server.getQueue()) {
-                if(!getSingleServer(queuePlayer.getPlayer()).equals(server)) continue;
 
                 int pos = queuePlayer.getPosition();
                 if(pos == 0) {
@@ -242,6 +246,8 @@ public class QueueManagerImpl implements QueueManager {
 
                 AdaptedPlayer player = queuePlayer.getPlayer();
                 if(player == null) continue;
+
+                if(!getSingleServer(player).equals(server)) continue;
 
                 if(!server.isJoinable(player)) {
                     queuePlayer.getPlayer().sendActionBar(msgs.getComponent("spigot.actionbar.offline",

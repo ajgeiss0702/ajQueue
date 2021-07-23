@@ -96,6 +96,11 @@ public class QueueMain {
     }
 
 
+    public void shutdown() {
+        taskManager.shutdown();
+    }
+
+
     private final File dataFolder;
 
 

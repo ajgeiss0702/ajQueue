@@ -15,6 +15,7 @@ import us.ajg0702.queue.api.commands.ICommandSender;
 import us.ajg0702.queue.api.players.AdaptedPlayer;
 import us.ajg0702.queue.api.players.QueuePlayer;
 import us.ajg0702.queue.api.queues.QueueServer;
+import us.ajg0702.queue.commands.commands.PlayerSender;
 import us.ajg0702.queue.platforms.velocity.players.VelocityPlayer;
 
 import java.util.ArrayList;
@@ -23,23 +24,16 @@ import java.util.Locale;
 import java.util.Optional;
 import java.util.logging.Logger;
 
-public class PlatformMethodsImpl implements PlatformMethods {
+public class VelocityMethods implements PlatformMethods {
 
     final ProxyServer proxyServer;
     final Logger logger;
     final VelocityQueue plugin;
 
-    public PlatformMethodsImpl(VelocityQueue plugin, ProxyServer proxyServer, Logger logger) {
+    public VelocityMethods(VelocityQueue plugin, ProxyServer proxyServer, Logger logger) {
         this.proxyServer = proxyServer;
         this.logger = logger;
         this.plugin = plugin;
-    }
-
-    @Override
-    public void sendJoinQueueChannelMessages(QueueServer queueServer, QueuePlayer queuePlayer) {
-        AdaptedPlayer player = queuePlayer.getPlayer();
-        if(player == null) return;
-        player.sendMessage(Component.text());
     }
 
     @Override
@@ -58,6 +52,9 @@ public class PlatformMethodsImpl implements PlatformMethods {
 
     @Override
     public AdaptedPlayer senderToPlayer(ICommandSender sender) {
+        if(sender instanceof PlayerSender) {
+            return ((PlayerSender) sender).getHandle();
+        }
         return new VelocityPlayer((Player) sender.getHandle());
     }
 
