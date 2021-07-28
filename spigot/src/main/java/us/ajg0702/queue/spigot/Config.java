@@ -9,10 +9,10 @@ import java.io.PrintWriter;
 import java.nio.file.Files;
 
 public class Config {
-	File f;
-	YamlConfiguration yml;
+	final File f;
+	final YamlConfiguration yml;
 	
-	JavaPlugin pl;
+	final JavaPlugin pl;
 	
 	
 	public boolean getBoolean(String key) {

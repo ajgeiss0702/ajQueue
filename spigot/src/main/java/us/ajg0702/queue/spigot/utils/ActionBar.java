@@ -12,18 +12,15 @@ import java.lang.reflect.Method;
  *
  */
 public class ActionBar {
-	
-    private static String version;
-    private static boolean old;
 
-	public static void send(Player player, String message) {
+    public static void send(Player player, String message) {
 		if(player == null) return;
 		if(!player.isOnline()) return;
-		
-		version = Bukkit.getServer().getClass().getPackage().getName();
+
+        String version = Bukkit.getServer().getClass().getPackage().getName();
         version = version.substring(version.lastIndexOf(".") + 1);
 
-        old = version.equalsIgnoreCase("v1_8_R1") || version.startsWith("v1_7_");
+        boolean old = version.equalsIgnoreCase("v1_8_R1") || version.startsWith("v1_7_");
 		
 		try {
             Class<?> craftPlayerClass = Class.forName("org.bukkit.craftbukkit." + version + ".entity.CraftPlayer");

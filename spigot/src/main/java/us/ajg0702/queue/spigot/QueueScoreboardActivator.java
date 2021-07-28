@@ -3,11 +3,12 @@ package us.ajg0702.queue.spigot;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
+import org.jetbrains.annotations.NotNull;
 
 public class QueueScoreboardActivator extends Event {
 	private static final HandlerList HANDLERS = new HandlerList();
 
-    public HandlerList getHandlers() {
+    public @NotNull HandlerList getHandlers() {
         return HANDLERS;
     }
 
@@ -15,7 +16,7 @@ public class QueueScoreboardActivator extends Event {
         return HANDLERS;
     }
     
-    Player ply;
+    final Player ply;
     
     public QueueScoreboardActivator(Player p) {
     	this.ply = p;

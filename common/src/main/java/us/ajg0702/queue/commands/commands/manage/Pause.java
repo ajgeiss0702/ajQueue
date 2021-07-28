@@ -1,7 +1,6 @@
 package us.ajg0702.queue.commands.commands.manage;
 
 import com.google.common.collect.ImmutableList;
-import net.kyori.adventure.text.Component;
 import us.ajg0702.queue.api.commands.ICommandSender;
 import us.ajg0702.queue.api.queues.QueueServer;
 import us.ajg0702.queue.commands.SubCommand;

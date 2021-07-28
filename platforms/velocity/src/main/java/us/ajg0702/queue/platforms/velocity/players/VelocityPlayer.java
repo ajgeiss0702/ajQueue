@@ -10,6 +10,7 @@ import org.jetbrains.annotations.NotNull;
 import us.ajg0702.queue.api.players.AdaptedPlayer;
 import us.ajg0702.queue.api.server.AdaptedServer;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -68,6 +69,11 @@ public class VelocityPlayer implements AdaptedPlayer, Audience {
     @Override
     public String getName() {
         return handle.getUsername();
+    }
+
+    @Override
+    public List<String> getPermissions() {
+        throw new IllegalStateException("AdaptedPlayer#getPermissions cannot be used on velocity");
     }
 
     @Override

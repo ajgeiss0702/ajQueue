@@ -15,7 +15,7 @@ import java.io.IOException;
 
 public class EventHandlerImpl implements EventHandler {
 
-    QueueMain main;
+    final QueueMain main;
     public EventHandlerImpl(QueueMain main) {
         this.main = main;
     }

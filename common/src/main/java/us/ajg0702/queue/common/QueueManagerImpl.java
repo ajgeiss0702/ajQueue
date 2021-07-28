@@ -9,7 +9,6 @@ import us.ajg0702.queue.api.server.AdaptedServer;
 import us.ajg0702.queue.api.server.ServerBuilder;
 import us.ajg0702.queue.common.players.QueuePlayerImpl;
 import us.ajg0702.queue.common.queues.QueueServerImpl;
-import us.ajg0702.utils.bungee.BungeeUtils;
 import us.ajg0702.utils.common.Messages;
 import us.ajg0702.utils.common.TimeUtils;
 

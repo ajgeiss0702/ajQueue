@@ -6,6 +6,7 @@ import org.jetbrains.annotations.NotNull;
 import us.ajg0702.queue.api.server.AdaptedServer;
 import us.ajg0702.queue.api.util.Handle;
 
+import java.util.List;
 import java.util.UUID;
 
 /**
@@ -70,4 +71,6 @@ public interface AdaptedPlayer extends Handle, Audience {
      * @return the player's username
      */
     String getName();
+
+    List<String> getPermissions();
 }

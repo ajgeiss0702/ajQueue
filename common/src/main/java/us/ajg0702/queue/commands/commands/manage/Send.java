@@ -4,14 +4,12 @@ import com.google.common.collect.ImmutableList;
 import net.kyori.adventure.text.Component;
 import us.ajg0702.queue.api.commands.ICommandSender;
 import us.ajg0702.queue.api.players.AdaptedPlayer;
-import us.ajg0702.queue.api.queues.QueueServer;
 import us.ajg0702.queue.api.server.AdaptedServer;
 import us.ajg0702.queue.commands.SubCommand;
 import us.ajg0702.queue.common.QueueMain;
 import us.ajg0702.utils.common.Messages;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class Send extends SubCommand {

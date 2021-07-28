@@ -50,7 +50,7 @@ public class TaskManager {
 
         updateTask = scheduleAtFixedRate(updateExecutor,
                 main.getQueueManager()::updateServers,
-                0L,
+                500L,
                 (long) (Math.max(main.getTimeBetweenPlayers(), 2)*1000L),
                 TimeUnit.MILLISECONDS
         );
@@ -88,7 +88,7 @@ public class TaskManager {
             sendTask.cancel(false);
         }
         if(updateTask != null && !updateTask.isCancelled()) {
-            updateTask.cancel(false);
+            updateTask.cancel(true);
         }
         if(messageTask != null && !messageTask.isCancelled()) {
             messageTask.cancel(false);

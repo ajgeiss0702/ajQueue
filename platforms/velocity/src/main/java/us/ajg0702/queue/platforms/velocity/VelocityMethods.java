@@ -38,7 +38,7 @@ public class VelocityMethods implements PlatformMethods {
     public void sendPluginMessage(AdaptedPlayer player, String channel, String... data) {
         if(player == null) return;
         Player velocityPlayer = ((VelocityPlayer) player).getHandle();
-        ByteArrayDataOutput out = ByteStreams.newDataOutput();
+        @SuppressWarnings("UnstableApiUsage") ByteArrayDataOutput out = ByteStreams.newDataOutput();
         out.writeUTF( channel );
         out.writeUTF(player.getName());
         for(String s : data) {
@@ -110,7 +110,17 @@ public class VelocityMethods implements PlatformMethods {
     }
 
     @Override
+    public String getImplementationName() {
+        return "velocity";
+    }
+
+    @Override
     public List<IBaseCommand> getCommands() {
         return plugin.commands;
+    }
+
+    @Override
+    public boolean hasPlugin(String pluginName) {
+        return proxyServer.getPluginManager().getPlugin(pluginName.toLowerCase(Locale.ROOT)).isPresent();
     }
 }

@@ -3,8 +3,6 @@ package us.ajg0702.queue.api;
 import us.ajg0702.queue.api.commands.IBaseCommand;
 import us.ajg0702.queue.api.commands.ICommandSender;
 import us.ajg0702.queue.api.players.AdaptedPlayer;
-import us.ajg0702.queue.api.players.QueuePlayer;
-import us.ajg0702.queue.api.queues.QueueServer;
 
 import java.util.List;
 
@@ -34,6 +32,14 @@ public interface PlatformMethods {
 
     List<String> getServerNames();
 
+    String getImplementationName();
 
     List<IBaseCommand> getCommands();
+
+    /**
+     * Checks if a plugin is installed
+     * @param pluginName The name of the plugin to check for (case in-sensitive)
+     * @return if the plugin is on the server
+     */
+    boolean hasPlugin(String pluginName);
 }

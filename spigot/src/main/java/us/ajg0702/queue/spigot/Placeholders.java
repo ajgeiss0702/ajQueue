@@ -14,7 +14,7 @@ import java.util.Iterator;
  */
 public class Placeholders extends PlaceholderExpansion {
 
-    private SpigotMain plugin;
+    private final SpigotMain plugin;
 
     /**
      * Since we register the expansion inside our own plugin, we
@@ -89,7 +89,7 @@ public class Placeholders extends PlaceholderExpansion {
         return plugin.getDescription().getVersion();
     }
     
-    HashMap<Player, HashMap<String, String>> responseCache = new HashMap<>();
+    final HashMap<Player, HashMap<String, String>> responseCache = new HashMap<>();
     
     public void cleanCache() {
     	Iterator<Player> it = responseCache.keySet().iterator();
@@ -135,31 +135,25 @@ public class Placeholders extends PlaceholderExpansion {
         	}
     	}
     	
-    	Bukkit.getScheduler().runTaskAsynchronously(plugin, new Runnable() {
-    		public void run() {
-    			HashMap<String, String> playerCache;
-    			if(responseCache.containsKey(player)) {
-    				playerCache = responseCache.get(player);
-    			} else {
-    				playerCache = new HashMap<String, String>();
-    			}
-    			if(playerCache.size() > 75) {
-    				try {
-    					playerCache.remove(playerCache.keySet().toArray()[0]);
-    				} catch(ConcurrentModificationException e) {
-    					Bukkit.getScheduler().runTask(plugin, new Runnable() {
-    						public void run() {
-    							playerCache.remove(playerCache.keySet().toArray()[0]);
-    						}
-    					});
-    				}
-    			}
-    			String resp = parsePlaceholder(player, identifier);
-    			if(resp == null) return;
-    			playerCache.put(identifier, resp);
-    			responseCache.put(player, playerCache);
-    		}
-    	});
+    	Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+			HashMap<String, String> playerCache;
+			if(responseCache.containsKey(player)) {
+				playerCache = responseCache.get(player);
+			} else {
+				playerCache = new HashMap<>();
+			}
+			if(playerCache.size() > 75) {
+				try {
+					playerCache.remove(playerCache.keySet().toArray()[0]);
+				} catch(ConcurrentModificationException e) {
+					Bukkit.getScheduler().runTask(plugin, () -> playerCache.remove(playerCache.keySet().toArray()[0]));
+				}
+			}
+			String resp = parsePlaceholder(player, identifier);
+			if(resp == null) return;
+			playerCache.put(identifier, resp);
+			responseCache.put(player, playerCache);
+		});
     	
     	
     	if(responseCache.containsKey(player)) {
@@ -189,23 +183,18 @@ public class Placeholders extends PlaceholderExpansion {
     private String parsePlaceholder(Player player, String identifier) {
     	if(identifier.equalsIgnoreCase("queued")) {
         	plugin.sendMessage(player, "queuename", "");
-        	return null;
         }
     	if(identifier.equalsIgnoreCase("position")) {
     		plugin.sendMessage(player, "position", "");
-    		return null;
     	}
     	if(identifier.equalsIgnoreCase("of")) {
     		plugin.sendMessage(player, "positionof", "");
-    		return null;
     	}
     	if(identifier.equalsIgnoreCase("inqueue")) {
     		plugin.sendMessage(player, "inqueue", "");
-    		return null;
     	}
     	if(identifier.matches("queuedfor_*.*")) {
     		plugin.sendMessage(player, "queuedfor", identifier.split("_")[1]);
-    		return null;
     	}
         
         

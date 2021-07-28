@@ -9,6 +9,8 @@ group = "us.ajg0702.queue"
 repositories {
     mavenCentral()
     maven { url = uri("https://repo.ajg0702.us") }
+    maven { url = uri("https://oss.sonatype.org/content/repositories/snapshots") }
+
 }
 
 dependencies {
@@ -22,6 +24,12 @@ dependencies {
     compileOnly("us.ajg0702:ajUtils:1.1.6")
 
     compileOnly("net.kyori:adventure-api:4.8.1")
+
+    compileOnly("net.luckperms:api:5.0")
+}
+
+tasks.shadowJar {
+    archiveFileName.set("${baseName}-${version}.${extension}")
 }
 
 publishing {

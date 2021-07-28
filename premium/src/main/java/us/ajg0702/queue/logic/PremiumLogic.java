@@ -11,6 +11,12 @@ import us.ajg0702.queue.common.players.QueuePlayerImpl;
 import us.ajg0702.queue.logic.permissions.PermissionGetter;
 
 public class PremiumLogic implements Logic {
+
+    private final PermissionGetter permissionGetter;
+    public PremiumLogic(QueueMain main) {
+        permissionGetter = new PermissionGetter(main);
+    }
+
     @Override
     public boolean isPremium() {
         return true;
@@ -18,26 +24,33 @@ public class PremiumLogic implements Logic {
 
     @Override
     public QueuePlayer priorityLogic(QueueServer server, AdaptedPlayer player) {
-        int maxOfflineTime = PermissionGetter.getMaxOfflineTime(player);
+        int maxOfflineTime = permissionGetter.getMaxOfflineTime(player);
 
         QueueMain main = QueueMain.getInstance();
 
+        QueueLogger logger = main.getLogger();
+        boolean debug = main.getConfig().getBoolean("priority-queue-debug");
+
         if(player.hasPermission("ajqueue.bypass") || player.hasPermission("ajqueue.serverbypass."+server.getName())) {
+            if(debug) {
+                logger.info("[priority] "+player.getName()+" bypass");
+            }
             QueuePlayer queuePlayer = new QueuePlayerImpl(player, server, Integer.MAX_VALUE, maxOfflineTime);
             server.addPlayer(queuePlayer, 0);
             main.getQueueManager().sendPlayers(server);
             return queuePlayer;
         }
 
-        int priority = PermissionGetter.getPriority(player);
-        int serverPriority = PermissionGetter.getServerPriotity(server.getName(), player);
+        int priority = permissionGetter.getPriority(player);
+        int serverPriority = permissionGetter.getServerPriotity(server.getName(), player);
+
+        if(debug) {
+            logger.info("[priority] Using "+permissionGetter.getSelected().getName()+" for permissions");
+        }
 
         int highestPriority = Math.max(priority, serverPriority);
 
         QueuePlayer queuePlayer = new QueuePlayerImpl(player, server, highestPriority, maxOfflineTime);
-
-        QueueLogger logger = main.getLogger();
-        boolean debug = main.getConfig().getBoolean("priority-queue-debug");
 
         if(debug) {
             logger.info("[priority] "+player.getName()+" highestPriority: "+highestPriority);

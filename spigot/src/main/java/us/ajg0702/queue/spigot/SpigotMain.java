@@ -11,10 +11,10 @@ import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.plugin.messaging.PluginMessageListener;
 import org.jetbrains.annotations.NotNull;
-import us.ajg0702.queue.spigot.utils.VersionSupport;
 
 import java.util.HashMap;
 
+@SuppressWarnings("UnstableApiUsage")
 public class SpigotMain extends JavaPlugin implements PluginMessageListener,Listener {
 	
 	boolean papi = false;
@@ -22,6 +22,7 @@ public class SpigotMain extends JavaPlugin implements PluginMessageListener,List
 	
 	Config config;
 	
+	@SuppressWarnings("ConstantConditions")
 	public void onEnable() {
 		getServer().getMessenger().registerIncomingPluginChannel(this, "ajqueue:tospigot", this);
 		getServer().getMessenger().registerOutgoingPluginChannel(this, "ajqueue:toproxy");
@@ -39,20 +40,18 @@ public class SpigotMain extends JavaPlugin implements PluginMessageListener,List
 			getLogger().info("Registered PlaceholderAPI placeholders");
 		}
 		
-		Bukkit.getScheduler().runTaskTimer(this, new Runnable() {
-			public void run() {
-				if(Bukkit.getOnlinePlayers().size() <= 0 || queuebatch.size() <= 0) return;
-				String msg = "";
-				for(Player p : queuebatch.keySet()) {
-					if(p == null || !p.isOnline()) continue;
-					msg += p.getName()+":"+queuebatch.get(p)+",";
-				}
-				if(msg.length() > 1) {
-					msg = msg.substring(0, msg.length()-1);
-				}
-				queuebatch.clear();
-				sendMessage("massqueue", msg);
+		Bukkit.getScheduler().runTaskTimer(this, () -> {
+			if(Bukkit.getOnlinePlayers().size() <= 0 || queuebatch.size() <= 0) return;
+			StringBuilder msg = new StringBuilder();
+			for(Player p : queuebatch.keySet()) {
+				if(p == null || !p.isOnline()) continue;
+				msg.append(p.getName()).append(":").append(queuebatch.get(p)).append(",");
 			}
+			if(msg.length() > 1) {
+				msg = new StringBuilder(msg.substring(0, msg.length() - 1));
+			}
+			queuebatch.clear();
+			sendMessage("massqueue", msg.toString());
 		}, 2*20, 20);
 		
 		config = new Config(this);
@@ -60,10 +59,10 @@ public class SpigotMain extends JavaPlugin implements PluginMessageListener,List
 		getLogger().info("Spigot side enabled! v"+getDescription().getVersion());
 	}
 	
-	HashMap<Player, String> queuebatch = new HashMap<>();
+	final HashMap<Player, String> queuebatch = new HashMap<>();
 
 	@Override
-	public void onPluginMessageReceived(@NotNull String channel, @NotNull Player player, @NotNull byte[] message) {
+	public void onPluginMessageReceived(@NotNull String channel, @NotNull Player player, byte[] message) {
 		if (!channel.equals("ajqueue:tospigot")) return;
 		
 		ByteArrayDataInput in = ByteStreams.newDataInput(message);
@@ -133,7 +132,7 @@ public class SpigotMain extends JavaPlugin implements PluginMessageListener,List
 	    	if(p == null) return;
 	    	if(!p.isOnline()) return;
 	    	
-	    	int number = Integer.valueOf(in.readUTF());
+	    	int number = Integer.parseInt(in.readUTF());
 	    	HashMap<String, String> phs = placeholders.responseCache.get(p);
 	    	if(phs == null) phs = new HashMap<>();
 	    	phs.put("queuedfor_"+queuename, number+"");
