@@ -18,7 +18,9 @@ public class QueuePlayerImpl implements QueuePlayer {
     private final UUID uuid;
     private final String name;
 
-    public QueuePlayerImpl(AdaptedPlayer player, QueueServer server, int highestPriority) {
+    private final int maxOfflineTime;
+
+    public QueuePlayerImpl(AdaptedPlayer player, QueueServer server, int highestPriority, int maxOfflineTime) {
         this.player = player;
         this.server = server;
 
@@ -26,6 +28,8 @@ public class QueuePlayerImpl implements QueuePlayer {
 
         uuid = player.getUniqueId();
         name = player.getName();
+
+        this.maxOfflineTime = maxOfflineTime;
     }
 
     @Override
@@ -82,6 +86,11 @@ public class QueuePlayerImpl implements QueuePlayer {
             return 0;
         }
         return System.currentTimeMillis()-leaveTime;
+    }
+
+    @Override
+    public int getMaxOfflineTime() {
+        return maxOfflineTime;
     }
 
 

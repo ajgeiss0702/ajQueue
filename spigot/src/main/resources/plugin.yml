@@ -1,4 +1,4 @@
-main: us.ajg0702.queue.spigot.Main
+main: us.ajg0702.queue.spigot.SpigotMain
 version: "@VERSION@"
 api-version: 1.13
 author: ajgeiss0702

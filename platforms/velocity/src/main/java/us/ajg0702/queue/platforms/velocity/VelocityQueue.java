@@ -13,7 +13,6 @@ import com.velocitypowered.api.plugin.annotation.DataDirectory;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.proxy.messages.MinecraftChannelIdentifier;
-import net.kyori.adventure.text.Component;
 import us.ajg0702.queue.api.commands.IBaseCommand;
 import us.ajg0702.queue.commands.BaseCommand;
 import us.ajg0702.queue.commands.commands.leavequeue.LeaveCommand;
@@ -29,7 +28,8 @@ import java.io.File;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
-import java.util.logging.Logger;
+
+import org.slf4j.Logger;
 
 @Plugin(
         id = "ajqueue",
@@ -42,7 +42,7 @@ import java.util.logging.Logger;
 
 public class VelocityQueue  {
     final ProxyServer proxyServer;
-    final Logger logger;
+    final VelocityLogger logger;
 
     QueueMain main;
 
@@ -51,7 +51,7 @@ public class VelocityQueue  {
     @Inject
     public VelocityQueue(ProxyServer proxyServer, Logger logger, @DataDirectory Path dataFolder) {
         this.proxyServer = proxyServer;
-        this.logger = logger;
+        this.logger = new VelocityLogger(logger);
 
         this.dataFolder = dataFolder.toFile();
     }
@@ -104,13 +104,8 @@ public class VelocityQueue  {
             System.out.println("Skipping message: "+e.getIdentifier().getId());
             return;
         }
-        if(!e.getIdentifier().getId().equals("ajqueue:toproxy")) {
-            System.out.println("Skipping message: "+e.getIdentifier().getId());
-            return;
-        }
+        if(!e.getIdentifier().getId().equals("ajqueue:toproxy")) return;
         e.setResult(PluginMessageEvent.ForwardResult.handled());
-
-        System.out.println("Processing message: "+e.getIdentifier().getId());
 
         if(!(e.getTarget() instanceof Player)) return;
 

@@ -15,7 +15,7 @@ import us.ajg0702.queue.spigot.utils.VersionSupport;
 
 import java.util.HashMap;
 
-public class Main extends JavaPlugin implements PluginMessageListener,Listener {
+public class SpigotMain extends JavaPlugin implements PluginMessageListener,Listener {
 	
 	boolean papi = false;
 	Placeholders placeholders;
@@ -64,30 +64,12 @@ public class Main extends JavaPlugin implements PluginMessageListener,Listener {
 
 	@Override
 	public void onPluginMessageReceived(@NotNull String channel, @NotNull Player player, @NotNull byte[] message) {
-		if (!channel.equals("ajqueue:tospigot")) {
-			getLogger().info("Skipping message: "+channel);
-			return;
-		}
-		getLogger().info("Processing message: "+channel);
+		if (!channel.equals("ajqueue:tospigot")) return;
 		
 		ByteArrayDataInput in = ByteStreams.newDataInput(message);
 		
 	    String subchannel = in.readUTF();
-	    
-	    if(subchannel.equals("actionbar")) {
-	    	String playername = in.readUTF();
-	    	Player p = Bukkit.getPlayer(playername);
-	    	if(p == null) return;
-	    	
-	    	String data = in.readUTF();
-	    	final String text = data.split(";time=")[0];
-	    	//getLogger().info("recieved actionbar for "+player.getName()+": "+text);
-	    	VersionSupport.sendActionBar(p, text);
-	    	
-	    	/*QueueActionbarUpdateEvent e = new QueueActionbarUpdateEvent(p);
-	    	Bukkit.getPluginManager().callEvent(e);*/
-	    	return;
-	    }
+
 	    if(subchannel.equals("inqueueevent")) {
 	    	String playername = in.readUTF();
 	    	Player p = Bukkit.getPlayer(playername);
@@ -161,7 +143,6 @@ public class Main extends JavaPlugin implements PluginMessageListener,Listener {
 	
 	
 	public void sendMessage(Player player, String subchannel, String data) {
-		//getLogger().info("Sending message. "+subchannel+" "+data);
 		ByteArrayDataOutput out = ByteStreams.newDataOutput();
 		out.writeUTF(subchannel);
 		out.writeUTF(data);

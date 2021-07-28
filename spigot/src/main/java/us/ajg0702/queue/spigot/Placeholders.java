@@ -14,7 +14,7 @@ import java.util.Iterator;
  */
 public class Placeholders extends PlaceholderExpansion {
 
-    private Main plugin;
+    private SpigotMain plugin;
 
     /**
      * Since we register the expansion inside our own plugin, we
@@ -24,7 +24,7 @@ public class Placeholders extends PlaceholderExpansion {
      * @param plugin
      *        The instance of our plugin.
      */
-    public Placeholders(Main plugin){
+    public Placeholders(SpigotMain plugin){
         this.plugin = plugin;
     }
 

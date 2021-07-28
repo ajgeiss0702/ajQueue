@@ -8,3 +8,4 @@ include(":spigot")
 include(":platforms:velocity")
 
 include(":free")
+include(":premium")

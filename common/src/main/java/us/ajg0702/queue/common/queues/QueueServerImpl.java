@@ -244,12 +244,12 @@ public class QueueServerImpl implements QueueServer {
     }
 
     @Override
-    public synchronized void addPlayer(QueuePlayer player) {
+    public void addPlayer(QueuePlayer player) {
         addPlayer(player, -1);
     }
 
     @Override
-    public void addPlayer(QueuePlayer player, int position) {
+    public synchronized void addPlayer(QueuePlayer player, int position) {
         if(!player.getQueueServer().equals(this) || queue.contains(player)) return;
         if(position > 0) {
             queue.add(position, player);

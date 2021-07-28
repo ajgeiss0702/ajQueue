@@ -62,4 +62,10 @@ public interface QueuePlayer {
      * @return The number of miliseconds since this player was online
      */
     long getTimeSinceOnline();
+
+    /**
+     * Gets the max number of seconds this player is allowed to be offline before getting removed from the queue.
+     * @return
+     */
+    int getMaxOfflineTime();
 }

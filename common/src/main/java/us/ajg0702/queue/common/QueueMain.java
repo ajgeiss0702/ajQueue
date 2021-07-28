@@ -3,7 +3,9 @@ package us.ajg0702.queue.common;
 import org.spongepowered.configurate.ConfigurateException;
 import us.ajg0702.queue.api.*;
 import us.ajg0702.queue.api.server.ServerBuilder;
-import us.ajg0702.queue.logic.LogicGetter;
+import us.ajg0702.queue.api.util.QueueLogger;
+import us.ajg0702.queue.common.utils.LogConverter;
+import us.ajg0702.queue.logic.LogicGetterImpl;
 import us.ajg0702.utils.common.Config;
 import us.ajg0702.utils.common.Messages;
 
@@ -12,10 +14,13 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.concurrent.*;
-import java.util.logging.Logger;
 
 public class QueueMain {
 
+    private static QueueMain instance;
+    public static QueueMain getInstance() {
+        return instance;
+    }
 
     private double timeBetweenPlayers;
     public double getTimeBetweenPlayers() {
@@ -54,8 +59,8 @@ public class QueueMain {
         return platformMethods;
     }
 
-    private final Logger logger;
-    public Logger getLogger() {
+    private final QueueLogger logger;
+    public QueueLogger getLogger() {
         return logger;
     }
 
@@ -104,7 +109,18 @@ public class QueueMain {
     private final File dataFolder;
 
 
-    public QueueMain(Logger logger, PlatformMethods platformMethods, File dataFolder) {
+    public QueueMain(QueueLogger logger, PlatformMethods platformMethods, File dataFolder) {
+
+        if(instance != null) {
+            try {
+                throw new Exception("ajQueue QueueMain is being initialized when there is already one! Still initializing it, but this can cause issues.");
+            } catch(Exception e) {
+                e.printStackTrace();
+            }
+        }
+        instance = this;
+
+
         this.logger = logger;
         this.platformMethods = platformMethods;
         this.dataFolder = dataFolder;
@@ -112,7 +128,7 @@ public class QueueMain {
         constructMessages();
 
         try {
-            config = new Config(dataFolder, logger);
+            config = new Config(dataFolder, new LogConverter(logger));
         } catch (ConfigurateException e) {
             logger.warning("Unable to load config:");
             e.printStackTrace();
@@ -123,8 +139,8 @@ public class QueueMain {
 
         queueManager = new QueueManagerImpl(this);
 
-        logic = new LogicGetter().constructLogic();
-        aliasManager = new LogicGetter().constructAliasManager(config);
+        logic = new LogicGetterImpl().constructLogic();
+        aliasManager = new LogicGetterImpl().constructAliasManager(config);
 
         taskManager.rescheduleTasks();
 
@@ -196,6 +212,6 @@ public class QueueMain {
         d.put("max-tries-reached", "&cUnable to connect to {SERVER}. Max retries reached.");
         d.put("auto-queued", "&aYou've been auto-queued for {SERVER} because you were kicked.");
 
-        messages = new Messages(dataFolder, logger, d);
+        messages = new Messages(dataFolder, new LogConverter(logger), d);
     }
 }

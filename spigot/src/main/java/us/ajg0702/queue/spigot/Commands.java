@@ -9,8 +9,8 @@ import org.bukkit.entity.Player;
 
 public class Commands implements CommandExecutor {
 	
-	Main pl;
-	public Commands(Main pl) {
+	SpigotMain pl;
+	public Commands(SpigotMain pl) {
 		this.pl = pl;
 	}
 

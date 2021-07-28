@@ -1,34 +1,28 @@
 plugins {
-    java
-    id("com.github.johnrengelman.shadow").version("6.1.0")
+    `java-library`
+    id("com.github.johnrengelman.shadow")
     `maven-publish`
 }
 
-allprojects {
-    version = "2.0.0"
-    group = "us.ajg0702"
+group = "us.ajg0702.queue"
 
-    tasks.withType<Test>().configureEach {
-        useJUnitPlatform()
-
-        ignoreFailures = false
-        failFast = true
-        maxParallelForks = (Runtime.getRuntime().availableProcessors() - 1).takeIf { it > 0 } ?: 1
-
-        reports.html.isEnabled = false
-        reports.junitXml.isEnabled = false
-    }
-
-
+repositories {
+    mavenCentral()
+    maven { url = uri("https://repo.ajg0702.us") }
 }
-
 
 dependencies {
-    testImplementation("junit:junit:4.12")
-
     implementation(project(":free"))
-}
 
+    compileOnly(project(":api"))
+    compileOnly(project(":common"))
+
+    compileOnly("com.google.guava:guava:30.1.1-jre")
+
+    compileOnly("us.ajg0702:ajUtils:1.1.6")
+
+    compileOnly("net.kyori:adventure-api:4.8.1")
+}
 
 publishing {
     publications {

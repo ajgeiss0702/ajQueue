@@ -8,6 +8,7 @@ import us.ajg0702.queue.api.queues.QueueServer;
 import us.ajg0702.queue.api.server.AdaptedServer;
 import us.ajg0702.queue.api.server.ServerBuilder;
 import us.ajg0702.queue.common.players.QueuePlayerImpl;
+import us.ajg0702.queue.common.queues.QueueServerImpl;
 import us.ajg0702.utils.bungee.BungeeUtils;
 import us.ajg0702.utils.common.Messages;
 import us.ajg0702.utils.common.TimeUtils;
@@ -31,7 +32,39 @@ public class QueueManagerImpl implements QueueManager {
         serverBuilderFuture.thenRunAsync(() -> {
             try {
                 servers = serverBuilderFuture.get().buildServers();
-                // TODO: groups
+                List<String> groupsRaw = main.getConfig().getStringList("server-groups");
+                for(String groupRaw : groupsRaw) {
+                    if(groupRaw.isEmpty()) {
+                        main.getLogger().warning("Empty group string! If you dont want server groups, set server-groups like this: server-groups: []");
+                        continue;
+                    }
+
+                    String groupName = groupRaw.split(":")[0];
+                    String[] serversRaw = groupRaw.split(":")[1].split(",");
+
+                    if(main.getServerBuilder().getServer(groupName) != null) {
+                        main.getLogger().warning("The name of a group ('"+groupName+"') cannot be the same as the name of a server!");
+                        continue;
+                    }
+
+                    List<AdaptedServer> groupServers = new ArrayList<>();
+
+                    for(String serverRaw : serversRaw) {
+                        AdaptedServer si = main.getServerBuilder().getServer(serverRaw);
+                        if(si == null) {
+                            main.getLogger().warning("Could not find server named '"+serverRaw+"' in servergroup '"+groupName+"'!");
+                            continue;
+                        }
+                        groupServers.add(si);
+                    }
+
+                    if(groupServers.size() == 0) {
+                        main.getLogger().warning("Server group '"+groupName+"' has no servers! Ignoring it.");
+                        continue;
+                    }
+
+                    servers.add(new QueueServerImpl(groupName, main, groupServers));
+                }
             } catch (InterruptedException | ExecutionException e) {
                 e.printStackTrace();
             }
@@ -81,7 +114,8 @@ public class QueueManagerImpl implements QueueManager {
         } else {
             int priority = player.hasPermission("ajqueue.priority") ||
                     player.hasPermission("ajqueue.serverpriority."+server.getName()) ? 1 : 0;
-            queuePlayer = new QueuePlayerImpl(player, server, priority);
+            int maxOfflineTime = player.hasPermission("ajqueue.stayqueued") ? 60 : 0;
+            queuePlayer = new QueuePlayerImpl(player, server, priority, maxOfflineTime);
             if(
                     priority == 1 &&
                     server.getQueue().size() > 0
@@ -180,7 +214,9 @@ public class QueueManagerImpl implements QueueManager {
 
     @Override
     public String getQueuedName(AdaptedPlayer player) {
-        return getSingleServer(player).getName();
+        QueueServer server = getSingleServer(player);
+        if(server == null) return main.getMessages().getString("placeholders.queued.none");
+        return server.getName();
     }
 
     @Override
@@ -367,6 +403,12 @@ public class QueueManagerImpl implements QueueManager {
         }
 
         for(QueueServer server : sendingServers) {
+            for(QueuePlayer queuePlayer : server.getQueue()) {
+                if(queuePlayer.getPlayer() != null) continue;
+                if(main.getLogic().playerDisconnectedTooLong(queuePlayer)) {
+                    server.removePlayer(queuePlayer);
+                }
+            }
             if(!server.isOnline()) continue;
             if(server.getQueue().size() == 0) continue;
 

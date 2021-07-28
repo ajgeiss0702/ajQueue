@@ -5,16 +5,15 @@ import com.google.common.io.ByteStreams;
 import com.velocitypowered.api.plugin.PluginContainer;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
-import com.velocitypowered.api.proxy.messages.ChannelIdentifier;
+import com.velocitypowered.api.proxy.ServerConnection;
 import com.velocitypowered.api.proxy.messages.MinecraftChannelIdentifier;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
-import net.kyori.adventure.text.Component;
+
 import us.ajg0702.queue.api.PlatformMethods;
 import us.ajg0702.queue.api.commands.IBaseCommand;
 import us.ajg0702.queue.api.commands.ICommandSender;
 import us.ajg0702.queue.api.players.AdaptedPlayer;
-import us.ajg0702.queue.api.players.QueuePlayer;
-import us.ajg0702.queue.api.queues.QueueServer;
+import us.ajg0702.queue.api.util.QueueLogger;
 import us.ajg0702.queue.commands.commands.PlayerSender;
 import us.ajg0702.queue.platforms.velocity.players.VelocityPlayer;
 
@@ -22,15 +21,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
-import java.util.logging.Logger;
 
 public class VelocityMethods implements PlatformMethods {
 
     final ProxyServer proxyServer;
-    final Logger logger;
+    final QueueLogger logger;
     final VelocityQueue plugin;
 
-    public VelocityMethods(VelocityQueue plugin, ProxyServer proxyServer, Logger logger) {
+    public VelocityMethods(VelocityQueue plugin, ProxyServer proxyServer, QueueLogger logger) {
         this.proxyServer = proxyServer;
         this.logger = logger;
         this.plugin = plugin;
@@ -46,8 +44,11 @@ public class VelocityMethods implements PlatformMethods {
         for(String s : data) {
             out.writeUTF( s );
         }
-
-        velocityPlayer.sendPluginMessage(MinecraftChannelIdentifier.from("ajqueue:tospigot"), out.toByteArray());
+        Optional<ServerConnection> server = velocityPlayer.getCurrentServer();
+        if(!server.isPresent()) {
+            throw new IllegalStateException("No server to send data to");
+        }
+        server.get().sendPluginMessage(MinecraftChannelIdentifier.from("ajqueue:tospigot"), out.toByteArray());
     }
 
     @Override

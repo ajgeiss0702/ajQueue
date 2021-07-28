@@ -18,6 +18,6 @@ public class FreeLogic implements Logic {
 
     @Override
     public boolean playerDisconnectedTooLong(QueuePlayer player) {
-        return true;
+        return 60000L < player.getTimeSinceOnline();
     }
 }
