@@ -118,7 +118,8 @@ public class Placeholders extends PlaceholderExpansion {
      *
      * @return possibly-null String of the requested identifier.
      */
-    @Override
+    @SuppressWarnings("SuspiciousMethodCalls")
+	@Override
     public String onPlaceholderRequest(Player player, final String identifier){
     	//Bukkit.getLogger().info("itentifier: "+identifier);
 
@@ -180,7 +181,8 @@ public class Placeholders extends PlaceholderExpansion {
         return null;
     }
     
-    private String parsePlaceholder(Player player, String identifier) {
+    @SuppressWarnings("SameReturnValue")
+	private String parsePlaceholder(Player player, String identifier) {
     	if(identifier.equalsIgnoreCase("queued")) {
         	plugin.sendMessage(player, "queuename", "");
         }

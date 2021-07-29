@@ -109,6 +109,7 @@ public class TaskManager {
         return scheduleAtFixedRate(executor, command, 0, period, unit);
     }
 
+    @SuppressWarnings("UnusedReturnValue")
     public ScheduledFuture<?> runLater(Runnable runnable, long delay, TimeUnit unit) {
         return executor.schedule(runnable, delay, unit);
     }

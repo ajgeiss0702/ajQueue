@@ -35,11 +35,11 @@ tasks.withType<ProcessResources> {
 }
 
 tasks.jar {
-    exclude("**/*.java");
+    exclude("**/*.java")
 }
 
 tasks.compileJava {
-    source = tasks.getByName("processResources").outputs.files.asFileTree;
+    source = tasks.getByName("processResources").outputs.files.asFileTree
 }
 
 

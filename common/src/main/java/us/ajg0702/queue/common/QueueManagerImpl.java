@@ -14,12 +14,11 @@ import us.ajg0702.utils.common.TimeUtils;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 public class QueueManagerImpl implements QueueManager {
 
-    private List<QueueServer> servers = new ArrayList<>();
+    private final List<QueueServer> servers = new ArrayList<>();
 
     private final QueueMain main;
     private final Messages msgs;
@@ -283,7 +282,6 @@ public class QueueManagerImpl implements QueueManager {
 
     @Override
     public void sendMessages() {
-        if(servers == null) return;
         try {
             for(QueueServer server : servers) {
                 for(QueuePlayer queuePlayer : server.getQueue()) {

@@ -28,18 +28,14 @@ import java.util.List;
 
 public class BungeeQueue extends Plugin implements Listener {
 
-    private QueueLogger logger;
-
     private QueueMain main;
-
-    private File dataFolder;
 
     List<IBaseCommand> commands;
 
     @Override
     public void onEnable() {
-        logger = new BungeeLogger(getLogger());
-        dataFolder = getDataFolder();
+        QueueLogger logger = new BungeeLogger(getLogger());
+        File dataFolder = getDataFolder();
 
         main = new QueueMain(
                 logger,
@@ -60,7 +56,7 @@ public class BungeeQueue extends Plugin implements Listener {
 
         for(IBaseCommand command : commands) {
             getProxy().getPluginManager()
-                    .registerCommand(this, new BungeeCommand(main, (BaseCommand) command));
+                    .registerCommand(this, new BungeeCommand((BaseCommand) command));
         }
 
         getProxy().getPluginManager().registerListener(this, this);

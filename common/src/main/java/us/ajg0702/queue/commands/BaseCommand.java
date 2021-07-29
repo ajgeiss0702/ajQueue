@@ -20,6 +20,7 @@ public class BaseCommand implements IBaseCommand {
         return null;
     }
 
+    @SuppressWarnings("unused")
     @Override
     public ImmutableList<ISubCommand> getSubCommands() {
         return null;
@@ -35,6 +36,7 @@ public class BaseCommand implements IBaseCommand {
         return null;
     }
 
+    @SuppressWarnings("unused")
     @Override
     public void addSubCommand(ISubCommand subCommand) {
 
