@@ -4,6 +4,12 @@ plugins {
     `maven-publish`
 }
 
+repositories {
+    mavenCentral()
+    maven { url = uri("https://repo.ajg0702.us") }
+    maven { url = uri("https://oss.sonatype.org/content/repositories/snapshots") }
+}
+
 allprojects {
     version = "2.0.0"
     group = "us.ajg0702"
