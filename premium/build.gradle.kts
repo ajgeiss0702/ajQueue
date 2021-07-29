@@ -29,7 +29,13 @@ dependencies {
 }
 
 tasks.shadowJar {
-    archiveFileName.set("${baseName}-${version}.${extension}")
+    relocate("us.ajg0702.utils", "us.ajg0702.queue.libs.utils")
+    relocate("org.bstats", "us.ajg0702.queue.libs.bstats")
+    relocate("io.leangen.geantyref", "us.ajg0702.queue.libs.geantyref")
+    relocate("org.spongepowered", "us.ajg0702.queue.libs.sponge")
+    relocate("org.yaml", "us.ajg0702.queue.libs.yaml")
+    archiveBaseName.set("ajQueuePlus")
+    archiveClassifier.set("")
 }
 
 publishing {

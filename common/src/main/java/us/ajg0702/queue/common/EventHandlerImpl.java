@@ -1,17 +1,22 @@
 package us.ajg0702.queue.common;
 
 import com.google.common.collect.ImmutableList;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import us.ajg0702.queue.api.EventHandler;
 import us.ajg0702.queue.api.commands.IBaseCommand;
 import us.ajg0702.queue.api.players.AdaptedPlayer;
 import us.ajg0702.queue.api.players.QueuePlayer;
 import us.ajg0702.queue.api.queues.QueueServer;
+import us.ajg0702.queue.api.server.AdaptedServer;
 import us.ajg0702.queue.commands.commands.PlayerSender;
 import us.ajg0702.queue.common.players.QueuePlayerImpl;
 
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public class EventHandlerImpl implements EventHandler {
 
@@ -91,7 +96,6 @@ public class EventHandlerImpl implements EventHandler {
         }
     }
 
-
     @Override
     public void onPlayerJoin(AdaptedPlayer player) {
         ImmutableList<QueuePlayer> queues = main.getQueueManager().findPlayerInQueues(player);
@@ -108,6 +112,85 @@ public class EventHandlerImpl implements EventHandler {
         ImmutableList<QueuePlayer> queues = main.getQueueManager().findPlayerInQueues(player);
         for(QueuePlayer queuePlayer : queues) {
             ((QueuePlayerImpl) queuePlayer).setLeaveTime(System.currentTimeMillis());
+        }
+        main.getQueueManager().clear(player);
+    }
+
+    @Override
+    public void onPlayerJoinServer(AdaptedPlayer player) {
+        ImmutableList<QueuePlayer> alreadyqueued = main.getQueueManager().findPlayerInQueues(player);
+        for(QueuePlayer queuePlayer : alreadyqueued) {
+            QueueServer server = queuePlayer.getQueueServer();
+            int pos = queuePlayer.getPosition();
+            if((pos <= 1 && server.getServerNames().contains(player.getServerName())) || main.getConfig().getBoolean("remove-player-on-server-switch")) {
+                server.removePlayer(player);
+                server.setLastSentTime(System.currentTimeMillis());
+            }
+        }
+
+
+
+        String serverName = player.getServerName();
+        List<String> svs = main.getConfig().getStringList("queue-servers");
+        for(String s : svs) {
+            if(!s.contains(":")) continue;
+            String[] parts = s.split(":");
+            String from = parts[0];
+            String to = parts[1];
+            if(from.equalsIgnoreCase(serverName)) {
+                main.getQueueManager().addToQueue(player, to);
+            }
+        }
+    }
+
+    @Override
+    public void onServerKick(AdaptedPlayer player, AdaptedServer from, Component reason, boolean moving) {
+
+        if(!player.isConnected()) return;
+
+        String plainReason = PlainTextComponentSerializer.plainText().serialize(reason);
+
+        if(!moving && main.getConfig().getBoolean("send-fail-debug")) {
+            main.getLogger().warning("Failed to send "+player.getName()+" to "+from.getName()+". Kicked with reason: "+plainReason);
+        }
+
+        ImmutableList<QueueServer> queuedServers = main.getQueueManager().getPlayerQueues(player);
+        if(!queuedServers.contains(main.getQueueManager().findServer(from.getName())) && main.getConfig().getBoolean("auto-add-to-queue-on-kick")) {
+
+            List<String> reasons = main.getConfig().getStringList("auto-add-kick-reasons");
+            boolean shouldqueue = false;
+            for(String kickReason : reasons) {
+                if(plainReason.toLowerCase().contains(kickReason.toLowerCase())) {
+                    shouldqueue = true;
+                    break;
+                }
+            }
+
+            if(shouldqueue || reasons.isEmpty()) {
+                main.getTaskManager().runLater(() -> {
+                    if(!player.isConnected()) return;
+
+                    String toName = from.getName();
+                    player.sendMessage(main.getMessages().getComponent("auto-queued", "SERVER:"+toName));
+                    main.getQueueManager().addToQueue(player, toName);
+                }, (long) (main.getConfig().getDouble("auto-add-to-queue-on-kick-delay")*1000), TimeUnit.MILLISECONDS);
+                return;
+            }
+
+        }
+
+
+        for(QueueServer server : queuedServers) {
+            if(!(server.getServerNames().contains(from.getName()))) continue;
+            QueuePlayer queuePlayer = server.findPlayer(player);
+            if(queuePlayer.getPosition() != 1) continue;
+            List<String> kickReasons = main.getConfig().getStringList("kick-reasons");
+
+            for(String kickReason : kickReasons) {
+                if(plainReason.toLowerCase().contains(kickReason.toLowerCase())) {
+                    server.removePlayer(queuePlayer);
+                }
+            }
         }
     }
 }

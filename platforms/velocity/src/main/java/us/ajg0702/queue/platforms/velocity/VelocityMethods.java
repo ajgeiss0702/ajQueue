@@ -64,8 +64,7 @@ public class VelocityMethods implements PlatformMethods {
         Optional<PluginContainer> plugin = proxyServer.getPluginManager().getPlugin("ajqueue");
         if(!plugin.isPresent()) return "?E";
         Optional<String> version = plugin.get().getDescription().getVersion();
-        if(!version.isPresent()) return "?V";
-        return version.get();
+        return version.orElse("?V");
     }
 
     @Override

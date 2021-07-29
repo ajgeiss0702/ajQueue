@@ -50,6 +50,7 @@ public class ListCommand extends BaseCommand {
     public void execute(ICommandSender sender, String[] args) {
         if(!checkPermission(sender)) return;
 
+
         AdaptedPlayer spp = null;
         if(sender.isPlayer()) {
             spp = main.getPlatformMethods().senderToPlayer(sender);

@@ -9,6 +9,7 @@ import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.jetbrains.annotations.NotNull;
 import us.ajg0702.queue.api.players.AdaptedPlayer;
 import us.ajg0702.queue.api.server.AdaptedServer;
+import us.ajg0702.queue.common.QueueMain;
 
 import java.util.List;
 import java.util.Optional;
@@ -63,7 +64,18 @@ public class VelocityPlayer implements AdaptedPlayer, Audience {
 
     @Override
     public void connect(AdaptedServer server) {
-        handle.createConnectionRequest((RegisteredServer) server.getHandle()).connect();
+        handle.createConnectionRequest((RegisteredServer) server.getHandle()).connect().thenAcceptAsync(
+                result -> {
+                    if(!result.isSuccessful()) {
+                        QueueMain.getInstance().getEventHandler().onServerKick(
+                                this,
+                                server,
+                                result.getReasonComponent().orElseGet(() -> Component.text("Connection failed")),
+                                false
+                        );
+                    }
+                }
+        );
     }
 
     @Override

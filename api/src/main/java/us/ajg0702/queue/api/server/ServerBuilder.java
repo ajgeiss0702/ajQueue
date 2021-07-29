@@ -8,6 +8,4 @@ public interface ServerBuilder {
     List<QueueServer> buildServers();
 
     AdaptedServer getServer(String name);
-
-    QueueServer buildGroup(String name, List<AdaptedServer> servers);
 }

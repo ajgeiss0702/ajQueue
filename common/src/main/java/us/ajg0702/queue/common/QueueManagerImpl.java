@@ -15,6 +15,7 @@ import us.ajg0702.utils.common.TimeUtils;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 
 public class QueueManagerImpl implements QueueManager {
 
@@ -27,47 +28,12 @@ public class QueueManagerImpl implements QueueManager {
         this.main = main;
         this.msgs = main.getMessages();
 
-        CompletableFuture<ServerBuilder> serverBuilderFuture = main.getFutureServerBuilder();
-        serverBuilderFuture.thenRunAsync(() -> {
-            try {
-                servers = serverBuilderFuture.get().buildServers();
-                List<String> groupsRaw = main.getConfig().getStringList("server-groups");
-                for(String groupRaw : groupsRaw) {
-                    if(groupRaw.isEmpty()) {
-                        main.getLogger().warning("Empty group string! If you dont want server groups, set server-groups like this: server-groups: []");
-                        continue;
-                    }
+        int delay = main.getConfig().getBoolean("wait-to-load-servers") ? main.getConfig().getInt("wait-to-load-servers-delay") : 0;
 
-                    String groupName = groupRaw.split(":")[0];
-                    String[] serversRaw = groupRaw.split(":")[1].split(",");
-
-                    if(main.getServerBuilder().getServer(groupName) != null) {
-                        main.getLogger().warning("The name of a group ('"+groupName+"') cannot be the same as the name of a server!");
-                        continue;
-                    }
-
-                    List<AdaptedServer> groupServers = new ArrayList<>();
-
-                    for(String serverRaw : serversRaw) {
-                        AdaptedServer si = main.getServerBuilder().getServer(serverRaw);
-                        if(si == null) {
-                            main.getLogger().warning("Could not find server named '"+serverRaw+"' in servergroup '"+groupName+"'!");
-                            continue;
-                        }
-                        groupServers.add(si);
-                    }
-
-                    if(groupServers.size() == 0) {
-                        main.getLogger().warning("Server group '"+groupName+"' has no servers! Ignoring it.");
-                        continue;
-                    }
-
-                    servers.add(new QueueServerImpl(groupName, main, groupServers));
-                }
-            } catch (InterruptedException | ExecutionException e) {
-                e.printStackTrace();
-            }
-        });
+        main.getTaskManager().runLater(() -> {
+            CompletableFuture<ServerBuilder> serverBuilderFuture = main.getFutureServerBuilder();
+            serverBuilderFuture.thenRunAsync(this::reloadServers);
+        }, delay, TimeUnit.MILLISECONDS);
     }
 
     @Override
@@ -261,7 +227,7 @@ public class QueueManagerImpl implements QueueManager {
                 continue;
             }
 
-            this.servers.add(main.getServerBuilder().buildGroup(groupName, groupServers));
+            this.servers.add(new QueueServerImpl(groupName, main, groupServers));
         }
     }
 
@@ -514,5 +480,10 @@ public class QueueManagerImpl implements QueueManager {
             }
         }
         return ImmutableList.copyOf(srs);
+    }
+
+    @Override
+    public void clear(AdaptedPlayer player) {
+        sendingNowAntiSpam.remove(player);
     }
 }

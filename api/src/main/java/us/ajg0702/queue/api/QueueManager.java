@@ -116,4 +116,6 @@ public interface QueueManager {
      * @return A list of QueueServers that this player is queued for
      */
     ImmutableList<QueueServer> getPlayerQueues(AdaptedPlayer p);
+
+    void clear(AdaptedPlayer player);
 }

@@ -13,11 +13,11 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
-public class ServerBuilderImpl implements ServerBuilder {
+public class VelocityServerBuilder implements ServerBuilder {
 
     private final ProxyServer proxyServer;
     private final QueueMain main;
-    public ServerBuilderImpl(QueueMain main, ProxyServer proxyServer) {
+    public VelocityServerBuilder(QueueMain main, ProxyServer proxyServer) {
         this.proxyServer = proxyServer;
         this.main = main;
     }
@@ -35,15 +35,11 @@ public class ServerBuilderImpl implements ServerBuilder {
         return result;
     }
 
+    @SuppressWarnings("OptionalIsPresent")
     @Override
     public AdaptedServer getServer(String name) {
         Optional<RegisteredServer> serverOptional = proxyServer.getServer(name);
         if(!serverOptional.isPresent()) return null;
         return new VelocityServer(serverOptional.get());
-    }
-
-    @Override
-    public QueueServer buildGroup(String name, List<AdaptedServer> servers) {
-        return new QueueServerImpl(name, main, servers);
     }
 }

@@ -19,9 +19,9 @@ dependencies {
 
     implementation("us.ajg0702:ajUtils:1.1.6")
 
-    //implementation("net.kyori:adventure-text-minimessage:4.1.0-SNAPSHOT")
-
     implementation(project(":platforms:velocity"))
+    implementation(project(":platforms:bungeecord"))
+
     implementation(project(":spigot"))
 }
 
@@ -32,7 +32,8 @@ tasks.shadowJar {
     relocate("io.leangen.geantyref", "us.ajg0702.queue.libs.geantyref")
     relocate("org.spongepowered", "us.ajg0702.queue.libs.sponge")
     relocate("org.yaml", "us.ajg0702.queue.libs.yaml")
-    archiveFileName.set("${baseName}-${version}.${extension}")
+    archiveBaseName.set("ajQueue")
+    archiveClassifier.set("")
 }
 
 publishing {
