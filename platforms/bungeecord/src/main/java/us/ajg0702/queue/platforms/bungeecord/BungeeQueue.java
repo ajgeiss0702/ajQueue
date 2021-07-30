@@ -45,7 +45,7 @@ public class BungeeQueue extends Plugin implements Listener {
         main.setServerBuilder(new BungeeServerBuilder(main, getProxy()));
 
         getProxy().registerChannel("ajqueue:tospigot");
-        getProxy().registerChannel("ajqueue:tobungee");
+        getProxy().registerChannel("ajqueue:toproxy");
 
         commands = Arrays.asList(
                 new QueueCommand(main),
@@ -85,7 +85,6 @@ public class BungeeQueue extends Plugin implements Listener {
 
     @EventHandler
     public void onPluginMessage(PluginMessageEvent e) {
-
         if(e.getTag().equals("ajqueue:tospigot")) {
             e.setCancelled(true);
             return;
