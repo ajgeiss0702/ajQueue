@@ -63,14 +63,14 @@ public class TaskManager {
 
         actionBarTask = scheduleAtFixedRate(
                 main.getQueueManager()::sendActionBars,
-                2L,
-                TimeUnit.SECONDS
+                1500L,
+                TimeUnit.MILLISECONDS
         );
 
         queueEventTask = scheduleAtFixedRate(
                 main.getQueueManager()::sendQueueEvents,
-                2L,
-                TimeUnit.SECONDS
+                1500L,
+                TimeUnit.MILLISECONDS
         );
 
         if(main.getConfig().getInt("reload-servers-interval") > 0) {
@@ -85,22 +85,22 @@ public class TaskManager {
 
     public void cancelTasks() {
         if(sendTask != null && !sendTask.isCancelled()) {
-            sendTask.cancel(false);
+            sendTask.cancel(true);
         }
         if(updateTask != null && !updateTask.isCancelled()) {
             updateTask.cancel(true);
         }
         if(messageTask != null && !messageTask.isCancelled()) {
-            messageTask.cancel(false);
+            messageTask.cancel(true);
         }
         if(actionBarTask != null && !actionBarTask.isCancelled()) {
-            actionBarTask.cancel(false);
+            actionBarTask.cancel(true);
         }
         if(queueEventTask != null && !queueEventTask.isCancelled()) {
-            queueEventTask.cancel(false);
+            queueEventTask.cancel(true);
         }
         if(reloadServerTask != null && !reloadServerTask.isCancelled()) {
-            reloadServerTask.cancel(false);
+            reloadServerTask.cancel(true);
             reloadServerTask = null;
         }
     }
