@@ -118,7 +118,7 @@ public class VelocityQueue  {
     @SuppressWarnings("UnstableApiUsage")
     @Subscribe
     public void onJoin(ServerPostConnectEvent e) {
-        if(e.getPreviousServer() != null) { // only run if the player just joined
+        if(e.getPreviousServer() == null) { // only run if the player just joined
             main.getEventHandler().onPlayerJoin(new VelocityPlayer(e.getPlayer()));
         }
         main.getEventHandler().onPlayerJoinServer(new VelocityPlayer(e.getPlayer()));
