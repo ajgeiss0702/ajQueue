@@ -14,11 +14,12 @@ import us.ajg0702.utils.common.TimeUtils;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
 
 public class QueueManagerImpl implements QueueManager {
 
-    private final List<QueueServer> servers = new ArrayList<>();
+    private final List<QueueServer> servers = new CopyOnWriteArrayList<>();
 
     private final QueueMain main;
     private final Messages msgs;
