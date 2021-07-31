@@ -3,14 +3,17 @@ package us.ajg0702.queue.platforms.bungeecord;
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
 import net.md_5.bungee.api.ProxyServer;
+import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import us.ajg0702.queue.api.PlatformMethods;
 import us.ajg0702.queue.api.commands.IBaseCommand;
 import us.ajg0702.queue.api.commands.ICommandSender;
 import us.ajg0702.queue.api.players.AdaptedPlayer;
+import us.ajg0702.queue.api.server.AdaptedServer;
 import us.ajg0702.queue.api.util.QueueLogger;
 import us.ajg0702.queue.commands.commands.PlayerSender;
 import us.ajg0702.queue.platforms.bungeecord.players.BungeePlayer;
+import us.ajg0702.queue.platforms.bungeecord.server.BungeeServer;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -99,5 +102,12 @@ public class BungeeMethods implements PlatformMethods {
     @Override
     public boolean hasPlugin(String pluginName) {
         return proxyServer.getPluginManager().getPlugin(pluginName) != null;
+    }
+
+    @Override
+    public AdaptedServer getServer(String name) {
+        ServerInfo server = proxyServer.getServerInfo(name);
+        if(server == null) return null;
+        return new BungeeServer(server);
     }
 }

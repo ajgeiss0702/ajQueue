@@ -13,15 +13,18 @@ import us.ajg0702.queue.api.PlatformMethods;
 import us.ajg0702.queue.api.commands.IBaseCommand;
 import us.ajg0702.queue.api.commands.ICommandSender;
 import us.ajg0702.queue.api.players.AdaptedPlayer;
+import us.ajg0702.queue.api.server.AdaptedServer;
 import us.ajg0702.queue.api.util.QueueLogger;
 import us.ajg0702.queue.commands.commands.PlayerSender;
 import us.ajg0702.queue.platforms.velocity.players.VelocityPlayer;
+import us.ajg0702.queue.platforms.velocity.server.VelocityServer;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 
+@SuppressWarnings("OptionalIsPresent")
 public class VelocityMethods implements PlatformMethods {
 
     final ProxyServer proxyServer;
@@ -121,5 +124,12 @@ public class VelocityMethods implements PlatformMethods {
     @Override
     public boolean hasPlugin(String pluginName) {
         return proxyServer.getPluginManager().getPlugin(pluginName.toLowerCase(Locale.ROOT)).isPresent();
+    }
+
+    @Override
+    public AdaptedServer getServer(String name) {
+        Optional<RegisteredServer> server = proxyServer.getServer(name);
+        if(!server.isPresent()) return null;
+        return new VelocityServer(server.get());
     }
 }

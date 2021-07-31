@@ -194,8 +194,8 @@ public class QueueManagerImpl implements QueueManager {
 
         servers.addAll(main.getServerBuilder().buildServers());
 
-        List<String> groupsraw = main.getConfig().getStringList("server-groups");
-        for(String groupraw : groupsraw) {
+        List<String> groupsRaw = main.getConfig().getStringList("server-groups");
+        for(String groupraw : groupsRaw) {
             if(groupraw.isEmpty()) {
                 main.getLogger().warning("Empty group string! If you dont want server groups, set server-groups like this: server-groups: []");
                 continue;
@@ -272,6 +272,21 @@ public class QueueManagerImpl implements QueueManager {
 
     @Override
     public void sendQueueEvents() {
+        List<String> svs = main.getConfig().getStringList("queue-servers");
+        for(String s : svs) {
+            if(!s.contains(":")) continue;
+            String[] parts = s.split(":");
+            String fromName = parts[0];
+            String toName = parts[1];
+            AdaptedServer from = main.getPlatformMethods().getServer(fromName);
+            QueueServer to = findServer(toName);
+            if(from == null || to == null) continue;
+            from.getPlayers().forEach(player -> {
+                if(!getPlayerQueues(player).contains(to)) {
+                    addToQueue(player, to);
+                }
+            });
+        }
         for (QueueServer s : servers) {
             for (QueuePlayer queuePlayer : s.getQueue()) {
                 AdaptedPlayer player =  queuePlayer.getPlayer();
