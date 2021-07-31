@@ -250,7 +250,7 @@ public class QueueManagerImpl implements QueueManager {
                 if(!getSingleServer(player).equals(server)) continue;
 
                 if(!server.isJoinable(player)) {
-                    queuePlayer.getPlayer().sendActionBar(msgs.getComponent("spigot.actionbar.offline",
+                    player.sendActionBar(msgs.getComponent("spigot.actionbar.offline",
                             "POS:"+pos,
                             "LEN:"+server.getQueue().size(),
                             "SERVER:"+server.getAlias(),
