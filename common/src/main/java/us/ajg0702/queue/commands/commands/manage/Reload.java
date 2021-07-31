@@ -53,6 +53,7 @@ public class Reload extends SubCommand {
         main.setTimeBetweenPlayers();
         main.getTaskManager().rescheduleTasks();
         main.getQueueManager().reloadServers();
+        main.getMessages().reload();
 
         sender.sendMessage(getMessages().getComponent("commands.reload"));
     }
