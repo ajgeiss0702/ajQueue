@@ -88,6 +88,6 @@ public class PremiumLogic implements Logic {
 
     @Override
     public boolean playerDisconnectedTooLong(QueuePlayer player) {
-        return player.getTimeSinceOnline() > player.getMaxOfflineTime();
+        return player.getTimeSinceOnline() > player.getMaxOfflineTime()*1000L;
     }
 }
