@@ -138,18 +138,18 @@ public class EventHandlerImpl implements EventHandler {
         }
 
 
-
         String serverName = player.getServerName();
         List<String> svs = main.getConfig().getStringList("queue-servers");
         for(String s : svs) {
             if(!s.contains(":")) continue;
             String[] parts = s.split(":");
             String from = parts[0];
-            String to = parts[1];
-            if(from.equalsIgnoreCase(serverName)) {
+            QueueServer to = main.getQueueManager().findServer(parts[1]);
+            if(from.equalsIgnoreCase(serverName) && to != null) {
                 main.getQueueManager().addToQueue(player, to);
             }
         }
+
     }
 
     @Override
