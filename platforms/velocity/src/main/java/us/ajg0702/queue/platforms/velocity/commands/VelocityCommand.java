@@ -34,6 +34,8 @@ public class VelocityCommand implements RawCommand {
 
     @Override
     public boolean hasPermission(final Invocation invocation) {
-        return command.checkPermission(new VelocitySender(invocation.source()));
+        String permission = command.getPermission();
+        if(permission == null) return true;
+        return invocation.source().hasPermission(permission);
     }
 }
