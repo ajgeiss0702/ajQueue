@@ -1,6 +1,7 @@
 package us.ajg0702.queue.platforms.bungeecord.commands;
 
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import org.jetbrains.annotations.NotNull;
@@ -27,6 +28,7 @@ public class BungeeSender implements ICommandSender {
 
     @Override
     public void sendMessage(@NotNull Component message) {
+        if(PlainTextComponentSerializer.plainText().serialize(message).isEmpty()) return;
         BungeeQueue.adventure().sender(handle).sendMessage(message);
     }
 
