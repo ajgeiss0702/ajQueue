@@ -110,4 +110,13 @@ public class BungeeMethods implements PlatformMethods {
         if(server == null) return null;
         return new BungeeServer(server);
     }
+
+    @Override
+    public List<AdaptedServer> getServers() {
+        List<AdaptedServer> result = new ArrayList<>();
+
+        proxyServer.getServers().forEach((s, serverInfo) -> result.add(new BungeeServer(serverInfo)));
+
+        return result;
+    }
 }

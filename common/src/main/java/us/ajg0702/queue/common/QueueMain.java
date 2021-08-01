@@ -2,7 +2,6 @@ package us.ajg0702.queue.common;
 
 import org.spongepowered.configurate.ConfigurateException;
 import us.ajg0702.queue.api.*;
-import us.ajg0702.queue.api.server.ServerBuilder;
 import us.ajg0702.queue.api.util.QueueLogger;
 import us.ajg0702.queue.common.utils.LogConverter;
 import us.ajg0702.queue.logic.LogicGetterImpl;
@@ -10,10 +9,7 @@ import us.ajg0702.utils.common.Config;
 import us.ajg0702.utils.common.Messages;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.concurrent.*;
 
 public class QueueMain {
 
@@ -72,27 +68,6 @@ public class QueueMain {
     private final EventHandler eventHandler = new EventHandlerImpl(this);
     public EventHandler getEventHandler() {
         return eventHandler;
-    }
-
-    private final List<CompletableFuture<ServerBuilder>> serverCompletableFutures = new ArrayList<>();
-    private ServerBuilder serverBuilder;
-    public ServerBuilder getServerBuilder() {
-        return serverBuilder;
-    }
-    public CompletableFuture<ServerBuilder> getFutureServerBuilder() {
-        CompletableFuture<ServerBuilder> completableFuture = new CompletableFuture<>();
-        if(serverBuilder != null) {
-            completableFuture.complete(serverBuilder);
-        }
-        serverCompletableFutures.add(completableFuture);
-        return completableFuture;
-    }
-    public void setServerBuilder(ServerBuilder serverBuilder) {
-        if(this.serverBuilder != null) throw new IllegalStateException("SeverBuilder already set");
-        this.serverBuilder = serverBuilder;
-        for(CompletableFuture<ServerBuilder> future : serverCompletableFutures) {
-            future.complete(serverBuilder);
-        }
     }
 
     private QueueManager queueManager;

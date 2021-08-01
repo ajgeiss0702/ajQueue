@@ -45,4 +45,6 @@ public interface PlatformMethods {
     boolean hasPlugin(String pluginName);
 
     AdaptedServer getServer(String name);
+
+    List<AdaptedServer> getServers();
 }

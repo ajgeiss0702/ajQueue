@@ -132,4 +132,14 @@ public class VelocityMethods implements PlatformMethods {
         if(!server.isPresent()) return null;
         return new VelocityServer(server.get());
     }
+
+
+    @Override
+    public List<AdaptedServer> getServers() {
+        List<AdaptedServer> result = new ArrayList<>();
+
+        proxyServer.getAllServers().forEach(registeredServer -> result.add(new VelocityServer(registeredServer)));
+
+        return result;
+    }
 }

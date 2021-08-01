@@ -6,14 +6,15 @@ import us.ajg0702.queue.api.players.AdaptedPlayer;
 import us.ajg0702.queue.api.players.QueuePlayer;
 import us.ajg0702.queue.api.queues.QueueServer;
 import us.ajg0702.queue.api.server.AdaptedServer;
-import us.ajg0702.queue.api.server.ServerBuilder;
 import us.ajg0702.queue.common.players.QueuePlayerImpl;
 import us.ajg0702.queue.common.queues.QueueServerImpl;
 import us.ajg0702.utils.common.Messages;
 import us.ajg0702.utils.common.TimeUtils;
 
-import java.util.*;
-import java.util.concurrent.CompletableFuture;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
 
@@ -30,15 +31,12 @@ public class QueueManagerImpl implements QueueManager {
 
         int delay = main.getConfig().getBoolean("wait-to-load-servers") ? main.getConfig().getInt("wait-to-load-servers-delay") : 0;
 
-        main.getTaskManager().runLater(() -> {
-            CompletableFuture<ServerBuilder> serverBuilderFuture = main.getFutureServerBuilder();
-            serverBuilderFuture.thenRunAsync(this::reloadServers);
-        }, delay, TimeUnit.MILLISECONDS);
+        main.getTaskManager().runLater(this::reloadServers, delay, TimeUnit.MILLISECONDS);
     }
 
     public List<QueueServer> buildServers() {
         List<QueueServer> result = new ArrayList<>();
-        List<AdaptedServer> servers = main.getServerBuilder().getServers();
+        List<AdaptedServer> servers = main.getPlatformMethods().getServers();
 
         for(AdaptedServer server : servers) {
             QueueServer previousServer = main.getQueueManager().findServer(server.getName());

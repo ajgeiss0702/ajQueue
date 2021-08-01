@@ -15,6 +15,7 @@ import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.proxy.messages.MinecraftChannelIdentifier;
 import net.kyori.adventure.text.Component;
+import org.slf4j.Logger;
 import us.ajg0702.queue.api.commands.IBaseCommand;
 import us.ajg0702.queue.commands.BaseCommand;
 import us.ajg0702.queue.commands.commands.leavequeue.LeaveCommand;
@@ -24,16 +25,13 @@ import us.ajg0702.queue.commands.commands.queue.QueueCommand;
 import us.ajg0702.queue.common.QueueMain;
 import us.ajg0702.queue.platforms.velocity.commands.VelocityCommand;
 import us.ajg0702.queue.platforms.velocity.players.VelocityPlayer;
-import us.ajg0702.queue.platforms.velocity.server.VelocityServerBuilder;
+import us.ajg0702.queue.platforms.velocity.server.VelocityServer;
 
 import java.io.File;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-
-import org.slf4j.Logger;
-import us.ajg0702.queue.platforms.velocity.server.VelocityServer;
 
 @Plugin(
         id = "ajqueue",
@@ -69,7 +67,6 @@ public class VelocityQueue  {
                 new VelocityMethods(this, proxyServer, logger),
                 dataFolder
         );
-        main.setServerBuilder(new VelocityServerBuilder(proxyServer));
 
         commands = Arrays.asList(
                 new QueueCommand(main),

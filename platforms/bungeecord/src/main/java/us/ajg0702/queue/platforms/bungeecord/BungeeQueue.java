@@ -20,7 +20,6 @@ import us.ajg0702.queue.common.QueueMain;
 import us.ajg0702.queue.platforms.bungeecord.commands.BungeeCommand;
 import us.ajg0702.queue.platforms.bungeecord.players.BungeePlayer;
 import us.ajg0702.queue.platforms.bungeecord.server.BungeeServer;
-import us.ajg0702.queue.platforms.bungeecord.server.BungeeServerBuilder;
 
 import java.io.File;
 import java.util.Arrays;
@@ -42,7 +41,6 @@ public class BungeeQueue extends Plugin implements Listener {
                 new BungeeMethods(this, getProxy(), logger),
                 dataFolder
         );
-        main.setServerBuilder(new BungeeServerBuilder(getProxy()));
 
         getProxy().registerChannel("ajqueue:tospigot");
         getProxy().registerChannel("ajqueue:toproxy");

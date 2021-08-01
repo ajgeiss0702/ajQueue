@@ -66,7 +66,7 @@ public class Send extends SubCommand {
             );
         } else if(main.getQueueManager().getServerNames().contains(args[0])) {
 
-            AdaptedServer from = main.getServerBuilder().getServer(args[0]);
+            AdaptedServer from = main.getPlatformMethods().getServer(args[0]);
             if(from == null) {
                 sender.sendMessage(getMessages().getComponent("errors.server-not-exist", "SERVER:"+args[0]));
                 return;
