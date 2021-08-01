@@ -5,7 +5,7 @@ import us.ajg0702.queue.api.queues.QueueServer;
 import java.util.List;
 
 public interface ServerBuilder {
-    List<QueueServer> buildServers();
+    List<AdaptedServer> getServers();
 
     AdaptedServer getServer(String name);
 }

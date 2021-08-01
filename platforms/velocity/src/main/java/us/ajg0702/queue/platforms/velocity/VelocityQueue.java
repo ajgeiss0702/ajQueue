@@ -69,7 +69,7 @@ public class VelocityQueue  {
                 new VelocityMethods(this, proxyServer, logger),
                 dataFolder
         );
-        main.setServerBuilder(new VelocityServerBuilder(main, proxyServer));
+        main.setServerBuilder(new VelocityServerBuilder(proxyServer));
 
         commands = Arrays.asList(
                 new QueueCommand(main),

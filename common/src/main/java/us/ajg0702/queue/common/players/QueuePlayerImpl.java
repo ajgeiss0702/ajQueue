@@ -1,5 +1,6 @@
 package us.ajg0702.queue.common.players;
 
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import us.ajg0702.queue.api.players.AdaptedPlayer;
 import us.ajg0702.queue.api.players.QueuePlayer;
@@ -20,14 +21,22 @@ public class QueuePlayerImpl implements QueuePlayer {
 
     private final int maxOfflineTime;
 
+    public QueuePlayerImpl(UUID uuid, String name, QueueServer server, int highestPriority, int maxOfflineTime) {
+        this(null, name, uuid, server, highestPriority, maxOfflineTime);
+    }
+
     public QueuePlayerImpl(AdaptedPlayer player, QueueServer server, int highestPriority, int maxOfflineTime) {
+        this(player, player.getName(), player.getUniqueId(), server, highestPriority, maxOfflineTime);
+    }
+
+    private QueuePlayerImpl(@Nullable AdaptedPlayer player, String name, @NotNull UUID uuid, QueueServer server, int highestPriority, int maxOfflineTime) {
         this.player = player;
         this.server = server;
 
         this.highestPriority = highestPriority;
 
-        uuid = player.getUniqueId();
-        name = player.getName();
+        this.uuid = uuid;
+        this.name = name;
 
         this.maxOfflineTime = maxOfflineTime;
     }

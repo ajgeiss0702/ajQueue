@@ -19,7 +19,7 @@ import java.util.concurrent.TimeUnit;
 
 public class QueueManagerImpl implements QueueManager {
 
-    private final List<QueueServer> servers = new CopyOnWriteArrayList<>();
+    private List<QueueServer> servers = new CopyOnWriteArrayList<>();
 
     private final QueueMain main;
     private final Messages msgs;
@@ -34,6 +34,27 @@ public class QueueManagerImpl implements QueueManager {
             CompletableFuture<ServerBuilder> serverBuilderFuture = main.getFutureServerBuilder();
             serverBuilderFuture.thenRunAsync(this::reloadServers);
         }, delay, TimeUnit.MILLISECONDS);
+    }
+
+    public List<QueueServer> buildServers() {
+        List<QueueServer> result = new ArrayList<>();
+        List<AdaptedServer> servers = main.getServerBuilder().getServers();
+
+        for(AdaptedServer server : servers) {
+            QueueServer previousServer = main.getQueueManager().findServer(server.getName());
+            List<QueuePlayer> previousPlayers = previousServer == null ? new ArrayList<>() : previousServer.getQueue();
+            if(previousPlayers.size() > 0) {
+                main.getLogger().info("Adding "+previousPlayers.size()+" players back to the queue for "+server.getName());
+            }
+            QueueServer queueServer = new QueueServerImpl(server.getName(), main, server, previousPlayers);
+            if(previousServer != null) {
+                queueServer.setPaused(previousServer.isPaused());
+                queueServer.setLastSentTime(previousServer.getLastSentTime());
+            }
+            result.add(queueServer);
+        }
+
+        return result;
     }
 
     @Override
@@ -190,19 +211,19 @@ public class QueueManagerImpl implements QueueManager {
             main.getLogger().severe("[MAN] Config is null");
         }
 
-        servers.clear();
+        List<QueueServer> oldServers = ImmutableList.copyOf(servers);
 
-        servers.addAll(main.getServerBuilder().buildServers());
+        servers = buildServers();
 
         List<String> groupsRaw = main.getConfig().getStringList("server-groups");
-        for(String groupraw : groupsRaw) {
-            if(groupraw.isEmpty()) {
+        for(String groupRaw : groupsRaw) {
+            if(groupRaw.isEmpty()) {
                 main.getLogger().warning("Empty group string! If you dont want server groups, set server-groups like this: server-groups: []");
                 continue;
             }
 
-            String groupName = groupraw.split(":")[0];
-            String[] serversraw = groupraw.split(":")[1].split(",");
+            String groupName = groupRaw.split(":")[0];
+            String[] serversraw = groupRaw.split(":")[1].split(",");
 
             if(findServer(groupName) != null) {
                 main.getLogger().warning("The name of a group ('"+groupName+"') cannot be the same as the name of a server!");
@@ -227,7 +248,15 @@ public class QueueManagerImpl implements QueueManager {
                 continue;
             }
 
-            this.servers.add(new QueueServerImpl(groupName, main, groupServers));
+
+            final List<QueuePlayer> previousPlayers = new ArrayList<>();
+            oldServers.forEach(queueServer -> {
+                if(queueServer.getName().equals(groupName)) {
+                    previousPlayers.addAll(queueServer.getQueue());
+                }
+            });
+
+            this.servers.add(new QueueServerImpl(groupName, main, groupServers, previousPlayers));
         }
     }
 

@@ -2,35 +2,26 @@ package us.ajg0702.queue.platforms.velocity.server;
 
 import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
-import us.ajg0702.queue.api.server.ServerBuilder;
-import us.ajg0702.queue.api.queues.QueueServer;
 import us.ajg0702.queue.api.server.AdaptedServer;
-import us.ajg0702.queue.common.QueueMain;
-import us.ajg0702.queue.common.queues.QueueServerImpl;
+import us.ajg0702.queue.api.server.ServerBuilder;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
 public class VelocityServerBuilder implements ServerBuilder {
 
     private final ProxyServer proxyServer;
-    private final QueueMain main;
-    public VelocityServerBuilder(QueueMain main, ProxyServer proxyServer) {
+
+    public VelocityServerBuilder(ProxyServer proxyServer) {
         this.proxyServer = proxyServer;
-        this.main = main;
     }
 
     @Override
-    public List<QueueServer> buildServers() {
-        List<QueueServer> result = new ArrayList<>();
-        Collection<RegisteredServer> servers = proxyServer.getAllServers();
+    public List<AdaptedServer> getServers() {
+        List<AdaptedServer> result = new ArrayList<>();
 
-        for(RegisteredServer server : servers) {
-            AdaptedServer adaptedServer = new VelocityServer(server);
-            result.add(new QueueServerImpl(adaptedServer.getName(), main, adaptedServer));
-        }
+        proxyServer.getAllServers().forEach(registeredServer -> result.add(new VelocityServer(registeredServer)));
 
         return result;
     }

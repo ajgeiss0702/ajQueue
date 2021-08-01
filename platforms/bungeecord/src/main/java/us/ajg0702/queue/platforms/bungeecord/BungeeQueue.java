@@ -42,7 +42,7 @@ public class BungeeQueue extends Plugin implements Listener {
                 new BungeeMethods(this, getProxy(), logger),
                 dataFolder
         );
-        main.setServerBuilder(new BungeeServerBuilder(main, getProxy()));
+        main.setServerBuilder(new BungeeServerBuilder(getProxy()));
 
         getProxy().registerChannel("ajqueue:tospigot");
         getProxy().registerChannel("ajqueue:toproxy");

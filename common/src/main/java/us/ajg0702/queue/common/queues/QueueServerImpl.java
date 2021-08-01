@@ -7,6 +7,7 @@ import us.ajg0702.queue.api.queues.QueueServer;
 import us.ajg0702.queue.api.server.AdaptedServer;
 import us.ajg0702.queue.api.server.AdaptedServerPing;
 import us.ajg0702.queue.common.QueueMain;
+import us.ajg0702.queue.common.players.QueuePlayerImpl;
 import us.ajg0702.utils.common.GenUtils;
 import us.ajg0702.utils.common.Messages;
 
@@ -20,14 +21,37 @@ public class QueueServerImpl implements QueueServer {
 
     private final String name;
 
-    public QueueServerImpl(String name, QueueMain main, AdaptedServer server) {
-        this(name, main, Collections.singletonList(server));
+    public QueueServerImpl(String name, QueueMain main, AdaptedServer server, List<QueuePlayer> previousPlayers) {
+        this(name, main, Collections.singletonList(server), previousPlayers);
     }
 
-    public QueueServerImpl(String name, QueueMain main, List<AdaptedServer> servers) {
+    public QueueServerImpl(String name, QueueMain main, List<AdaptedServer> servers, List<QueuePlayer> previousPlayers) {
         this.name = name;
         this.servers = servers;
         this.main = main;
+
+        for(QueuePlayer queuePlayer : previousPlayers) {
+            if(queuePlayer.getPlayer() == null) {
+                addPlayer(
+                        new QueuePlayerImpl(
+                                queuePlayer.getUniqueId(),
+                                queuePlayer.getName(),
+                                this,
+                                queuePlayer.getPriority(),
+                                queuePlayer.getMaxOfflineTime()
+                        )
+                );
+            } else {
+                addPlayer(
+                        new QueuePlayerImpl(
+                                queuePlayer.getPlayer(),
+                                this,
+                                queuePlayer.getPriority(),
+                                queuePlayer.getMaxOfflineTime()
+                        )
+                );
+            }
+        }
     }
 
     private final QueueMain main;
@@ -251,6 +275,7 @@ public class QueueServerImpl implements QueueServer {
     @Override
     public synchronized void addPlayer(QueuePlayer player, int position) {
         if(!player.getQueueServer().equals(this) || queue.contains(player)) return;
+
         if(position > 0) {
             queue.add(position, player);
         } else {
