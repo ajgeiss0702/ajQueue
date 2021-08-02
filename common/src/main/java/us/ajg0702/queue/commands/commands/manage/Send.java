@@ -31,7 +31,7 @@ public class Send extends SubCommand {
 
     @Override
     public String getPermission() {
-        return "ajqueue.send";
+        return "ajqueue.manage.send";
     }
 
     @Override

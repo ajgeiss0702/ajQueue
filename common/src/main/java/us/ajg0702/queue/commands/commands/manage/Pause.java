@@ -30,7 +30,7 @@ public class Pause extends SubCommand {
 
     @Override
     public String getPermission() {
-        return "ajqueue.pause";
+        return "ajqueue.manage.pause";
     }
 
     @Override

@@ -29,7 +29,7 @@ public class Tasks extends SubCommand {
 
     @Override
     public String getPermission() {
-        return "ajqueue.tasks";
+        return "ajqueue.manage.tasks";
     }
 
     @Override

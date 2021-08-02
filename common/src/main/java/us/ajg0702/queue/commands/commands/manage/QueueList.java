@@ -34,7 +34,7 @@ public class QueueList extends SubCommand {
 
     @Override
     public String getPermission() {
-        return "ajqueue.list";
+        return "ajqueue.manage.list";
     }
 
     @Override

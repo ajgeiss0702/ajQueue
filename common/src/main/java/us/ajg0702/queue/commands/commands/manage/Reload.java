@@ -31,7 +31,7 @@ public class Reload extends SubCommand {
 
     @Override
     public String getPermission() {
-        return "ajqueue.reload";
+        return "ajqueue.manage.reload";
     }
 
     @Override

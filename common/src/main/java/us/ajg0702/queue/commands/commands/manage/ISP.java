@@ -29,7 +29,7 @@ public class ISP extends SubCommand {
 
     @Override
     public String getPermission() {
-        return "ajqueue.isp";
+        return null;
     }
 
     @Override

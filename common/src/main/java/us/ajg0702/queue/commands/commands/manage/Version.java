@@ -29,7 +29,7 @@ public class Version extends SubCommand {
 
     @Override
     public String getPermission() {
-        return "ajqueue.version";
+        return null;
     }
 
     @Override
