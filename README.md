@@ -10,4 +10,6 @@ or lacking basic features
 
 # Contributing
 As long as you don't break anything, i'll probably accept any merge requests you submit.
+I like to have the least number of steps possible for server owners updating my plugin.
+
 If you need *any* help making your changes, feel free to contact me on discord. The invite link is on the plugin page ;)
