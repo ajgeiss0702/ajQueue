@@ -6,7 +6,7 @@ plugins {
 group = "us.ajg0702.queue.common"
 
 repositories {
-    mavenLocal()
+    //mavenLocal()
     mavenCentral()
     maven { url = uri("https://repo.ajg0702.us") }
 }

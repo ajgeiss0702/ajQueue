@@ -28,6 +28,11 @@ public class ISP extends SubCommand {
     }
 
     @Override
+    public boolean showInTabComplete() {
+        return false;
+    }
+
+    @Override
     public String getPermission() {
         return null;
     }

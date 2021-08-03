@@ -36,7 +36,7 @@ public class LuckPermsHook implements PermissionHook {
         User user = api.getUserManager().getUser(player.getUniqueId());
 
         assert user != null;
-        SortedSet<Node> nodes = user.resolveDistinctInheritedNodes(QueryOptions.defaultContextualOptions());
+        SortedSet<Node> nodes = user.resolveDistinctInheritedNodes(QueryOptions.nonContextual());
 
         List<String> perms = new ArrayList<>();
 

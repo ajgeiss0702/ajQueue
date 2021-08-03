@@ -36,6 +36,8 @@ public class BungeeQueue extends Plugin implements Listener {
         QueueLogger logger = new BungeeLogger(getLogger());
         File dataFolder = getDataFolder();
 
+        adventure = BungeeAudiences.create(this);
+
         main = new QueueMain(
                 logger,
                 new BungeeMethods(this, getProxy(), logger),
@@ -59,15 +61,13 @@ public class BungeeQueue extends Plugin implements Listener {
 
         getProxy().getPluginManager().registerListener(this, this);
 
-        adventure = BungeeAudiences.create(this);
-
     }
 
     private static BungeeAudiences adventure;
 
     public static @NonNull BungeeAudiences adventure() {
         if(adventure == null) {
-            throw new IllegalStateException("Cannot retrieve audience provider while plugin is not enabled");
+            throw new IllegalStateException("Cannot retrieve audience provider. Not loaded yet.");
         }
         return adventure;
     }

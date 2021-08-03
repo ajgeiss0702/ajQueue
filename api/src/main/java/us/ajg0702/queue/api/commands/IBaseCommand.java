@@ -16,6 +16,8 @@ public interface IBaseCommand {
 
     String getPermission();
 
+    boolean showInTabComplete();
+
     Messages getMessages();
 
     void addSubCommand(ISubCommand subCommand);

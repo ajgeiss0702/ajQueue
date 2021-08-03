@@ -9,17 +9,18 @@ import us.ajg0702.utils.common.Messages;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
-public class Tasks extends SubCommand {
+public class PermissionList extends SubCommand {
 
     final QueueMain main;
-    public Tasks(QueueMain main) {
+    public PermissionList(QueueMain main) {
         this.main = main;
     }
 
     @Override
     public String getName() {
-        return "tasks";
+        return "permissionlist";
     }
 
     @Override
@@ -28,13 +29,13 @@ public class Tasks extends SubCommand {
     }
 
     @Override
-    public String getPermission() {
-        return "ajqueue.manage.tasks";
+    public boolean showInTabComplete() {
+        return false;
     }
 
     @Override
-    public boolean showInTabComplete() {
-        return false;
+    public String getPermission() {
+        return null;
     }
 
     @Override
@@ -45,7 +46,15 @@ public class Tasks extends SubCommand {
     @Override
     public void execute(ICommandSender sender, String[] args) {
         if(!checkPermission(sender)) return;
-        sender.sendMessage(Component.text(main.getTaskManager().taskStatus()));
+        List<String> permissions = main.getLogicGetter().getPermissions(main.getPlatformMethods().senderToPlayer(sender));
+        if(permissions == null) {
+            sender.sendMessage(Component.text("no permission handler"));
+            return;
+        }
+        permissions.forEach(s -> {
+            if(!s.toLowerCase(Locale.ROOT).contains("ajqueue")) return;
+            sender.sendMessage(Component.text(s));
+        });
     }
 
     @Override

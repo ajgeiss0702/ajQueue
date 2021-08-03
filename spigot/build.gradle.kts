@@ -6,7 +6,7 @@ plugins {
 group = "us.ajg0702.queue.spigot"
 
 repositories {
-    mavenLocal()
+    //mavenLocal()
     mavenCentral()
 
     maven { url = uri("https://repo.extendedclip.com/content/repositories/placeholderapi/") }

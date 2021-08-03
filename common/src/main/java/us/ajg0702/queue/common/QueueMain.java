@@ -75,6 +75,10 @@ public class QueueMain {
         return queueManager;
     }
 
+    private final LogicGetter logicGetter;
+    public LogicGetter getLogicGetter() {
+        return logicGetter;
+    }
 
     public void shutdown() {
         taskManager.shutdown();
@@ -85,6 +89,8 @@ public class QueueMain {
 
 
     public QueueMain(QueueLogger logger, PlatformMethods platformMethods, File dataFolder) {
+
+        logicGetter = new LogicGetterImpl();
 
         if(instance != null) {
             try {
@@ -114,8 +120,8 @@ public class QueueMain {
 
         queueManager = new QueueManagerImpl(this);
 
-        logic = new LogicGetterImpl().constructLogic();
-        aliasManager = new LogicGetterImpl().constructAliasManager(config);
+        logic = logicGetter.constructLogic();
+        aliasManager = logicGetter.constructAliasManager(config);
 
         taskManager.rescheduleTasks();
 

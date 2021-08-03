@@ -27,6 +27,7 @@ public class ManageCommand extends BaseCommand {
         addSubCommand(new ISP(main));
         addSubCommand(new QueueList(main));
         addSubCommand(new Send(main));
+        addSubCommand(new PermissionList(main));
     }
 
 
@@ -87,6 +88,7 @@ public class ManageCommand extends BaseCommand {
         }
         List<String> commands = new ArrayList<>();
         for(ISubCommand subCommand : subCommands) {
+            if(!subCommand.showInTabComplete()) continue;
             commands.add(subCommand.getName());
             commands.addAll(subCommand.getAliases());
         }

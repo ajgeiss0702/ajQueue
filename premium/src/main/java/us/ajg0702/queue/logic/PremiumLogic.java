@@ -12,6 +12,10 @@ import us.ajg0702.queue.logic.permissions.PermissionGetter;
 
 public class PremiumLogic implements Logic {
 
+    public PermissionGetter getPermissionGetter() {
+        return permissionGetter;
+    }
+
     private final PermissionGetter permissionGetter;
     public PremiumLogic(QueueMain main) {
         permissionGetter = new PermissionGetter(main);

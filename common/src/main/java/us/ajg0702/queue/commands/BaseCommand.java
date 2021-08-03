@@ -32,6 +32,11 @@ public class BaseCommand implements IBaseCommand {
     }
 
     @Override
+    public boolean showInTabComplete() {
+        return true;
+    }
+
+    @Override
     public Messages getMessages() {
         return null;
     }
