@@ -8,6 +8,8 @@ import net.md_5.bungee.api.event.*;
 import net.md_5.bungee.api.plugin.Listener;
 import net.md_5.bungee.api.plugin.Plugin;
 import net.md_5.bungee.event.EventHandler;
+import org.bstats.bungeecord.Metrics;
+import org.bstats.charts.SimplePie;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import us.ajg0702.queue.api.commands.IBaseCommand;
 import us.ajg0702.queue.api.util.QueueLogger;
@@ -61,6 +63,11 @@ public class BungeeQueue extends Plugin implements Listener {
 
         getProxy().getPluginManager().registerListener(this, this);
 
+
+        Metrics metrics = new Metrics(this, 7404);
+
+        metrics.addCustomChart(new SimplePie("premium", () -> String.valueOf(main.getLogic().isPremium())));
+        metrics.addCustomChart(new SimplePie("implementation", () -> main.getPlatformMethods().getImplementationName()));
     }
 
     private static BungeeAudiences adventure;

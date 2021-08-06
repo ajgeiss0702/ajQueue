@@ -15,6 +15,8 @@ import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.proxy.messages.MinecraftChannelIdentifier;
 import net.kyori.adventure.text.Component;
+import org.bstats.charts.SimplePie;
+import org.bstats.velocity.Metrics;
 import org.slf4j.Logger;
 import us.ajg0702.queue.api.commands.IBaseCommand;
 import us.ajg0702.queue.commands.BaseCommand;
@@ -50,12 +52,16 @@ public class VelocityQueue  {
 
     final File dataFolder;
 
+    private final Metrics.Factory metricsFactory;
+
     @Inject
-    public VelocityQueue(ProxyServer proxyServer, Logger logger, @DataDirectory Path dataFolder) {
+    public VelocityQueue(ProxyServer proxyServer, Logger logger, @DataDirectory Path dataFolder, Metrics.Factory metricsFactory) {
         this.proxyServer = proxyServer;
         this.logger = new VelocityLogger(logger);
 
         this.dataFolder = dataFolder.toFile();
+
+        this.metricsFactory = metricsFactory;
     }
 
     List<IBaseCommand> commands;
@@ -90,6 +96,12 @@ public class VelocityQueue  {
                     new VelocityCommand(main, (BaseCommand) command)
             );
         }
+
+
+        Metrics metrics = metricsFactory.make(this, 7404);
+
+        metrics.addCustomChart(new SimplePie("premium", () -> String.valueOf(main.getLogic().isPremium())));
+        metrics.addCustomChart(new SimplePie("implementation", () -> main.getPlatformMethods().getImplementationName()));
     }
 
     @Subscribe
@@ -126,6 +138,7 @@ public class VelocityQueue  {
         main.getEventHandler().onPlayerLeave(new VelocityPlayer(e.getPlayer()));
     }
 
+    @SuppressWarnings("SimplifyOptionalCallChains")
     @Subscribe
     public void onKick(KickedFromServerEvent e) {
         if(!e.getPlayer().getCurrentServer().isPresent()) return; // if the player is kicked on initial join, we dont care

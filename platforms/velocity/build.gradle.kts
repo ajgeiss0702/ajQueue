@@ -21,6 +21,8 @@ dependencies {
     annotationProcessor("com.velocitypowered:velocity-api:3.0.0")
     compileOnly("net.kyori:adventure-text-minimessage:4.0.0-SNAPSHOT")
 
+    implementation("org.bstats:bstats-velocity:2.2.1")
+
     implementation(project(":common"))
     implementation(project(":api"))
 }

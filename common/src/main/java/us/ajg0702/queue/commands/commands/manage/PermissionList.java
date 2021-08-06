@@ -51,6 +51,7 @@ public class PermissionList extends SubCommand {
             sender.sendMessage(Component.text("no permission handler"));
             return;
         }
+
         permissions.forEach(s -> {
             if(!s.toLowerCase(Locale.ROOT).contains("ajqueue")) return;
             sender.sendMessage(Component.text(s));

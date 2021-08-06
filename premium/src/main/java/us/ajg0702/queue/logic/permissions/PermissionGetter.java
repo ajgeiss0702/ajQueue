@@ -4,6 +4,7 @@ import us.ajg0702.queue.api.players.AdaptedPlayer;
 import us.ajg0702.queue.common.QueueMain;
 import us.ajg0702.queue.logic.permissions.hooks.BuiltIn;
 import us.ajg0702.queue.logic.permissions.hooks.LuckPermsHook;
+import us.ajg0702.queue.logic.permissions.hooks.UltraPermissionsHook;
 
 import java.util.*;
 
@@ -15,7 +16,8 @@ public class PermissionGetter {
     public PermissionGetter(QueueMain main) {
         hooks = Arrays.asList(
                 new BuiltIn(main),
-                new LuckPermsHook(main)
+                new LuckPermsHook(main),
+                new UltraPermissionsHook(main)
         );
     }
 
@@ -30,6 +32,7 @@ public class PermissionGetter {
                 selected = hook;
             }
         }
+        main.getLogger().info("Using "+selected.getName()+" for permissions.");
         return selected;
     }
 

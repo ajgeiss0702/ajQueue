@@ -26,6 +26,8 @@ dependencies {
 
     compileOnly("net.kyori:adventure-api:4.8.1")
 
+    compileOnly(fileTree(mapOf("dir" to "../libs", "include" to listOf("*.jar"))))
+
     compileOnly("net.luckperms:api:5.0")
 }
 

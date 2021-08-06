@@ -24,6 +24,8 @@ dependencies {
     implementation("net.kyori:adventure-platform-bungeecord:4.0.0-SNAPSHOT")
     compileOnly("net.kyori:adventure-text-serializer-plain:4.0.0-SNAPSHOT")
 
+    implementation("org.bstats:bstats-bungeecord:2.2.1")
+
     implementation(project(":common"))
     implementation(project(":api"))
 }
