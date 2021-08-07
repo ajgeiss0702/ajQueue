@@ -276,7 +276,7 @@ public class QueueServerImpl implements QueueServer {
     public synchronized void addPlayer(QueuePlayer player, int position) {
         if(!player.getQueueServer().equals(this) || queue.contains(player)) return;
 
-        if(position > 0) {
+        if(position >= 0) {
             queue.add(position, player);
         } else {
             queue.add(player);
