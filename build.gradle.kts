@@ -39,7 +39,7 @@ dependencies {
 publishing {
     publications {
         create<MavenPublication>("mavenJava") {
-            artifact(tasks["jar"])
+            artifact(tasks["shadowJar"])
         }
     }
 
