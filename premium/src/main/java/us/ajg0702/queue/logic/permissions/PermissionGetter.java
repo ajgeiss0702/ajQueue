@@ -12,13 +12,14 @@ public class PermissionGetter {
 
     private final List<PermissionHook> hooks;
 
-    private QueueMain main;
+    private final QueueMain main;
     public PermissionGetter(QueueMain main) {
         hooks = Arrays.asList(
                 new BuiltIn(main),
                 new LuckPermsHook(main),
                 new UltraPermissionsHook(main)
         );
+        this.main = main;
     }
 
     private PermissionHook selected;
@@ -31,6 +32,9 @@ public class PermissionGetter {
             if(hook.canUse()) {
                 selected = hook;
             }
+        }
+        if(selected == null) {
+            throw new IllegalStateException("All hooks are unusable!");
         }
         main.getLogger().info("Using "+selected.getName()+" for permissions.");
         return selected;
