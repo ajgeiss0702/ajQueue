@@ -12,10 +12,10 @@ build:
   stage: build
   script:
     - rm -rf build
-    - ./gradlew shadowJar
+    - gradle :free:shadowJar
   artifacts:
     paths:
-      - build/libs
+      - free/build/libs
 
 pages:
   stage: build
@@ -23,8 +23,8 @@ pages:
   only:
     - master
   script:
-    - ./gradlew javadoc
-    - mv build/docs/javadoc public
+    - gradle :api:javadoc
+    - mv api/build/docs/javadoc public
   artifacts:
     paths:
       - public
@@ -34,7 +34,7 @@ test:
   dependencies:
     - build
   script:
-    - ./gradlew test
+    - gradle test
 
 deploy to maven repo:
   stage: deploy
@@ -43,7 +43,7 @@ deploy to maven repo:
   dependencies:
     - build
   script:
-    - ./gradlew publish --stacktrace
+    - gradle :api:publish --stacktrace
 
 upload to updater:
   stage: deploy
@@ -52,6 +52,6 @@ upload to updater:
   dependencies:
     - build
   script:
-    - cd build/libs
+    - cd free/build/libs
     - files=(*)
     - curl -i -F "submit=true" -F "secret=$UPLOAD_SECRET" -F "file=@${files[0]}" https://ajg0702.us/pl/updater/upload.php
