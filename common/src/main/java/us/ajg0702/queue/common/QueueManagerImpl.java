@@ -145,6 +145,17 @@ public class QueueManagerImpl implements QueueManager {
                        "SERVERNAME:"+server.getName()
                     )
             );
+            if(main.getConfig().getBoolean("enable-priority-messages")) {
+                for(String rawPriorityMessage : main.getConfig().getStringList("priority-messages")) {
+                    String[] parts = rawPriorityMessage.split(":");
+                    if(parts.length != 2) continue;
+                    String level = parts[0];
+                    String messageRaw = parts[1];
+                    if(level.equals("*") || level.equals(queuePlayer.getPriority()+"")) {
+                        player.sendMessage(main.getMessages().toComponent(messageRaw));
+                    }
+                }
+            }
         }
 
         if(!server.isJoinable(player)) {
