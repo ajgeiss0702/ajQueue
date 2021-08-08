@@ -2,6 +2,7 @@ package us.ajg0702.queue.commands.commands.manage;
 
 import com.google.common.collect.ImmutableList;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import us.ajg0702.queue.api.commands.ICommandSender;
 import us.ajg0702.queue.commands.SubCommand;
 import us.ajg0702.queue.common.QueueMain;
@@ -46,7 +47,15 @@ public class PermissionList extends SubCommand {
     @Override
     public void execute(ICommandSender sender, String[] args) {
         if(!checkPermission(sender)) return;
-        List<String> permissions = main.getLogicGetter().getPermissions(main.getPlatformMethods().senderToPlayer(sender));
+        if(!sender.isPlayer()) {
+            sender.sendMessage(
+                    Component.text("You need to run this as a player with priority!")
+                    .color(NamedTextColor.RED)
+            );
+        }
+
+        List<String> permissions = main.getLogicGetter()
+                .getPermissions(main.getPlatformMethods().senderToPlayer(sender));
         if(permissions == null) {
             sender.sendMessage(Component.text("no permission handler"));
             return;
