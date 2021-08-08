@@ -7,10 +7,10 @@ import us.ajg0702.queue.logic.permissions.PermissionHook;
 import java.util.ArrayList;
 import java.util.List;
 
-public class BuiltIn implements PermissionHook {
+public class BuiltInHook implements PermissionHook {
 
     private final QueueMain main;
-    public BuiltIn(QueueMain main) {
+    public BuiltInHook(QueueMain main) {
         this.main = main;
     }
 

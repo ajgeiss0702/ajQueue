@@ -34,7 +34,7 @@ test:
   dependencies:
     - build
   script:
-    - gradle test
+    - gradle :free:test
 
 deploy to maven repo:
   stage: deploy
@@ -44,6 +44,7 @@ deploy to maven repo:
     - build
   script:
     - gradle :api:publish --stacktrace
+    - gradle :common:publish
 
 upload to updater:
   stage: deploy

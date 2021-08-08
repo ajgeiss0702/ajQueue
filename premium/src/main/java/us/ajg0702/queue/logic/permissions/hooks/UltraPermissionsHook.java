@@ -11,7 +11,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-@SuppressWarnings("SimplifyOptionalCallChains")
 public class UltraPermissionsHook implements PermissionHook {
 
     private final QueueMain main;
@@ -26,14 +25,21 @@ public class UltraPermissionsHook implements PermissionHook {
 
     @Override
     public boolean canUse() {
-        return main.getPlatformMethods().hasPlugin("UltraPermissions");
+        if(!main.getPlatformMethods().hasPlugin("UltraPermissions") ) return false;
+        if(UltraPermissions.getAPI() == null) {
+            main.getLogger().warn("UltraPermissions getApi() method returned null! Unable to hook into it.");
+            return false;
+        }
+        return true;
     }
 
     @Override
     public List<String> getPermissions(AdaptedPlayer player) {
         UltraPermissionsAPI ultraPermissionsAPI = UltraPermissions.getAPI();
 
-        Optional<User> userOptional =  ultraPermissionsAPI.getUsers().uuid(player.getUniqueId());
+        Optional<User> userOptional =  ultraPermissionsAPI
+                .getUsers()
+                .uuid(player.getUniqueId());
         if(!userOptional.isPresent()) return new ArrayList<>();
         User user = userOptional.get();
 

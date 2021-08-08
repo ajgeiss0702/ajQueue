@@ -11,7 +11,7 @@ repositories {
 }
 
 allprojects {
-    version = "2.0.0"
+    version = "2.0.1"
     group = "us.ajg0702"
 
     tasks.withType<Test>().configureEach {

@@ -2,7 +2,7 @@ package us.ajg0702.queue.logic.permissions;
 
 import us.ajg0702.queue.api.players.AdaptedPlayer;
 import us.ajg0702.queue.common.QueueMain;
-import us.ajg0702.queue.logic.permissions.hooks.BuiltIn;
+import us.ajg0702.queue.logic.permissions.hooks.BuiltInHook;
 import us.ajg0702.queue.logic.permissions.hooks.LuckPermsHook;
 import us.ajg0702.queue.logic.permissions.hooks.UltraPermissionsHook;
 
@@ -15,7 +15,7 @@ public class PermissionGetter {
     private final QueueMain main;
     public PermissionGetter(QueueMain main) {
         hooks = Arrays.asList(
-                new BuiltIn(main),
+                new BuiltInHook(main),
                 new LuckPermsHook(main),
                 new UltraPermissionsHook(main)
         );
