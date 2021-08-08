@@ -151,7 +151,7 @@ public class QueueManagerImpl implements QueueManager {
                     if(parts.length != 2) continue;
                     String level = parts[0];
                     String messageRaw = parts[1];
-                    if(level.equals("*") || level.equals(queuePlayer.getPriority()+"")) {
+                    if((level.equals("*") && queuePlayer.getPriority() > 0) || level.equals(queuePlayer.getPriority()+"")) {
                         player.sendMessage(main.getMessages().toComponent(messageRaw));
                     }
                 }
