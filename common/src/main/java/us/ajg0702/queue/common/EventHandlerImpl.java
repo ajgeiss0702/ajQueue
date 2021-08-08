@@ -54,7 +54,12 @@ public class EventHandlerImpl implements EventHandler {
                 }
             }
             if(subchannel.equals("queuename")) {
-                main.getPlatformMethods().sendPluginMessage(recievingPlayer, "queuename", main.getQueueManager().getQueuedName(recievingPlayer));
+                QueueServer server = main.getQueueManager().getSingleServer(recievingPlayer);
+                String name = main.getMessages().getString("placeholders.position.none");
+                if(server != null) {
+                    name = server.getAlias();
+                }
+                main.getPlatformMethods().sendPluginMessage(recievingPlayer, "queuename", name);
             }
             if(subchannel.equals("position")) {
                 QueueServer server = main.getQueueManager().getSingleServer(recievingPlayer);
