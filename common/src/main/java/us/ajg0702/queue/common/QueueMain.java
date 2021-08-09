@@ -137,6 +137,7 @@ public class QueueMain {
         d.put("status.offline.full", "full");
         d.put("status.offline.restricted", "restricted");
         d.put("status.offline.paused", "paused");
+        d.put("status.offline.whitelisted", "whitelisted");
 
         d.put("status.online.base", "&7You are in position &f{POS}&7 of &f{LEN}&7. Estimated time: {TIME}");
         d.put("status.left-last-queue", "&aYou left the last queue you were in.");

@@ -1,0 +1,18 @@
+# This is the config for the spigot side.
+# You can find more settings in the config of bungee.
+
+
+# Should we send queue requests from commands in batches?
+# Enable this if you have issues with players sometimes not executing commands correctly
+# Note though that it could delay queue commands by up to 1 second!
+send-queue-commands-in-batches: false
+
+# Should we take over the server MOTD to tell the proxy if the server is whitelisted?
+# If you disable this, ajQueue will not be able to tell if the server is whitelisted!
+take-over-motd-for-whitelist: true
+
+
+
+
+# Dont touch this
+config-version: 2

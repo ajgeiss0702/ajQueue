@@ -124,7 +124,7 @@ public class BungeeQueue extends Plugin implements Listener {
         Component reason = BungeeComponentSerializer.get().deserialize(e.getKickReasonComponent());
         main.getEventHandler().onServerKick(
                 new BungeePlayer(e.getPlayer()),
-                new BungeeServer(e.getCancelServer()),
+                new BungeeServer(e.getKickedFrom()),
                 reason,
                 false
         );

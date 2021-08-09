@@ -125,7 +125,7 @@ public class QueueManagerImpl implements QueueManager {
         int len = list.size();
 
         boolean sendInstant = main.getConfig().getStringList("send-instantly").contains(server.getName()) || server.isJoinable(player);
-        boolean sendInstantp = list.size() <= 1 && server.canAccess(player);
+        boolean sendInstantp = list.size() <= 1 && server.isJoinable(player);
         boolean timeGood = !main.getConfig().getBoolean("check-last-player-sent-time") || System.currentTimeMillis() - server.getLastSentTime() > Math.floor(main.getConfig().getDouble("wait-time") * 1000);
 
         if((sendInstant && (sendInstantp && timeGood))) {
@@ -145,6 +145,17 @@ public class QueueManagerImpl implements QueueManager {
                        "SERVERNAME:"+server.getName()
                     )
             );
+            if(main.getConfig().getBoolean("enable-priority-messages")) {
+                for(String rawPriorityMessage : main.getConfig().getStringList("priority-messages")) {
+                    String[] parts = rawPriorityMessage.split(":");
+                    if(parts.length != 2) continue;
+                    String level = parts[0];
+                    String messageRaw = parts[1];
+                    if((level.equals("*") && queuePlayer.getPriority() > 0) || level.equals(queuePlayer.getPriority()+"")) {
+                        player.sendMessage(main.getMessages().toComponent(messageRaw.replaceAll("\\{PRIORITY}", queuePlayer.getPriority()+"")));
+                    }
+                }
+            }
         }
 
         if(!server.isJoinable(player)) {
@@ -461,6 +472,8 @@ public class QueueManagerImpl implements QueueManager {
             }
 
             if(nextPlayer == null) continue; // None of the players in the queue are online
+
+            if(server.isWhitelisted() && !server.getWhitelistedPlayers().contains(nextPlayer.getUniqueId())) continue;
 
             if(!server.canAccess(nextPlayer)) continue;
 

@@ -1,4 +1,4 @@
-package us.ajg0702.queue.commands.commands.manage;
+package us.ajg0702.queue.commands.commands.manage.debug;
 
 import com.google.common.collect.ImmutableList;
 import net.kyori.adventure.text.Component;

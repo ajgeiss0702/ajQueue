@@ -5,6 +5,7 @@ import net.kyori.adventure.text.Component;
 import us.ajg0702.queue.api.commands.ICommandSender;
 import us.ajg0702.queue.api.commands.ISubCommand;
 import us.ajg0702.queue.commands.BaseCommand;
+import us.ajg0702.queue.commands.commands.manage.debug.*;
 import us.ajg0702.queue.common.QueueMain;
 import us.ajg0702.utils.common.Messages;
 
@@ -28,6 +29,7 @@ public class ManageCommand extends BaseCommand {
         addSubCommand(new QueueList(main));
         addSubCommand(new Send(main));
         addSubCommand(new PermissionList(main));
+        addSubCommand(new Whitelist(main));
     }
 
 
@@ -50,7 +52,7 @@ public class ManageCommand extends BaseCommand {
 
     @Override
     public String getPermission() {
-        return "ajqueue.manage";
+        return null;
     }
 
     @Override

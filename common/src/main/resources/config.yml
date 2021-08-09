@@ -1,5 +1,5 @@
 # Dont touch this number please
-config-version: 22
+config-version: 23
 
 # The time the server will wait between sending people in the queue
 #  Default: 5
@@ -177,3 +177,16 @@ auto-add-kick-reasons:
 # This may require extra setup on bungeecord. See the wiki:
 # https://wiki.ajg0702.us/ajqueue/setup/replacing-server-command
 enable-server-command: false
+
+# Should we enable priority messages?
+# Configure the priority messages in the option below.
+enable-priority-messages: false
+
+# Messages we send to players with priority queue when they join the queue
+# In the free version, "priority" is 1.
+# The * will send when a player joins with any priority.
+# The format is <priority>:<message>
+# Example: 1:You have a priority of 1!
+priority-messages:
+  - "*:<green>Joining the queue with a priority of {PRIORITY}!"
+  - "100:<yellow>Wow! You have a priority of 100!"
