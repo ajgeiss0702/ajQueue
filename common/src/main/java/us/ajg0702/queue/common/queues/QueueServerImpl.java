@@ -170,7 +170,6 @@ public class QueueServerImpl implements QueueServer {
                         List<UUID> uuids = new ArrayList<>();
                         for(String uuid : serverPing.getPlainDescription().substring(20).split(",")) {
                             if(uuid.isEmpty()) continue;
-                            main.getLogger().info("Adding uuid "+uuid+" to whitelist");
                             uuids.add(UUID.fromString(uuid));
                         }
                         setWhitelistedPlayers(uuids);

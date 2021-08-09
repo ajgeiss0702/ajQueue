@@ -125,7 +125,7 @@ public class QueueManagerImpl implements QueueManager {
         int len = list.size();
 
         boolean sendInstant = main.getConfig().getStringList("send-instantly").contains(server.getName()) || server.isJoinable(player);
-        boolean sendInstantp = list.size() <= 1 && server.canAccess(player);
+        boolean sendInstantp = list.size() <= 1 && server.isJoinable(player);
         boolean timeGood = !main.getConfig().getBoolean("check-last-player-sent-time") || System.currentTimeMillis() - server.getLastSentTime() > Math.floor(main.getConfig().getDouble("wait-time") * 1000);
 
         if((sendInstant && (sendInstantp && timeGood))) {
