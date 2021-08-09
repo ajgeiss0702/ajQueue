@@ -169,7 +169,7 @@ public class EventHandlerImpl implements EventHandler {
         }
 
         ImmutableList<QueueServer> queuedServers = main.getQueueManager().getPlayerQueues(player);
-        if(!queuedServers.contains(main.getQueueManager().findServer(from.getName())) && main.getConfig().getBoolean("auto-add-to-queue-on-kick")) {
+        if(from != null && !queuedServers.contains(main.getQueueManager().findServer(from.getName())) && main.getConfig().getBoolean("auto-add-to-queue-on-kick")) {
 
             List<String> reasons = main.getConfig().getStringList("auto-add-kick-reasons");
             boolean shouldqueue = false;
@@ -193,7 +193,7 @@ public class EventHandlerImpl implements EventHandler {
 
         }
 
-
+        assert from != null;
         for(QueueServer server : queuedServers) {
             if(!(server.getServerNames().contains(from.getName()))) continue;
             QueuePlayer queuePlayer = server.findPlayer(player);
