@@ -4,14 +4,19 @@ import com.google.common.io.ByteArrayDataInput;
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
 import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerQuitEvent;
+import org.bukkit.event.server.ServerListPingEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.plugin.messaging.PluginMessageListener;
 import org.jetbrains.annotations.NotNull;
+import us.ajg0702.utils.common.ConfigFile;
 
+import java.io.File;
 import java.util.HashMap;
 
 @SuppressWarnings("UnstableApiUsage")
@@ -20,7 +25,7 @@ public class SpigotMain extends JavaPlugin implements PluginMessageListener,List
 	boolean papi = false;
 	Placeholders placeholders;
 	
-	Config config;
+	ConfigFile config;
 	
 	@SuppressWarnings("ConstantConditions")
 	public void onEnable() {
@@ -53,9 +58,20 @@ public class SpigotMain extends JavaPlugin implements PluginMessageListener,List
 			queuebatch.clear();
 			sendMessage("massqueue", msg.toString());
 		}, 2*20, 20);
-		
-		config = new Config(this);
-		
+
+		File oldConfig = new File(getDataFolder(), "config.yml");
+		if(oldConfig.exists()) {
+			//noinspection ResultOfMethodCallIgnored
+			oldConfig.renameTo(new File(getDataFolder(), "spigot-config.yml"));
+		}
+
+		try {
+			config = new ConfigFile(getDataFolder(), getLogger(), "spigot-config.yml");
+		} catch (Exception e) {
+			getLogger().severe("Unable to read config:");
+			e.printStackTrace();
+		}
+
 		getLogger().info("Spigot side enabled! v"+getDescription().getVersion());
 	}
 	
@@ -162,5 +178,20 @@ public class SpigotMain extends JavaPlugin implements PluginMessageListener,List
 	public void onLeave(PlayerQuitEvent e) {
 		if(!papi) return;
 		placeholders.cleanCache();
+	}
+
+	@EventHandler(priority = EventPriority.HIGH)
+	public void onServerPing(ServerListPingEvent e) {
+		if(!config.getBoolean("take-over-motd-for-whitelist")) return;
+		if(!Bukkit.hasWhitelist()) return;
+
+		StringBuilder whitelist = new StringBuilder();
+		for(OfflinePlayer player : Bukkit.getWhitelistedPlayers()) {
+			whitelist.append(player.getUniqueId()).append(",");
+		}
+		if(whitelist.length() > 1) {
+			whitelist.deleteCharAt(whitelist.length()-1);
+		}
+		e.setMotd("ajQueue;whitelisted="+whitelist);
 	}
 }

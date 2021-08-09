@@ -473,6 +473,8 @@ public class QueueManagerImpl implements QueueManager {
 
             if(nextPlayer == null) continue; // None of the players in the queue are online
 
+            if(server.isWhitelisted() && !server.getWhitelistedPlayers().contains(nextPlayer.getUniqueId())) continue;
+
             if(!server.canAccess(nextPlayer)) continue;
 
             if(server.isFull() && !nextPlayer.hasPermission("ajqueue.joinfull")) continue;

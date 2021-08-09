@@ -20,6 +20,8 @@ dependencies {
     implementation("net.kyori:adventure-api:4.8.1")
     compileOnly("com.google.guava:guava:30.1.1-jre")
 
+    compileOnly("org.spongepowered:configurate-yaml:4.0.0")
+
     compileOnly("us.ajg0702:ajUtils:1.1.8")
 
     compileOnly(group = "org.spigotmc", name = "spigot", version = "1.16.5-R0.1-SNAPSHOT")

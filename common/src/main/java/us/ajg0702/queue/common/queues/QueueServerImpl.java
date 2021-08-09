@@ -105,6 +105,10 @@ public class QueueServerImpl implements QueueServer {
             return msgs.getString("status.offline.paused");
         }
 
+        if(p != null && isWhitelisted() && !getWhitelistedPlayers().contains(p.getUniqueId())) {
+            return msgs.getString("status.offline.whitelisted");
+        }
+
         if(isFull()) {
             return msgs.getString("status.offline.full");
         }
@@ -158,6 +162,20 @@ public class QueueServerImpl implements QueueServer {
                     AdaptedServerPing serverPing = pings.get(pingedServer);
                     if(serverPing == null) {
                         continue;
+                    }
+                    if(serverPing.getPlainDescription().contains("ajQueue;whitelisted=")) {
+                        if(servers.size() > 1) continue;
+
+                        setWhitelisted(true);
+                        List<UUID> uuids = new ArrayList<>();
+                        for(String uuid : serverPing.getPlainDescription().substring(20).split(",")) {
+                            if(uuid.isEmpty()) continue;
+                            main.getLogger().info("Adding uuid "+uuid+" to whitelist");
+                            uuids.add(UUID.fromString(uuid));
+                        }
+                        setWhitelistedPlayers(uuids);
+                    } else {
+                        setWhitelisted(false);
                     }
                     onlineCount++;
                     playerCount += serverPing.getPlayerCount();
@@ -217,8 +235,10 @@ public class QueueServerImpl implements QueueServer {
 
     @Override
     public boolean isJoinable(AdaptedPlayer p) {
-        return (!whitelisted || whitelistedUUIDs.contains(p.getUniqueId())) &&
-                this.isOnline() &&
+        if(p != null && isWhitelisted() && !whitelistedUUIDs.contains(p.getUniqueId())) {
+            return false;
+        }
+        return this.isOnline() &&
                 this.canAccess(p) &&
                 !this.isFull() &&
                 !this.isPaused();

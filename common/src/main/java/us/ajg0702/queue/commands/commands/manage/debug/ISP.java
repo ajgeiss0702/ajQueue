@@ -1,8 +1,7 @@
-package us.ajg0702.queue.commands.commands.manage;
+package us.ajg0702.queue.commands.commands.manage.debug;
 
 import com.google.common.collect.ImmutableList;
 import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
 import us.ajg0702.queue.api.commands.ICommandSender;
 import us.ajg0702.queue.commands.SubCommand;
 import us.ajg0702.queue.common.QueueMain;
@@ -10,18 +9,17 @@ import us.ajg0702.utils.common.Messages;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
-public class PermissionList extends SubCommand {
+public class ISP extends SubCommand {
 
     final QueueMain main;
-    public PermissionList(QueueMain main) {
+    public ISP(QueueMain main) {
         this.main = main;
     }
 
     @Override
     public String getName() {
-        return "permissionlist";
+        return "isp";
     }
 
     @Override
@@ -47,24 +45,7 @@ public class PermissionList extends SubCommand {
     @Override
     public void execute(ICommandSender sender, String[] args) {
         if(!checkPermission(sender)) return;
-        if(!sender.isPlayer()) {
-            sender.sendMessage(
-                    Component.text("You need to run this as a player with priority!")
-                    .color(NamedTextColor.RED)
-            );
-        }
-
-        List<String> permissions = main.getLogicGetter()
-                .getPermissions(main.getPlatformMethods().senderToPlayer(sender));
-        if(permissions == null) {
-            sender.sendMessage(Component.text("no permission handler"));
-            return;
-        }
-
-        permissions.forEach(s -> {
-            if(!s.toLowerCase(Locale.ROOT).contains("ajqueue")) return;
-            sender.sendMessage(Component.text(s));
-        });
+        sender.sendMessage(Component.text(main.getLogic().isPremium()));
     }
 
     @Override

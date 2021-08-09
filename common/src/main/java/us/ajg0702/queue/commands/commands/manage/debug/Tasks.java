@@ -1,4 +1,4 @@
-package us.ajg0702.queue.commands.commands.manage;
+package us.ajg0702.queue.commands.commands.manage.debug;
 
 import com.google.common.collect.ImmutableList;
 import net.kyori.adventure.text.Component;
@@ -10,16 +10,16 @@ import us.ajg0702.utils.common.Messages;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ISP extends SubCommand {
+public class Tasks extends SubCommand {
 
     final QueueMain main;
-    public ISP(QueueMain main) {
+    public Tasks(QueueMain main) {
         this.main = main;
     }
 
     @Override
     public String getName() {
-        return "isp";
+        return "tasks";
     }
 
     @Override
@@ -28,13 +28,13 @@ public class ISP extends SubCommand {
     }
 
     @Override
-    public boolean showInTabComplete() {
-        return false;
+    public String getPermission() {
+        return "ajqueue.manage.tasks";
     }
 
     @Override
-    public String getPermission() {
-        return null;
+    public boolean showInTabComplete() {
+        return false;
     }
 
     @Override
@@ -45,7 +45,7 @@ public class ISP extends SubCommand {
     @Override
     public void execute(ICommandSender sender, String[] args) {
         if(!checkPermission(sender)) return;
-        sender.sendMessage(Component.text(main.getLogic().isPremium()));
+        sender.sendMessage(Component.text(main.getTaskManager().taskStatus()));
     }
 
     @Override
