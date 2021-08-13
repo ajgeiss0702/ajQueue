@@ -14,6 +14,11 @@ allprojects {
     version = "2.0.2"
     group = "us.ajg0702"
 
+    plugins.apply("java")
+    java {
+        sourceCompatibility = JavaVersion.VERSION_1_8
+    }
+
     tasks.withType<Test>().configureEach {
         useJUnitPlatform()
 
