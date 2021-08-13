@@ -471,6 +471,9 @@ public class QueueManagerImpl implements QueueManager {
                     }
                 } else {
                     i++;
+                    if(i > server.getQueue().size()-1) {
+                        break;
+                    }
                     nextQueuePlayer = server.getQueue().get(i);
                     nextPlayer = nextQueuePlayer.getPlayer();
                 }
