@@ -231,6 +231,11 @@ public class QueueManagerImpl implements QueueManager {
                 continue;
             }
 
+            if(!groupRaw.contains(":")) {
+                main.getLogger().warning("Incorrect formatting! Each server group needs to have a name and a list of servers seperated by a colon (:).");
+                continue;
+            }
+
             String groupName = groupRaw.split(":")[0];
             String[] serversraw = groupRaw.split(":")[1].split(",");
 
@@ -466,6 +471,9 @@ public class QueueManagerImpl implements QueueManager {
                     }
                 } else {
                     i++;
+                    if(i > server.getQueue().size()-1) {
+                        break;
+                    }
                     nextQueuePlayer = server.getQueue().get(i);
                     nextPlayer = nextQueuePlayer.getPlayer();
                 }
