@@ -1,5 +1,5 @@
 # Dont touch this number please
-config-version: 24
+config-version: 25
 
 # The time the server will wait between sending people in the queue
 #  Default: 5
@@ -31,9 +31,7 @@ kick-reasons:
 
 
 # Should we remove a player from the queue if they move servers?
-# If they join another queue, they will be removed from the previous one no matter what
-# This is more meant for if you have multiple lobbies if you want to let the player switch
-# between them without losing their queue position
+# This will remove the player from if they switch to any other server
 #  Default: false
 remove-player-on-server-switch: false
 
@@ -53,17 +51,19 @@ wait-to-load-servers-delay: 500
 # How often (in seconds) we should check for new servers to add queues for.
 # If you dynamicly add servers, set this to something other than 0.
 # To disable, set to 0
+#  Default: 0
 reload-servers-interval: 0
 
 
 # Should we require permissions for players to be able to join queues?
-# If enabled, players will be required to have the permission ajqueue.queue.<server>
+# If enabled, players will be required to have the permission ajqueue.queue.<server> to be able to join queues
 #  Default: false
 require-permission: false
 
 
 # Should we let players join more than one queue?
 # If enabled, players will be able to be in multiple queues at once.
+# If disabled, players will be removed from the previous queue when joining a new queue
 #  Default: true
 allow-multiple-queues: true
 
@@ -163,6 +163,7 @@ priority-queue-debug: false
 auto-add-to-queue-on-kick: false
 # The delay for the above option.
 # In seconds, decimals supported.
+#  Default: 1
 auto-add-to-queue-on-kick-delay: 1
 
 # With what kick reasons should we auto-add the player to the queue
@@ -176,10 +177,12 @@ auto-add-kick-reasons:
 # Should we enable the server command being a queue command?
 # This may require extra setup on bungeecord. See the wiki:
 # https://wiki.ajg0702.us/ajqueue/setup/replacing-server-command
+#  Default: false
 enable-server-command: false
 
 # Should we enable priority messages?
 # Configure the priority messages in the option below.
+#  Default: false
 enable-priority-messages: false
 
 # Messages we send to players with priority queue when they join the queue
@@ -190,3 +193,8 @@ enable-priority-messages: false
 priority-messages:
   - "*:<green>Joining the queue with a priority of {PRIORITY}!"
   - "100:<yellow>Wow! You have a priority of 100!"
+
+# Should the plugin send a title to the player?
+# The title shows what position the player is in the queue
+#  Default: false
+send-title: false
