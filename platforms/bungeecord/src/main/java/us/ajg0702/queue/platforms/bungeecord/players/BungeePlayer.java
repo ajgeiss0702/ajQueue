@@ -27,7 +27,6 @@ public class BungeePlayer implements AdaptedPlayer, Audience {
 
     @Override
     public void showTitle(@NotNull Title title) {
-        System.out.println("title!");
         getAudience().showTitle(title);
     }
 
