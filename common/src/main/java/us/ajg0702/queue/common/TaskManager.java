@@ -24,7 +24,7 @@ public class TaskManager {
     }
 
     public String taskStatus() {
-        List<ScheduledFuture<?>> tasks = Arrays.asList(sendTask, updateTask, messageTask, actionBarTask, queueEventTask, reloadServerTask);
+        List<ScheduledFuture<?>> tasks = Arrays.asList(sendTask, updateTask, messageTask, actionBarTask, titleTask, queueEventTask, reloadServerTask);
         StringBuilder sb = new StringBuilder();
         for(ScheduledFuture<?> task : tasks) {
             sb.append(task == null ? "null" : task.isDone() ? "canceled/done" : "running");
@@ -37,6 +37,7 @@ public class TaskManager {
     ScheduledFuture<?> updateTask;
     ScheduledFuture<?> messageTask;
     ScheduledFuture<?> actionBarTask;
+    ScheduledFuture<?> titleTask;
     ScheduledFuture<?> queueEventTask;
     ScheduledFuture<?> reloadServerTask;
     public void rescheduleTasks() {
@@ -63,6 +64,12 @@ public class TaskManager {
 
         actionBarTask = scheduleAtFixedRate(
                 main.getQueueManager()::sendActionBars,
+                1500L,
+                TimeUnit.MILLISECONDS
+        );
+
+        titleTask = scheduleAtFixedRate(
+                main.getQueueManager()::sendTitles,
                 1500L,
                 TimeUnit.MILLISECONDS
         );
@@ -95,6 +102,9 @@ public class TaskManager {
         }
         if(actionBarTask != null && !actionBarTask.isCancelled()) {
             actionBarTask.cancel(true);
+        }
+        if(titleTask != null && !titleTask.isCancelled()) {
+            titleTask.cancel(true);
         }
         if(queueEventTask != null && !queueEventTask.isCancelled()) {
             queueEventTask.cancel(true);

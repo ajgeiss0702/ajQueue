@@ -175,6 +175,9 @@ public class QueueMain {
         d.put("placeholders.queued.none", "None");
         d.put("placeholders.position.none", "None");
 
+        d.put("title.title", "");
+        d.put("title.subtitle", "<gold>You are <green>#{POS} <gold>in the queue!");
+
         d.put("commands.leave.more-args", "&cPlease specify which queue you want to leave! &7You are in these queues: {QUEUES}");
         d.put("commands.leave.queues-list-format", "&f{NAME}&7, ");
         d.put("commands.leave.not-queued", "&cYou are not queued for that server! &7You are in these queues: {QUEUES}");

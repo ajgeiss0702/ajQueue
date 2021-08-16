@@ -1,6 +1,8 @@
 package us.ajg0702.queue.common;
 
 import com.google.common.collect.ImmutableList;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.title.Title;
 import us.ajg0702.queue.api.QueueManager;
 import us.ajg0702.queue.api.players.AdaptedPlayer;
 import us.ajg0702.queue.api.players.QueuePlayer;
@@ -11,6 +13,7 @@ import us.ajg0702.queue.common.queues.QueueServerImpl;
 import us.ajg0702.utils.common.Messages;
 import us.ajg0702.utils.common.TimeUtils;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -309,6 +312,44 @@ public class QueueManagerImpl implements QueueManager {
                             "TIME:"+ TimeUtils.timeString(time, msgs.getString("format.time.mins"), msgs.getString("format.time.secs"))
                     ));
                 }
+            }
+        }
+    }
+
+    @Override
+    public void sendTitles() {
+        if(!main.getConfig().getBoolean("send-title")) return;
+
+        for(QueueServer server : servers) {
+            String status = server.getStatusString();
+            for(QueuePlayer queuePlayer : server.getQueue()) {
+
+                int pos = queuePlayer.getPosition();
+                if(pos == 0) {
+                    server.removePlayer(queuePlayer);
+                    continue;
+                }
+
+                AdaptedPlayer player = queuePlayer.getPlayer();
+                if(player == null) continue;
+
+                if(!getSingleServer(player).equals(server)) continue;
+
+                Component titleMessage = msgs.getComponent("title.title",
+                        "POS:"+pos,
+                        "LEN:"+server.getQueue().size(),
+                        "SERVER:"+server.getAlias(),
+                        "STATUS:"+status
+                );
+                Component subTitleMessage = msgs.getComponent("title.title",
+                        "POS:"+pos,
+                        "LEN:"+server.getQueue().size(),
+                        "SERVER:"+server.getAlias(),
+                        "STATUS:"+status
+                );
+
+                Title title = Title.title(titleMessage, subTitleMessage, Title.Times.of(Duration.ZERO, Duration.ofSeconds(2L), Duration.ZERO));
+                player.showTitle(title);
             }
         }
     }
