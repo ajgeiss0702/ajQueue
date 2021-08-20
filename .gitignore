@@ -7,4 +7,5 @@ dependency-reduced-pom.xml
 build
 .DS_Store
 .nosync
-libs/private
+libs/private/*
+!libs/private/README.md
