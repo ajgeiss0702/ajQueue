@@ -13,7 +13,7 @@ import us.ajg0702.utils.common.Messages;
 import java.io.File;
 import java.util.LinkedHashMap;
 
-public class QueueMain {
+public class QueueMain extends AjQueueAPI {
 
     private static QueueMain instance;
     public static QueueMain getInstance() {
@@ -21,67 +21,81 @@ public class QueueMain {
     }
 
     private double timeBetweenPlayers;
+    @Override
     public double getTimeBetweenPlayers() {
         return timeBetweenPlayers;
     }
+    @Override
     public void setTimeBetweenPlayers() {
         this.timeBetweenPlayers = config.getDouble("wait-time");
     }
 
     private Config config;
+    @Override
     public Config getConfig() {
         return config;
     }
 
     private Messages messages;
+    @Override
     public Messages getMessages() {
         return messages;
     }
 
     private AliasManager aliasManager;
+    @Override
     public AliasManager getAliasManager() {
         return aliasManager;
     }
 
     private Logic logic;
+    @Override
     public Logic getLogic() {
         return logic;
     }
 
+    @Override
     public boolean isPremium() {
         return getLogic().isPremium();
     }
 
     private final PlatformMethods platformMethods;
+    @Override
     public PlatformMethods getPlatformMethods() {
         return platformMethods;
     }
 
     private final QueueLogger logger;
+    @Override
     public QueueLogger getLogger() {
         return logger;
     }
 
     private final TaskManager taskManager = new TaskManager(this);
+    @Override
     public TaskManager getTaskManager() {
         return taskManager;
     }
 
     private final EventHandler eventHandler = new EventHandlerImpl(this);
+    @Override
     public EventHandler getEventHandler() {
         return eventHandler;
     }
 
     private QueueManager queueManager;
+    @Override
     public QueueManager getQueueManager() {
         return queueManager;
     }
 
     private final LogicGetter logicGetter;
+    @Override
     public LogicGetter getLogicGetter() {
         return logicGetter;
     }
 
+    @Override
     public void shutdown() {
         taskManager.shutdown();
     }
@@ -102,6 +116,8 @@ public class QueueMain {
             }
         }
         instance = this;
+
+        AjQueueAPI.INSTANCE = this;
 
 
         this.logger = logger;
