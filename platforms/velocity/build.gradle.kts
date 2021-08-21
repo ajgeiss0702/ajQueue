@@ -6,7 +6,6 @@ plugins {
 group = "us.ajg0702.queue.platforms.velocity"
 
 repositories {
-    //mavenLocal()
     maven { url = uri("https://repo.ajg0702.us") }
     maven { url = uri("https://nexus.velocitypowered.com/repository/maven-public/") }
     mavenCentral()
