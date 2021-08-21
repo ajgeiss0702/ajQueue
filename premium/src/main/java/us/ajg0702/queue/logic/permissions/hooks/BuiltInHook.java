@@ -2,7 +2,7 @@ package us.ajg0702.queue.logic.permissions.hooks;
 
 import us.ajg0702.queue.api.players.AdaptedPlayer;
 import us.ajg0702.queue.common.QueueMain;
-import us.ajg0702.queue.logic.permissions.PermissionHook;
+import us.ajg0702.queue.api.premium.PermissionHook;
 
 import java.util.ArrayList;
 import java.util.List;

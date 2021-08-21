@@ -1,8 +1,9 @@
 package us.ajg0702.queue.logic;
 
-import us.ajg0702.queue.api.Logic;
+import us.ajg0702.queue.api.premium.Logic;
 import us.ajg0702.queue.api.players.AdaptedPlayer;
 import us.ajg0702.queue.api.players.QueuePlayer;
+import us.ajg0702.queue.api.premium.PermissionGetter;
 import us.ajg0702.queue.api.queues.QueueServer;
 
 public class FreeLogic implements Logic {
@@ -19,5 +20,10 @@ public class FreeLogic implements Logic {
     @Override
     public boolean playerDisconnectedTooLong(QueuePlayer player) {
         return player.getMaxOfflineTime() < player.getTimeSinceOnline()*1000;
+    }
+
+    @Override
+    public PermissionGetter getPermissionGetter() {
+        return null;
     }
 }

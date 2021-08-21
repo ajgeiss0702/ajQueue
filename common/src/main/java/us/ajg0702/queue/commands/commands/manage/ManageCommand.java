@@ -83,6 +83,7 @@ public class ManageCommand extends BaseCommand {
         if(args.length > 1) {
             for(ISubCommand subCommand : subCommands) {
                 if(args[0].equalsIgnoreCase(subCommand.getName()) || subCommand.getAliases().contains(args[0].toLowerCase(Locale.ROOT))) {
+                    if(!sender.hasPermission(subCommand.getPermission())) continue;
                     return subCommand.autoComplete(sender, Arrays.copyOfRange(args, 1, args.length));
                 }
             }
@@ -91,6 +92,7 @@ public class ManageCommand extends BaseCommand {
         List<String> commands = new ArrayList<>();
         for(ISubCommand subCommand : subCommands) {
             if(!subCommand.showInTabComplete()) continue;
+            if(!sender.hasPermission(subCommand.getPermission())) continue;
             commands.add(subCommand.getName());
             commands.addAll(subCommand.getAliases());
         }

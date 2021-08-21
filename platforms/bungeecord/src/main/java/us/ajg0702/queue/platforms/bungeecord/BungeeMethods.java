@@ -5,6 +5,7 @@ import com.google.common.io.ByteStreams;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
+import net.md_5.bungee.api.connection.Server;
 import us.ajg0702.queue.api.PlatformMethods;
 import us.ajg0702.queue.api.commands.IBaseCommand;
 import us.ajg0702.queue.api.commands.ICommandSender;
@@ -40,13 +41,15 @@ public class BungeeMethods implements PlatformMethods {
             ByteArrayDataOutput out = ByteStreams.newDataOutput();
             out.writeUTF(channel);
             out.writeUTF(player.getName());
-            int length = data.length;
 
             for (String s : data) {
                 out.writeUTF(s);
             }
-
-            ((BungeePlayer) player).getHandle().getServer().sendData("ajqueue:tospigot", out.toByteArray());
+            ProxiedPlayer proxiedPlayer = ((BungeePlayer) player).getHandle();
+            if(proxiedPlayer == null) return;
+            Server server = proxiedPlayer.getServer();
+            if(server == null) return;
+            server.sendData("ajqueue:tospigot", out.toByteArray());
         }
     }
 

@@ -5,7 +5,7 @@ import me.TechsCode.UltraPermissions.UltraPermissionsAPI;
 import me.TechsCode.UltraPermissions.storage.objects.User;
 import us.ajg0702.queue.api.players.AdaptedPlayer;
 import us.ajg0702.queue.common.QueueMain;
-import us.ajg0702.queue.logic.permissions.PermissionHook;
+import us.ajg0702.queue.api.premium.PermissionHook;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,7 +27,7 @@ public class UltraPermissionsHook implements PermissionHook {
     public boolean canUse() {
         if(!main.getPlatformMethods().hasPlugin("UltraPermissions") ) return false;
         if(UltraPermissions.getAPI() == null) {
-            main.getLogger().warn("UltraPermissions getApi() method returned null! Unable to hook into it.");
+            main.getLogger().warn("UltraPermissions is installed, but its getApi() method returned null! Unable to hook into it.");
             return false;
         }
         return true;

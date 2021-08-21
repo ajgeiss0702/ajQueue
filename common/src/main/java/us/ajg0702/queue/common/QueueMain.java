@@ -2,6 +2,8 @@ package us.ajg0702.queue.common;
 
 import org.spongepowered.configurate.ConfigurateException;
 import us.ajg0702.queue.api.*;
+import us.ajg0702.queue.api.premium.Logic;
+import us.ajg0702.queue.api.premium.LogicGetter;
 import us.ajg0702.queue.api.util.QueueLogger;
 import us.ajg0702.queue.common.utils.LogConverter;
 import us.ajg0702.queue.logic.LogicGetterImpl;

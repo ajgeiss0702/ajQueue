@@ -1,14 +1,15 @@
 package us.ajg0702.queue.logic;
 
 import com.google.common.collect.ImmutableList;
-import us.ajg0702.queue.api.Logic;
+import us.ajg0702.queue.api.premium.Logic;
 import us.ajg0702.queue.api.players.AdaptedPlayer;
 import us.ajg0702.queue.api.players.QueuePlayer;
 import us.ajg0702.queue.api.queues.QueueServer;
 import us.ajg0702.queue.api.util.QueueLogger;
 import us.ajg0702.queue.common.QueueMain;
 import us.ajg0702.queue.common.players.QueuePlayerImpl;
-import us.ajg0702.queue.logic.permissions.PermissionGetter;
+import us.ajg0702.queue.api.premium.PermissionGetter;
+import us.ajg0702.queue.logic.permissions.PermissionGetterImpl;
 
 public class PremiumLogic implements Logic {
 
@@ -18,7 +19,7 @@ public class PremiumLogic implements Logic {
 
     private final PermissionGetter permissionGetter;
     public PremiumLogic(QueueMain main) {
-        permissionGetter = new PermissionGetter(main);
+        permissionGetter = new PermissionGetterImpl(main);
     }
 
     @Override

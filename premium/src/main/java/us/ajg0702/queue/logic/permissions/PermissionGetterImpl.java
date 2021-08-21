@@ -1,28 +1,33 @@
 package us.ajg0702.queue.logic.permissions;
 
 import us.ajg0702.queue.api.players.AdaptedPlayer;
+import us.ajg0702.queue.api.premium.PermissionGetter;
+import us.ajg0702.queue.api.premium.PermissionHook;
 import us.ajg0702.queue.common.QueueMain;
+import us.ajg0702.queue.logic.permissions.hooks.AquaCoreHook;
 import us.ajg0702.queue.logic.permissions.hooks.BuiltInHook;
 import us.ajg0702.queue.logic.permissions.hooks.LuckPermsHook;
 import us.ajg0702.queue.logic.permissions.hooks.UltraPermissionsHook;
 
 import java.util.*;
 
-public class PermissionGetter {
+public class PermissionGetterImpl implements PermissionGetter {
 
     private final List<PermissionHook> hooks;
 
     private final QueueMain main;
-    public PermissionGetter(QueueMain main) {
+    public PermissionGetterImpl(QueueMain main) {
         hooks = Arrays.asList(
                 new BuiltInHook(main),
                 new LuckPermsHook(main),
-                new UltraPermissionsHook(main)
+                new UltraPermissionsHook(main),
+                new AquaCoreHook(main)
         );
         this.main = main;
     }
 
     private PermissionHook selected;
+    @Override
     public PermissionHook getSelected() {
         if(selected != null) return selected;
         if(hooks == null) {
@@ -40,14 +45,17 @@ public class PermissionGetter {
         return selected;
     }
 
+    @Override
     public int getMaxOfflineTime(AdaptedPlayer player) {
         return getHighestPermission(player, "ajqueue.stayqueued.");
     }
 
+    @Override
     public int getPriority(AdaptedPlayer player) {
         return getHighestPermission(player, "ajqueue.priority.");
     }
 
+    @Override
     public int getServerPriotity(String server, AdaptedPlayer player) {
         return getHighestPermission(player, "ajqueue.serverpriority."+server+".");
     }

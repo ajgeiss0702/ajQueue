@@ -65,6 +65,11 @@ public class PermissionList extends SubCommand {
             if(!s.toLowerCase(Locale.ROOT).contains("ajqueue")) return;
             sender.sendMessage(Component.text(s));
         });
+        sender.sendMessage(
+                Component.text(
+                        "Using: "+main.getLogicGetter().getPermissionGetter().getSelected().getName())
+                        .color(NamedTextColor.GOLD)
+        );
     }
 
     @Override

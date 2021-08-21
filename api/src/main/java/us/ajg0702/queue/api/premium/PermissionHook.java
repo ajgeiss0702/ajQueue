@@ -1,4 +1,4 @@
-package us.ajg0702.queue.logic.permissions;
+package us.ajg0702.queue.api.premium;
 
 import us.ajg0702.queue.api.players.AdaptedPlayer;
 

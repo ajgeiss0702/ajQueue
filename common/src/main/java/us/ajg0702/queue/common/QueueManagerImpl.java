@@ -312,6 +312,7 @@ public class QueueManagerImpl implements QueueManager {
                             "TIME:"+ TimeUtils.timeString(time, msgs.getString("format.time.mins"), msgs.getString("format.time.secs"))
                     ));
                 }
+
             }
         }
     }
@@ -341,7 +342,7 @@ public class QueueManagerImpl implements QueueManager {
                         "SERVER:"+server.getAlias(),
                         "STATUS:"+status
                 );
-                Component subTitleMessage = msgs.getComponent("title.title",
+                Component subTitleMessage = msgs.getComponent("title.subtitle",
                         "POS:"+pos,
                         "LEN:"+server.getQueue().size(),
                         "SERVER:"+server.getAlias(),

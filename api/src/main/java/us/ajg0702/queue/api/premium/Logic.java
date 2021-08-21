@@ -1,4 +1,4 @@
-package us.ajg0702.queue.api;
+package us.ajg0702.queue.api.premium;
 
 import us.ajg0702.queue.api.players.AdaptedPlayer;
 import us.ajg0702.queue.api.players.QueuePlayer;
@@ -26,4 +26,10 @@ public interface Logic {
      * @return true if the player has been disconnected for too long and should be removed from the queue
      */
     boolean playerDisconnectedTooLong(QueuePlayer player);
+
+    /**
+     * Gets the permissionGetter. Only available on ajQueuePlus
+     * @return the permission getter
+     */
+    PermissionGetter getPermissionGetter();
 }
