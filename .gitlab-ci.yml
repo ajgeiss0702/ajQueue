@@ -1,4 +1,4 @@
-image: gradle:6.8.2-jdk8
+image: gradle:7.2.0-jdk8
 
 # Cache downloaded dependencies and plugins between builds.
 # To keep cache across branches add 'key: "$CI_JOB_NAME"'
@@ -9,10 +9,10 @@ cache:
 
 
 build:
+  retry: 2
   stage: build
   script:
-    - rm -rf build
-    - gradle :free:shadowJar
+    - gradle clean :free:shadowJar
   artifacts:
     paths:
       - free/build/libs

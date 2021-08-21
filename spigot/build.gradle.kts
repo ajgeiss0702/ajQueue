@@ -7,13 +7,15 @@ group = "us.ajg0702.queue.spigot"
 
 repositories {
     //mavenLocal()
-    mavenCentral()
+
 
     maven { url = uri("https://repo.extendedclip.com/content/repositories/placeholderapi/") }
 
     maven { url = uri("https://repo.codemc.io/repository/nms/") }
 
     maven { url = uri("https://repo.ajg0702.us") }
+
+    mavenCentral()
 }
 
 dependencies {
@@ -22,7 +24,7 @@ dependencies {
 
     compileOnly("org.spongepowered:configurate-yaml:4.0.0")
 
-    compileOnly("us.ajg0702:ajUtils:1.1.9")
+    compileOnly("us.ajg0702:ajUtils:1.1.10")
 
     compileOnly(group = "org.spigotmc", name = "spigot", version = "1.16.5-R0.1-SNAPSHOT")
     compileOnly("me.clip:placeholderapi:2.10.4")

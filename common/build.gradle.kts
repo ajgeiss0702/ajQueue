@@ -7,8 +7,8 @@ group = "us.ajg0702.queue.common"
 
 repositories {
     //mavenLocal()
-    mavenCentral()
     maven { url = uri("https://repo.ajg0702.us") }
+    mavenCentral()
 }
 
 dependencies {
@@ -16,7 +16,7 @@ dependencies {
     compileOnly("net.kyori:adventure-text-serializer-plain:4.0.0-SNAPSHOT")
 
     compileOnly("com.google.guava:guava:30.1.1-jre")
-    compileOnly("us.ajg0702:ajUtils:1.1.9")
+    compileOnly("us.ajg0702:ajUtils:1.1.10")
 
     compileOnly("org.slf4j:slf4j-log4j12:1.7.29")
 

@@ -6,16 +6,15 @@ plugins {
 group = "us.ajg0702.queue.platforms.velocity"
 
 repositories {
-    //mavenLocal()
-    mavenCentral()
     maven { url = uri("https://repo.ajg0702.us") }
     maven { url = uri("https://nexus.velocitypowered.com/repository/maven-public/") }
+    mavenCentral()
 }
 
 dependencies {
     compileOnly("net.kyori:adventure-api:4.8.1")
     compileOnly("com.google.guava:guava:30.1.1-jre")
-    compileOnly("us.ajg0702:ajUtils:1.1.9")
+    compileOnly("us.ajg0702:ajUtils:1.1.10")
 
     compileOnly("com.velocitypowered:velocity-api:3.0.0")
     annotationProcessor("com.velocitypowered:velocity-api:3.0.0")

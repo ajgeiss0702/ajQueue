@@ -65,6 +65,11 @@ public interface QueueManager {
     void sendActionBars();
 
     /**
+     * Sends queue status titles to players in queues
+     */
+    void sendTitles();
+
+    /**
      * Tell the spigot sides to call the queue scoreboard event
      */
     void sendQueueEvents();

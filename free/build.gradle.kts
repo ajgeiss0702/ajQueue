@@ -7,10 +7,9 @@ plugins {
 group = "us.ajg0702.queue"
 
 repositories {
-    //mavenLocal()
-    mavenCentral()
     maven { url = uri("https://repo.ajg0702.us") }
     maven { url = uri("https://oss.sonatype.org/content/repositories/snapshots") }
+    mavenCentral()
 }
 
 dependencies {
@@ -18,7 +17,7 @@ dependencies {
     compileOnly("com.google.guava:guava:30.1.1-jre")
     compileOnly("org.spongepowered:configurate-yaml:4.0.0")
 
-    implementation("us.ajg0702:ajUtils:1.1.9")
+    implementation("us.ajg0702:ajUtils:1.1.10")
 
     implementation(project(":platforms:velocity"))
     implementation(project(":platforms:bungeecord"))

@@ -1,11 +1,11 @@
 package us.ajg0702.queue.logic;
 
 import us.ajg0702.queue.api.AliasManager;
-import us.ajg0702.queue.api.Logic;
-import us.ajg0702.queue.api.LogicGetter;
+import us.ajg0702.queue.api.premium.Logic;
+import us.ajg0702.queue.api.premium.LogicGetter;
 import us.ajg0702.queue.api.players.AdaptedPlayer;
+import us.ajg0702.queue.api.premium.PermissionGetter;
 import us.ajg0702.queue.common.QueueMain;
-import us.ajg0702.queue.logic.permissions.PermissionGetter;
 import us.ajg0702.utils.common.Config;
 
 import java.util.List;
@@ -30,5 +30,10 @@ public class LogicGetterImpl implements LogicGetter {
     public List<String> getPermissions(AdaptedPlayer player) {
         if(logic == null) return null;
         return logic.getPermissionGetter().getSelected().getPermissions(player);
+    }
+
+    @Override
+    public PermissionGetter getPermissionGetter() {
+        return logic.getPermissionGetter();
     }
 }

@@ -9,6 +9,7 @@ import us.ajg0702.utils.common.Messages;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class Pause extends SubCommand {
@@ -47,26 +48,36 @@ public class Pause extends SubCommand {
             return;
         }
 
-        QueueServer server = main.getQueueManager().findServer(args[0]);
-        if(server == null) {
+        List<QueueServer> servers;
+        QueueServer queueServer = main.getQueueManager().findServer(args[0]);
+        if(queueServer == null && !args[0].equalsIgnoreCase("all")) {
             sender.sendMessage(getMessages().getComponent("commands.pause.no-server", "SERVER:"+args[1]));
             return;
-        }
-        if(args.length == 1) {
-            server.setPaused(!server.isPaused());
+        } else if(queueServer == null && args[0].equalsIgnoreCase("all")) {
+            servers = main.getQueueManager().getServers();
         } else {
-            server.setPaused(args[1].equalsIgnoreCase("on") || args[1].equalsIgnoreCase("true"));
+            servers = Collections.singletonList(queueServer);
         }
-        sender.sendMessage(getMessages().getComponent("commands.pause.success",
-                "SERVER:"+server.getName(),
-                "PAUSED:"+getMessages().getString("commands.pause.paused."+server.isPaused())
-        ));
+
+        for(QueueServer server : servers) {
+            if(args.length == 1) {
+                server.setPaused(!server.isPaused());
+            } else {
+                server.setPaused(args[1].equalsIgnoreCase("on") || args[1].equalsIgnoreCase("true"));
+            }
+            sender.sendMessage(getMessages().getComponent("commands.pause.success",
+                    "SERVER:"+server.getName(),
+                    "PAUSED:"+getMessages().getString("commands.pause.paused."+server.isPaused())
+            ));
+        }
     }
 
     @Override
     public List<String> autoComplete(ICommandSender sender, String[] args) {
         if(args.length == 1) {
-            return main.getQueueManager().getServerNames();
+            List<String> servers = new ArrayList<>(main.getQueueManager().getServerNames());
+            servers.add("all");
+            return servers;
         }
         if(args.length == 2) {
             return Arrays.asList("on", "off", "true", "false");
