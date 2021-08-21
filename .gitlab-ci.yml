@@ -9,6 +9,7 @@ cache:
 
 
 build:
+  retry: 2
   stage: build
   script:
     - rm -rf build
