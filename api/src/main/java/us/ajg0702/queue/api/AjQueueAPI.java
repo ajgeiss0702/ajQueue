@@ -1,9 +1,5 @@
-package us.ajg0702.queue.common;
+package us.ajg0702.queue.api;
 
-import us.ajg0702.queue.api.AliasManager;
-import us.ajg0702.queue.api.EventHandler;
-import us.ajg0702.queue.api.PlatformMethods;
-import us.ajg0702.queue.api.QueueManager;
 import us.ajg0702.queue.api.premium.Logic;
 import us.ajg0702.queue.api.premium.LogicGetter;
 import us.ajg0702.queue.api.util.QueueLogger;
@@ -78,12 +74,6 @@ public abstract class AjQueueAPI {
      * @return The ajQueue logger
      */
     public abstract QueueLogger getLogger();
-
-    /**
-     * Gets the repeating task manager
-     * @return The TaskManager
-     */
-    public abstract TaskManager getTaskManager();
 
     /**
      * Gets the event handler.

@@ -72,7 +72,6 @@ public class QueueMain extends AjQueueAPI {
     }
 
     private final TaskManager taskManager = new TaskManager(this);
-    @Override
     public TaskManager getTaskManager() {
         return taskManager;
     }
