@@ -23,7 +23,9 @@ public class BungeeServerPing implements AdaptedServerPing {
 
     @Override
     public String getPlainDescription() {
-        return handle.getDescriptionComponent().toPlainText();
+        BaseComponent desc = handle.getDescriptionComponent();
+        if(desc == null) return "";
+        return desc.toPlainText();
     }
 
     @Override
