@@ -160,7 +160,10 @@ public class QueueServerImpl implements QueueServer {
                 maxPlayers = 0;
                 for(AdaptedServer pingedServer : pings.keySet()) {
                     AdaptedServerPing serverPing = pings.get(pingedServer);
-                    if(serverPing == null) {
+                    if(serverPing == null || serverPing.getPlainDescription() == null) {
+                        if(serverPing != null) {
+                            pings.put(pingedServer, null);
+                        }
                         continue;
                     }
                     if(serverPing.getPlainDescription().contains("ajQueue;whitelisted=")) {
