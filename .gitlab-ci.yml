@@ -14,6 +14,7 @@ build:
   script:
     - gradle clean :free:shadowJar
   artifacts:
+    untracked: true
     paths:
       - free/build/libs
 
