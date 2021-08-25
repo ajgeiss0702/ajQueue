@@ -125,6 +125,11 @@ public class BungeePlayer implements AdaptedPlayer, Audience {
     }
 
     @Override
+    public int getProtocolVersion() {
+        return handle.getPendingConnection().getVersion();
+    }
+
+    @Override
     public String getName() {
         return handle.getName();
     }

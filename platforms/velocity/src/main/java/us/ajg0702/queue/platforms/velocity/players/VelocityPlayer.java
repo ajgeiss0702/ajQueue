@@ -132,6 +132,11 @@ public class VelocityPlayer implements AdaptedPlayer, Audience {
     }
 
     @Override
+    public int getProtocolVersion() {
+        return handle.getProtocolVersion().getProtocol();
+    }
+
+    @Override
     public String getName() {
         return handle.getUsername();
     }
