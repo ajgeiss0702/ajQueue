@@ -19,10 +19,7 @@ import us.ajg0702.queue.commands.commands.PlayerSender;
 import us.ajg0702.queue.platforms.velocity.players.VelocityPlayer;
 import us.ajg0702.queue.platforms.velocity.server.VelocityServer;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Optional;
+import java.util.*;
 
 @SuppressWarnings("OptionalIsPresent")
 public class VelocityMethods implements PlatformMethods {
@@ -96,7 +93,15 @@ public class VelocityMethods implements PlatformMethods {
     public AdaptedPlayer getPlayer(String name) {
         Optional<Player> player = proxyServer.getPlayer(name);
         if(!player.isPresent()) {
-            System.out.println("Player "+name+" not found");
+            return null;
+        }
+        return new VelocityPlayer(player.get());
+    }
+
+    @Override
+    public AdaptedPlayer getPlayer(UUID uuid) {
+        Optional<Player> player = proxyServer.getPlayer(uuid);
+        if(!player.isPresent()) {
             return null;
         }
         return new VelocityPlayer(player.get());
