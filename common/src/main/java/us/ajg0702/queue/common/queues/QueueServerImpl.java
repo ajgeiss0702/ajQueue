@@ -62,6 +62,8 @@ public class QueueServerImpl implements QueueServer {
 
     private final List<QueuePlayer> queue = new ArrayList<>();
 
+    private List<Integer> supportedProtocols = new ArrayList<>();
+
 
     private int playerCount;
     private int maxPlayers;
@@ -408,5 +410,15 @@ public class QueueServerImpl implements QueueServer {
     @Override
     public HashMap<AdaptedServer, AdaptedServerPing> getLastPings() {
         return new HashMap<>(pings);
+    }
+
+    @Override
+    public List<Integer> getSupportedProtocols() {
+        return new ArrayList<>(supportedProtocols);
+    }
+
+    @Override
+    public void setSupportedProtocols(List<Integer> list) {
+        supportedProtocols = new ArrayList<>(list);
     }
 }

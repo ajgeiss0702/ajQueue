@@ -218,6 +218,20 @@ public interface QueueServer {
      */
     HashMap<AdaptedServer, AdaptedServerPing> getLastPings();
 
+    /**
+     * Gets the protocol versions this queue supports.
+     * A blank list means all protocols are supported.
+     * @return The protocol versions this queue supports
+     */
+    List<Integer> getSupportedProtocols();
+
+    /**
+     * Sets the protocols that are supported
+     * A blank list means all protocols are supported.
+     * @param list the list of protocols that are supported
+     */
+    void setSupportedProtocols(List<Integer> list);
+
 
     /**
      * elliot is bad

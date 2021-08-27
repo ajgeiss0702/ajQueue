@@ -94,6 +94,12 @@ public class QueueMain extends AjQueueAPI {
         return logicGetter;
     }
 
+    private ProtocolNameManager protocolNameManager;
+    @Override
+    public ProtocolNameManager getProtocolNameManager() {
+        return protocolNameManager;
+    }
+
     @Override
     public void shutdown() {
         taskManager.shutdown();
@@ -140,6 +146,8 @@ public class QueueMain extends AjQueueAPI {
         logic = logicGetter.constructLogic();
         aliasManager = logicGetter.constructAliasManager(config);
 
+        protocolNameManager = new ProtocolNameManagerImpl(config, platformMethods);
+
         taskManager.rescheduleTasks();
 
     }
@@ -168,6 +176,9 @@ public class QueueMain extends AjQueueAPI {
         d.put("errors.already-connected", "&cYou are already connected to this server!");
         d.put("errors.cant-join-paused", "&cYou cannot join the queue for {SERVER} because it is paused.");
         d.put("errors.deny-joining-from-server", "&cYou are not allowed to join queues from this server!");
+        d.put("errors.wrong-version.base", "<red>You must be on {VERSIONS} to join this server!");
+        d.put("errors.wrong-version.or", " or ");
+        d.put("errors.wrong-version.comma", ", ");
 
         d.put("commands.leave-queue", "&aYou left the queue for {SERVER}!");
         d.put("commands.reload", "&aConfig and messages reloaded successfully!");

@@ -126,4 +126,9 @@ public class BungeeMethods implements PlatformMethods {
 
         return result;
     }
+
+    @Override
+    public String getProtocolName(int protocol) {
+        return protocol+"";
+    }
 }

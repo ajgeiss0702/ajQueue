@@ -2,6 +2,7 @@ package us.ajg0702.queue.platforms.velocity;
 
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
+import com.velocitypowered.api.network.ProtocolVersion;
 import com.velocitypowered.api.plugin.PluginContainer;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
@@ -146,5 +147,10 @@ public class VelocityMethods implements PlatformMethods {
         proxyServer.getAllServers().forEach(registeredServer -> result.add(new VelocityServer(registeredServer)));
 
         return result;
+    }
+
+    @Override
+    public String getProtocolName(int protocol) {
+        return ProtocolVersion.getProtocolVersion(protocol).getMostRecentSupportedVersion();
     }
 }

@@ -16,7 +16,6 @@ public interface PlatformMethods {
      * @param channel The (sub)channel
      * @param data The data
      */
-    @SuppressWarnings("EmptyMethod")
     void sendPluginMessage(AdaptedPlayer player, String channel, String... data);
 
     /**
@@ -28,6 +27,7 @@ public interface PlatformMethods {
 
     String getPluginVersion();
 
+    @SuppressWarnings("unused")
     List<AdaptedPlayer> getOnlinePlayers();
     List<String> getPlayerNames(boolean lowercase);
 
@@ -74,4 +74,6 @@ public interface PlatformMethods {
     AdaptedServer getServer(String name);
 
     List<AdaptedServer> getServers();
+
+    String getProtocolName(int protocol);
 }

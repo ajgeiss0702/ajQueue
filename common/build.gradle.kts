@@ -12,6 +12,8 @@ repositories {
 }
 
 dependencies {
+    testImplementation("junit:junit:4.12")
+
     compileOnly("net.kyori:adventure-api:4.8.1")
     compileOnly("net.kyori:adventure-text-serializer-plain:4.0.0-SNAPSHOT")
 
