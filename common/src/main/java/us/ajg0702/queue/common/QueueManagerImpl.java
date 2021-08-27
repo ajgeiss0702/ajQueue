@@ -55,6 +55,35 @@ public class QueueManagerImpl implements QueueManager {
             result.add(queueServer);
         }
 
+        List<String> supportedProtocolsRaw = main.getConfig().getStringList("supported-protocols");
+        for(String supportedProtocolsString : supportedProtocolsRaw) {
+            String[] parts = supportedProtocolsString.split(":");
+            if(parts.length < 2) {
+                main.getLogger().warn("Invalid supported protocols entry! Must have a colon to seperate the server(s) and the protocols");
+                continue;
+            }
+            String serversRaw = parts[0];
+            String protocolsRaw = parts[1];
+
+            List<Integer> protocols = new ArrayList<>();
+            for(String protocolString : protocolsRaw.split(",")) {
+                try {
+                    protocols.add(Integer.valueOf(protocolString));
+                } catch(NumberFormatException e) {
+                    main.getLogger().info("The protocol "+protocolString+" is not a valid number!");
+                }
+            }
+
+            for(String serverName : serversRaw.split(",")) {
+                for(QueueServer server : result) {
+                    if(serverName.equalsIgnoreCase(server.getName())) {
+                        server.setSupportedProtocols(protocols);
+                        break;
+                    }
+                }
+            }
+        }
+
         return result;
     }
 
@@ -67,6 +96,22 @@ public class QueueManagerImpl implements QueueManager {
 
         if(main.getConfig().getBoolean("joinfrom-server-permission") && !player.hasPermission("ajqueue.joinfrom."+player.getServerName())) {
             player.sendMessage(msgs.getComponent("errors.deny-joining-from-server"));
+            return false;
+        }
+
+        int playerVersion = player.getProtocolVersion();
+        List<Integer> supportedProtocols = server.getSupportedProtocols();
+        if(!supportedProtocols.contains(playerVersion) && supportedProtocols.size() > 0) {
+            StringBuilder versions = new StringBuilder();
+            for(int protocol : supportedProtocols) {
+                versions.append(main.getProtocolNameManager().getProtocolName(protocol));
+                if(supportedProtocols.indexOf(protocol) == supportedProtocols.size()-2) {
+                    versions.append(msgs.getString("errors.wrong-version.or"));
+                } else if(supportedProtocols.indexOf(protocol) != supportedProtocols.size()-1) {
+                    versions.append(msgs.getString("errors.wrong-version.comma"));
+                }
+            }
+            player.sendMessage(msgs.getComponent("errors.wrong-version.base", "VERSIONS:" + versions));
             return false;
         }
 

@@ -96,6 +96,13 @@ public abstract class AjQueueAPI {
     public abstract LogicGetter getLogicGetter();
 
     /**
+     * Gets the protocol name manager
+     * Used to get version names from protocol versions
+     * @return The ProtocolNameManager
+     */
+    public abstract ProtocolNameManager getProtocolNameManager();
+
+    /**
      * Tells ajQueue to shut down.
      */
     public abstract void shutdown();

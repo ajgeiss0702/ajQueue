@@ -6,6 +6,7 @@ import us.ajg0702.queue.api.players.AdaptedPlayer;
 import us.ajg0702.queue.api.server.AdaptedServer;
 
 import java.util.List;
+import java.util.UUID;
 
 public interface PlatformMethods {
 
@@ -15,7 +16,6 @@ public interface PlatformMethods {
      * @param channel The (sub)channel
      * @param data The data
      */
-    @SuppressWarnings("EmptyMethod")
     void sendPluginMessage(AdaptedPlayer player, String channel, String... data);
 
     /**
@@ -27,12 +27,34 @@ public interface PlatformMethods {
 
     String getPluginVersion();
 
+    @SuppressWarnings("unused")
     List<AdaptedPlayer> getOnlinePlayers();
     List<String> getPlayerNames(boolean lowercase);
+
+    /**
+     * Gets an online player by their name
+     * @param name The players name
+     * @return The AdaptedPlayer for this player
+     */
     AdaptedPlayer getPlayer(String name);
 
+    /**
+     * Gets an online player by their UUID
+     * @param uuid their UUID
+     * @return the AdaptedPlayer for this player
+     */
+    AdaptedPlayer getPlayer(UUID uuid);
+
+    /**
+     * Gets a list of the server names
+     * @return A list of the server names
+     */
     List<String> getServerNames();
 
+    /**
+     * Gets the name of the implementation. E.g. bungeecord, velocity
+     * @return the name of the implementation
+     */
     String getImplementationName();
 
     List<IBaseCommand> getCommands();
@@ -44,7 +66,14 @@ public interface PlatformMethods {
      */
     boolean hasPlugin(String pluginName);
 
+    /**
+     * Gets an AdaptedServer from the server name
+     * @param name The name of the server
+     * @return The AdaptedServer
+     */
     AdaptedServer getServer(String name);
 
     List<AdaptedServer> getServers();
+
+    String getProtocolName(int protocol);
 }

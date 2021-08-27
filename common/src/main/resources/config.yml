@@ -1,5 +1,13 @@
 # Dont touch this number please
-config-version: 25
+config-version: 26
+
+
+# This is the main config for ajQueue.
+# If you have any questions, make sure to read the comment above the options first,
+#  then feel free to join my discord and ask for support.
+# Discord invite link is on the plugin page.
+
+
 
 # The time the server will wait between sending people in the queue
 #  Default: 5
@@ -198,3 +206,50 @@ priority-messages:
 # The title shows what position the player is in the queue
 #  Default: false
 send-title: false
+
+# What protocols do servers support?
+# The protocol version number list can be found here: https://wiki.vg/Protocol_version_numbers
+# Format: server(s):protocol(s)
+# Example: 1.17:755,756
+#  This example will only allow 1.17 and 1.17.1 on the server called 1.17
+# Example: lobby-1,lobby-2,lobby-3:754,755,756
+#  This example will only allow 1.16.5, 1.17, and 1.17.1 on the 3 lobby servers
+supported-protocols:
+  - "1.17:755,756"
+
+
+# These are the protocol names the plugin should use.
+# If you are on velocity, if the protocol is not listed here then the velocity
+#  api will be used to find the name of the protocol.
+# If you are on bungee, only this list can be used.
+protocol-names:
+  - "756:1.17.1"
+  - "755:1.17"
+  - "754:1.16.5"
+  - "753:1.16.3"
+  - "751:1.16.2"
+  - "736:1.16.1"
+  - "735:1.16"
+  - "578:1.15.2"
+  - "575:1.15.1"
+  - "573:1.15"
+  - "498:1.14.4"
+  - "490:1.14.3"
+  - "485:1.14.2"
+  - "480:1.14.1"
+  - "477:1.14"
+  - "404:1.13.2"
+  - "401:1.13.1"
+  - "393:1.13"
+  - "340:1.12.2"
+  - "338:1.12.1"
+  - "335:1.12"
+  - "316:1.11.2"
+  - "315:1.11"
+  - "210:1.10.2"
+  - "110:1.9.4"
+  - "109:1.9.2"
+  - "108:1.9.1"
+  - "107:1.9"
+  - "47:1.8.9"
+  - "5:1.7.10"

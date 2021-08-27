@@ -67,6 +67,12 @@ public interface AdaptedPlayer extends Handle, Audience {
     void connect(AdaptedServer server);
 
     /**
+     * Returns the version this player is running.
+     * @return the version
+     */
+    int getProtocolVersion();
+
+    /**
      * Gets the player's username
      * @return the player's username
      */

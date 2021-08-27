@@ -2,6 +2,7 @@ package us.ajg0702.queue.platforms.velocity;
 
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
+import com.velocitypowered.api.network.ProtocolVersion;
 import com.velocitypowered.api.plugin.PluginContainer;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
@@ -19,10 +20,7 @@ import us.ajg0702.queue.commands.commands.PlayerSender;
 import us.ajg0702.queue.platforms.velocity.players.VelocityPlayer;
 import us.ajg0702.queue.platforms.velocity.server.VelocityServer;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Optional;
+import java.util.*;
 
 @SuppressWarnings("OptionalIsPresent")
 public class VelocityMethods implements PlatformMethods {
@@ -96,7 +94,15 @@ public class VelocityMethods implements PlatformMethods {
     public AdaptedPlayer getPlayer(String name) {
         Optional<Player> player = proxyServer.getPlayer(name);
         if(!player.isPresent()) {
-            System.out.println("Player "+name+" not found");
+            return null;
+        }
+        return new VelocityPlayer(player.get());
+    }
+
+    @Override
+    public AdaptedPlayer getPlayer(UUID uuid) {
+        Optional<Player> player = proxyServer.getPlayer(uuid);
+        if(!player.isPresent()) {
             return null;
         }
         return new VelocityPlayer(player.get());
@@ -141,5 +147,14 @@ public class VelocityMethods implements PlatformMethods {
         proxyServer.getAllServers().forEach(registeredServer -> result.add(new VelocityServer(registeredServer)));
 
         return result;
+    }
+
+    @Override
+    public String getProtocolName(int protocol) {
+        String version = ProtocolVersion.getProtocolVersion(protocol).getMostRecentSupportedVersion();
+        if(version.equalsIgnoreCase("Unknown")) {
+            return protocol+"";
+        }
+        return version;
     }
 }

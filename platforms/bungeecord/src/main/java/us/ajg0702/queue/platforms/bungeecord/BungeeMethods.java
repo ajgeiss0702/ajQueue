@@ -16,10 +16,7 @@ import us.ajg0702.queue.commands.commands.PlayerSender;
 import us.ajg0702.queue.platforms.bungeecord.players.BungeePlayer;
 import us.ajg0702.queue.platforms.bungeecord.server.BungeeServer;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Locale;
+import java.util.*;
 
 public class BungeeMethods implements PlatformMethods {
 
@@ -88,6 +85,13 @@ public class BungeeMethods implements PlatformMethods {
     }
 
     @Override
+    public AdaptedPlayer getPlayer(UUID uuid) {
+        ProxiedPlayer player = proxyServer.getPlayer(uuid);
+        if(player == null) return null;
+        return new BungeePlayer(player);
+    }
+
+    @Override
     public List<String> getServerNames() {
         return new ArrayList<>(proxyServer.getServers().keySet());
     }
@@ -121,5 +125,10 @@ public class BungeeMethods implements PlatformMethods {
         proxyServer.getServers().forEach((s, serverInfo) -> result.add(new BungeeServer(serverInfo)));
 
         return result;
+    }
+
+    @Override
+    public String getProtocolName(int protocol) {
+        return protocol+"";
     }
 }
