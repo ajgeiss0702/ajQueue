@@ -151,6 +151,10 @@ public class VelocityMethods implements PlatformMethods {
 
     @Override
     public String getProtocolName(int protocol) {
-        return ProtocolVersion.getProtocolVersion(protocol).getMostRecentSupportedVersion();
+        String version = ProtocolVersion.getProtocolVersion(protocol).getMostRecentSupportedVersion();
+        if(version.equalsIgnoreCase("Unknown")) {
+            return protocol+"";
+        }
+        return version;
     }
 }
