@@ -18,6 +18,7 @@ public class BungeeSender implements ICommandSender {
 
     @Override
     public boolean hasPermission(String permission) {
+        if(permission == null) return true;
         return handle.hasPermission(permission);
     }
 
