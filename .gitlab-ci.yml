@@ -13,10 +13,13 @@ build:
   stage: build
   script:
     - gradle clean :free:shadowJar
+    - mv free/build/libs/ajQueue*.jar jars/
+    - gradle :premium:shadowJar
+    - mv premium/build/libs/ajQueue*.jar jars/
   artifacts:
     untracked: true
     paths:
-      - free/build/libs
+      - jars
 
 pages:
   stage: build
@@ -54,6 +57,7 @@ upload to updater:
   dependencies:
     - build
   script:
-    - cd free/build/libs
+    - cd jars
     - files=(*)
     - curl -i -F "submit=true" -F "secret=$UPLOAD_SECRET" -F "file=@${files[0]}" https://ajg0702.us/pl/updater/upload.php
+    - curl -i -F "submit=true" -F "secret=$UPLOAD_SECRET" -F "file=@${files[1]}" https://ajg0702.us/pl/updater/upload.php

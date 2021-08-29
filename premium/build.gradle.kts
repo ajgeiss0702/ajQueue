@@ -21,6 +21,8 @@ dependencies {
 
     compileOnly("com.google.guava:guava:30.1.1-jre")
 
+    compileOnly("me.TechsCode:FakeUltraPerms:1.0.2")
+
     compileOnly("us.ajg0702:ajUtils:1.1.10")
 
     compileOnly("net.kyori:adventure-api:4.8.1")
