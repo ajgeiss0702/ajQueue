@@ -13,9 +13,10 @@ build:
   stage: build
   script:
     - gradle clean :free:shadowJar
-    - mv free/build/libs/ajQueue*.jar jars/
+    - mkdir jars
+    - cp free/build/libs/ajQueue*.jar jars/
     - gradle :premium:shadowJar
-    - mv premium/build/libs/ajQueue*.jar jars/
+    - cp premium/build/libs/ajQueue*.jar jars/
   artifacts:
     untracked: true
     paths:
