@@ -19,6 +19,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 public class QueueManagerImpl implements QueueManager {
@@ -474,9 +476,14 @@ public class QueueManagerImpl implements QueueManager {
 
     @Override
     public void updateServers() {
+        ExecutorService pool = main.getTaskManager().getServersUpdateExecutor();
+        if (pool instanceof ThreadPoolExecutor && main.getConfig().getBoolean("pinger-debug")) {
+            main.getLogger().info("[pinger] Server update thread pool has "
+                    +((ThreadPoolExecutor) pool).getActiveCount()+" threads");
+        }
         try {
             for(QueueServer server : servers) {
-                server.updatePing();
+                pool.submit(server::updatePing);
             }
         } catch(Exception e) {
             e.printStackTrace();

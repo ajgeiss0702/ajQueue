@@ -249,10 +249,10 @@ public class QueueServerImpl implements QueueServer {
         if(p != null && isWhitelisted() && !whitelistedUUIDs.contains(p.getUniqueId())) {
             return false;
         }
-        return this.isOnline() &&
-                this.canAccess(p) &&
-                !this.isFull() &&
-                !this.isPaused();
+        return isOnline() &&
+                canAccess(p) &&
+                !isFull() &&
+                !isPaused();
     }
 
     @Override

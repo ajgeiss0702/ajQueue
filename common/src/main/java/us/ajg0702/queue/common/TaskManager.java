@@ -2,16 +2,15 @@ package us.ajg0702.queue.common;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.*;
 
 public class TaskManager {
 
 
     final ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
     final ScheduledExecutorService updateExecutor = Executors.newScheduledThreadPool(1);
+
+    final ExecutorService serversUpdateExecutor = Executors.newCachedThreadPool();
 
     final QueueMain main;
     public TaskManager(QueueMain main) {
@@ -21,6 +20,11 @@ public class TaskManager {
     public void shutdown() {
         executor.shutdown();
         updateExecutor.shutdown();
+        serversUpdateExecutor.shutdown();
+    }
+
+    public ExecutorService getServersUpdateExecutor() {
+        return serversUpdateExecutor;
     }
 
     public String taskStatus() {
@@ -52,7 +56,7 @@ public class TaskManager {
         updateTask = scheduleAtFixedRate(updateExecutor,
                 main.getQueueManager()::updateServers,
                 500L,
-                (long) (Math.max(main.getTimeBetweenPlayers(), 2)*1000L),
+                (long) (Math.max(main.getTimeBetweenPlayers()/2, 1)*1000L),
                 TimeUnit.MILLISECONDS
         );
 
