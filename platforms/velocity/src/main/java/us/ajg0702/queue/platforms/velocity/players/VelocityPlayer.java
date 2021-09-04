@@ -121,9 +121,27 @@ public class VelocityPlayer implements AdaptedPlayer, Audience {
                 result -> {
                     if(!result.isSuccessful()) {
                         QueueMain main = QueueMain.getInstance();
-                        Component reason = result.getReasonComponent().orElseGet(
-                                () -> Component.text("Connection failed")
-                        );
+                        Component reason = result.getReasonComponent().orElse(null);
+                        if(reason == null) {
+                            switch (result.getStatus()) {
+                                case SUCCESS:
+                                    reason = Component.text("Success");
+                                    break;
+                                case ALREADY_CONNECTED:
+                                    reason = Component.text("Already connected");
+                                    break;
+                                case CONNECTION_IN_PROGRESS:
+                                    reason = Component.text("Already connecting");
+                                    break;
+                                case CONNECTION_CANCELLED:
+                                    reason = Component.text("Connection canceled");
+                                    break;
+                                case SERVER_DISCONNECTED:
+                                    reason = Component.text("Connection failed with unknown reason");
+                                    break;
+                            }
+                        }
+
                         if(main.getConfig().getBoolean("velocity-kick-message")) {
                             handle.sendMessage(
                                     main.getMessages().getComponent(
