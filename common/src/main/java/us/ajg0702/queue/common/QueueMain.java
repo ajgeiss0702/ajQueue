@@ -225,6 +225,8 @@ public class QueueMain extends AjQueueAPI {
         d.put("max-tries-reached", "&cUnable to connect to {SERVER}. Max retries reached.");
         d.put("auto-queued", "&aYou've been auto-queued for {SERVER} because you were kicked.");
 
+        d.put("velocity-kick-message", "<red>You were kicked while trying to join {SERVER}: <white>{REASON}");
+
         messages = new Messages(dataFolder, new LogConverter(logger), d);
     }
 }

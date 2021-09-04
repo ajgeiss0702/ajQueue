@@ -1,5 +1,5 @@
 # Dont touch this number please
-config-version: 26
+config-version: 27
 
 
 # This is the main config for ajQueue.
@@ -253,3 +253,8 @@ protocol-names:
   - "107:1.9"
   - "47:1.8.9"
   - "5:1.7.10"
+
+# On velocity, should we end a player a message when they are kicked while trying to connect to a server with the queue?
+# This has no effect on bungee, because the message is sent from bungee and theres no way to change that in ajQueue
+#  Default: false
+velocity-kick-message: false
