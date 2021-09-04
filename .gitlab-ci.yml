@@ -23,6 +23,7 @@ build:
       - jars
 
 pages:
+  retry: 2
   stage: build
   image: gradle:6.8.3-jdk15
   only:
@@ -35,6 +36,7 @@ pages:
       - public
 
 test:
+  retry: 2
   stage: test
   dependencies:
     - build
