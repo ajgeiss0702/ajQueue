@@ -7,6 +7,7 @@ import us.ajg0702.queue.api.commands.ICommandSender;
 import us.ajg0702.queue.api.commands.ISubCommand;
 import us.ajg0702.utils.common.Messages;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
@@ -68,7 +69,8 @@ public class BaseCommand implements IBaseCommand {
     }
 
     public List<String> filterCompletion(List<String> in, String current) {
-        in.removeIf(t -> !t.toLowerCase(Locale.ROOT).contains(current.toLowerCase(Locale.ROOT)));
-        return in;
+        List<String> out = new ArrayList<>(in);
+        out.removeIf(t -> !t.toLowerCase(Locale.ROOT).contains(current.toLowerCase(Locale.ROOT)));
+        return out;
     }
 }
