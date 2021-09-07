@@ -16,6 +16,3 @@ updating my plugin.
 
 If you need *any* help making your changes, feel free to contact me
 on discord. The invite link is on the plugin page ;)
-
-# Note on compiling ajQueuePlus
-If you want to compile ajQueuePlus, please read the readme file that is in libs/private

@@ -9,6 +9,7 @@ import us.ajg0702.queue.common.utils.LogConverter;
 import us.ajg0702.queue.logic.LogicGetterImpl;
 import us.ajg0702.utils.common.Config;
 import us.ajg0702.utils.common.Messages;
+import us.ajg0702.utils.common.Updater;
 
 import java.io.File;
 import java.util.LinkedHashMap;
@@ -100,9 +101,15 @@ public class QueueMain extends AjQueueAPI {
         return protocolNameManager;
     }
 
+    private Updater updater;
+    public Updater getUpdater() {
+        return updater;
+    }
+
     @Override
     public void shutdown() {
         taskManager.shutdown();
+        updater.shutdown();
     }
 
 
@@ -149,6 +156,8 @@ public class QueueMain extends AjQueueAPI {
         protocolNameManager = new ProtocolNameManagerImpl(config, platformMethods);
 
         taskManager.rescheduleTasks();
+
+        updater = new Updater(logger, platformMethods.getPluginVersion(), isPremium() ? "ajQueuePlus" : "ajQueue", config.getBoolean("enable-updater"), isPremium() ? 79123 : 78266, dataFolder.getParentFile(), "ajQueue update");
 
     }
 
@@ -224,6 +233,20 @@ public class QueueMain extends AjQueueAPI {
 
         d.put("max-tries-reached", "&cUnable to connect to {SERVER}. Max retries reached.");
         d.put("auto-queued", "&aYou've been auto-queued for {SERVER} because you were kicked.");
+
+        d.put("velocity-kick-message", "<red>You were kicked while trying to join {SERVER}: <white>{REASON}");
+
+        d.put("updater.update-available",
+                "<gray><strikethrough>                                                         <reset>\n" +
+                        "  <green>An update is available for ajQueue!\n" +
+                        "  <dark_green>You can download it by " +
+                        "<click:run_command:/ajqueue update><bold>clicking here</bold>\n    or running <gray>/ajQueue update</click>\n" +
+                        "<gray><strikethrough>                                                         <reset>"
+        );
+        d.put("updater.no-update", "<red>There is not an update available");
+        d.put("updater.success", "<green>The update has been downloaded! Now just restart the server");
+        d.put("updater.fail", "<red>An error occurred while downloading the update. Check the console for more info.");
+        d.put("updater.already-downloaded", "<red>The update has already been downloaded.");
 
         messages = new Messages(dataFolder, new LogConverter(logger), d);
     }

@@ -94,7 +94,7 @@ public class VelocityPlayer implements AdaptedPlayer, Audience {
 
     @Override
     public void sendMessage(String message) {
-        handle.sendMessage(Component.text().content(message));
+        sendMessage(Component.text().content(message));
     }
 
     @Override
@@ -120,10 +120,41 @@ public class VelocityPlayer implements AdaptedPlayer, Audience {
         handle.createConnectionRequest((RegisteredServer) server.getHandle()).connect().thenAcceptAsync(
                 result -> {
                     if(!result.isSuccessful()) {
-                        QueueMain.getInstance().getEventHandler().onServerKick(
+                        QueueMain main = QueueMain.getInstance();
+                        Component reason = result.getReasonComponent().orElse(null);
+                        if(reason == null) {
+                            switch (result.getStatus()) {
+                                case SUCCESS:
+                                    reason = Component.text("Success");
+                                    break;
+                                case ALREADY_CONNECTED:
+                                    reason = Component.text("Already connected");
+                                    break;
+                                case CONNECTION_IN_PROGRESS:
+                                    reason = Component.text("Already connecting");
+                                    break;
+                                case CONNECTION_CANCELLED:
+                                    reason = Component.text("Connection canceled");
+                                    break;
+                                case SERVER_DISCONNECTED:
+                                    reason = Component.text("Connection failed with unknown reason");
+                                    break;
+                            }
+                        }
+
+                        if(main.getConfig().getBoolean("velocity-kick-message")) {
+                            handle.sendMessage(
+                                    main.getMessages().getComponent(
+                                            "velocity-kick-message",
+                                            "SERVER:"+server.getName(),
+                                            "REASON:"+reason
+                                    )
+                            );
+                        }
+                        main.getEventHandler().onServerKick(
                                 this,
                                 server,
-                                result.getReasonComponent().orElseGet(() -> Component.text("Connection failed")),
+                                reason,
                                 false
                         );
                     }

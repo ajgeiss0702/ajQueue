@@ -75,7 +75,7 @@ public class QueueCommand extends BaseCommand {
             return new ArrayList<>();
         }
         if(args.length == 1) {
-            return main.getQueueManager().getServerNames();
+            return filterCompletion(main.getQueueManager().getServerNames(), args[0]);
         }
         return new ArrayList<>();
     }

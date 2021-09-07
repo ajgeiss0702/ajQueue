@@ -1,5 +1,5 @@
 # Dont touch this number please
-config-version: 26
+config-version: 28
 
 
 # This is the main config for ajQueue.
@@ -22,9 +22,10 @@ offline-time: 120
 message-time: 10
 
 # If a player is in a server, you can have the plugin make them automatically join a queue for another server
-# Example with the default values: Player joins survivalqueue server, they will auto-join the queue for survival
+# Example with the default values: Player joins the limbo server, they will auto-join the queue for the lobbys group
+# Note that you dont have to use groups. Just put the name of a server to use a single server instead.
 queue-servers:
-  - 'survivalqueue:survival'
+  - 'limbo:lobbys'
 
 # Should the plugin send an actionbar to the player?
 # The actionbar contains some info such as which server they are queued for, what position they are in, estimated time remaining, etc.
@@ -253,3 +254,11 @@ protocol-names:
   - "107:1.9"
   - "47:1.8.9"
   - "5:1.7.10"
+
+# On velocity, should we end a player a message when they are kicked while trying to connect to a server with the queue?
+# This has no effect on bungee, because the message is sent from bungee and theres no way to change that in ajQueue
+#  Default: false
+velocity-kick-message: false
+
+# Should the updater be enabled?
+enable-updater: true

@@ -30,6 +30,7 @@ public class ManageCommand extends BaseCommand {
         addSubCommand(new Send(main));
         addSubCommand(new PermissionList(main));
         addSubCommand(new Whitelist(main));
+        addSubCommand(new Update(main));
     }
 
 

@@ -8,20 +8,21 @@ import us.ajg0702.queue.api.commands.ICommandSender;
 import us.ajg0702.queue.commands.SubCommand;
 import us.ajg0702.queue.common.QueueMain;
 import us.ajg0702.utils.common.Messages;
+import us.ajg0702.utils.common.Updater;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class Reload extends SubCommand {
+public class Update extends SubCommand {
 
     final QueueMain main;
-    public Reload(QueueMain main) {
+    public Update(QueueMain main) {
         this.main = main;
     }
 
     @Override
     public String getName() {
-        return "reload";
+        return "update";
     }
 
     @Override
@@ -31,7 +32,7 @@ public class Reload extends SubCommand {
 
     @Override
     public String getPermission() {
-        return "ajqueue.manage.reload";
+        return "ajqueue.manage.update";
     }
 
     @Override
@@ -42,22 +43,20 @@ public class Reload extends SubCommand {
     @Override
     public void execute(ICommandSender sender, String[] args) {
         if(!checkPermission(sender)) return;
-        main.getMessages().reload();
-        try {
-            main.getConfig().reload();
-        } catch (ConfigurateException e) {
-            sender.sendMessage(Component.text("An error occurred while reloading. Check the console").color(NamedTextColor.RED));
-            e.printStackTrace();
+        Updater updater = main.getUpdater();
+        if(updater.isAlreadyDownloaded()) {
+            sender.sendMessage(getMessages().getComponent("updater.already-downloaded"));
             return;
         }
-        main.setTimeBetweenPlayers();
-        main.getTaskManager().rescheduleTasks();
-        main.getQueueManager().reloadServers();
-        main.getMessages().reload();
-
-        main.getUpdater().setEnabled(main.getConfig().getBoolean("enable-updater"));
-
-        sender.sendMessage(getMessages().getComponent("commands.reload"));
+        if(!updater.isUpdateAvailable()) {
+            sender.sendMessage(getMessages().getComponent("updater.no-update"));
+            return;
+        }
+        if(updater.downloadUpdate()) {
+            sender.sendMessage(getMessages().getComponent("updater.success"));
+        } else {
+            sender.sendMessage(getMessages().getComponent("updater.fail"));
+        }
     }
 
     @Override
