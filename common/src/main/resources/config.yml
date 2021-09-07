@@ -1,5 +1,5 @@
 # Dont touch this number please
-config-version: 27
+config-version: 28
 
 
 # This is the main config for ajQueue.
@@ -259,3 +259,6 @@ protocol-names:
 # This has no effect on bungee, because the message is sent from bungee and theres no way to change that in ajQueue
 #  Default: false
 velocity-kick-message: false
+
+# Should the updater be enabled?
+enable-updater: true
