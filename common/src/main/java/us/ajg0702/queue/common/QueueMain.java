@@ -13,6 +13,7 @@ import us.ajg0702.utils.common.Updater;
 
 import java.io.File;
 import java.util.LinkedHashMap;
+import java.util.regex.Pattern;
 
 public class QueueMain extends AjQueueAPI {
 
@@ -145,6 +146,10 @@ public class QueueMain extends AjQueueAPI {
             e.printStackTrace();
             return;
         }
+
+
+        //noinspection ResultOfMethodCallIgnored
+        messages.getComponent("one").replaceText(b -> b.match(Pattern.compile("\\e")).replacement("a"));
 
         setTimeBetweenPlayers();
 
