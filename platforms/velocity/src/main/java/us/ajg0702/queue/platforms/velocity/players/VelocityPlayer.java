@@ -147,7 +147,7 @@ public class VelocityPlayer implements AdaptedPlayer, Audience {
                                     main.getMessages().getComponent(
                                             "velocity-kick-message",
                                             "SERVER:"+server.getName(),
-                                            "REASON:"+reason
+                                            "REASON:"+PlainTextComponentSerializer.plainText().serialize(reason)
                                     )
                             );
                         }
