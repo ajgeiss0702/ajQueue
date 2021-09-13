@@ -21,12 +21,16 @@ public class LogConverter extends Logger {
                 break;
             case "SEVERE":
                 logger.error(message);
+                break;
             case "WARNING":
                 logger.warn(message);
+                break;
             case "INFO":
                 logger.info(message);
+                break;
             default:
                 logger.info(message);
+                break;
         }
     }
 }
