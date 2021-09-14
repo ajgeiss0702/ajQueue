@@ -8,7 +8,6 @@ import us.ajg0702.queue.api.commands.ISubCommand;
 import us.ajg0702.utils.common.Messages;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 
