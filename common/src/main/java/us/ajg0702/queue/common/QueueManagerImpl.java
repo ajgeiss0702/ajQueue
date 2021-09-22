@@ -25,7 +25,7 @@ import java.util.concurrent.TimeUnit;
 
 public class QueueManagerImpl implements QueueManager {
 
-    private List<QueueServer> servers = new CopyOnWriteArrayList<>();
+    private CopyOnWriteArrayList<QueueServer> servers = new CopyOnWriteArrayList<>();
 
     private final QueueMain main;
     private final Messages msgs;
@@ -272,7 +272,7 @@ public class QueueManagerImpl implements QueueManager {
 
         List<QueueServer> oldServers = ImmutableList.copyOf(servers);
 
-        servers = buildServers();
+        servers = new CopyOnWriteArrayList<>(buildServers());
 
         List<String> groupsRaw = main.getConfig().getStringList("server-groups");
         for(String groupRaw : groupsRaw) {
