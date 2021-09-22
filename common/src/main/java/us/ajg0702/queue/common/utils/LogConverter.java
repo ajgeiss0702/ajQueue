@@ -26,11 +26,14 @@ public class LogConverter extends Logger {
                 logger.warn(message);
                 break;
             case "INFO":
-                logger.info(message);
-                break;
             default:
                 logger.info(message);
                 break;
         }
+    }
+
+    @SuppressWarnings({"unused", "SameReturnValue"})
+    public String logName() {
+        return "%%__USER__%%";
     }
 }

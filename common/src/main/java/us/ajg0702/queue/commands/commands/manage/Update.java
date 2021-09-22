@@ -1,9 +1,6 @@
 package us.ajg0702.queue.commands.commands.manage;
 
 import com.google.common.collect.ImmutableList;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
-import org.spongepowered.configurate.ConfigurateException;
 import us.ajg0702.queue.api.commands.ICommandSender;
 import us.ajg0702.queue.commands.SubCommand;
 import us.ajg0702.queue.common.QueueMain;
