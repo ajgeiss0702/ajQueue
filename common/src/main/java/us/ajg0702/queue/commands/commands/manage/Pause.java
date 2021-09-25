@@ -51,7 +51,7 @@ public class Pause extends SubCommand {
         List<QueueServer> servers;
         QueueServer queueServer = main.getQueueManager().findServer(args[0]);
         if(queueServer == null && !args[0].equalsIgnoreCase("all")) {
-            sender.sendMessage(getMessages().getComponent("commands.pause.no-server", "SERVER:"+args[1]));
+            sender.sendMessage(getMessages().getComponent("commands.pause.no-server", "SERVER:"+args[0]));
             return;
         } else if(queueServer == null && args[0].equalsIgnoreCase("all")) {
             servers = main.getQueueManager().getServers();
