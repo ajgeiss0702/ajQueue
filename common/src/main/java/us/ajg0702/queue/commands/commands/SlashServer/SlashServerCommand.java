@@ -1,0 +1,55 @@
+package us.ajg0702.queue.commands.commands.SlashServer;
+
+import com.google.common.collect.ImmutableList;
+import us.ajg0702.queue.api.commands.ICommandSender;
+import us.ajg0702.queue.commands.BaseCommand;
+import us.ajg0702.queue.common.QueueMain;
+import us.ajg0702.utils.common.Messages;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+
+public class SlashServerCommand extends BaseCommand {
+
+    final QueueMain main;
+    final String server;
+    public SlashServerCommand(QueueMain main, String server) {
+        this.main = main;
+        this.server = server;
+    }
+
+    @Override
+    public String getName() {
+        return server;
+    }
+
+    @Override
+    public ImmutableList<String> getAliases() {
+        return ImmutableList.of();
+    }
+
+    @Override
+    public String getPermission() {
+        return null;
+    }
+
+    @Override
+    public Messages getMessages() {
+        return main.getMessages();
+    }
+
+    @Override
+    public void execute(ICommandSender sender, String[] args) {
+        if(!sender.isPlayer()) {
+            sender.sendMessage(getMessages().getComponent("errors.player-only"));
+            return;
+        }
+        main.getQueueManager().addToQueue(main.getPlatformMethods().senderToPlayer(sender), server);
+    }
+
+    @Override
+    public List<String> autoComplete(ICommandSender sender, String[] args) {
+        return new ArrayList<>();
+    }
+}

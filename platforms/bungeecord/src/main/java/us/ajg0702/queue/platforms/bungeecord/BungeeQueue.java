@@ -11,6 +11,7 @@ import net.md_5.bungee.event.EventHandler;
 import org.bstats.bungeecord.Metrics;
 import org.bstats.charts.SimplePie;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import us.ajg0702.queue.api.Implementation;
 import us.ajg0702.queue.api.commands.IBaseCommand;
 import us.ajg0702.queue.api.util.QueueLogger;
 import us.ajg0702.queue.commands.BaseCommand;
@@ -25,13 +26,17 @@ import us.ajg0702.queue.platforms.bungeecord.server.BungeeServer;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-public class BungeeQueue extends Plugin implements Listener {
+public class BungeeQueue extends Plugin implements Listener, Implementation {
 
     private QueueMain main;
 
     List<IBaseCommand> commands;
+
+    Map<String, BungeeCommand> commandMap;
 
     @Override
     public void onEnable() {
@@ -41,6 +46,7 @@ public class BungeeQueue extends Plugin implements Listener {
         adventure = BungeeAudiences.create(this);
 
         main = new QueueMain(
+                this,
                 logger,
                 new BungeeMethods(this, getProxy(), logger),
                 dataFolder
@@ -56,9 +62,10 @@ public class BungeeQueue extends Plugin implements Listener {
                 new ManageCommand(main)
         );
 
+        commandMap = new HashMap<>();
+
         for(IBaseCommand command : commands) {
-            getProxy().getPluginManager()
-                    .registerCommand(this, new BungeeCommand((BaseCommand) command));
+            registerCommand(command);
         }
 
         getProxy().getPluginManager().registerListener(this, this);
@@ -128,5 +135,21 @@ public class BungeeQueue extends Plugin implements Listener {
                 reason,
                 false
         );
+    }
+
+    @Override
+    public void unregisterCommand(String name) {
+        BungeeCommand bungeeCommand = commandMap.get(name);
+        if(bungeeCommand == null) return;
+        getProxy().getPluginManager().unregisterCommand(bungeeCommand);
+        commandMap.remove(name);
+    }
+
+    @Override
+    public void registerCommand(IBaseCommand command) {
+        BungeeCommand bungeeCommand = new BungeeCommand((BaseCommand) command);
+        commandMap.put(command.getName(), bungeeCommand);
+        getProxy().getPluginManager()
+                .registerCommand(this, bungeeCommand);
     }
 }

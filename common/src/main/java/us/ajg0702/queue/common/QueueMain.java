@@ -107,6 +107,16 @@ public class QueueMain extends AjQueueAPI {
         return updater;
     }
 
+    private final Implementation implementation;
+    public Implementation getImplementation() {
+        return implementation;
+    }
+
+    private SlashServerManager slashServerManager;
+    public SlashServerManager getSlashServerManager() {
+        return slashServerManager;
+    }
+
     @Override
     public void shutdown() {
         taskManager.shutdown();
@@ -117,7 +127,8 @@ public class QueueMain extends AjQueueAPI {
     private final File dataFolder;
 
 
-    public QueueMain(QueueLogger logger, PlatformMethods platformMethods, File dataFolder) {
+    public QueueMain(Implementation implementation, QueueLogger logger, PlatformMethods platformMethods, File dataFolder) {
+        this.implementation = implementation;
 
         logicGetter = new LogicGetterImpl();
 
@@ -146,6 +157,8 @@ public class QueueMain extends AjQueueAPI {
             e.printStackTrace();
             return;
         }
+
+        slashServerManager = new SlashServerManager(this);
 
 
         //noinspection ResultOfMethodCallIgnored

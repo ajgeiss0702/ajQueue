@@ -1,5 +1,5 @@
 # Dont touch this number please
-config-version: 28
+config-version: 29
 
 
 # This is the main config for ajQueue.
@@ -262,3 +262,9 @@ velocity-kick-message: false
 
 # Should the updater be enabled?
 enable-updater: true
+
+# What servers should we make slash server commands for?
+# For example, if survival is in this list, then if a player executes /survival
+#  then they will be put in the queue for survival
+# This works for both servers and groups
+slash-servers: []
