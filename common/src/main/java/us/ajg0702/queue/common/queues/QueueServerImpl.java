@@ -130,9 +130,10 @@ public class QueueServerImpl implements QueueServer {
 
     @Override
     public void updatePing() {
+        boolean pingerDebug = main.getConfig().getBoolean("pinger-debug");
         HashMap<AdaptedServer, CompletableFuture<AdaptedServerPing>> pingsFutures = new HashMap<>();
         for(AdaptedServer server : servers) {
-            if(main.getConfig().getBoolean("pinger-debug")) {
+            if(pingerDebug) {
                 main.getLogger().info("[pinger] ["+server.getServerInfo().getName()+"] sending ping");
             }
             pingsFutures.put(server, server.ping());
@@ -145,13 +146,15 @@ public class QueueServerImpl implements QueueServer {
             try {
                 ping = futurePing.get(5, TimeUnit.SECONDS);
             } catch (InterruptedException | ExecutionException | TimeoutException e) {
-                if(main.getConfig().getBoolean("pinger-debug")) {
+                if(pingerDebug) {
                     main.getLogger().info("[pinger] ["+server.getServerInfo().getName()+"] offline:");
                     e.printStackTrace();
                 }
             }
-            if(ping != null && main.getConfig().getBoolean("pinger-debug")) {
+            if(ping != null && pingerDebug) {
                 main.getLogger().info("[pinger] ["+server.getServerInfo().getName()+"] online. motd: "+ping.getPlainDescription()+"  players: "+ping.getPlayerCount()+"/"+ping.getMaxPlayers());
+            } else if(ping == null && pingerDebug) {
+                main.getLogger().info("[pinger] ["+server.getServerInfo().getName()+"] offline (unknown)");
             }
 
             pings.put(server, ping);
@@ -206,6 +209,10 @@ public class QueueServerImpl implements QueueServer {
                         offlineTime = 0;
                     }
                 }
+            }
+
+            if(pingerDebug) {
+                main.getLogger().info("[pinger] ["+server.getServerInfo().getName()+"] Success");
             }
         }
     }
