@@ -60,6 +60,15 @@ public class PermissionGetterImpl implements PermissionGetter {
         return getHighestPermission(player, "ajqueue.serverpriority."+server+".");
     }
 
+    @Override
+    public boolean hasContextBypass(AdaptedPlayer player, String server) {
+        if(getSelected() == null) {
+            return false;
+        }
+        List<String> perms = getSelected().getPermissions(player);
+        return perms.contains("ajqueue.serverbypass."+server);
+    }
+
     private int getHighestPermission(AdaptedPlayer player, String prefix) {
         if(getSelected() == null) {
             return -1;
