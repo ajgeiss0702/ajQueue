@@ -43,8 +43,13 @@ public class Send extends SubCommand {
     public void execute(ICommandSender sender, String[] args) {
         if(!checkPermission(sender)) return;
 
+        if(args.length < 2) {
+            sender.sendMessage(getMessages().getComponent("commands.send.usage"));
+            return;
+        }
+
         if(main.getQueueManager().findServer(args[1]) == null) {
-            sender.sendMessage(getMessages().getComponent("errors.server-not-exist", "SERVER:"+args[2]));
+            sender.sendMessage(getMessages().getComponent("errors.server-not-exist", "SERVER:"+args[1]));
             return;
         }
 
@@ -53,7 +58,7 @@ public class Send extends SubCommand {
 
             AdaptedPlayer ply = main.getPlatformMethods().getPlayer(args[0]);
             if(ply == null) {
-                sender.sendMessage(Component.text("player not found"));
+                sender.sendMessage(Component.text("player not found (even though it was in playerNames)"));
                 return;
             }
             if(ply.getName() == null) {

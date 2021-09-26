@@ -18,6 +18,7 @@ import net.kyori.adventure.text.Component;
 import org.bstats.charts.SimplePie;
 import org.bstats.velocity.Metrics;
 import org.slf4j.Logger;
+import us.ajg0702.queue.api.Implementation;
 import us.ajg0702.queue.api.commands.IBaseCommand;
 import us.ajg0702.queue.commands.BaseCommand;
 import us.ajg0702.queue.commands.commands.leavequeue.LeaveCommand;
@@ -44,7 +45,7 @@ import java.util.Optional;
         authors = {"ajgeiss0702"}
 )
 
-public class VelocityQueue  {
+public class VelocityQueue implements Implementation {
     final ProxyServer proxyServer;
     final VelocityLogger logger;
 
@@ -66,9 +67,12 @@ public class VelocityQueue  {
 
     List<IBaseCommand> commands;
 
+    CommandManager commandManager;
+
     @Subscribe
     public void onProxyInit(ProxyInitializeEvent e) {
         main = new QueueMain(
+                this,
                 logger,
                 new VelocityMethods(this, proxyServer, logger),
                 dataFolder
@@ -81,7 +85,7 @@ public class VelocityQueue  {
                 new ManageCommand(main)
         );
 
-        CommandManager commandManager = proxyServer.getCommandManager();
+        commandManager = proxyServer.getCommandManager();
 
 
         proxyServer.getChannelRegistrar().register(MinecraftChannelIdentifier.create("ajqueue", "tospigot"));
@@ -89,12 +93,7 @@ public class VelocityQueue  {
 
 
         for(IBaseCommand command : commands) {
-            commandManager.register(
-                    commandManager.metaBuilder(command.getName())
-                    .aliases(command.getAliases().toArray(new String[]{}))
-                    .build(),
-                    new VelocityCommand(main, (BaseCommand) command)
-            );
+            registerCommand(command);
         }
 
 
@@ -138,7 +137,6 @@ public class VelocityQueue  {
         main.getEventHandler().onPlayerLeave(new VelocityPlayer(e.getPlayer()));
     }
 
-    @SuppressWarnings("SimplifyOptionalCallChains")
     @Subscribe
     public void onKick(KickedFromServerEvent e) {
         if(!e.getPlayer().getCurrentServer().isPresent()) return; // if the player is kicked on initial join, we dont care
@@ -152,4 +150,18 @@ public class VelocityQueue  {
         );
     }
 
+    @Override
+    public void unregisterCommand(String name) {
+        commandManager.unregister(name);
+    }
+
+    @Override
+    public void registerCommand(IBaseCommand command) {
+        commandManager.register(
+                commandManager.metaBuilder(command.getName())
+                        .aliases(command.getAliases().toArray(new String[]{}))
+                        .build(),
+                new VelocityCommand(main, (BaseCommand) command)
+        );
+    }
 }
