@@ -71,6 +71,9 @@ public class VelocityQueue implements Implementation {
 
     @Subscribe
     public void onProxyInit(ProxyInitializeEvent e) {
+
+        commandManager = proxyServer.getCommandManager();
+
         main = new QueueMain(
                 this,
                 logger,
@@ -84,8 +87,6 @@ public class VelocityQueue implements Implementation {
                 new ListCommand(main),
                 new ManageCommand(main)
         );
-
-        commandManager = proxyServer.getCommandManager();
 
 
         proxyServer.getChannelRegistrar().register(MinecraftChannelIdentifier.create("ajqueue", "tospigot"));
