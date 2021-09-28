@@ -14,14 +14,8 @@ import us.ajg0702.utils.common.Messages;
 import us.ajg0702.utils.common.TimeUtils;
 
 import java.time.Duration;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
+import java.util.*;
+import java.util.concurrent.*;
 
 public class QueueManagerImpl implements QueueManager {
 
@@ -506,7 +500,8 @@ public class QueueManagerImpl implements QueueManager {
         sendPlayers(null);
     }
 
-    final HashMap<AdaptedPlayer, Long> sendingNowAntiSpam = new HashMap<>();
+
+    final ConcurrentHashMap<AdaptedPlayer, Long> sendingNowAntiSpam = new ConcurrentHashMap<>();
     final HashMap<QueuePlayer, Integer> sendingAttempts = new HashMap<>();
 
     @Override
@@ -640,6 +635,9 @@ public class QueueManagerImpl implements QueueManager {
 
     @Override
     public void clear(AdaptedPlayer player) {
-        sendingNowAntiSpam.remove(player);
+        for (AdaptedPlayer next : sendingNowAntiSpam.keySet()) {
+            if(!next.equals(player)) continue;
+            sendingNowAntiSpam.remove(next);
+        }
     }
 }

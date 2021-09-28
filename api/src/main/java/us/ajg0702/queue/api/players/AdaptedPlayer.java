@@ -79,4 +79,8 @@ public interface AdaptedPlayer extends Handle, Audience {
     String getName();
 
     List<String> getPermissions();
+
+    default boolean equals(AdaptedPlayer other) {
+        return this.getUniqueId().equals(other.getUniqueId());
+    }
 }
