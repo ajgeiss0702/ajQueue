@@ -11,4 +11,6 @@ public interface PermissionGetter {
     int getPriority(AdaptedPlayer player);
 
     int getServerPriotity(String server, AdaptedPlayer player);
+
+    boolean hasContextBypass(AdaptedPlayer player, String server);
 }

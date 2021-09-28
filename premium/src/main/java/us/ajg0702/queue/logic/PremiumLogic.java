@@ -36,7 +36,11 @@ public class PremiumLogic implements Logic {
         QueueLogger logger = main.getLogger();
         boolean debug = main.getConfig().getBoolean("priority-queue-debug");
 
-        if(player.hasPermission("ajqueue.bypass") || player.hasPermission("ajqueue.serverbypass."+server.getName())) {
+        if(
+                player.hasPermission("ajqueue.bypass") ||
+                player.hasPermission("ajqueue.serverbypass."+server.getName()) ||
+                permissionGetter.hasContextBypass(player, server.getName())
+        ) {
             if(debug) {
                 logger.info("[priority] "+player.getName()+" bypass");
             }
