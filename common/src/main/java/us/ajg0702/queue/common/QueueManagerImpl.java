@@ -528,7 +528,11 @@ public class QueueManagerImpl implements QueueManager {
                     AdaptedPlayer player = p.getPlayer();
                     if(player == null) continue;
 
-                    if(server.isFull() && !p.getPlayer().hasPermission("ajqueue.joinfull")) continue;
+                    boolean bypassFull =
+                            p.getPlayer().hasPermission("ajqueue.joinfull") ||
+                            p.getPlayer().hasPermission("ajqueue.joinfullserver."+server.getName());
+
+                    if(server.isFull() && !bypassFull) continue;
 
                     AdaptedServer selected = server.getIdealServer(player);
                     if(selected == null) {
