@@ -435,6 +435,9 @@ public class QueueServerImpl implements QueueServer {
 
     @Override
     public boolean canJoinFull(AdaptedPlayer player) {
-        return player.hasPermission("ajqueue.joinfull") || player.hasPermission("ajqueue.joinfullserver."+name);
+        return
+                player.hasPermission("ajqueue.joinfull") ||
+                player.hasPermission("ajqueue.joinfullserver."+name) ||
+                player.hasPermission("ajqueue.joinfullandbypass");
     }
 }
