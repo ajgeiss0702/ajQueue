@@ -428,4 +428,9 @@ public class QueueServerImpl implements QueueServer {
     public void setSupportedProtocols(List<Integer> list) {
         supportedProtocols = new ArrayList<>(list);
     }
+
+    @Override
+    public boolean canJoinFull(AdaptedPlayer player) {
+        return player.hasPermission("ajqueue.joinfull") || player.hasPermission("ajqueue.joinfullserver."+name);
+    }
 }

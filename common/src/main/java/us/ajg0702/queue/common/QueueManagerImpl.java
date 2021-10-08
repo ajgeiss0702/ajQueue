@@ -528,11 +528,7 @@ public class QueueManagerImpl implements QueueManager {
                     AdaptedPlayer player = p.getPlayer();
                     if(player == null) continue;
 
-                    boolean bypassFull =
-                            p.getPlayer().hasPermission("ajqueue.joinfull") ||
-                            p.getPlayer().hasPermission("ajqueue.joinfullserver."+server.getName());
-
-                    if(server.isFull() && !bypassFull) continue;
+                    if(server.isFull() && !server.canJoinFull(p.getPlayer())) continue;
 
                     AdaptedServer selected = server.getIdealServer(player);
                     if(selected == null) {
@@ -578,7 +574,7 @@ public class QueueManagerImpl implements QueueManager {
 
             if(!server.canAccess(nextPlayer)) continue;
 
-            if(server.isFull() && !nextPlayer.hasPermission("ajqueue.joinfull")) continue;
+            if(server.isFull() && !server.canJoinFull(nextPlayer)) continue;
 
             if(main.getConfig().getBoolean("enable-bypasspaused-permission")) {
                 if(server.isPaused() && !nextPlayer.hasPermission("ajqueue.bypasspaused")) continue;

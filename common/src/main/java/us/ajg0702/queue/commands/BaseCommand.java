@@ -54,6 +54,7 @@ public class BaseCommand implements IBaseCommand {
         sender.sendMessage(Component.text("Unimplemented command"));
     }
 
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public boolean checkPermission(ICommandSender sender) {
         if(getPermission() != null && !sender.hasPermission(getPermission())) {
             sender.sendMessage(getMessages().getComponent("noperm"));
