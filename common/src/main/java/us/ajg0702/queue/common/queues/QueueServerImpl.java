@@ -253,12 +253,16 @@ public class QueueServerImpl implements QueueServer {
 
     @Override
     public boolean isJoinable(AdaptedPlayer p) {
-        if(p != null && isWhitelisted() && !whitelistedUUIDs.contains(p.getUniqueId())) {
-            return false;
+        if(p != null) {
+            if (isWhitelisted() && !whitelistedUUIDs.contains(p.getUniqueId())) {
+                return false;
+            }
+            if (isFull() && !canJoinFull(p)) {
+                return false;
+            }
         }
         return isOnline() &&
                 canAccess(p) &&
-                !isFull() &&
                 !isPaused();
     }
 
