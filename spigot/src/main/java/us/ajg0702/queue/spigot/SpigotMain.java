@@ -9,6 +9,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 import org.bukkit.event.server.ServerListPingEvent;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -26,6 +27,8 @@ public class SpigotMain extends JavaPlugin implements PluginMessageListener,List
 	Placeholders placeholders;
 	
 	ConfigFile config;
+
+	boolean hasProxy = false;
 	
 	@SuppressWarnings("ConstantConditions")
 	public void onEnable() {
@@ -74,7 +77,11 @@ public class SpigotMain extends JavaPlugin implements PluginMessageListener,List
 
 		getLogger().info("Spigot side enabled! v"+getDescription().getVersion());
 	}
-	
+
+	public boolean hasProxy() {
+		return hasProxy;
+	}
+
 	final HashMap<Player, String> queuebatch = new HashMap<>();
 
 	@Override
@@ -84,6 +91,10 @@ public class SpigotMain extends JavaPlugin implements PluginMessageListener,List
 		ByteArrayDataInput in = ByteStreams.newDataInput(message);
 		
 	    String subchannel = in.readUTF();
+
+	    if(subchannel.equals("ack")) {
+	    	hasProxy = true;
+		}
 
 	    if(subchannel.equals("inqueueevent")) {
 	    	String playername = in.readUTF();
@@ -178,6 +189,14 @@ public class SpigotMain extends JavaPlugin implements PluginMessageListener,List
 	public void onLeave(PlayerQuitEvent e) {
 		if(!papi) return;
 		placeholders.cleanCache();
+	}
+
+	@EventHandler
+	public void onJoin(PlayerJoinEvent e) {
+		if(hasProxy) return;
+		Bukkit.getScheduler().runTask(this, () -> {
+			sendMessage(e.getPlayer(), "ack", "");
+		});
 	}
 
 	@EventHandler(priority = EventPriority.HIGH)

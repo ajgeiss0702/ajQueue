@@ -33,6 +33,10 @@ public class EventHandlerImpl implements EventHandler {
         try {
             String subchannel = in.readUTF();
 
+            if(subchannel.equals("ack")) {
+                main.getPlatformMethods().sendPluginMessage(recievingPlayer, "ack", "yes, im here");
+            }
+
             if(subchannel.equals("queue")) {
                 String rawData = in.readUTF();
                 String[] args = new String[1];
