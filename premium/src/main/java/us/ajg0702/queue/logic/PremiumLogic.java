@@ -39,6 +39,7 @@ public class PremiumLogic implements Logic {
         if(
                 player.hasPermission("ajqueue.bypass") ||
                 player.hasPermission("ajqueue.serverbypass."+server.getName()) ||
+                player.hasPermission("ajqueue.joinfullandbypassserver."+server.getName()) ||
                 player.hasPermission("ajqueue.joinfullandbypass") ||
                 permissionGetter.hasContextBypass(player, server.getName())
         ) {

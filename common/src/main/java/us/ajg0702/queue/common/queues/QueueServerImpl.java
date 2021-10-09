@@ -438,6 +438,7 @@ public class QueueServerImpl implements QueueServer {
         return
                 player.hasPermission("ajqueue.joinfull") ||
                 player.hasPermission("ajqueue.joinfullserver."+name) ||
+                player.hasPermission("ajqueue.joinfullandbypassserver."+name) ||
                 player.hasPermission("ajqueue.joinfullandbypass");
     }
 }
