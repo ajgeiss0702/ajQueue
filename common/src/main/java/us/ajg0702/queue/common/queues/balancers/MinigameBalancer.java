@@ -29,7 +29,9 @@ public class MinigameBalancer implements Balancer {
             servers.sort(Comparator.comparingInt(o -> {
                 @SuppressWarnings("unchecked")
                 Map.Entry<AdaptedServer, AdaptedServerPing> e = (Map.Entry<AdaptedServer, AdaptedServerPing>) o;
-                return e.getValue().getPlayerCount();
+                AdaptedServerPing value = e.getValue();
+                if(value == null) return -1;
+                return value.getPlayerCount();
             }).reversed());
             LinkedHashMap<AdaptedServer, AdaptedServerPing> sortedServers = new LinkedHashMap<>();
             for(Map.Entry<AdaptedServer, AdaptedServerPing> entry : servers) {
