@@ -1,5 +1,5 @@
 # Dont touch this number please
-config-version: 29
+config-version: 30
 
 
 # This is the main config for ajQueue.
@@ -271,9 +271,13 @@ slash-servers: []
 
 # What balancer should we use?
 # If a group is not specified here, then the default one is used
-# Example entry: - bedwars: minigame
+# Example entry: - "bedwars:minigame"
 # Balancers:
 #  default - Will send the player to the server in the group with the least number of players
-#  minigame - Will send the player to the server with the most players, until that server is full, which it will then send to the next full server
+#  minigame - Will send the player to the server with the most players, until that server is full, which it will then send to the next server
 balancer-types:
-  - bedwars: minigame
+  - "bedwars:minigame"
+
+
+# Should we print some extra stuff to the console that might help diagnose some issues?
+debug: false
