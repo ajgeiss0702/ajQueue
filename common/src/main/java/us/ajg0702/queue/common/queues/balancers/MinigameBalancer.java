@@ -6,9 +6,8 @@ import us.ajg0702.queue.api.queues.QueueServer;
 import us.ajg0702.queue.api.server.AdaptedServer;
 import us.ajg0702.queue.api.server.AdaptedServerPing;
 import us.ajg0702.queue.common.QueueMain;
-import us.ajg0702.utils.common.GenUtils;
 
-import java.util.HashMap;
+import java.util.*;
 
 public class MinigameBalancer implements Balancer {
 
@@ -22,35 +21,31 @@ public class MinigameBalancer implements Balancer {
     @Override
     public AdaptedServer getIdealServer(AdaptedPlayer player) {
         HashMap<AdaptedServer, AdaptedServerPing> serverInfos = server.getLastPings();
-        AdaptedServer selected = null;
-        int selectednum = 0;
         if(serverInfos.keySet().size() == 1) {
-            selected = serverInfos.keySet().iterator().next();
+            return serverInfos.keySet().iterator().next();
         } else {
-            for(AdaptedServer si : serverInfos.keySet()) {
-                AdaptedServerPing sp = serverInfos.get(si);
+
+            List<Map.Entry<AdaptedServer, AdaptedServerPing>> servers = new ArrayList<>(serverInfos.entrySet());
+            servers.sort(Comparator.comparingInt(o -> {
+                @SuppressWarnings("unchecked")
+                Map.Entry<AdaptedServer, AdaptedServerPing> e = (Map.Entry<AdaptedServer, AdaptedServerPing>) o;
+                return e.getValue().getPlayerCount();
+            }).reversed());
+            LinkedHashMap<AdaptedServer, AdaptedServerPing> sortedServers = new LinkedHashMap<>();
+            for(Map.Entry<AdaptedServer, AdaptedServerPing> entry : servers) {
+                sortedServers.put(entry.getKey(), entry.getValue());
+            }
+
+            for(AdaptedServer si : sortedServers.keySet()) {
+                AdaptedServerPing sp = sortedServers.get(si);
                 if(sp == null) continue;
                 int online = sp.getPlayerCount();
                 int max = sp.getMaxPlayers();
-                if(selected == null) {
-                    selected = si;
-                    selectednum = online;
-                    continue;
-                }
-                if(selectednum < online && online < max && main.getQueueManager().findServer(si.getName()).isJoinable(player)) {
-                    selected = si;
-                    selectednum = online;
+                if(online < max) {
+                    return si;
                 }
             }
+            return new ArrayList<AdaptedServer>(sortedServers.keySet().size()).get(sortedServers.keySet().size()-1);
         }
-        if(selected == null && serverInfos.size() > 0) {
-            selected = serverInfos.keySet().iterator().next();
-        }
-        if(selected == null) {
-            main.getLogger().warning("Unable to find ideal server, using random server from group.");
-            int r = GenUtils.randomInt(0, server.getServers().size()-1);
-            selected = server.getServers().get(r);
-        }
-        return selected;
     }
 }

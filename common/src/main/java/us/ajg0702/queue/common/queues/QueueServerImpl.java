@@ -419,6 +419,7 @@ public class QueueServerImpl implements QueueServer {
 
     @Override
     public AdaptedServer getIdealServer(AdaptedPlayer player) {
+        Debugger.debug(getBalancer().toString());
         return getBalancer().getIdealServer(player);
     }
 
