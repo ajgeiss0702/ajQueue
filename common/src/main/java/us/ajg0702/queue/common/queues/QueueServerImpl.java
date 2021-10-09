@@ -144,7 +144,7 @@ public class QueueServerImpl implements QueueServer {
             return msgs.getString("status.offline.whitelisted");
         }
 
-        if(isFull()) {
+        if(isFull() && !canJoinFull(p)) {
             return msgs.getString("status.offline.full");
         }
 
@@ -327,6 +327,7 @@ public class QueueServerImpl implements QueueServer {
 
     @Override
     public boolean isFull() {
+        if(!isOnline()) return false;
         return playerCount >= maxPlayers;
     }
 
@@ -445,6 +446,7 @@ public class QueueServerImpl implements QueueServer {
 
     @Override
     public boolean canJoinFull(AdaptedPlayer player) {
+        if(player == null) return true;
         return
                 player.hasPermission("ajqueue.joinfull") ||
                 player.hasPermission("ajqueue.joinfullserver."+name) ||
