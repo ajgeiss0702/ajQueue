@@ -253,12 +253,16 @@ public class QueueServerImpl implements QueueServer {
 
     @Override
     public boolean isJoinable(AdaptedPlayer p) {
-        if(p != null && isWhitelisted() && !whitelistedUUIDs.contains(p.getUniqueId())) {
-            return false;
+        if(p != null) {
+            if (isWhitelisted() && !whitelistedUUIDs.contains(p.getUniqueId())) {
+                return false;
+            }
+            if (isFull() && !canJoinFull(p)) {
+                return false;
+            }
         }
         return isOnline() &&
                 canAccess(p) &&
-                !isFull() &&
                 !isPaused();
     }
 
@@ -427,5 +431,14 @@ public class QueueServerImpl implements QueueServer {
     @Override
     public void setSupportedProtocols(List<Integer> list) {
         supportedProtocols = new ArrayList<>(list);
+    }
+
+    @Override
+    public boolean canJoinFull(AdaptedPlayer player) {
+        return
+                player.hasPermission("ajqueue.joinfull") ||
+                player.hasPermission("ajqueue.joinfullserver."+name) ||
+                player.hasPermission("ajqueue.joinfullandbypassserver."+name) ||
+                player.hasPermission("ajqueue.joinfullandbypass");
     }
 }

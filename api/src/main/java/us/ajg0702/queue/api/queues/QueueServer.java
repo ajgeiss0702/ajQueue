@@ -13,7 +13,7 @@ import java.util.UUID;
 /**
  * Represents a server or a group that can be queued for
  */
-@SuppressWarnings("unused")
+@SuppressWarnings({"unused", "BooleanMethodIsAlwaysInverted"})
 public interface QueueServer {
 
     /**
@@ -237,6 +237,13 @@ public interface QueueServer {
      * @return The balancer this server is using
      */
     Balancer getBalancer();
+
+    /**
+     * Checks if the player can join this server even if its full
+     * @param player The player
+     * @return If the player can join this server if its full
+     */
+    boolean canJoinFull(AdaptedPlayer player);
 
 
     /**
