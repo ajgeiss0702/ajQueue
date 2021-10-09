@@ -116,7 +116,9 @@ public class QueueManagerImpl implements QueueManager {
             return false;
         }
 
-        if(player.getServerName().equals(server.getName())) {
+        List<AdaptedServer> notInServers = new ArrayList<>(server.getServers());
+        notInServers.removeIf(adaptedServer -> !adaptedServer.getName().equals(player.getServerName()));
+        if(notInServers.size() > 0) {
             player.sendMessage(msgs.getComponent("errors.already-connected", "SERVER:"+server.getAlias()));
             return false;
         }

@@ -232,6 +232,12 @@ public interface QueueServer {
      */
     void setSupportedProtocols(List<Integer> list);
 
+    /**
+     * Gets the balancer this server is using
+     * @return The balancer this server is using
+     */
+    Balancer getBalancer();
+
 
     /**
      * elliot is bad

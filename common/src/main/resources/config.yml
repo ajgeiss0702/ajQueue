@@ -268,3 +268,12 @@ enable-updater: true
 #  then they will be put in the queue for survival
 # This works for both servers and groups
 slash-servers: []
+
+# What balancer should we use?
+# If a group is not specified here, then the default one is used
+# Example entry: - bedwars: minigame
+# Balancers:
+#  default - Will send the player to the server in the group with the least number of players
+#  minigame - Will send the player to the server with the most players, until that server is full, which it will then send to the next full server
+balancer-types:
+  - bedwars: minigame
