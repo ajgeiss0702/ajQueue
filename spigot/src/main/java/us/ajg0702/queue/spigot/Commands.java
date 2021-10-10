@@ -17,6 +17,10 @@ public class Commands implements CommandExecutor {
 
 	@Override
 	public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, String[] args) {
+		if(!pl.hasProxy()) {
+			sender.sendMessage(color("&cajQueue must also be installed on the proxy!&7 If it has been installed on the proxy, make sure it loaded correctly and try relogging."));
+			return true;
+		}
 		Player player = null;
 		if(sender instanceof Player) {
 			player = (Player) sender;

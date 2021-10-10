@@ -1,13 +1,18 @@
 package us.ajg0702.queue.common.queues;
 
 import com.google.common.collect.ImmutableList;
+import jdk.nashorn.internal.runtime.Debug;
 import us.ajg0702.queue.api.players.AdaptedPlayer;
 import us.ajg0702.queue.api.players.QueuePlayer;
+import us.ajg0702.queue.api.queues.Balancer;
 import us.ajg0702.queue.api.queues.QueueServer;
 import us.ajg0702.queue.api.server.AdaptedServer;
 import us.ajg0702.queue.api.server.AdaptedServerPing;
 import us.ajg0702.queue.common.QueueMain;
 import us.ajg0702.queue.common.players.QueuePlayerImpl;
+import us.ajg0702.queue.common.queues.balancers.DefaultBalancer;
+import us.ajg0702.queue.common.queues.balancers.MinigameBalancer;
+import us.ajg0702.queue.common.utils.Debugger;
 import us.ajg0702.utils.common.GenUtils;
 import us.ajg0702.utils.common.Messages;
 
@@ -29,6 +34,32 @@ public class QueueServerImpl implements QueueServer {
         this.name = name;
         this.servers = servers;
         this.main = main;
+
+        List<String> types = main.getConfig().getStringList("balancer-types");
+        for(String type : types) {
+            int colon = type.indexOf(":");
+            if(colon == -1) continue;
+            String groupName = type.substring(0, colon);
+            String balancerType = type.substring(colon+1);
+
+            if(groupName.equals(name)) {
+                boolean valid = true;
+                switch(balancerType.toLowerCase(Locale.ROOT)) {
+                    case "minigame":
+                        balancer = new MinigameBalancer(this, main);
+                        break;
+                    default:
+                        balancerType = "default";
+                        balancer = new DefaultBalancer(this, main);
+                }
+                Debugger.debug("Using "+balancerType.toLowerCase(Locale.ROOT)+" balancer for "+name);
+                break;
+            }
+        }
+        if(balancer == null) {
+            balancer = new DefaultBalancer(this, main);
+            Debugger.debug("Using default balancer for "+name);
+        }
 
         for(QueuePlayer queuePlayer : previousPlayers) {
             if(queuePlayer.getPlayer() == null) {
@@ -63,6 +94,8 @@ public class QueueServerImpl implements QueueServer {
     private final List<QueuePlayer> queue = new ArrayList<>();
 
     private List<Integer> supportedProtocols = new ArrayList<>();
+
+    private Balancer balancer;
 
 
     private int playerCount;
@@ -111,7 +144,7 @@ public class QueueServerImpl implements QueueServer {
             return msgs.getString("status.offline.whitelisted");
         }
 
-        if(isFull()) {
+        if(isFull() && !canJoinFull(p)) {
             return msgs.getString("status.offline.full");
         }
 
@@ -253,12 +286,16 @@ public class QueueServerImpl implements QueueServer {
 
     @Override
     public boolean isJoinable(AdaptedPlayer p) {
-        if(p != null && isWhitelisted() && !whitelistedUUIDs.contains(p.getUniqueId())) {
-            return false;
+        if(p != null) {
+            if (isWhitelisted() && !whitelistedUUIDs.contains(p.getUniqueId())) {
+                return false;
+            }
+            if (isFull() && !canJoinFull(p)) {
+                return false;
+            }
         }
         return isOnline() &&
                 canAccess(p) &&
-                !isFull() &&
                 !isPaused();
     }
 
@@ -290,6 +327,7 @@ public class QueueServerImpl implements QueueServer {
 
     @Override
     public boolean isFull() {
+        if(!isOnline()) return false;
         return playerCount >= maxPlayers;
     }
 
@@ -382,36 +420,8 @@ public class QueueServerImpl implements QueueServer {
 
     @Override
     public AdaptedServer getIdealServer(AdaptedPlayer player) {
-        HashMap<AdaptedServer, AdaptedServerPing> serverInfos = pings;
-        AdaptedServer selected = null;
-        int selectednum = 0;
-        if(serverInfos.keySet().size() == 1) {
-            selected = serverInfos.keySet().iterator().next();
-        } else {
-            for(AdaptedServer si : serverInfos.keySet()) {
-                AdaptedServerPing sp = serverInfos.get(si);
-                if(sp == null) continue;
-                int online = sp.getPlayerCount();
-                if(selected == null) {
-                    selected = si;
-                    selectednum = online;
-                    continue;
-                }
-                if(selectednum > online && main.getQueueManager().findServer(si.getName()).isJoinable(player)) {
-                    selected = si;
-                    selectednum = online;
-                }
-            }
-        }
-        if(selected == null && serverInfos.size() > 0) {
-            selected = serverInfos.keySet().iterator().next();
-        }
-        if(selected == null) {
-            main.getLogger().warning("Unable to find ideal server, using random server from group.");
-            int r = GenUtils.randomInt(0, getServers().size()-1);
-            selected = getServers().get(r);
-        }
-        return selected;
+        Debugger.debug(getBalancer().toString());
+        return getBalancer().getIdealServer(player);
     }
 
     @Override
@@ -427,5 +437,20 @@ public class QueueServerImpl implements QueueServer {
     @Override
     public void setSupportedProtocols(List<Integer> list) {
         supportedProtocols = new ArrayList<>(list);
+    }
+
+    @Override
+    public Balancer getBalancer() {
+        return balancer;
+    }
+
+    @Override
+    public boolean canJoinFull(AdaptedPlayer player) {
+        if(player == null) return true;
+        return
+                player.hasPermission("ajqueue.joinfull") ||
+                player.hasPermission("ajqueue.joinfullserver."+name) ||
+                player.hasPermission("ajqueue.joinfullandbypassserver."+name) ||
+                player.hasPermission("ajqueue.joinfullandbypass");
     }
 }
