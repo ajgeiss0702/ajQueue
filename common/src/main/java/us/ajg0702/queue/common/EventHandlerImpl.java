@@ -3,6 +3,7 @@ package us.ajg0702.queue.common;
 import com.google.common.collect.ImmutableList;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
+import org.jetbrains.annotations.NotNull;
 import us.ajg0702.queue.api.EventHandler;
 import us.ajg0702.queue.api.commands.IBaseCommand;
 import us.ajg0702.queue.api.players.AdaptedPlayer;
@@ -11,6 +12,7 @@ import us.ajg0702.queue.api.queues.QueueServer;
 import us.ajg0702.queue.api.server.AdaptedServer;
 import us.ajg0702.queue.commands.commands.PlayerSender;
 import us.ajg0702.queue.common.players.QueuePlayerImpl;
+import us.ajg0702.queue.common.utils.Debugger;
 
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
@@ -172,18 +174,20 @@ public class EventHandlerImpl implements EventHandler {
     }
 
     @Override
-    public void onServerKick(AdaptedPlayer player, AdaptedServer from, Component reason, boolean moving) {
+    public void onServerKick(AdaptedPlayer player, @NotNull AdaptedServer from, Component reason, boolean moving) {
 
         if(!player.isConnected()) return;
 
         String plainReason = PlainTextComponentSerializer.plainText().serialize(reason);
+        
+        Debugger.debug(player.getName()+" kicked! Moving: "+moving+" from: "+from.getName()+" plainReason: "+plainReason    );
 
         if(!moving && main.getConfig().getBoolean("send-fail-debug")) {
             main.getLogger().warning("Failed to send "+player.getName()+" to "+from.getName()+". Kicked with reason: "+plainReason);
         }
 
         ImmutableList<QueueServer> queuedServers = main.getQueueManager().getPlayerQueues(player);
-        if(from != null && !queuedServers.contains(main.getQueueManager().findServer(from.getName())) && main.getConfig().getBoolean("auto-add-to-queue-on-kick")) {
+        if(!queuedServers.contains(main.getQueueManager().findServer(from.getName())) && main.getConfig().getBoolean("auto-add-to-queue-on-kick")) {
 
             List<String> reasons = main.getConfig().getStringList("auto-add-kick-reasons");
             boolean shouldqueue = false;
@@ -207,7 +211,6 @@ public class EventHandlerImpl implements EventHandler {
 
         }
 
-        assert from != null;
         for(QueueServer server : queuedServers) {
             if(!(server.getServerNames().contains(from.getName()))) continue;
             QueuePlayer queuePlayer = server.findPlayer(player);
