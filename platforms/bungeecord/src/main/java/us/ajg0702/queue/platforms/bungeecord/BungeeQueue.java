@@ -43,6 +43,8 @@ public class BungeeQueue extends Plugin implements Listener, Implementation {
         QueueLogger logger = new BungeeLogger(getLogger());
         File dataFolder = getDataFolder();
 
+        commandMap = new HashMap<>();
+
         adventure = BungeeAudiences.create(this);
 
         main = new QueueMain(
@@ -61,8 +63,6 @@ public class BungeeQueue extends Plugin implements Listener, Implementation {
                 new ListCommand(main),
                 new ManageCommand(main)
         );
-
-        commandMap = new HashMap<>();
 
         for(IBaseCommand command : commands) {
             registerCommand(command);
