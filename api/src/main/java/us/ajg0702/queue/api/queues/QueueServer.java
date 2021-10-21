@@ -245,6 +245,11 @@ public interface QueueServer {
      */
     boolean canJoinFull(AdaptedPlayer player);
 
+    /**
+     * Adds one to the player count for a server (temporarily until the next server ping)
+     */
+    void addPlayer(AdaptedServer server);
+
 
     /**
      * elliot is bad

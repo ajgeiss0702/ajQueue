@@ -608,6 +608,7 @@ public class QueueManagerImpl implements QueueManager {
             }
             server.setLastSentTime(System.currentTimeMillis());
             nextPlayer.connect(selected);
+            server.addPlayer(selected);
         }
     }
 
