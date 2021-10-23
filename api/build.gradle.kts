@@ -24,7 +24,7 @@ dependencies {
 publishing {
     publications {
         create<MavenPublication>("mavenJava") {
-            artifact(tasks["jar"])
+            from(components["java"])
         }
     }
 
