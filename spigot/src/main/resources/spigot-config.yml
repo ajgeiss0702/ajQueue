@@ -11,8 +11,12 @@ send-queue-commands-in-batches: false
 # If you disable this, ajQueue will not be able to tell if the server is whitelisted!
 take-over-motd-for-whitelist: true
 
+# Should we check if the proxy responds to plugin messages?
+# For some reason this seems to fail for some people,
+#  so disable this if ajqueue says its not installed on the proxy when it actually is
+check-proxy-response: true
 
 
 
 # Dont touch this
-config-version: 2
+config-version: 3

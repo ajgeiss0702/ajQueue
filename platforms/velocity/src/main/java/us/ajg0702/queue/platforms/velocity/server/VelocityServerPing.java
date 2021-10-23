@@ -22,14 +22,21 @@ public class VelocityServerPing implements AdaptedServerPing {
         return PlainTextComponentSerializer.plainText().serialize(handle.getDescriptionComponent());
     }
 
+    int add = 0;
+
     @Override
     public int getPlayerCount() {
-        return handle.getPlayers().map(ServerPing.Players::getOnline).orElse(0);
+        return handle.getPlayers().map(ServerPing.Players::getOnline).orElse(0)+add;
     }
 
     @Override
     public int getMaxPlayers() {
         return handle.getPlayers().map(ServerPing.Players::getMax).orElse(0);
+    }
+
+    @Override
+    public void addPlayer() {
+        add++;
     }
 
     @Override

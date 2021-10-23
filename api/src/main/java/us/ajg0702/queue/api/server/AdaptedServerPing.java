@@ -28,4 +28,9 @@ public interface AdaptedServerPing extends Handle {
      * @return The maximum number of players that can join
      */
     int getMaxPlayers();
+
+    /**
+     * Temporarly adds one player to the player count
+     */
+    void addPlayer();
 }

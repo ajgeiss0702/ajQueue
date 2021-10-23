@@ -10,6 +10,7 @@ import us.ajg0702.queue.api.queues.QueueServer;
 import us.ajg0702.queue.api.server.AdaptedServer;
 import us.ajg0702.queue.common.players.QueuePlayerImpl;
 import us.ajg0702.queue.common.queues.QueueServerImpl;
+import us.ajg0702.queue.common.utils.Debugger;
 import us.ajg0702.utils.common.Messages;
 import us.ajg0702.utils.common.TimeUtils;
 
@@ -86,9 +87,15 @@ public class QueueManagerImpl implements QueueManager {
     @Override
     public boolean addToQueue(AdaptedPlayer player, QueueServer server) {
         if(player == null || server == null) {
+            Debugger.debug("addToQueue method called, but something is null");
             return false;
         }
-        if(!player.isConnected()) return false;
+        if(!player.isConnected()) {
+            Debugger.debug("addToQueue method called, but player is not connected");
+            return false;
+        }
+
+        Debugger.debug("addToQueue method called for "+player.getName()+" to "+server.getName());
 
         if(main.getConfig().getBoolean("joinfrom-server-permission") && !player.hasPermission("ajqueue.joinfrom."+player.getServerName())) {
             player.sendMessage(msgs.getComponent("errors.deny-joining-from-server"));
@@ -516,6 +523,7 @@ public class QueueManagerImpl implements QueueManager {
         }
 
         for(QueueServer server : sendingServers) {
+            Debugger.debug("Sending players for "+server.getName());
             for(QueuePlayer queuePlayer : server.getQueue()) {
                 if(queuePlayer.getPlayer() != null) continue;
                 if(main.getLogic().playerDisconnectedTooLong(queuePlayer)) {
@@ -608,6 +616,10 @@ public class QueueManagerImpl implements QueueManager {
             }
             server.setLastSentTime(System.currentTimeMillis());
             nextPlayer.connect(selected);
+            server.addPlayer(selected);
+            if(main.getConfig().getBoolean("debug")) {
+                Debugger.debug(selected.getName()+" player count is now set to "+ server.getLastPings().get(selected).getPlayerCount());
+            }
         }
     }
 
@@ -641,5 +653,10 @@ public class QueueManagerImpl implements QueueManager {
             if(!next.equals(player)) continue;
             sendingNowAntiSpam.remove(next);
         }
+    }
+
+    @Override
+    public HashMap<QueuePlayer, Integer> getSendingAttempts() {
+        return sendingAttempts;
     }
 }

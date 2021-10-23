@@ -453,4 +453,10 @@ public class QueueServerImpl implements QueueServer {
                 player.hasPermission("ajqueue.joinfullandbypassserver."+name) ||
                 player.hasPermission("ajqueue.joinfullandbypass");
     }
+
+    @Override
+    public void addPlayer(AdaptedServer server) {
+        if(!pings.containsKey(server)) throw new IllegalArgumentException("Server is not in this group!");
+        pings.get(server).addPlayer();
+    }
 }

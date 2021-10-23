@@ -28,14 +28,21 @@ public class BungeeServerPing implements AdaptedServerPing {
         return desc.toPlainText();
     }
 
+    int add = 0;
+
     @Override
     public int getPlayerCount() {
-        return handle.getPlayers().getOnline();
+        return handle.getPlayers().getOnline()+add;
     }
 
     @Override
     public int getMaxPlayers() {
         return handle.getPlayers().getMax();
+    }
+
+    @Override
+    public void addPlayer() {
+        add++;
     }
 
     @Override
