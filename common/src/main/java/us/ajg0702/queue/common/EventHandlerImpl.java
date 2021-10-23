@@ -155,6 +155,7 @@ public class EventHandlerImpl implements EventHandler {
             if((pos <= 1 && server.getServerNames().contains(player.getServerName())) || main.getConfig().getBoolean("remove-player-on-server-switch")) {
                 server.removePlayer(player);
                 server.setLastSentTime(System.currentTimeMillis());
+                main.getQueueManager().getSendingAttempts().remove(queuePlayer);
             }
         }
 

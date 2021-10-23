@@ -5,6 +5,8 @@ import us.ajg0702.queue.api.players.AdaptedPlayer;
 import us.ajg0702.queue.api.players.QueuePlayer;
 import us.ajg0702.queue.api.queues.QueueServer;
 
+import java.util.HashMap;
+
 public interface QueueManager {
 
     /**
@@ -123,4 +125,6 @@ public interface QueueManager {
     ImmutableList<QueueServer> getPlayerQueues(AdaptedPlayer p);
 
     void clear(AdaptedPlayer player);
+
+    HashMap<QueuePlayer, Integer> getSendingAttempts();
 }

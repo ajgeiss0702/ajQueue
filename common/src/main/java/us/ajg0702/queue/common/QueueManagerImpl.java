@@ -643,4 +643,9 @@ public class QueueManagerImpl implements QueueManager {
             sendingNowAntiSpam.remove(next);
         }
     }
+
+    @Override
+    public HashMap<QueuePlayer, Integer> getSendingAttempts() {
+        return sendingAttempts;
+    }
 }
