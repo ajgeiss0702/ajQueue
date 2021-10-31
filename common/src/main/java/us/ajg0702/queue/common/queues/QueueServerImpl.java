@@ -1,7 +1,6 @@
 package us.ajg0702.queue.common.queues;
 
 import com.google.common.collect.ImmutableList;
-import jdk.nashorn.internal.runtime.Debug;
 import us.ajg0702.queue.api.players.AdaptedPlayer;
 import us.ajg0702.queue.api.players.QueuePlayer;
 import us.ajg0702.queue.api.queues.Balancer;
@@ -13,7 +12,6 @@ import us.ajg0702.queue.common.players.QueuePlayerImpl;
 import us.ajg0702.queue.common.queues.balancers.DefaultBalancer;
 import us.ajg0702.queue.common.queues.balancers.MinigameBalancer;
 import us.ajg0702.queue.common.utils.Debugger;
-import us.ajg0702.utils.common.GenUtils;
 import us.ajg0702.utils.common.Messages;
 
 import java.util.*;
@@ -43,7 +41,7 @@ public class QueueServerImpl implements QueueServer {
             String balancerType = type.substring(colon+1);
 
             if(groupName.equals(name)) {
-                boolean valid = true;
+                //noinspection SwitchStatementWithTooFewBranches
                 switch(balancerType.toLowerCase(Locale.ROOT)) {
                     case "minigame":
                         balancer = new MinigameBalancer(this, main);
