@@ -69,6 +69,18 @@ public class PermissionGetterImpl implements PermissionGetter {
         return perms.contains("ajqueue.serverbypass."+server);
     }
 
+    @Override
+    public boolean hasUniqueFullBypass(AdaptedPlayer player, String server) {
+        if(player.hasPermission("ajqueue.joinfullandbypassserver."+server)) return true;
+
+        if(getSelected() == null) {
+            return false;
+        }
+        List<String> perms = getSelected().getPermissions(player);
+        perms.removeIf(s -> !s.startsWith("ajqueue.joinfullandbypassserver."+server));
+        return perms.size() > 0;
+    }
+
     private int getHighestPermission(AdaptedPlayer player, String prefix) {
         if(getSelected() == null) {
             return -1;
