@@ -523,7 +523,6 @@ public class QueueManagerImpl implements QueueManager {
         }
 
         for(QueueServer server : sendingServers) {
-            Debugger.debug("Sending players for "+server.getName());
             for(QueuePlayer queuePlayer : server.getQueue()) {
                 if(queuePlayer.getPlayer() != null) continue;
                 if(main.getLogic().playerDisconnectedTooLong(queuePlayer)) {
@@ -628,6 +627,18 @@ public class QueueManagerImpl implements QueueManager {
         List<QueuePlayer> srs = new ArrayList<>();
         for(QueueServer s : servers) {
             QueuePlayer player = s.findPlayer(p);
+            if(player != null) {
+                srs.add(player);
+            }
+        }
+        return ImmutableList.copyOf(srs);
+    }
+
+    @Override
+    public ImmutableList<QueuePlayer> findPlayerInQueuesByName(String name) {
+        List<QueuePlayer> srs = new ArrayList<>();
+        for(QueueServer s : servers) {
+            QueuePlayer player = s.findPlayer(name);
             if(player != null) {
                 srs.add(player);
             }

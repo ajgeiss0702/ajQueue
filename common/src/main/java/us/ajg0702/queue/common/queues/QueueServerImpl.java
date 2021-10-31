@@ -405,6 +405,15 @@ public class QueueServerImpl implements QueueServer {
     }
 
     @Override
+    public QueuePlayer findPlayer(String player) {
+        for(QueuePlayer queuePlayer : queue) {
+            if(queuePlayer.getName().equalsIgnoreCase(player)) {
+                return queuePlayer;
+            }
+        }
+        return null;
+    }
+    @Override
     public QueuePlayer findPlayer(AdaptedPlayer player) {
         return findPlayer(player.getUniqueId());
     }
