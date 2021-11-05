@@ -409,20 +409,22 @@ public class QueueManagerImpl implements QueueManager {
 
     @Override
     public void sendQueueEvents() {
-        List<String> svs = main.getConfig().getStringList("queue-servers");
-        for(String s : svs) {
-            if(!s.contains(":")) continue;
-            String[] parts = s.split(":");
-            String fromName = parts[0];
-            String toName = parts[1];
-            AdaptedServer from = main.getPlatformMethods().getServer(fromName);
-            QueueServer to = findServer(toName);
-            if(from == null || to == null) continue;
-            from.getPlayers().forEach(player -> {
-                if(!getPlayerQueues(player).contains(to)) {
-                    addToQueue(player, to);
-                }
-            });
+        if(main.getConfig().getBoolean("force-queue-server-target")) {
+            List<String> svs = main.getConfig().getStringList("queue-servers");
+            for(String s : svs) {
+                if(!s.contains(":")) continue;
+                String[] parts = s.split(":");
+                String fromName = parts[0];
+                String toName = parts[1];
+                AdaptedServer from = main.getPlatformMethods().getServer(fromName);
+                QueueServer to = findServer(toName);
+                if(from == null || to == null) continue;
+                from.getPlayers().forEach(player -> {
+                    if(!getPlayerQueues(player).contains(to)) {
+                        addToQueue(player, to);
+                    }
+                });
+            }
         }
         for (QueueServer s : servers) {
             for (QueuePlayer queuePlayer : s.getQueue()) {

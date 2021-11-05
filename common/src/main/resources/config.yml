@@ -296,5 +296,11 @@ give-pausedbypass-players-priority: 0
 # If you have the free version, set it to 1 to enable
 give-fulljoin-players-priority: 0
 
+
+# Should we force players to be queued every few seconds for queue-servers?
+# This will check every few seconds, and if a player in a queue-server is
+#  not in the queue for the target server, it will add them.
+force-queue-server-target: true
+
 # Should we print some extra stuff to the console that might help aj diagnose some issues?
 debug: false
