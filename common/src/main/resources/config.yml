@@ -1,5 +1,5 @@
 # Dont touch this number please
-config-version: 30
+config-version: 31
 
 
 # This is the main config for ajQueue.
@@ -278,6 +278,23 @@ slash-servers: []
 balancer-types:
   - "bedwars:minigame"
 
+# What priority should we give whitelisted players priority when the server is whitelisted?
+# This will have no effect if the server isnt whitelisted
+# If you set to 0, this will be disabled
+# If you have the free version, set it to 1 to enable
+give-whitelisted-players-priority: 0
 
-# Should we print some extra stuff to the console that might help diagnose some issues?
+# What priority should we give players that are able to bypass paused priority when the server is paused?
+# This will have no effect if the server isnt paused
+# If you set to 0, this will be disabled
+# If you have the free version, set it to 1 to enable
+give-pausedbypass-players-priority: 0
+
+# What priority should we give players that are able to bypass full servers priority when the server is full?
+# This will have no effect if the server isnt full
+# If you set to 0, this will be disabled
+# If you have the free version, set it to 1 to enable
+give-fulljoin-players-priority: 0
+
+# Should we print some extra stuff to the console that might help aj diagnose some issues?
 debug: false

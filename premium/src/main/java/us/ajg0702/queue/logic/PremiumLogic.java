@@ -61,6 +61,7 @@ public class PremiumLogic implements Logic {
         }
 
         int highestPriority = Math.max(priority, serverPriority);
+        highestPriority = Math.max(highestPriority, Logic.getUnJoinablePriorities(server, player));
 
         QueuePlayer queuePlayer = new QueuePlayerImpl(player, server, highestPriority, maxOfflineTime);
 
@@ -82,14 +83,15 @@ public class PremiumLogic implements Logic {
 
         for(int i = 0; i < list.size(); i++) {
             QueuePlayer pl = list.get(i);
-            if(pl.getPriority() < highestPriority) {
-                if(debug) {
-                    logger.info("[priority] "+player.getName()+"  Adding to: "+i);
+            if (pl.getPriority() < highestPriority) {
+                if (debug) {
+                    logger.info("[priority] " + player.getName() + "  Adding to: " + i);
                 }
                 server.addPlayer(queuePlayer, i);
                 return queuePlayer;
             }
         }
+
 
         if(debug) {
             logger.info("[priority] "+player.getName()+"  Cant go infront of anyone" );

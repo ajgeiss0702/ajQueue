@@ -6,6 +6,7 @@ import net.kyori.adventure.title.Title;
 import us.ajg0702.queue.api.QueueManager;
 import us.ajg0702.queue.api.players.AdaptedPlayer;
 import us.ajg0702.queue.api.players.QueuePlayer;
+import us.ajg0702.queue.api.premium.Logic;
 import us.ajg0702.queue.api.queues.QueueServer;
 import us.ajg0702.queue.api.server.AdaptedServer;
 import us.ajg0702.queue.common.players.QueuePlayerImpl;
@@ -151,6 +152,7 @@ public class QueueManagerImpl implements QueueManager {
         } else {
             int priority = player.hasPermission("ajqueue.priority") ||
                     player.hasPermission("ajqueue.serverpriority."+server.getName()) ? 1 : 0;
+            priority = Math.max(priority, Logic.getUnJoinablePriorities(server, player) > 0 ? 1 : 0);
             int maxOfflineTime = player.hasPermission("ajqueue.stayqueued") ? 60 : 0;
             queuePlayer = new QueuePlayerImpl(player, server, priority, maxOfflineTime);
             if(
