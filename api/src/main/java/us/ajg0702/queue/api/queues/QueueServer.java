@@ -196,6 +196,12 @@ public interface QueueServer {
      * Finds the player in this queue and returns the representative QueuePlayer
      * @return The QueuePlayer representing the player, null if not found
      */
+    QueuePlayer findPlayer(String player);
+
+    /**
+     * Finds the player in this queue and returns the representative QueuePlayer
+     * @return The QueuePlayer representing the player, null if not found
+     */
     QueuePlayer findPlayer(AdaptedPlayer player);
 
     /**

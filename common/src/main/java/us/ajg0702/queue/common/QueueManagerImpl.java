@@ -6,6 +6,7 @@ import net.kyori.adventure.title.Title;
 import us.ajg0702.queue.api.QueueManager;
 import us.ajg0702.queue.api.players.AdaptedPlayer;
 import us.ajg0702.queue.api.players.QueuePlayer;
+import us.ajg0702.queue.api.premium.Logic;
 import us.ajg0702.queue.api.queues.QueueServer;
 import us.ajg0702.queue.api.server.AdaptedServer;
 import us.ajg0702.queue.common.players.QueuePlayerImpl;
@@ -151,6 +152,7 @@ public class QueueManagerImpl implements QueueManager {
         } else {
             int priority = player.hasPermission("ajqueue.priority") ||
                     player.hasPermission("ajqueue.serverpriority."+server.getName()) ? 1 : 0;
+            priority = Math.max(priority, Logic.getUnJoinablePriorities(server, player) > 0 ? 1 : 0);
             int maxOfflineTime = player.hasPermission("ajqueue.stayqueued") ? 60 : 0;
             queuePlayer = new QueuePlayerImpl(player, server, priority, maxOfflineTime);
             if(
@@ -407,20 +409,22 @@ public class QueueManagerImpl implements QueueManager {
 
     @Override
     public void sendQueueEvents() {
-        List<String> svs = main.getConfig().getStringList("queue-servers");
-        for(String s : svs) {
-            if(!s.contains(":")) continue;
-            String[] parts = s.split(":");
-            String fromName = parts[0];
-            String toName = parts[1];
-            AdaptedServer from = main.getPlatformMethods().getServer(fromName);
-            QueueServer to = findServer(toName);
-            if(from == null || to == null) continue;
-            from.getPlayers().forEach(player -> {
-                if(!getPlayerQueues(player).contains(to)) {
-                    addToQueue(player, to);
-                }
-            });
+        if(main.getConfig().getBoolean("force-queue-server-target")) {
+            List<String> svs = main.getConfig().getStringList("queue-servers");
+            for(String s : svs) {
+                if(!s.contains(":")) continue;
+                String[] parts = s.split(":");
+                String fromName = parts[0];
+                String toName = parts[1];
+                AdaptedServer from = main.getPlatformMethods().getServer(fromName);
+                QueueServer to = findServer(toName);
+                if(from == null || to == null) continue;
+                from.getPlayers().forEach(player -> {
+                    if(!getPlayerQueues(player).contains(to)) {
+                        addToQueue(player, to);
+                    }
+                });
+            }
         }
         for (QueueServer s : servers) {
             for (QueuePlayer queuePlayer : s.getQueue()) {
@@ -523,7 +527,6 @@ public class QueueManagerImpl implements QueueManager {
         }
 
         for(QueueServer server : sendingServers) {
-            Debugger.debug("Sending players for "+server.getName());
             for(QueuePlayer queuePlayer : server.getQueue()) {
                 if(queuePlayer.getPlayer() != null) continue;
                 if(main.getLogic().playerDisconnectedTooLong(queuePlayer)) {
@@ -628,6 +631,18 @@ public class QueueManagerImpl implements QueueManager {
         List<QueuePlayer> srs = new ArrayList<>();
         for(QueueServer s : servers) {
             QueuePlayer player = s.findPlayer(p);
+            if(player != null) {
+                srs.add(player);
+            }
+        }
+        return ImmutableList.copyOf(srs);
+    }
+
+    @Override
+    public ImmutableList<QueuePlayer> findPlayerInQueuesByName(String name) {
+        List<QueuePlayer> srs = new ArrayList<>();
+        for(QueueServer s : servers) {
+            QueuePlayer player = s.findPlayer(name);
             if(player != null) {
                 srs.add(player);
             }

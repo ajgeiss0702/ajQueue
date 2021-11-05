@@ -118,6 +118,13 @@ public interface QueueManager {
     ImmutableList<QueuePlayer> findPlayerInQueues(AdaptedPlayer p);
 
     /**
+     * Finds QueuePlayers that have this username
+     * @param name The username to look up
+     * @return A list of QueuePlayers that have this username
+     */
+    ImmutableList<QueuePlayer> findPlayerInQueuesByName(String name);
+
+    /**
      * Gets all of the queues the player is currently queued for
      * @param p The player
      * @return A list of QueueServers that this player is queued for
