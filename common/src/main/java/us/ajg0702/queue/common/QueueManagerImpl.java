@@ -121,7 +121,7 @@ public class QueueManagerImpl implements QueueManager {
 
         boolean enableBypassPaused = main.getConfig().getBoolean("enable-bypasspaused-permission");
         if(server.isPaused() && main.getConfig().getBoolean("prevent-joining-paused")) {
-            if(!enableBypassPaused || player.hasPermission("ajqueue.bypasspaused")) {
+            if(!enableBypassPaused || !player.hasPermission("ajqueue.bypasspaused")) {
                 player.sendMessage(msgs.getComponent("errors.cant-join-paused", "SERVER:"+server.getAlias()));
                 return false;
             }
