@@ -37,8 +37,10 @@ public class BungeeServer implements AdaptedServer {
         CompletableFuture<AdaptedServerPing> future = new CompletableFuture<>();
         handle.ping((pp, error) -> {
             if(error != null) {
-                future.complete(null);
+                future.completeExceptionally(error);
+                return;
             }
+
             future.complete(new BungeeServerPing(pp));
         });
         return future;

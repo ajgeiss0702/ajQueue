@@ -106,7 +106,7 @@ public class VelocityPlayer implements AdaptedPlayer, Audience {
     @Override
     public String getServerName() {
         Optional<ServerConnection> serverConnection = handle.getCurrentServer();
-        if(!serverConnection.isPresent()) return "none";
+        if(!serverConnection.isPresent()) return null;
         ServerConnection connection = serverConnection.get();
         return connection.getServerInfo().getName();
     }

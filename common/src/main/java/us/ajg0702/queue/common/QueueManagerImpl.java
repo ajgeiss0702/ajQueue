@@ -119,9 +119,12 @@ public class QueueManagerImpl implements QueueManager {
             return false;
         }
 
+        boolean enableBypassPaused = main.getConfig().getBoolean("enable-bypasspaused-permission");
         if(server.isPaused() && main.getConfig().getBoolean("prevent-joining-paused")) {
-            player.sendMessage(msgs.getComponent("errors.cant-join-paused", "SERVER:"+server.getAlias()));
-            return false;
+            if(!enableBypassPaused || !player.hasPermission("ajqueue.bypasspaused")) {
+                player.sendMessage(msgs.getComponent("errors.cant-join-paused", "SERVER:"+server.getAlias()));
+                return false;
+            }
         }
 
         List<AdaptedServer> notInServers = new ArrayList<>(server.getServers());
@@ -430,6 +433,7 @@ public class QueueManagerImpl implements QueueManager {
             for (QueuePlayer queuePlayer : s.getQueue()) {
                 AdaptedPlayer player =  queuePlayer.getPlayer();
                 if (player == null || !player.isConnected()) continue;
+                if(player.getServerName() == null) continue;
                 main.getPlatformMethods().sendPluginMessage(player, "inqueueevent", "true");
             }
         }
