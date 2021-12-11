@@ -36,11 +36,12 @@ public class VelocityServer implements AdaptedServer {
         CompletableFuture<AdaptedServerPing> future = new CompletableFuture<>();
         CompletableFuture<ServerPing> serverPing = handle.ping();
         serverPing.thenRunAsync(() -> {
-            AdaptedServerPing aPing = null;
+            AdaptedServerPing aPing;
             try {
                 aPing = new VelocityServerPing(serverPing.get());
-            } catch (InterruptedException | ExecutionException e) {
-                e.printStackTrace();
+            } catch (Throwable e) {
+                future.completeExceptionally(e);
+                return;
             }
             future.complete(aPing);
         });
