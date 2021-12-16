@@ -49,6 +49,9 @@ public class QueueManagerImpl implements QueueManager {
             if(previousServer != null) {
                 queueServer.setPaused(previousServer.isPaused());
                 queueServer.setLastSentTime(previousServer.getLastSentTime());
+                queueServer.setOnline(previousServer.isOnline());
+                queueServer.setWhitelisted(previousServer.isWhitelisted());
+                queueServer.setWhitelistedPlayers(previousServer.getWhitelistedPlayers());
             }
             result.add(queueServer);
         }

@@ -468,4 +468,9 @@ public class QueueServerImpl implements QueueServer {
         if(!pings.containsKey(server)) throw new IllegalArgumentException("Server is not in this group!");
         pings.get(server).addPlayer();
     }
+
+    @Override
+    public void setOnline(boolean online) {
+        this.online = online;
+    }
 }
