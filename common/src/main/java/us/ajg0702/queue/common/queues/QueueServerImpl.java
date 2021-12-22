@@ -176,7 +176,7 @@ public class QueueServerImpl implements QueueServer {
             AdaptedServerPing ping = null;
             try {
                 ping = futurePing.get(5, TimeUnit.SECONDS);
-            } catch (InterruptedException | ExecutionException | TimeoutException e) {
+            } catch (Exception e) {
                 if(pingerDebug) {
                     main.getLogger().info("[pinger] ["+server.getServerInfo().getName()+"] offline:");
                     e.printStackTrace();
