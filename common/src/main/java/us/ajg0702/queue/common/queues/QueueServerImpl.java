@@ -243,7 +243,7 @@ public class QueueServerImpl implements QueueServer {
             }
 
             if(pingerDebug) {
-                main.getLogger().info("[pinger] ["+server.getServerInfo().getName()+"] Success");
+                main.getLogger().info("[pinger] ["+server.getServerInfo().getName()+"] Finished");
             }
         }
     }
