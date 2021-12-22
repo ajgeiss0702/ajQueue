@@ -224,6 +224,7 @@ supported-protocols:
 #  api will be used to find the name of the protocol.
 # If you are on bungee, only this list can be used.
 protocol-names:
+  - "757:1.18.1"
   - "756:1.17.1"
   - "755:1.17"
   - "754:1.16.5"
