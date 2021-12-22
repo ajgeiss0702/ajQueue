@@ -3,6 +3,7 @@ package us.ajg0702.queue.platforms.bungeecord;
 import net.kyori.adventure.platform.bungeecord.BungeeAudiences;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.bungeecord.BungeeComponentSerializer;
+import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.*;
 import net.md_5.bungee.api.plugin.Listener;
@@ -30,6 +31,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@SuppressWarnings("unused")
 public class BungeeQueue extends Plugin implements Listener, Implementation {
 
     private QueueMain main;
@@ -106,7 +108,13 @@ public class BungeeQueue extends Plugin implements Listener, Implementation {
 
         if(!(e.getReceiver() instanceof ProxiedPlayer)) return;
 
-        main.getEventHandler().handleMessage(new BungeePlayer((ProxiedPlayer) e.getReceiver()), e.getData());
+        ProxyServer.getInstance().getScheduler().runAsync(this, () ->
+                main.getEventHandler()
+                        .handleMessage(
+                                new BungeePlayer((ProxiedPlayer) e.getReceiver()),
+                                e.getData()
+                        )
+        );
     }
 
     @EventHandler
