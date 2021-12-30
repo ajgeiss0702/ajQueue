@@ -175,6 +175,11 @@ public class VelocityPlayer implements AdaptedPlayer, Audience {
     }
 
     @Override
+    public void kick(Component reason) {
+        handle.disconnect(reason);
+    }
+
+    @Override
     public List<String> getPermissions() {
         throw new IllegalStateException("AdaptedPlayer#getPermissions cannot be used on velocity");
     }

@@ -6,6 +6,7 @@ import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.sound.SoundStop;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.ComponentLike;
+import net.kyori.adventure.text.serializer.bungeecord.BungeeComponentSerializer;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import net.kyori.adventure.title.Title;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
@@ -134,6 +135,11 @@ public class BungeePlayer implements AdaptedPlayer, Audience {
     @Override
     public String getName() {
         return handle.getName();
+    }
+
+    @Override
+    public void kick(Component reason) {
+        handle.disconnect(BungeeComponentSerializer.get().serialize(reason));
     }
 
     @Override

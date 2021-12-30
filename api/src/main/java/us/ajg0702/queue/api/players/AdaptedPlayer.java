@@ -78,6 +78,12 @@ public interface AdaptedPlayer extends Handle, Audience {
      */
     String getName();
 
+    /**
+     * Kick a player from the proxy
+     * @param reason The reason to kick them with
+     */
+    void kick(Component reason);
+
     List<String> getPermissions();
 
     default boolean equals(AdaptedPlayer other) {
