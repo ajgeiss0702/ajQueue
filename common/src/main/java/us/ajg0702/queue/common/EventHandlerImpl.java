@@ -217,10 +217,29 @@ public class EventHandlerImpl implements EventHandler {
             QueuePlayer queuePlayer = server.findPlayer(player);
             if(queuePlayer.getPosition() != 1) continue;
             List<String> kickReasons = main.getConfig().getStringList("kick-reasons");
+            boolean kickPlayer = main.getConfig().getBoolean("kick-kicked-players");
+            if(kickPlayer) {
+                List<String> svs = main.getConfig().getStringList("queue-servers");
+                boolean found = false;
+                for(String s : svs) {
+                    if(!s.contains(":")) continue;
+                    String[] parts = s.split(":");
+                    String fromName = parts[0];
+                    QueueServer toServer = main.getQueueManager().findServer(parts[1]);
+                    if(fromName.equalsIgnoreCase(server.getName()) && toServer != null && toServer.equals(server)) {
+                        found = true;
+                    }
+                }
+                kickPlayer = found;
+            }
 
             for(String kickReason : kickReasons) {
                 if(plainReason.toLowerCase().contains(kickReason.toLowerCase())) {
                     server.removePlayer(queuePlayer);
+                    if(kickPlayer) {
+                        player.kick(reason);
+                    }
+                    break;
                 }
             }
         }

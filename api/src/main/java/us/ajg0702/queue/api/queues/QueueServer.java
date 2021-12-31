@@ -256,6 +256,14 @@ public interface QueueServer {
      */
     void addPlayer(AdaptedServer server);
 
+    /**
+     * Sets if this server is online.
+     * Note that this is overrided by the pinger, so if you set
+     *  this, it will most likely be temporary
+     * @param online whether the server is online or not
+     */
+    void setOnline(boolean online);
+
 
     /**
      * elliot is bad

@@ -176,7 +176,7 @@ public class QueueServerImpl implements QueueServer {
             AdaptedServerPing ping = null;
             try {
                 ping = futurePing.get(5, TimeUnit.SECONDS);
-            } catch (InterruptedException | ExecutionException | TimeoutException e) {
+            } catch (Exception e) {
                 if(pingerDebug) {
                     main.getLogger().info("[pinger] ["+server.getServerInfo().getName()+"] offline:");
                     e.printStackTrace();
@@ -243,7 +243,7 @@ public class QueueServerImpl implements QueueServer {
             }
 
             if(pingerDebug) {
-                main.getLogger().info("[pinger] ["+server.getServerInfo().getName()+"] Success");
+                main.getLogger().info("[pinger] ["+server.getServerInfo().getName()+"] Finished");
             }
         }
     }
@@ -467,5 +467,10 @@ public class QueueServerImpl implements QueueServer {
     public void addPlayer(AdaptedServer server) {
         if(!pings.containsKey(server)) throw new IllegalArgumentException("Server is not in this group!");
         pings.get(server).addPlayer();
+    }
+
+    @Override
+    public void setOnline(boolean online) {
+        this.online = online;
     }
 }

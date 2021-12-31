@@ -1,5 +1,5 @@
 # Dont touch this number please
-config-version: 31
+config-version: 32
 
 
 # This is the main config for ajQueue.
@@ -38,6 +38,12 @@ kick-reasons:
   - 'banned'
   - 'blacklisted'
 
+# Should we completly kick the user from the server if they are in a queue-server
+#  and are kicked from the server with one of the above reasons?
+# Note this will do nothing on servers that arent queue-servers
+#  (as in the config option queue-servers)
+#  Default: true
+kick-kicked-players: true
 
 # Should we remove a player from the queue if they move servers?
 # This will remove the player from if they switch to any other server
@@ -224,6 +230,7 @@ supported-protocols:
 #  api will be used to find the name of the protocol.
 # If you are on bungee, only this list can be used.
 protocol-names:
+  - "757:1.18.1"
   - "756:1.17.1"
   - "755:1.17"
   - "754:1.16.5"

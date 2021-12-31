@@ -20,7 +20,11 @@ public class VelocityCommand implements RawCommand {
 
     @Override
     public void execute(Invocation invocation) {
-        command.execute(new VelocitySender(invocation.source()), invocation.arguments().split(" "));
+        String[] args = new String[]{};
+        if(!invocation.arguments().isEmpty()) {
+            args = invocation.arguments().split(" ");
+        }
+        command.execute(new VelocitySender(invocation.source()), args);
     }
 
     @Override

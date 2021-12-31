@@ -45,6 +45,10 @@ public class SlashServerCommand extends BaseCommand {
             sender.sendMessage(getMessages().getComponent("errors.player-only"));
             return;
         }
+        if(main.getConfig().getBoolean("require-permission") && !sender.hasPermission("ajqueue.queue."+args[0])) {
+            sender.sendMessage(getMessages().getComponent("noperm"));
+            return;
+        }
         main.getQueueManager().addToQueue(main.getPlatformMethods().senderToPlayer(sender), server);
     }
 
