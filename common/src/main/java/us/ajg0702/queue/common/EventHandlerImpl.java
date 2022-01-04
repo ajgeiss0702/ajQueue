@@ -12,7 +12,7 @@ import us.ajg0702.queue.api.queues.QueueServer;
 import us.ajg0702.queue.api.server.AdaptedServer;
 import us.ajg0702.queue.commands.commands.PlayerSender;
 import us.ajg0702.queue.common.players.QueuePlayerImpl;
-import us.ajg0702.queue.common.utils.Debugger;
+import us.ajg0702.queue.common.utils.Debug;
 
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
@@ -181,7 +181,7 @@ public class EventHandlerImpl implements EventHandler {
 
         String plainReason = PlainTextComponentSerializer.plainText().serialize(reason);
         
-        Debugger.debug(player.getName()+" kicked! Moving: "+moving+" from: "+from.getName()+" plainReason: "+plainReason    );
+        Debug.info(player.getName()+" kicked! Moving: "+moving+" from: "+from.getName()+" plainReason: "+plainReason    );
 
         if(!moving && main.getConfig().getBoolean("send-fail-debug")) {
             main.getLogger().warning("Failed to send "+player.getName()+" to "+from.getName()+". Kicked with reason: "+plainReason);
@@ -219,6 +219,7 @@ public class EventHandlerImpl implements EventHandler {
             List<String> kickReasons = main.getConfig().getStringList("kick-reasons");
             boolean kickPlayer = main.getConfig().getBoolean("kick-kicked-players");
             if(kickPlayer) {
+                Debug.info("Initially kicking player");
                 List<String> svs = main.getConfig().getStringList("queue-servers");
                 boolean found = false;
                 for(String s : svs) {
@@ -226,12 +227,15 @@ public class EventHandlerImpl implements EventHandler {
                     String[] parts = s.split(":");
                     String fromName = parts[0];
                     QueueServer toServer = main.getQueueManager().findServer(parts[1]);
-                    if(fromName.equalsIgnoreCase(server.getName()) && toServer != null && toServer.equals(server)) {
+                    if(toServer == null) continue;
+                    Debug.info("fromName equals: "+fromName.equalsIgnoreCase(player.getServerName())+" ("+fromName+" = "+player.getServerName()+") toServer equals: "+toServer.equals(server));
+                    if(fromName.equalsIgnoreCase(player.getServerName()) && toServer.equals(server)) {
                         found = true;
                     }
                 }
                 kickPlayer = found;
             }
+            Debug.info("Kick player: "+kickPlayer);
 
             for(String kickReason : kickReasons) {
                 if(plainReason.toLowerCase().contains(kickReason.toLowerCase())) {

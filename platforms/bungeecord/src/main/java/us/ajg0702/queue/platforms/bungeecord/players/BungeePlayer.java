@@ -13,7 +13,7 @@ import net.md_5.bungee.api.connection.ProxiedPlayer;
 import org.jetbrains.annotations.NotNull;
 import us.ajg0702.queue.api.players.AdaptedPlayer;
 import us.ajg0702.queue.api.server.AdaptedServer;
-import us.ajg0702.queue.common.utils.Debugger;
+import us.ajg0702.queue.common.utils.Debug;
 import us.ajg0702.queue.platforms.bungeecord.BungeeQueue;
 import us.ajg0702.queue.platforms.bungeecord.server.BungeeServer;
 
@@ -123,7 +123,7 @@ public class BungeePlayer implements AdaptedPlayer, Audience {
 
     @Override
     public void connect(AdaptedServer server) {
-        Debugger.debug("Attempting to send "+getName()+" to "+server.getName());
+        Debug.info("Attempting to send "+getName()+" to "+server.getName());
         handle.connect(((BungeeServer) server).getHandle());
     }
 

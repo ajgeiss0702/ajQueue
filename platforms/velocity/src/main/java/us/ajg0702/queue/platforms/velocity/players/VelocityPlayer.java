@@ -14,7 +14,7 @@ import org.jetbrains.annotations.NotNull;
 import us.ajg0702.queue.api.players.AdaptedPlayer;
 import us.ajg0702.queue.api.server.AdaptedServer;
 import us.ajg0702.queue.common.QueueMain;
-import us.ajg0702.queue.common.utils.Debugger;
+import us.ajg0702.queue.common.utils.Debug;
 
 import java.util.List;
 import java.util.Optional;
@@ -118,7 +118,7 @@ public class VelocityPlayer implements AdaptedPlayer, Audience {
 
     @Override
     public void connect(AdaptedServer server) {
-        Debugger.debug("Attempting to send "+getName()+" to "+server.getName());
+        Debug.info("Attempting to send "+getName()+" to "+server.getName());
         handle.createConnectionRequest((RegisteredServer) server.getHandle()).connect().thenAcceptAsync(
                 result -> {
                     if(!result.isSuccessful()) {
