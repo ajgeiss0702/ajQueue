@@ -21,15 +21,19 @@ public class ManageCommand extends BaseCommand {
     public ManageCommand(QueueMain main) {
         this.main = main;
 
-        addSubCommand(new Reload(main));
+        //debug commands
+        addSubCommand(new Protocol(main));
+        addSubCommand(new ISP(main));
+        addSubCommand(new PermissionList(main));
         addSubCommand(new Tasks(main));
         addSubCommand(new Version(main));
+        addSubCommand(new Whitelist(main));
+
+        //normal commands
+        addSubCommand(new Reload(main));
         addSubCommand(new Pause(main));
-        addSubCommand(new ISP(main));
         addSubCommand(new QueueList(main));
         addSubCommand(new Send(main));
-        addSubCommand(new PermissionList(main));
-        addSubCommand(new Whitelist(main));
         addSubCommand(new Update(main));
         addSubCommand(new Kick(main));
         addSubCommand(new KickAll(main));
