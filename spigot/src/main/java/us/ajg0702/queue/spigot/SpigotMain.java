@@ -201,6 +201,7 @@ public class SpigotMain extends JavaPlugin implements PluginMessageListener,List
 
 	@EventHandler(priority = EventPriority.HIGH)
 	public void onServerPing(ServerListPingEvent e) {
+		if(config == null) getLogger().warning("Server ping before plugin load!");
 		if(!config.getBoolean("take-over-motd-for-whitelist")) return;
 		if(!Bukkit.hasWhitelist()) return;
 
