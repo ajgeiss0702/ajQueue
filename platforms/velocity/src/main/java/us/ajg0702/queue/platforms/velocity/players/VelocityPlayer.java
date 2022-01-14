@@ -3,6 +3,7 @@ package us.ajg0702.queue.platforms.velocity.players;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ServerConnection;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
+import com.viaversion.viaversion.api.Via;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.sound.Sound;
@@ -73,8 +74,11 @@ public class VelocityPlayer implements AdaptedPlayer, Audience {
 
     final Player handle;
 
+    private final boolean viaAvailable;
+
     public VelocityPlayer(Player player) {
         handle = player;
+        viaAvailable = isClassAvailable("com.viaversion.viaversion.api.Via");
     }
 
     @Override
@@ -166,6 +170,9 @@ public class VelocityPlayer implements AdaptedPlayer, Audience {
 
     @Override
     public int getProtocolVersion() {
+        if(viaAvailable) {
+            return Via.getAPI().getPlayerVersion(handle.getUniqueId());
+        }
         return handle.getProtocolVersion().getProtocol();
     }
 
@@ -187,5 +194,15 @@ public class VelocityPlayer implements AdaptedPlayer, Audience {
     @Override
     public Player getHandle() {
         return handle;
+    }
+
+
+    private static boolean isClassAvailable(String className) {
+        try {
+            Class.forName(className);
+        } catch(Exception e) {
+            return false;
+        }
+        return true;
     }
 }

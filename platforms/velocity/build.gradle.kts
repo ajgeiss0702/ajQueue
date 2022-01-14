@@ -9,6 +9,7 @@ repositories {
     //mavenLocal()
     maven { url = uri("https://repo.ajg0702.us") }
     maven { url = uri("https://nexus.velocitypowered.com/repository/maven-public/") }
+    maven { url = uri("https://repo.viaversion.com/") }
     mavenCentral()
 }
 
@@ -20,6 +21,8 @@ dependencies {
     compileOnly("com.velocitypowered:velocity-api:3.0.0")
     annotationProcessor("com.velocitypowered:velocity-api:3.0.0")
     implementation("net.kyori:adventure-text-minimessage:4.0.0-SNAPSHOT")
+
+    compileOnly("com.viaversion:viaversion-api:4.2.0-SNAPSHOT")
 
     implementation("org.bstats:bstats-velocity:2.2.1")
 
