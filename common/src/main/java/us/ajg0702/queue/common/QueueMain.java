@@ -214,6 +214,8 @@ public class QueueMain extends AjQueueAPI {
         d.put("commands.kick.no-player", "&cCould not find {PLAYER}! Make sure they are in a queue!");
         d.put("commands.kick.unknown-server", "&cCould not find queue {QUEUE}. Make sure you spelled it correctly!");
         d.put("commands.kick.success", "<green>Kicked <white>{PLAYER} <green>from {NUM} queue{s}!");
+        d.put("commands.kickall.usage", "<red>Usage: /ajqueue kickall <queue>");
+        d.put("commands.kickall.success", "<green>Kicked <white>{NUM} <green>player{s} from <white>{SERVER}<green>!");
 
         d.put("noperm", "&cYou do not have permission to do this!");
 

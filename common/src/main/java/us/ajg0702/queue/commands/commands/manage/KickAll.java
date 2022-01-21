@@ -44,35 +44,20 @@ public class KickAll extends SubCommand {
         if(!checkPermission(sender)) return;
 
         if(args.length < 1) {
-            sender.sendMessage(getMessages().getComponent("commands.kick.usage"));
+            sender.sendMessage(getMessages().getComponent("commands.kickall.usage"));
             return;
         }
 
-        List<QueuePlayer> kickPlayers;
-
-        if(args.length == 1) {
-            kickPlayers = main.getQueueManager().findPlayerInQueuesByName(args[0]);
-        } else {
-            QueueServer queue = main.getQueueManager().findServer(args[1]);
-            if(queue == null) {
-                sender.sendMessage(getMessages().getComponent("commands.kick.unknown-server", "QUEUE:"+args[1]));
-                return;
-            }
-            kickPlayers = Collections.singletonList(queue.findPlayer(args[0]));
-        }
-
-        if(kickPlayers.size() == 0) {
-            sender.sendMessage(getMessages().getComponent("commands.kick.no-player", "PLAYER:"+args[0]));
-            return;
-        }
+        QueueServer server = main.getQueueManager().findServer(args[0]);
+        List<QueuePlayer> kickPlayers = new ArrayList<>(server.getQueue());
 
         for(QueuePlayer player : kickPlayers) {
             player.getQueueServer().removePlayer(player);
         }
 
         sender.sendMessage(getMessages().getComponent(
-                "commands.kick.success",
-                "PLAYER:"+args[0],
+                "commands.kickall.success",
+                "SERVER:"+args[0],
                 "NUM:"+kickPlayers.size(),
                 "s:"+ (kickPlayers.size() == 1 ? "" : "s")
         ));
@@ -81,9 +66,6 @@ public class KickAll extends SubCommand {
     @Override
     public List<String> autoComplete(ICommandSender sender, String[] args) {
         if(args.length == 1) {
-            return main.getPlatformMethods().getPlayerNames(false);
-        }
-        if(args.length == 2) {
             return main.getQueueManager().getServerNames();
         }
         return new ArrayList<>();
