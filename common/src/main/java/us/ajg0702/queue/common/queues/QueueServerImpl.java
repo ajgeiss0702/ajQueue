@@ -329,6 +329,7 @@ public class QueueServerImpl implements QueueServer {
 
     @Override
     public synchronized void removePlayer(QueuePlayer player) {
+        main.getQueueManager().getSendingAttempts().remove(player);
         queue.remove(player);
     }
 

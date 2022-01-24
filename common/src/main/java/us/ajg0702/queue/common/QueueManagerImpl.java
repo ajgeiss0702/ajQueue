@@ -522,7 +522,7 @@ public class QueueManagerImpl implements QueueManager {
 
 
     final ConcurrentHashMap<AdaptedPlayer, Long> sendingNowAntiSpam = new ConcurrentHashMap<>();
-    final HashMap<QueuePlayer, Integer> sendingAttempts = new HashMap<>();
+    final Map<QueuePlayer, Integer> sendingAttempts = new WeakHashMap<>();
 
     @Override
     public void sendPlayers(QueueServer queueServer) {
@@ -600,7 +600,7 @@ public class QueueManagerImpl implements QueueManager {
                 if(server.isPaused() && !nextPlayer.hasPermission("ajqueue.bypasspaused")) continue;
             } else if(server.isPaused()) { continue; }
 
-            int tries = sendingAttempts.get(nextQueuePlayer) == null ? 0 : sendingAttempts.get(nextQueuePlayer);
+            int tries = sendingAttempts.getOrDefault(nextQueuePlayer, 0);
             int maxTries = main.getConfig().getInt("max-tries");
             if(tries >= maxTries && maxTries > 0) {
                 server.removePlayer(nextQueuePlayer);
@@ -678,7 +678,7 @@ public class QueueManagerImpl implements QueueManager {
     }
 
     @Override
-    public HashMap<QueuePlayer, Integer> getSendingAttempts() {
+    public Map<QueuePlayer, Integer> getSendingAttempts() {
         return sendingAttempts;
     }
 }
