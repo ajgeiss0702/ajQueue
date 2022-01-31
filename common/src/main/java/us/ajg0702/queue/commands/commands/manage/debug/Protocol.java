@@ -1,32 +1,35 @@
-package us.ajg0702.queue.commands.commands.SlashServer;
+package us.ajg0702.queue.commands.commands.manage.debug;
 
 import com.google.common.collect.ImmutableList;
+import net.kyori.adventure.text.Component;
 import us.ajg0702.queue.api.commands.ICommandSender;
-import us.ajg0702.queue.commands.BaseCommand;
+import us.ajg0702.queue.commands.SubCommand;
 import us.ajg0702.queue.common.QueueMain;
 import us.ajg0702.utils.common.Messages;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
-public class SlashServerCommand extends BaseCommand {
+public class Protocol extends SubCommand {
 
     final QueueMain main;
-    final String server;
-    public SlashServerCommand(QueueMain main, String server) {
+    public Protocol(QueueMain main) {
         this.main = main;
-        this.server = server;
     }
 
     @Override
     public String getName() {
-        return server;
+        return "protocol";
     }
 
     @Override
     public ImmutableList<String> getAliases() {
         return ImmutableList.of();
+    }
+
+    @Override
+    public boolean showInTabComplete() {
+        return false;
     }
 
     @Override
@@ -41,15 +44,9 @@ public class SlashServerCommand extends BaseCommand {
 
     @Override
     public void execute(ICommandSender sender, String[] args) {
-        if(!sender.isPlayer()) {
-            sender.sendMessage(getMessages().getComponent("errors.player-only"));
-            return;
-        }
-        if(main.getConfig().getBoolean("require-permission") && !sender.hasPermission("ajqueue.queue."+server)) {
-            sender.sendMessage(getMessages().getComponent("noperm"));
-            return;
-        }
-        main.getQueueManager().addToQueue(main.getPlatformMethods().senderToPlayer(sender), server);
+        if(!checkPermission(sender)) return;
+        if(!sender.isPlayer()) return;
+        sender.sendMessage(Component.text(main.getPlatformMethods().senderToPlayer(sender).getProtocolVersion()));
     }
 
     @Override

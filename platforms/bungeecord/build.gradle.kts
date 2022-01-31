@@ -9,6 +9,7 @@ repositories {
     //mavenLocal()
     maven { url = uri("https://repo.ajg0702.us") }
     maven { url = uri("https://nexus.velocitypowered.com/repository/maven-public/") }
+    maven { url = uri("https://repo.viaversion.com/") }
     mavenCentral()
 }
 
@@ -23,6 +24,8 @@ dependencies {
 
     implementation("net.kyori:adventure-platform-bungeecord:4.0.0")
     compileOnly("net.kyori:adventure-text-serializer-plain:4.0.0-SNAPSHOT")
+
+    compileOnly("com.viaversion:viaversion-api:4.2.0-SNAPSHOT")
 
     implementation("org.bstats:bstats-bungeecord:2.2.1")
 

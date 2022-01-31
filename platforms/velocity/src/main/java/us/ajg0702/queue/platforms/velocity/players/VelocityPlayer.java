@@ -3,6 +3,7 @@ package us.ajg0702.queue.platforms.velocity.players;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ServerConnection;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
+import com.viaversion.viaversion.api.Via;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.sound.Sound;
@@ -14,7 +15,7 @@ import org.jetbrains.annotations.NotNull;
 import us.ajg0702.queue.api.players.AdaptedPlayer;
 import us.ajg0702.queue.api.server.AdaptedServer;
 import us.ajg0702.queue.common.QueueMain;
-import us.ajg0702.queue.common.utils.Debugger;
+import us.ajg0702.queue.common.utils.Debug;
 
 import java.util.List;
 import java.util.Optional;
@@ -73,8 +74,11 @@ public class VelocityPlayer implements AdaptedPlayer, Audience {
 
     final Player handle;
 
+    private final boolean viaAvailable;
+
     public VelocityPlayer(Player player) {
         handle = player;
+        viaAvailable = isClassAvailable("com.viaversion.viaversion.api.Via");
     }
 
     @Override
@@ -118,7 +122,7 @@ public class VelocityPlayer implements AdaptedPlayer, Audience {
 
     @Override
     public void connect(AdaptedServer server) {
-        Debugger.debug("Attempting to send "+getName()+" to "+server.getName());
+        Debug.info("Attempting to send "+getName()+" to "+server.getName());
         handle.createConnectionRequest((RegisteredServer) server.getHandle()).connect().thenAcceptAsync(
                 result -> {
                     if(!result.isSuccessful()) {
@@ -166,6 +170,9 @@ public class VelocityPlayer implements AdaptedPlayer, Audience {
 
     @Override
     public int getProtocolVersion() {
+        if(viaAvailable) {
+            return Via.getAPI().getPlayerVersion(handle.getUniqueId());
+        }
         return handle.getProtocolVersion().getProtocol();
     }
 
@@ -187,5 +194,15 @@ public class VelocityPlayer implements AdaptedPlayer, Audience {
     @Override
     public Player getHandle() {
         return handle;
+    }
+
+
+    private static boolean isClassAvailable(String className) {
+        try {
+            Class.forName(className);
+        } catch(Exception e) {
+            return false;
+        }
+        return true;
     }
 }

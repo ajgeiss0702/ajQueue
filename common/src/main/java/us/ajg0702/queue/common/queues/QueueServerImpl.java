@@ -11,14 +11,12 @@ import us.ajg0702.queue.common.QueueMain;
 import us.ajg0702.queue.common.players.QueuePlayerImpl;
 import us.ajg0702.queue.common.queues.balancers.DefaultBalancer;
 import us.ajg0702.queue.common.queues.balancers.MinigameBalancer;
-import us.ajg0702.queue.common.utils.Debugger;
+import us.ajg0702.queue.common.utils.Debug;
 import us.ajg0702.utils.common.Messages;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 public class QueueServerImpl implements QueueServer {
 
@@ -50,13 +48,13 @@ public class QueueServerImpl implements QueueServer {
                         balancerType = "default";
                         balancer = new DefaultBalancer(this, main);
                 }
-                Debugger.debug("Using "+balancerType.toLowerCase(Locale.ROOT)+" balancer for "+name);
+                Debug.info("Using "+balancerType.toLowerCase(Locale.ROOT)+" balancer for "+name);
                 break;
             }
         }
         if(balancer == null) {
             balancer = new DefaultBalancer(this, main);
-            Debugger.debug("Using default balancer for "+name);
+            Debug.info("Using default balancer for "+name);
         }
 
         for(QueuePlayer queuePlayer : previousPlayers) {
@@ -331,6 +329,7 @@ public class QueueServerImpl implements QueueServer {
 
     @Override
     public synchronized void removePlayer(QueuePlayer player) {
+        main.getQueueManager().getSendingAttempts().remove(player);
         queue.remove(player);
     }
 
@@ -427,7 +426,7 @@ public class QueueServerImpl implements QueueServer {
 
     @Override
     public AdaptedServer getIdealServer(AdaptedPlayer player) {
-        Debugger.debug(getBalancer().toString());
+        Debug.info(getBalancer().toString());
         return getBalancer().getIdealServer(player);
     }
 

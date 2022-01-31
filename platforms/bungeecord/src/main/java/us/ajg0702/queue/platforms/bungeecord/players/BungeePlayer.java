@@ -1,5 +1,6 @@
 package us.ajg0702.queue.platforms.bungeecord.players;
 
+import com.viaversion.viaversion.api.Via;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.sound.Sound;
@@ -13,7 +14,7 @@ import net.md_5.bungee.api.connection.ProxiedPlayer;
 import org.jetbrains.annotations.NotNull;
 import us.ajg0702.queue.api.players.AdaptedPlayer;
 import us.ajg0702.queue.api.server.AdaptedServer;
-import us.ajg0702.queue.common.utils.Debugger;
+import us.ajg0702.queue.common.utils.Debug;
 import us.ajg0702.queue.platforms.bungeecord.BungeeQueue;
 import us.ajg0702.queue.platforms.bungeecord.server.BungeeServer;
 
@@ -79,8 +80,11 @@ public class BungeePlayer implements AdaptedPlayer, Audience {
 
     final ProxiedPlayer handle;
 
+    private final boolean viaAvailable;
+
     public BungeePlayer(ProxiedPlayer player) {
         handle = player;
+        viaAvailable = isClassAvailable("com.viaversion.viaversion.api.Via");
     }
 
     @Override
@@ -123,12 +127,15 @@ public class BungeePlayer implements AdaptedPlayer, Audience {
 
     @Override
     public void connect(AdaptedServer server) {
-        Debugger.debug("Attempting to send "+getName()+" to "+server.getName());
+        Debug.info("Attempting to send "+getName()+" to "+server.getName());
         handle.connect(((BungeeServer) server).getHandle());
     }
 
     @Override
     public int getProtocolVersion() {
+        if(viaAvailable) {
+            return Via.getAPI().getPlayerVersion(handle.getUniqueId());
+        }
         return handle.getPendingConnection().getVersion();
     }
 
@@ -154,5 +161,15 @@ public class BungeePlayer implements AdaptedPlayer, Audience {
 
     private Audience getAudience() {
         return BungeeQueue.adventure().player(handle);
+    }
+
+
+    private static boolean isClassAvailable(String className) {
+        try {
+            Class.forName(className);
+        } catch(Exception e) {
+            return false;
+        }
+        return true;
     }
 }
