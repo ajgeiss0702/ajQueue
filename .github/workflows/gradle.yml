@@ -31,6 +31,6 @@ jobs:
           # Artifact name
           name: plugin jar
           # A file, directory or wildcard pattern that describes what to upload
-          path: build/libs/ajQueue*.jar
+          path: free/build/libs/ajQueue*.jar
           # The desired behavior if no files are found using the provided path.
           if-no-files-found: error
