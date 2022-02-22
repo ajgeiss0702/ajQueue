@@ -55,6 +55,6 @@ jobs:
         with:
           name: build-files
       - name: Deploy api with Gradle
-        run: './gradlew :api:publish'
+        run: './gradlew :api:publishMavenJavaPublicationToAjRepoRepository'
       - name: Deploy common with Gradle
-        run: './gradlew :common:publish'
+        run: './gradlew :common:publishMavenJavaPublicationToAjRepoRepository'
