@@ -54,5 +54,7 @@ jobs:
       - uses: actions/download-artifact@v2
         with:
           name: build-files
-      - name: Deploy with Gradle
-        run: './gradlew :api:build :api:publish :common:build :common:publish'
+      - name: Deploy api with Gradle
+        run: './gradlew :api:publish'
+      - name: Deploy common with Gradle
+        run: './gradlew :common:publish'
