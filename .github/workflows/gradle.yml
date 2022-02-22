@@ -55,6 +55,4 @@ jobs:
         with:
           name: build-files
       - name: Deploy with Gradle
-        uses: gradle/gradle-build-action@937999e9cc2425eddc7fd62d1053baf041147db7
-        with:
-          arguments: :api:publish :common:publish
+        run: './gradlew :api:publish :common:publish'
