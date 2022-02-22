@@ -1,5 +1,5 @@
 # Dont touch this number please
-config-version: 32
+config-version: 33
 
 
 # This is the main config for ajQueue.
@@ -11,7 +11,7 @@ config-version: 32
 
 # The time the server will wait between sending people in the queue
 #  Default: 5
-wait-time: 5
+wait-time: 5.0
 
 # The time that a server has to be offline to be marked as offline instead of restarting
 #  Default: 120
@@ -308,6 +308,11 @@ give-fulljoin-players-priority: 0
 # This will check every few seconds, and if a player in a queue-server is
 #  not in the queue for the target server, it will add them.
 force-queue-server-target: true
+
+
+# The minimum time between pinging the server.
+# If ajQueue is pinging your backend servers too often, raise this number
+minimum-ping-time: 1.0
 
 # Should we print some extra stuff to the console that might help aj diagnose some issues?
 debug: false

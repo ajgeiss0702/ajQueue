@@ -56,7 +56,7 @@ public class TaskManager {
         updateTask = scheduleAtFixedRate(updateExecutor,
                 main.getQueueManager()::updateServers,
                 500L,
-                (long) (Math.max(main.getTimeBetweenPlayers()/2, 1)*1000L),
+                (long) (Math.max(main.getTimeBetweenPlayers()/2, main.getConfig().getDouble("minimum-ping-time"))*1000L),
                 TimeUnit.MILLISECONDS
         );
 
