@@ -55,4 +55,4 @@ jobs:
         with:
           name: build-files
       - name: Deploy with Gradle
-        run: './gradlew :api:publish :common:publish'
+        run: './gradlew :api:build :api:publish :common:build :common:publish'
