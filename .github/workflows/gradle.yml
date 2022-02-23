@@ -47,6 +47,8 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     environment: maven-repo-deploy
+    env:
+      REPO_TOKEN: ${{ secrets.REPO_TOKEN }}
     needs: build
     if: github.ref == 'refs/heads/master'
     steps:
@@ -55,6 +57,6 @@ jobs:
         with:
           name: build-files
       - name: Deploy api with Gradle
-        run: './gradlew :api:publishMavenJavaPublicationToAjRepoRepository'
+        run: './gradlew :api:publish'
       - name: Deploy common with Gradle
-        run: './gradlew :common:publishMavenJavaPublicationToAjRepoRepository'
+        run: './gradlew :common:publish'
