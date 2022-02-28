@@ -14,14 +14,21 @@ public class SlashServerCommand extends BaseCommand {
 
     final QueueMain main;
     final String server;
+    final String command;
     public SlashServerCommand(QueueMain main, String server) {
         this.main = main;
         this.server = server;
+        this.command = server;
+    }
+    public SlashServerCommand(QueueMain main, String command, String server) {
+        this.main = main;
+        this.server = server;
+        this.command = command;
     }
 
     @Override
     public String getName() {
-        return server;
+        return command;
     }
 
     @Override

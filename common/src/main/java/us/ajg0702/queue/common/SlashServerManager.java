@@ -22,10 +22,20 @@ public class SlashServerManager {
         serverCommands.clear();
 
         List<String> slashServerServers = main.getConfig().getStringList("slash-servers");
-        for(String server : slashServerServers) {
-            SlashServerCommand command = new SlashServerCommand(main, server);
-            serverCommands.add(command);
-            implementation.registerCommand(command);
+        for(String rawServer : slashServerServers) {
+            if(rawServer.contains(":") && main.isPremium()) {
+                String[] parts = rawServer.split(":");
+                String command = parts[0];
+                String server = parts[1];
+                SlashServerCommand slashServerCommand = new SlashServerCommand(main, command, server);
+                serverCommands.add(slashServerCommand);
+                implementation.registerCommand(slashServerCommand);
+            } else {
+                SlashServerCommand command = new SlashServerCommand(main, rawServer);
+                serverCommands.add(command);
+                implementation.registerCommand(command);
+            }
+
         }
     }
 }

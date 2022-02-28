@@ -1,5 +1,5 @@
 # Dont touch this number please
-config-version: 33
+config-version: 34
 
 
 # This is the main config for ajQueue.
@@ -274,6 +274,10 @@ enable-updater: true
 # For example, if survival is in this list, then if a player executes /survival
 #  then they will be put in the queue for survival
 # This works for both servers and groups
+# If you have ajQueuePlus, you can also make aliases.
+#  For example, if you have a server called lobby, and you want people to be able to use /hub, you can use this:
+#   - "hub:lobby"
+#  If you have the free version, you can only put the server name, no aliases.
 slash-servers: []
 
 # What balancer should we use?
