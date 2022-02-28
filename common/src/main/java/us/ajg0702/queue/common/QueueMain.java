@@ -235,6 +235,7 @@ public class QueueMain extends AjQueueAPI {
 
         d.put("placeholders.queued.none", "None");
         d.put("placeholders.position.none", "None");
+        d.put("placeholders.estimated_time.none", "None");
 
         d.put("title.title", "");
         d.put("title.subtitle", "<gold>You are <green>#{POS} <gold>in the queue!");

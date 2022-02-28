@@ -165,6 +165,19 @@ public class SpigotMain extends JavaPlugin implements PluginMessageListener,List
 	    	phs.put("queuedfor_"+queuename, number+"");
 	    	placeholders.responseCache.put(p, phs);
 	    }
+		if(subchannel.equals("estimated_time")) {
+			String playername = in.readUTF();
+
+			Player p = Bukkit.getPlayer(playername);
+			if(p == null) return;
+			if(!p.isOnline()) return;
+
+			String time = in.readUTF();
+			HashMap<String, String> phs = placeholders.responseCache.get(p);
+			if(phs == null) phs = new HashMap<>();
+			phs.put("estimated_time", time);
+			placeholders.responseCache.put(p, phs);
+		}
 	}
 	
 	
