@@ -14,11 +14,11 @@ repositories {
 dependencies {
     testImplementation("junit:junit:4.12")
 
-    compileOnly("net.kyori:adventure-api:4.8.1")
-    compileOnly("net.kyori:adventure-text-serializer-plain:4.0.0-SNAPSHOT")
+    compileOnly("net.kyori:adventure-api:4.9.3")
+    compileOnly("net.kyori:adventure-text-serializer-plain:4.9.3")
 
     compileOnly("com.google.guava:guava:30.1.1-jre")
-    compileOnly("us.ajg0702:ajUtils:1.1.17")
+    compileOnly("us.ajg0702:ajUtils:1.1.20")
 
     compileOnly("org.slf4j:slf4j-log4j12:1.7.29")
 
