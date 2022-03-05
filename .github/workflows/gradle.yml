@@ -24,7 +24,7 @@ jobs:
       - name: Build with Gradle
         uses: gradle/gradle-build-action@937999e9cc2425eddc7fd62d1053baf041147db7
         with:
-          arguments: :free:shadowJar
+          arguments: :free:shadowJar :premium:shadowJar
       - name: Upload plugin jar artifact
         uses: actions/upload-artifact@v2.3.1
         with:
@@ -60,3 +60,18 @@ jobs:
         run: './gradlew :api:publish'
       - name: Deploy common with Gradle
         run: './gradlew :common:publish'
+  updater:
+    runs-on: ubuntu-latest
+    environment: upload-to-updater
+    if: github.ref == 'refs/heads/master'
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/download-artifact@v2
+        with:
+          name: build-files
+      - run: cp free/build/libs/ajQueue*.jar jars/
+      - run: cp premium/build/libs/ajQueue*.jar jars/
+      - run: cd jars
+      - run: files=(*)
+      - run: curl -i -F "submit=true" -F "secret=${{ secrets.UPLOAD_TOKEN }}" -F "file=@${files[0]}" https://ajg0702.us/pl/updater/upload.php
+      - run: curl -i -F "submit=true" -F "secret=${{ secrets.UPLOAD_TOKEN }}" -F "file=@${files[1]}" https://ajg0702.us/pl/updater/upload.php

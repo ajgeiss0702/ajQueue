@@ -195,6 +195,9 @@ public class Placeholders extends PlaceholderExpansion {
     	if(identifier.equalsIgnoreCase("inqueue")) {
     		plugin.sendMessage(player, "inqueue", "");
     	}
+		if(identifier.equalsIgnoreCase("estimated_time")) {
+			plugin.sendMessage(player, "estimated_time", "");
+		}
     	if(identifier.matches("queuedfor_*.*")) {
     		plugin.sendMessage(player, "queuedfor", identifier.split("_")[1]);
     	}
