@@ -70,13 +70,14 @@ jobs:
       - uses: actions/download-artifact@v2
         with:
           name: build-files
-      - run: mkdir jars
-      - run: cp free/build/libs/ajQueue*.jar jars/
-      - run: cp premium/build/libs/ajQueue*.jar jars/
-      - run: cd jars
-      - run: files=(*)
-      - run: ls
-      - run: echo ${files[0]}
-      - run: echo ${files[1]}
-      - run: curl -i -F "submit=true" -F "secret=${{ secrets.UPLOAD_TOKEN }}" -F "file=@${files[0]}" https://ajg0702.us/pl/updater/upload.php
-      - run: curl -i -F "submit=true" -F "secret=${{ secrets.UPLOAD_TOKEN }}" -F "file=@${files[1]}" https://ajg0702.us/pl/updater/upload.php
+      - run: |
+          mkdir jars
+          cp free/build/libs/ajQueue*.jar jars/
+          cp premium/build/libs/ajQueue*.jar jars/
+          cd jars
+          files=(*)
+          ls
+          echo ${files[0]}
+          echo ${files[1]}
+          curl -i -F "submit=true" -F "secret=${{ secrets.UPLOAD_TOKEN }}" -F "file=@${files[0]}" https://ajg0702.us/pl/updater/upload.php
+          curl -i -F "submit=true" -F "secret=${{ secrets.UPLOAD_TOKEN }}" -F "file=@${files[1]}" https://ajg0702.us/pl/updater/upload.php
