@@ -70,6 +70,7 @@ jobs:
       - uses: actions/download-artifact@v2
         with:
           name: build-files
+      - run: mkdir jars
       - run: cp free/build/libs/ajQueue*.jar jars/
       - run: cp premium/build/libs/ajQueue*.jar jars/
       - run: cd jars
