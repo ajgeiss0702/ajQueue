@@ -75,6 +75,7 @@ jobs:
       - run: cp premium/build/libs/ajQueue*.jar jars/
       - run: cd jars
       - run: files=(*)
+      - run: ls
       - run: echo ${files[0]}
       - run: echo ${files[1]}
       - run: curl -i -F "submit=true" -F "secret=${{ secrets.UPLOAD_TOKEN }}" -F "file=@${files[0]}" https://ajg0702.us/pl/updater/upload.php
