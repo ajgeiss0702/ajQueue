@@ -158,6 +158,9 @@ public class QueueMain extends AjQueueAPI {
             return;
         }
 
+        logic = logicGetter.constructLogic();
+        aliasManager = logicGetter.constructAliasManager(config);
+
         slashServerManager = new SlashServerManager(this);
 
 
@@ -167,9 +170,6 @@ public class QueueMain extends AjQueueAPI {
         setTimeBetweenPlayers();
 
         queueManager = new QueueManagerImpl(this);
-
-        logic = logicGetter.constructLogic();
-        aliasManager = logicGetter.constructAliasManager(config);
 
         protocolNameManager = new ProtocolNameManagerImpl(config, platformMethods);
 
