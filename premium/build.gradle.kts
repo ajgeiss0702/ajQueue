@@ -23,7 +23,7 @@ dependencies {
 
     compileOnly("me.TechsCode:FakeUltraPerms:1.0.2")
 
-    compileOnly("us.ajg0702:ajUtils:1.1.20")
+    compileOnly("us.ajg0702:ajUtils:1.1.22")
 
     compileOnly("net.kyori:adventure-api:4.9.3")
 
