@@ -124,25 +124,32 @@ public class BungeeQueue extends Plugin implements Listener, Implementation {
 
     @EventHandler
     public void onServerSwitch(ServerSwitchEvent e) {
-        main.getEventHandler().onPlayerJoinServer(new BungeePlayer(e.getPlayer()));
+        ProxyServer.getInstance().getScheduler().runAsync(this, () ->
+                main.getEventHandler().onPlayerJoinServer(new BungeePlayer(e.getPlayer()))
+        );
+
     }
 
     @EventHandler
     public void onLeave(PlayerDisconnectEvent e) {
-        main.getEventHandler().onPlayerLeave(new BungeePlayer(e.getPlayer()));
+        ProxyServer.getInstance().getScheduler().runAsync(this, () ->
+            main.getEventHandler().onPlayerLeave(new BungeePlayer(e.getPlayer()))
+        );
     }
 
     @EventHandler
     public void onKick(ServerKickEvent e) {
         if(!e.getPlayer().isConnected()) return;
         if(e.getPlayer().getServer() == null) return; // if the player is kicked on initial join, we dont care
-        Component reason = BungeeComponentSerializer.get().deserialize(e.getKickReasonComponent());
-        main.getEventHandler().onServerKick(
-                new BungeePlayer(e.getPlayer()),
-                new BungeeServer(e.getKickedFrom()),
-                reason,
-                false
-        );
+        ProxyServer.getInstance().getScheduler().runAsync(this, () -> {
+            Component reason = BungeeComponentSerializer.get().deserialize(e.getKickReasonComponent());
+            main.getEventHandler().onServerKick(
+                    new BungeePlayer(e.getPlayer()),
+                    new BungeeServer(e.getKickedFrom()),
+                    reason,
+                    false
+            );
+        });
     }
 
     @Override

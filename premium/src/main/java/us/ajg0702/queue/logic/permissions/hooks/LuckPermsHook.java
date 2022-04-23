@@ -37,7 +37,12 @@ public class LuckPermsHook implements PermissionHook {
 
         User user = api.getUserManager().getUser(player.getUniqueId());
 
-        assert user != null;
+        if(user == null) {
+            main.getLogger().warn("LuckPerms doesnt seem to have data loaded for "+player.getName()+"! " +
+                    "Because of this I can't load priority permissions. Acting like "+player.getName()+" doesnt have any.");
+            return Collections.emptyList();
+        }
+
         SortedSet<Node> nodes = user.resolveDistinctInheritedNodes(QueryOptions.nonContextual());
 
         List<String> perms = new ArrayList<>();
