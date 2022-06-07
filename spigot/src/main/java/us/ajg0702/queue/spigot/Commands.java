@@ -10,68 +10,81 @@ import org.jetbrains.annotations.NotNull;
 
 public class Commands implements CommandExecutor {
 
-	final SpigotMain pl;
-	public Commands(SpigotMain pl) {
-		this.pl = pl;
-	}
+    final SpigotMain pl;
 
-	@Override
-	public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, String[] args) {
-		if(!pl.hasProxy() && pl.config.getBoolean("check-proxy-response")) {
-			sender.sendMessage(color("&cajQueue must also be installed on the proxy!&7 If it has been installed on the proxy, make sure it loaded correctly and try relogging."));
-			return true;
-		}
-		Player player = null;
-		if(sender instanceof Player) {
-			player = (Player) sender;
-		}
-		if(command.getName().equals("leavequeue")) {
-			if(player == null) return true;
-			StringBuilder arg = new StringBuilder();
-			for(String a : args) {
-				arg.append(" ");
-				arg.append(a);
-			}
-			pl.sendMessage(player, "leavequeue", arg.toString());
-			return true;
-		}
-		if(args.length < 1) return false;
+    public Commands(SpigotMain pl) {
+        this.pl = pl;
+    }
 
-		if (command.getName().equals("cqueue")) {
-			if(sender instanceof Player) return true;
-			Player tply = Bukkit.getPlayer(args[0]);
-			String srvname = args[1];
-			pl.sendMessage(tply, "cqueue", srvname);
-		}
+    @Override
+    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, String[] args) {
+        if (!pl.hasProxy() && pl.config.getBoolean("check-proxy-response")) {
+            sender.sendMessage(color("&cajQueue must also be installed on the proxy!&7 If it has been installed on the proxy, make sure it loaded correctly and try relogging."));
+            return true;
+        }
 
-		String srvname = args[0];
+        Player player = null;
+        if (sender instanceof Player) {
+            player = (Player) sender;
+        }
 
-		if(args.length > 1) {
-			pl.getLogger().info("Sending "+args[0]+" to queue");
-			if(!sender.hasPermission("ajqueue.send")) {
-				sender.sendMessage(color("&cYou do not have permission to do this!"));
-				return true;
-			}
-			Player tply = Bukkit.getPlayer(args[0]);
-			if(tply == null) {
-				sender.sendMessage(color("&cCannot find that player!"));
-				return true;
-			}
-			player = tply;
-			srvname = args[1];
-		}
-		if(pl.config.getBoolean("send-queue-commands-in-batches")) {
-			pl.queuebatch.put(player, srvname);
-		} else {
-			assert player != null;
-			pl.sendMessage(player, "queue", srvname);
-		}
+        if (command.getName().equals("leavequeue")) {
+            if (player == null) {
+                return true;
+            }
+            StringBuilder arg = new StringBuilder();
+            for (String a : args) {
+                arg.append(" ");
+                arg.append(a);
+            }
+            pl.sendMessage(player, "leavequeue", arg.toString());
+            return true;
+        }
 
-		return true;
-	}
+        if (args.length < 1) {
+            return false;
+        }
 
-	public String color(String txt) {
-		return ChatColor.translateAlternateColorCodes('&', txt);
-	}
+        if (command.getName().equals("cqueue")) {
+            if (sender instanceof Player) {
+                return true;
+            }
+            Player tply = Bukkit.getPlayer(args[0]);
+            String srvname = args[1];
+            pl.sendMessage(tply, "cqueue", srvname);
+            return true;
+        }
+
+        String srvname = args[0];
+
+        if (args.length > 1) {
+            if (!sender.hasPermission("ajqueue.send")) {
+                sender.sendMessage(color("&cYou do not have permission to do this!"));
+                return true;
+            }
+            Player tply = Bukkit.getPlayer(args[0]);
+            if (tply == null) {
+                sender.sendMessage(color("&cCannot find that player!"));
+                return true;
+            }
+
+            pl.getLogger().info("Sending " + tply.getName() + " to queue");
+
+            player = tply;
+            srvname = args[1];
+        }
+        if (pl.config.getBoolean("send-queue-commands-in-batches")) {
+            pl.queuebatch.put(player, srvname);
+        } else {
+            assert player != null;
+            pl.sendMessage(player, "queue", srvname);
+        }
+
+        return true;
+    }
+
+    public String color(String txt) {
+        return ChatColor.translateAlternateColorCodes('&', txt);
+    }
 
 }
