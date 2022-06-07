@@ -18,13 +18,13 @@ dependencies {
     compileOnly("com.google.guava:guava:30.1.1-jre")
     compileOnly("us.ajg0702:ajUtils:1.1.22")
 
-    compileOnly("com.velocitypowered:velocity-api:3.0.0")
-    annotationProcessor("com.velocitypowered:velocity-api:3.0.0")
+    compileOnly("com.velocitypowered:velocity-api:3.1.0")
+    annotationProcessor("com.velocitypowered:velocity-api:3.1.0")
     implementation("net.kyori:adventure-text-minimessage:4.10.0")
 
-    compileOnly("com.viaversion:viaversion-api:4.2.0-SNAPSHOT")
+    compileOnly("com.viaversion:viaversion-api:4.2.1")
 
-    implementation("org.bstats:bstats-velocity:2.2.1")
+    implementation("org.bstats:bstats-velocity:3.0.0")
 
     implementation(project(":common"))
     implementation(project(":api"))
