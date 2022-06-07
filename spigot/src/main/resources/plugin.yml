@@ -11,3 +11,5 @@ commands:
    leavequeue:
       aliases: [leaveq]
       description: Leaves a queue
+   cqueue:
+      description: Console queue command

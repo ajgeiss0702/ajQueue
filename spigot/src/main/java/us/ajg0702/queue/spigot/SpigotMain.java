@@ -36,6 +36,7 @@ public class SpigotMain extends JavaPlugin implements PluginMessageListener,List
 		getServer().getMessenger().registerOutgoingPluginChannel(this, "ajqueue:toproxy");
 		
 		this.getCommand("move").setExecutor(new Commands(this));
+		this.getCommand("cqueue").setExecutor(new Commands(this));
 		this.getCommand("leavequeue").setExecutor(new Commands(this));
 		
 		Bukkit.getPluginManager().registerEvents(this, this);

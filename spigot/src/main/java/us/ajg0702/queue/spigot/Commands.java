@@ -9,7 +9,7 @@ import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
 public class Commands implements CommandExecutor {
-	
+
 	final SpigotMain pl;
 	public Commands(SpigotMain pl) {
 		this.pl = pl;
@@ -36,9 +36,16 @@ public class Commands implements CommandExecutor {
 			return true;
 		}
 		if(args.length < 1) return false;
-		
+
+		if (command.getName().equals("cqueue")) {
+			if(sender instanceof Player) return true;
+			Player tply = Bukkit.getPlayer(args[0]);
+			String srvname = args[1];
+			pl.sendMessage(tply, "cqueue", srvname);
+		}
+
 		String srvname = args[0];
-		
+
 		if(args.length > 1) {
 			pl.getLogger().info("Sending "+args[0]+" to queue");
 			if(!sender.hasPermission("ajqueue.send")) {
@@ -59,10 +66,10 @@ public class Commands implements CommandExecutor {
 			assert player != null;
 			pl.sendMessage(player, "queue", srvname);
 		}
-		
+
 		return true;
 	}
-	
+
 	public String color(String txt) {
 		return ChatColor.translateAlternateColorCodes('&', txt);
 	}

@@ -13,7 +13,6 @@ import us.ajg0702.queue.api.server.AdaptedServer;
 import us.ajg0702.queue.commands.commands.PlayerSender;
 import us.ajg0702.queue.common.players.QueuePlayerImpl;
 import us.ajg0702.queue.common.utils.Debug;
-import us.ajg0702.utils.common.TimeUtils;
 
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
@@ -46,6 +45,12 @@ public class EventHandlerImpl implements EventHandler {
                 args[0] = rawData;
                 moveCommand.execute(new PlayerSender(recievingPlayer), args);
             }
+
+            if (subchannel.equals("cqueue")) {
+                String rawData = in.readUTF();
+                main.getQueueManager().addToQueue(recievingPlayer, rawData);
+            }
+
             if(subchannel.equals("massqueue")) {
                 String inData = in.readUTF();
                 String[] parts = inData.split(",");
@@ -83,28 +88,6 @@ public class EventHandlerImpl implements EventHandler {
                     pos = server.getQueue().size()+"";
                 }
                 main.getPlatformMethods().sendPluginMessage(recievingPlayer, "positionof", pos);
-            }
-            if(subchannel.equals("estimated_time")) {
-                QueueServer server = main.getQueueManager().getSingleServer(recievingPlayer);
-
-                int time;
-                String timeString;
-                if(server != null) {
-                    QueuePlayer queuePlayer = server.findPlayer(recievingPlayer);
-                    time = (int) Math.round(queuePlayer.getPosition() * main.getTimeBetweenPlayers());
-                    timeString = TimeUtils.timeString(
-                            time,
-                            main.getMessages().getString("format.time.mins"),
-                            main.getMessages().getString("format.time.secs")
-                    );
-                } else {
-                    timeString = main.getMessages().getString("placeholders.estimated_time.none");
-                }
-                main.getPlatformMethods().sendPluginMessage(
-                        recievingPlayer,
-                        "estimated_time",
-                        timeString
-                        );
             }
             if(subchannel.equals("inqueue")) {
                 QueueServer server = main.getQueueManager().getSingleServer(recievingPlayer);
@@ -203,7 +186,7 @@ public class EventHandlerImpl implements EventHandler {
         if(!player.isConnected()) return;
 
         String plainReason = PlainTextComponentSerializer.plainText().serialize(reason);
-        
+
         Debug.info(player.getName()+" kicked! Moving: "+moving+" from: "+from.getName()+" plainReason: "+plainReason    );
 
         if(!moving && main.getConfig().getBoolean("send-fail-debug")) {
