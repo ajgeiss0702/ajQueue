@@ -12,7 +12,6 @@ import us.ajg0702.queue.platforms.velocity.players.VelocityPlayer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 
 public class VelocityServer implements AdaptedServer {
 
