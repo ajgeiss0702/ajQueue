@@ -30,7 +30,7 @@ dependencies {
     compileOnly(fileTree(mapOf("dir" to "../libs/private", "include" to listOf("*.jar"))))
     compileOnly(fileTree(mapOf("dir" to "../libs/public", "include" to listOf("*.jar"))))
 
-    compileOnly("net.luckperms:api:5.0")
+    compileOnly("net.luckperms:api:5.4")
 }
 
 tasks.shadowJar {
