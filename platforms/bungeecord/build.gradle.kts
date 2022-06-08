@@ -25,7 +25,7 @@ dependencies {
     implementation("net.kyori:adventure-platform-bungeecord:4.0.0")
     compileOnly("net.kyori:adventure-text-serializer-plain:4.9.3")
 
-    compileOnly("com.viaversion:viaversion-api:4.2.1")
+    compileOnly("com.viaversion:viaversion-api:4.3.1")
 
     implementation("org.bstats:bstats-bungeecord:3.0.0")
 
