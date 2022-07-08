@@ -616,6 +616,19 @@ public class QueueManagerImpl implements QueueManager {
             }
             if(System.currentTimeMillis() - sendingNowAntiSpam.get(nextPlayer) >= 5000) {
                 nextPlayer.sendMessage(msgs.getComponent("status.sending-now", "SERVER:"+server.getAlias()));
+                if(main.getConfig().getBoolean("send-title")) {
+                    nextPlayer.showTitle(Title.title(
+                            main.getMessages().getComponent(
+                                    "title.sending-now.title",
+                                    "SERVER:"+server.getAlias()
+                            ),
+                            main.getMessages().getComponent(
+                                    "title.sending-now.subtitle",
+                                    "SERVER:"+server.getAlias()
+                            ),
+                            Title.Times.of(Duration.ZERO, Duration.ofSeconds(2L), Duration.ZERO)
+                    ));
+                }
                 sendingNowAntiSpam.put(nextPlayer, System.currentTimeMillis());
             }
 

@@ -247,6 +247,8 @@ public class QueueMain extends AjQueueAPI {
 
         d.put("title.title", "");
         d.put("title.subtitle", "<gold>You are <green>#{POS} <gold>in the queue!");
+        d.put("title.sending-now.title", "");
+        d.put("title.sending-now.subtitle", "<green>Sending you to <white>{SERVER} <green>now..");
 
         d.put("commands.leave.more-args", "&cPlease specify which queue you want to leave! &7You are in these queues: {QUEUES}");
         d.put("commands.leave.queues-list-format", "&f{NAME}&7, ");
