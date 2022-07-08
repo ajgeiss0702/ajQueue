@@ -37,6 +37,20 @@ public interface QueueServer {
     String getStatusString();
 
     /**
+     * Get the status of the server as a string (not from the messages file)
+     * @param p The player that you are checking for. Used for checking restricted servers
+     * @return The status of the server as a string
+     */
+    String getStatus(AdaptedPlayer p);
+
+    /**
+     * Get the status of the server as a string (not from the messages file)
+     * Does not check if the player has access using restricted mode. May show online if it is restricted
+     * @return The status of the server as a string
+     */
+    String getStatus();
+
+    /**
      * Sends a server ping and uses the response to update online status, player count status, and whitelist status
      */
     void updatePing();

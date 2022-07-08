@@ -175,6 +175,9 @@ public class Placeholders extends PlaceholderExpansion {
     		if(identifier.matches("queuedfor_*.*")) {
         		return "0";
         	}
+			if(identifier.matches("status_*.*")) {
+				return "Loading";
+			}
     	}
     	
 
@@ -185,22 +188,25 @@ public class Placeholders extends PlaceholderExpansion {
 	private String parsePlaceholder(Player player, String identifier) {
     	if(identifier.equalsIgnoreCase("queued")) {
         	plugin.sendMessage(player, "queuename", "");
-        }
+        } else
     	if(identifier.equalsIgnoreCase("position")) {
     		plugin.sendMessage(player, "position", "");
-    	}
+    	} else
     	if(identifier.equalsIgnoreCase("of")) {
     		plugin.sendMessage(player, "positionof", "");
-    	}
+    	} else
     	if(identifier.equalsIgnoreCase("inqueue")) {
     		plugin.sendMessage(player, "inqueue", "");
-    	}
+    	} else
 		if(identifier.equalsIgnoreCase("estimated_time")) {
 			plugin.sendMessage(player, "estimated_time", "");
-		}
+		} else
     	if(identifier.matches("queuedfor_*.*")) {
     		plugin.sendMessage(player, "queuedfor", identifier.split("_")[1]);
-    	}
+    	} else
+		if(identifier.matches("status_*.*")) {
+			plugin.sendMessage(player, "status", identifier.split("_")[1]);
+		}
         
         
         return null;

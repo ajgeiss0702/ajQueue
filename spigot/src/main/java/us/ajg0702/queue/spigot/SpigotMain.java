@@ -178,6 +178,20 @@ public class SpigotMain extends JavaPlugin implements PluginMessageListener,List
 			phs.put("estimated_time", time);
 			placeholders.responseCache.put(p, phs);
 		}
+		if(subchannel.equals("status")) {
+			String playername = in.readUTF();
+			String server = in.readUTF();
+
+			Player p = Bukkit.getPlayer(playername);
+			if(p == null) return;
+			if(!p.isOnline()) return;
+
+			String status = in.readUTF();
+			HashMap<String, String> phs = placeholders.responseCache.get(p);
+			if(phs == null) phs = new HashMap<>();
+			phs.put("status_"+server, status+"");
+			placeholders.responseCache.put(p, phs);
+		}
 	}
 	
 	
@@ -207,9 +221,7 @@ public class SpigotMain extends JavaPlugin implements PluginMessageListener,List
 	@EventHandler
 	public void onJoin(PlayerJoinEvent e) {
 		if(hasProxy) return;
-		Bukkit.getScheduler().runTask(this, () -> {
-			sendMessage(e.getPlayer(), "ack", "");
-		});
+		Bukkit.getScheduler().runTask(this, () -> sendMessage(e.getPlayer(), "ack", ""));
 	}
 
 	@EventHandler(priority = EventPriority.HIGH)
