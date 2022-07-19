@@ -23,14 +23,14 @@ dependencies {
 
     compileOnly("me.TechsCode:FakeUltraPerms:1.0.2")
 
-    compileOnly("us.ajg0702:ajUtils:1.1.22")
+    compileOnly("us.ajg0702:ajUtils:1.2.10")
 
     compileOnly("net.kyori:adventure-api:4.9.3")
 
     compileOnly(fileTree(mapOf("dir" to "../libs/private", "include" to listOf("*.jar"))))
     compileOnly(fileTree(mapOf("dir" to "../libs/public", "include" to listOf("*.jar"))))
 
-    compileOnly("net.luckperms:api:5.0")
+    compileOnly("net.luckperms:api:5.4")
 }
 
 tasks.shadowJar {

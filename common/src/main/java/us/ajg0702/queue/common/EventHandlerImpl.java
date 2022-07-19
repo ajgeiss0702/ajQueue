@@ -116,6 +116,17 @@ public class EventHandlerImpl implements EventHandler {
                 if(server == null) return;
                 main.getPlatformMethods().sendPluginMessage(recievingPlayer, "queuedfor", srv, server.getQueue().size()+"");
             }
+            if(subchannel.equals("status")) {
+                String srv = in.readUTF();
+                QueueServer server = main.getQueueManager().findServer(srv);
+                if(server == null) return;
+                main.getPlatformMethods().sendPluginMessage(
+                        recievingPlayer,
+                        "status",
+                        srv,
+                        main.getMessages().getRawString("placeholders.status."+server.getStatus(recievingPlayer))
+                );
+            }
             if(subchannel.equals("leavequeue")) {
                 String[] args = new String[1];
                 try {

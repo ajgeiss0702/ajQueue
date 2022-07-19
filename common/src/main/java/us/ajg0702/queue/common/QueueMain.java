@@ -180,7 +180,7 @@ public class QueueMain extends AjQueueAPI {
     }
 
     private void constructMessages() {
-        LinkedHashMap<String, String> d = new LinkedHashMap<>();
+        LinkedHashMap<String, Object> d = new LinkedHashMap<>();
 
         d.put("status.offline.base", "&c{SERVER} is {STATUS}. &7You are in position &f{POS}&7 of &f{LEN}&7.");
 
@@ -237,8 +237,18 @@ public class QueueMain extends AjQueueAPI {
         d.put("placeholders.position.none", "None");
         d.put("placeholders.estimated_time.none", "None");
 
+        d.put("placeholders.status.online", "&aOnline");
+        d.put("placeholders.status.offline", "&cOffline");
+        d.put("placeholders.status.restarting", "&cRestarting");
+        d.put("placeholders.status.full", "&eFull");
+        d.put("placeholders.status.restricted", "&eRestricted");
+        d.put("placeholders.status.paused", "&ePaused");
+        d.put("placeholders.status.whitelisted", "&eWhitelisted");
+
         d.put("title.title", "");
         d.put("title.subtitle", "<gold>You are <green>#{POS} <gold>in the queue!");
+        d.put("title.sending-now.title", "");
+        d.put("title.sending-now.subtitle", "<green>Sending you to <white>{SERVER} <green>now..");
 
         d.put("commands.leave.more-args", "&cPlease specify which queue you want to leave! &7You are in these queues: {QUEUES}");
         d.put("commands.leave.queues-list-format", "&f{NAME}&7, ");

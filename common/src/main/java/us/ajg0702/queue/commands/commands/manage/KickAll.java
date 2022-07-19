@@ -9,7 +9,6 @@ import us.ajg0702.queue.common.QueueMain;
 import us.ajg0702.utils.common.Messages;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class KickAll extends SubCommand {

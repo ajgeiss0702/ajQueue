@@ -158,6 +158,40 @@ public class QueueServerImpl implements QueueServer {
     }
 
     @Override
+    public String getStatus(AdaptedPlayer p) {
+        if(getOfflineTime() > main.getConfig().getInt("offline-time")) {
+            return "offline";
+        }
+
+        if(!isOnline()) {
+            return "restarting";
+        }
+
+        if(isPaused()) {
+            return "paused";
+        }
+
+        if(p != null && isWhitelisted() && !getWhitelistedPlayers().contains(p.getUniqueId())) {
+            return "whitelisted";
+        }
+
+        if(isFull() && !canJoinFull(p)) {
+            return "full";
+        }
+
+        if(p != null && !canAccess(p)) {
+            return "restricted";
+        }
+
+        return "online";
+    }
+
+    @Override
+    public String getStatus() {
+        return null;
+    }
+
+    @Override
     public void updatePing() {
         boolean pingerDebug = main.getConfig().getBoolean("pinger-debug");
         HashMap<AdaptedServer, CompletableFuture<AdaptedServerPing>> pingsFutures = new HashMap<>();

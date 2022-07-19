@@ -394,17 +394,21 @@ public class QueueManagerImpl implements QueueManager {
 
                 if(!getSingleServer(player).equals(server)) continue;
 
+                int time = (int) Math.round(pos * main.getTimeBetweenPlayers());
+
                 Component titleMessage = msgs.getComponent("title.title",
                         "POS:"+pos,
                         "LEN:"+server.getQueue().size(),
                         "SERVER:"+server.getAlias(),
-                        "STATUS:"+status
+                        "STATUS:"+status,
+                        "TIME:"+ TimeUtils.timeString(time, msgs.getString("format.time.mins"), msgs.getString("format.time.secs"))
                 );
                 Component subTitleMessage = msgs.getComponent("title.subtitle",
                         "POS:"+pos,
                         "LEN:"+server.getQueue().size(),
                         "SERVER:"+server.getAlias(),
-                        "STATUS:"+status
+                        "STATUS:"+status,
+                        "TIME:"+ TimeUtils.timeString(time, msgs.getString("format.time.mins"), msgs.getString("format.time.secs"))
                 );
 
                 Title title = Title.title(titleMessage, subTitleMessage, Title.Times.of(Duration.ZERO, Duration.ofSeconds(2L), Duration.ZERO));
@@ -616,6 +620,19 @@ public class QueueManagerImpl implements QueueManager {
             }
             if(System.currentTimeMillis() - sendingNowAntiSpam.get(nextPlayer) >= 5000) {
                 nextPlayer.sendMessage(msgs.getComponent("status.sending-now", "SERVER:"+server.getAlias()));
+                if(main.getConfig().getBoolean("send-title")) {
+                    nextPlayer.showTitle(Title.title(
+                            main.getMessages().getComponent(
+                                    "title.sending-now.title",
+                                    "SERVER:"+server.getAlias()
+                            ),
+                            main.getMessages().getComponent(
+                                    "title.sending-now.subtitle",
+                                    "SERVER:"+server.getAlias()
+                            ),
+                            Title.Times.of(Duration.ZERO, Duration.ofSeconds(2L), Duration.ZERO)
+                    ));
+                }
                 sendingNowAntiSpam.put(nextPlayer, System.currentTimeMillis());
             }
 
