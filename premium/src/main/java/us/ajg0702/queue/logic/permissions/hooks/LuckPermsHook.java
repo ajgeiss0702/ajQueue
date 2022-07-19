@@ -6,11 +6,10 @@ import net.luckperms.api.context.Context;
 import net.luckperms.api.model.user.User;
 import net.luckperms.api.node.Node;
 import net.luckperms.api.node.NodeType;
-import net.luckperms.api.query.QueryMode;
 import net.luckperms.api.query.QueryOptions;
 import us.ajg0702.queue.api.players.AdaptedPlayer;
-import us.ajg0702.queue.common.QueueMain;
 import us.ajg0702.queue.api.premium.PermissionHook;
+import us.ajg0702.queue.common.QueueMain;
 
 import java.util.*;
 

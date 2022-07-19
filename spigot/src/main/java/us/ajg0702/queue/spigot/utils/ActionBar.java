@@ -8,7 +8,7 @@ import java.lang.reflect.Method;
 
 /**
  * A cross-version actionbar class
- * @author Based on ActionBarAPI from https://github.com/ConnorLinfoot
+ * @author Based on ActionBarAPI from <a href="https://github.com/ConnorLinfoot">...</a>
  *
  */
 public class ActionBar {
