@@ -118,7 +118,11 @@ public class QueueManagerImpl implements QueueManager {
                     versions.append(msgs.getString("errors.wrong-version.comma"));
                 }
             }
-            player.sendMessage(msgs.getComponent("errors.wrong-version.base", "VERSIONS:" + versions));
+            player.sendMessage(msgs.getComponent(
+                    "errors.wrong-version.base",
+                    "VERSIONS:" + versions,
+                    "SERVER:"+server.getAlias()
+            ));
             return false;
         }
 
