@@ -380,7 +380,6 @@ public class QueueManagerImpl implements QueueManager {
         if(!main.getConfig().getBoolean("send-title")) return;
 
         for(QueueServer server : servers) {
-            String status = server.getStatusString();
             for(QueuePlayer queuePlayer : server.getQueue()) {
 
                 int pos = queuePlayer.getPosition();
@@ -393,6 +392,8 @@ public class QueueManagerImpl implements QueueManager {
                 if(player == null) continue;
 
                 if(!getSingleServer(player).equals(server)) continue;
+
+                String status = main.getMessages().getRawString("placeholders.status."+server.getStatus(player));
 
                 int time = (int) Math.round(pos * main.getTimeBetweenPlayers());
 
