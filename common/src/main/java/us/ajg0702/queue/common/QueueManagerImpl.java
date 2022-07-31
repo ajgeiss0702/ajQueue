@@ -393,7 +393,7 @@ public class QueueManagerImpl implements QueueManager {
 
                 if(!getSingleServer(player).equals(server)) continue;
 
-                String status = main.getMessages().getRawString("placeholders.status."+server.getStatus(player));
+                String status = Messages.color(main.getMessages().getRawString("placeholders.status."+server.getStatus(player)));
 
                 int time = (int) Math.round(pos * main.getTimeBetweenPlayers());
 
