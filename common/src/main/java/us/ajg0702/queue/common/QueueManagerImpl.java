@@ -352,7 +352,8 @@ public class QueueManagerImpl implements QueueManager {
                 AdaptedPlayer player = queuePlayer.getPlayer();
                 if(player == null) continue;
 
-                if(!getSingleServer(player).equals(server)) continue;
+                QueueServer singleServer = getSingleServer(player);
+                if(singleServer == null || !singleServer.equals(server)) continue;
 
                 if(!server.isJoinable(player)) {
                     player.sendActionBar(msgs.getComponent("spigot.actionbar.offline",
@@ -392,7 +393,8 @@ public class QueueManagerImpl implements QueueManager {
                 AdaptedPlayer player = queuePlayer.getPlayer();
                 if(player == null) continue;
 
-                if(!getSingleServer(player).equals(server)) continue;
+                QueueServer singleServer = getSingleServer(player);
+                if(singleServer == null || !singleServer.equals(server)) continue;
 
                 int time = (int) Math.round(pos * main.getTimeBetweenPlayers());
 
