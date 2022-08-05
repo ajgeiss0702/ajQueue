@@ -23,6 +23,7 @@ jobs:
           export NEW_VERSION=$OLD_VERSION-b${{github.run_number}}
           cat build.gradle.kts | sed "s/$OLD_VERION/$NEW_VERSION/" > build.gradle.kts
           echo Version number is now $(cat build.gradle.kts | grep "version " | awk -F'"' '{print $2}') - $NEW_VERSION
+          cat build.gradle.kts
       - name: Build with Gradle
         uses: gradle/gradle-build-action@937999e9cc2425eddc7fd62d1053baf041147db7
         with:
