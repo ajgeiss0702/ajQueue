@@ -23,7 +23,6 @@ jobs:
           export NEW_VERSION=$OLD_VERSION-b${{github.run_number}}
           (cat build.gradle.kts | sed "s/$OLD_VERSION/$NEW_VERSION/") > temp.txt
           mv temp.txt build.gradle.kts
-          rm temp.txt
           echo Version number is now $(cat build.gradle.kts | grep "version " | awk -F'"' '{print $2}') - $NEW_VERSION
           cat build.gradle.kts
       - name: Build with Gradle
