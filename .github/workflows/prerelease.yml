@@ -22,7 +22,7 @@ jobs:
           export OLD_VERSION=`cat build.gradle.kts | grep "version " | awk -F'"' '{print $2}'`
           export NEW_VERSION=$OLD_VERSION-b${{github.run_number}}
           sed -i 's/$OLD_VERION/$NEW_VERSION/' build.gradle.kts
-          echo Version number is now $(cat build.gradle.kts | grep "version " | awk -F'"' '{print $2}')
+          echo Version number is now $(cat build.gradle.kts | grep "version " | awk -F'"' '{print $2}') ($NEW_VERSION)
       - name: Build with Gradle
         uses: gradle/gradle-build-action@937999e9cc2425eddc7fd62d1053baf041147db7
         with:
@@ -41,5 +41,5 @@ jobs:
         env:
           POLYMART_TOKEN: ${{ secrets.POLYMART_TOKEN }}
         run: |
-          file free/build/libs/ajQueue-$UPDATE_VERSION.jar
-          curl -F "file=@free/build/libs/ajQueue-$UPDATE_VERSION.jar" -F api_key=$POLYMART_TOKEN -F resource_id="2535" -F version="$NEW_VERSION" -F title="Pre-release v$NEW_VERSION" -F beta=1 -F message="Note: This is a (most likely) un-tested build. It is not guarenteed to work!\n\n${{ github.event.head_commit.message }}" "https://api.polymart.org/v1/postUpdate"
+          file free/build/libs/ajQueue-$NEW_VERSION.jar
+          curl -F "file=@free/build/libs/ajQueue-$NEW_VERSION.jar" -F api_key=$POLYMART_TOKEN -F resource_id="2535" -F version="$NEW_VERSION" -F title="Pre-release v$NEW_VERSION" -F beta=1 -F message="Note: This is a (most likely) un-tested build. It is not guarenteed to work!\n\n${{ github.event.head_commit.message }}" "https://api.polymart.org/v1/postUpdate"
