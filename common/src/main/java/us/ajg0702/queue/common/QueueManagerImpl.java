@@ -118,7 +118,11 @@ public class QueueManagerImpl implements QueueManager {
                     versions.append(msgs.getString("errors.wrong-version.comma"));
                 }
             }
-            player.sendMessage(msgs.getComponent("errors.wrong-version.base", "VERSIONS:" + versions));
+            player.sendMessage(msgs.getComponent(
+                    "errors.wrong-version.base",
+                    "VERSIONS:" + versions,
+                    "SERVER:"+server.getAlias()
+            ));
             return false;
         }
 
@@ -352,7 +356,8 @@ public class QueueManagerImpl implements QueueManager {
                 AdaptedPlayer player = queuePlayer.getPlayer();
                 if(player == null) continue;
 
-                if(!getSingleServer(player).equals(server)) continue;
+                QueueServer singleServer = getSingleServer(player);
+                if(singleServer == null || !singleServer.equals(server)) continue;
 
                 if(!server.isJoinable(player)) {
                     player.sendActionBar(msgs.getComponent("spigot.actionbar.offline",
@@ -380,7 +385,6 @@ public class QueueManagerImpl implements QueueManager {
         if(!main.getConfig().getBoolean("send-title")) return;
 
         for(QueueServer server : servers) {
-            String status = server.getStatusString();
             for(QueuePlayer queuePlayer : server.getQueue()) {
 
                 int pos = queuePlayer.getPosition();
@@ -392,7 +396,10 @@ public class QueueManagerImpl implements QueueManager {
                 AdaptedPlayer player = queuePlayer.getPlayer();
                 if(player == null) continue;
 
-                if(!getSingleServer(player).equals(server)) continue;
+                QueueServer singleServer = getSingleServer(player);
+                if(singleServer == null || !singleServer.equals(server)) continue;
+
+                String status = Messages.color(main.getMessages().getRawString("placeholders.status."+server.getStatus(player)));
 
                 int time = (int) Math.round(pos * main.getTimeBetweenPlayers());
 

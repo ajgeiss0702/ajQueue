@@ -5,8 +5,8 @@ author: ajgeiss0702
 name: ajQueue
 softdepend: [PlaceholderAPI]
 commands:
-   move:
-      aliases: [server, queue, joinq, joinqueue]
+   queue:
+      aliases: [server, move, joinq, joinqueue]
       description: Queue for a server
    leavequeue:
       aliases: [leaveq]

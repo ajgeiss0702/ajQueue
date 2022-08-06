@@ -68,10 +68,10 @@ public class ListCommand extends BaseCommand {
 
             m = m.append(Component.text("\n"));
             m = m.append(main.getMessages().getComponent("commands.listqueues.format",
-                    "COLOR:" + main.getMessages().color(color),
+                    "COLOR:" + Messages.color(color),
                     "NAME:" + s.getAlias(),
                     "COUNT:" + s.getQueue().size(),
-                    "STATUS:" + s.getStatusString(spp)
+                    "STATUS:" + main.getMessages().getRawString("placeholders.status."+s.getStatus(spp))
             ));
         }
         sender.sendMessage(m);

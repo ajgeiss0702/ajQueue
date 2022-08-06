@@ -1,0 +1,48 @@
+name: Deploy Pre-Release to Polymart
+
+on:
+  push:
+    branches:
+      - dev
+
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    environment: polymart_deploy
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up JDK 11
+        uses: actions/setup-java@v2
+        with:
+          java-version: '11'
+          distribution: 'temurin'
+      - name: Change version to include build
+        run: |
+          export OLD_VERSION=`cat build.gradle.kts | grep "version " | awk -F'"' '{print $2}'`
+          export NEW_VERSION=$OLD_VERSION-b${{github.run_number}}
+          (cat build.gradle.kts | sed "s/$OLD_VERSION/$NEW_VERSION/") > temp.txt
+          mv temp.txt build.gradle.kts
+          echo Version number is now $(cat build.gradle.kts | grep "version " | awk -F'"' '{print $2}') - $NEW_VERSION
+          cat build.gradle.kts
+      - name: Build with Gradle
+        uses: gradle/gradle-build-action@937999e9cc2425eddc7fd62d1053baf041147db7
+        with:
+          arguments: :free:shadowJar :premium:shadowJar
+      - name: Upload build files artifact
+        uses: actions/upload-artifact@v2.3.1
+        with:
+          # Artifact name
+          name: build-files
+          # A file, directory or wildcard pattern that describes what to upload
+          path: '*/build/*'
+          # The desired behavior if no files are found using the provided path.
+          if-no-files-found: error
+          retention-days: 2
+      - name: Deploy to Polymart
+        env:
+          POLYMART_TOKEN: ${{ secrets.POLYMART_TOKEN }}
+        run: |
+          export VERSION=`cat build.gradle.kts | grep "version " | awk -F'"' '{print $2}'`
+          file free/build/libs/ajQueue-$VERSION.jar
+          curl -F "file=@free/build/libs/ajQueue-$VERSION.jar" -F api_key=$POLYMART_TOKEN -F resource_id="2535" -F version="$VERSION" -F title="Pre-release v$VERSION" -F beta=1 -F message=$'Note: This is a (most likely) un-tested build. It is not guarenteed to work!\n\nChange since previous build:\n[url=${{ github.event.compare }}"]${{ github.event.head_commit.message }}[/url]' "https://api.polymart.org/v1/postUpdate"
