@@ -45,4 +45,4 @@ jobs:
         run: |
           export VERSION=`cat build.gradle.kts | grep "version " | awk -F'"' '{print $2}'`
           file free/build/libs/ajQueue-$VERSION.jar
-          curl -F "file=@free/build/libs/ajQueue-$VERSION.jar" -F api_key=$POLYMART_TOKEN -F resource_id="2535" -F version="$VERSION" -F title="Pre-release v$VERSION" -F beta=1 -F message=$'Note: This is a (most likely) un-tested build. It is not guarenteed to work!\n\nChange since previous build:\n<a href="${{ github.event.head_commit.compare }}">${{ github.event.head_commit.message }}</a>' "https://api.polymart.org/v1/postUpdate"
+          curl -F "file=@free/build/libs/ajQueue-$VERSION.jar" -F api_key=$POLYMART_TOKEN -F resource_id="2535" -F version="$VERSION" -F title="Pre-release v$VERSION" -F beta=1 -F message=$'Note: This is a (most likely) un-tested build. It is not guarenteed to work!\n\nChange since previous build:\n[url=${{ github.event.compare }}"]${{ github.event.head_commit.message }}[/url]' "https://api.polymart.org/v1/postUpdate"
