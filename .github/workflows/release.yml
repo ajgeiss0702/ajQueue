@@ -39,5 +39,5 @@ jobs:
           POLYMART_TOKEN: ${{ secrets.POLYMART_TOKEN }}
         run: |
           export VERSION=`cat build.gradle.kts | grep "version " | awk -F'"' '{print $2}'`
-          file free/build/libs/ajQueue-$VERSION.jar
           curl -F "file=@free/build/libs/ajQueue-$VERSION.jar" -F api_key=$POLYMART_TOKEN -F resource_id="2535" -F version="$VERSION" -F title="v$VERSION" -F message="$(cat changelogs.bb)" "https://api.polymart.org/v1/postUpdate"
+          curl -F "file=@premium/build/libs/ajQueuePlus-$VERSION.jar" -F api_key=$POLYMART_TOKEN -F resource_id="2714" -F version="$VERSION" -F title="v$VERSION" -F message="$(cat changelogs.bb)" "https://api.polymart.org/v1/postUpdate"
