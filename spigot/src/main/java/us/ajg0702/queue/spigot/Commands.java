@@ -17,7 +17,7 @@ public class Commands implements CommandExecutor {
 
 	@Override
 	public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, String[] args) {
-		if(!pl.hasProxy() && pl.config.getBoolean("check-proxy-response")) {
+		if(!pl.hasProxy() && pl.getAConfig().getBoolean("check-proxy-response")) {
 			sender.sendMessage(color("&cajQueue must also be installed on the proxy!&7 If it has been installed on the proxy, make sure it loaded correctly and try relogging."));
 			return true;
 		}
@@ -53,7 +53,7 @@ public class Commands implements CommandExecutor {
 			player = tply;
 			srvname = args[1];
 		}
-		if(pl.config.getBoolean("send-queue-commands-in-batches")) {
+		if(pl.getAConfig().getBoolean("send-queue-commands-in-batches")) {
 			pl.queuebatch.put(player, srvname);
 		} else {
 			assert player != null;
