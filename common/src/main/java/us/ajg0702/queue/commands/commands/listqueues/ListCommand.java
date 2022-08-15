@@ -71,7 +71,7 @@ public class ListCommand extends BaseCommand {
                     "COLOR:" + Messages.color(color),
                     "NAME:" + s.getAlias(),
                     "COUNT:" + s.getQueue().size(),
-                    "STATUS:" + main.getMessages().getRawString("placeholders.status."+s.getStatus(spp))
+                    "STATUS:" + Messages.color(main.getMessages().getRawString("placeholders.status."+s.getStatus(spp)))
             ));
         }
         sender.sendMessage(m);
