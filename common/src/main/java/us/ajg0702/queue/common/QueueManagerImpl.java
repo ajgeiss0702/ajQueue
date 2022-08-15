@@ -99,6 +99,11 @@ public class QueueManagerImpl implements QueueManager {
             return false;
         }
 
+        if(player.getServerName() == null) {
+            main.getLogger().warning("Tried to queue " + player.getName() + " when they aren't connected!");
+            return false;
+        }
+
         Debug.info("addToQueue method called for "+player.getName()+" to "+server.getName());
 
         if(main.getConfig().getBoolean("joinfrom-server-permission") && !player.hasPermission("ajqueue.joinfrom."+player.getServerName())) {
