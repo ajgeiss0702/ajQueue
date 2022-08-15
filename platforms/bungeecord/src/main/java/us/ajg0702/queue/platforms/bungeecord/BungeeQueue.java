@@ -145,7 +145,7 @@ public class BungeeQueue extends Plugin implements Listener, Implementation {
             Component reason = BungeeComponentSerializer.get().deserialize(e.getKickReasonComponent());
             main.getEventHandler().onServerKick(
                     new BungeePlayer(e.getPlayer()),
-                    new BungeeServer(e.getKickedFrom()),
+                    new BungeeServer(e.getKickedFrom(), main),
                     reason,
                     false
             );
@@ -166,5 +166,9 @@ public class BungeeQueue extends Plugin implements Listener, Implementation {
         commandMap.put(command.getName(), bungeeCommand);
         getProxy().getPluginManager()
                 .registerCommand(this, bungeeCommand);
+    }
+
+    public QueueMain getMain() {
+        return main;
     }
 }

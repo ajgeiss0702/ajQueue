@@ -5,6 +5,7 @@ import us.ajg0702.queue.api.players.AdaptedPlayer;
 import us.ajg0702.queue.api.players.QueuePlayer;
 import us.ajg0702.queue.api.premium.PermissionGetter;
 import us.ajg0702.queue.api.queues.QueueServer;
+import us.ajg0702.queue.api.server.AdaptedServer;
 
 public class FreeLogic implements Logic {
     @Override
@@ -13,7 +14,7 @@ public class FreeLogic implements Logic {
     }
 
     @Override
-    public QueuePlayer priorityLogic(QueueServer server, AdaptedPlayer player) {
+    public QueuePlayer priorityLogic(QueueServer queueServer, AdaptedPlayer player, AdaptedServer server) {
         return null;
     }
 

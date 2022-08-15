@@ -9,9 +9,11 @@ import us.ajg0702.queue.api.server.AdaptedServerPing;
 public class BungeeServerPing implements AdaptedServerPing {
 
     final ServerPing handle;
+    private final long sent;
 
-    public BungeeServerPing(ServerPing handle) {
+    public BungeeServerPing(ServerPing handle, long sent) {
         this.handle = handle;
+        this.sent = sent;
     }
 
     @Override
@@ -43,6 +45,11 @@ public class BungeeServerPing implements AdaptedServerPing {
     @Override
     public void addPlayer() {
         add++;
+    }
+
+    @Override
+    public long getFetchedTime() {
+        return sent;
     }
 
     @Override

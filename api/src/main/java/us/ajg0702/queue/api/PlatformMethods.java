@@ -73,7 +73,7 @@ public interface PlatformMethods {
      */
     AdaptedServer getServer(String name);
 
-    List<AdaptedServer> getServers();
+    List<? extends AdaptedServer> getServers();
 
     String getProtocolName(int protocol);
 }

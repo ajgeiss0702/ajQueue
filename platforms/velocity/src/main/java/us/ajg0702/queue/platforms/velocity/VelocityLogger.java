@@ -36,4 +36,29 @@ public class VelocityLogger implements QueueLogger {
     public void severe(String message) {
         logger.error(message);
     }
+
+    @Override
+    public void warn(String message, Throwable t) {
+        logger.warn(message, t);
+    }
+
+    @Override
+    public void warning(String message, Throwable t) {
+        logger.warn(message, t);
+    }
+
+    @Override
+    public void info(String message, Throwable t) {
+        logger.info(message, t);
+    }
+
+    @Override
+    public void error(String message, Throwable t) {
+        logger.error(message, t);
+    }
+
+    @Override
+    public void severe(String message, Throwable t) {
+        logger.error(message, t);
+    }
 }

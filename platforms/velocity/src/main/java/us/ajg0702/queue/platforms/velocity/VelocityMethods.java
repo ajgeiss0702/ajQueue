@@ -17,6 +17,7 @@ import us.ajg0702.queue.api.players.AdaptedPlayer;
 import us.ajg0702.queue.api.server.AdaptedServer;
 import us.ajg0702.queue.api.util.QueueLogger;
 import us.ajg0702.queue.commands.commands.PlayerSender;
+import us.ajg0702.queue.common.utils.Debug;
 import us.ajg0702.queue.platforms.velocity.players.VelocityPlayer;
 import us.ajg0702.queue.platforms.velocity.server.VelocityServer;
 
@@ -134,19 +135,48 @@ public class VelocityMethods implements PlatformMethods {
 
     @Override
     public AdaptedServer getServer(String name) {
-        Optional<RegisteredServer> server = proxyServer.getServer(name);
-        if(!server.isPresent()) return null;
-        return new VelocityServer(server.get());
+        List<? extends AdaptedServer> servers = getServers();
+        for (AdaptedServer server : servers) {
+            if(server.getName().equals(name)) return server;
+        }
+        return null;
     }
+
+    List<VelocityServer> serverList = new ArrayList<>();
 
 
     @Override
-    public List<AdaptedServer> getServers() {
-        List<AdaptedServer> result = new ArrayList<>();
+    public List<? extends AdaptedServer> getServers() {
 
-        proxyServer.getAllServers().forEach(registeredServer -> result.add(new VelocityServer(registeredServer)));
+        for (RegisteredServer registeredServer : proxyServer.getAllServers()) {
+            boolean found = false;
+            for(VelocityServer sv : new ArrayList<>(serverList)) {
+                if(sv.getHandle().equals(registeredServer)) {
+                    found = true;
+                    break;
+                }
+            }
+            if(found) continue;
 
-        return result;
+            Debug.info("Added "+registeredServer.getServerInfo().getName());
+            serverList.add(new VelocityServer(registeredServer, plugin.getMain()));
+        }
+
+        for(VelocityServer sv : new ArrayList<>(serverList)) {
+            boolean found = false;
+            for (RegisteredServer registeredServer : proxyServer.getAllServers()) {
+                if(sv.getHandle().equals(registeredServer)) {
+                    found = true;
+                    break;
+                }
+            }
+            if(found) continue;
+
+            Debug.info("Removed "+sv.getName());
+            serverList.remove(sv);
+        }
+
+        return serverList;
     }
 
     @Override

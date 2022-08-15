@@ -20,34 +20,23 @@ public class MinigameBalancer implements Balancer {
 
     @Override
     public AdaptedServer getIdealServer(AdaptedPlayer player) {
-        HashMap<AdaptedServer, AdaptedServerPing> serverInfos = server.getLastPings();
-        if(serverInfos.keySet().size() == 1) {
-            return serverInfos.keySet().iterator().next();
+        List<AdaptedServer> servers = server.getServers();
+        if(servers.size() == 1) {
+            return servers.get(0);
         } else {
 
-            List<Map.Entry<AdaptedServer, AdaptedServerPing>> servers = new ArrayList<>(serverInfos.entrySet());
-            servers.sort(Comparator.comparingInt(o -> {
-                @SuppressWarnings("unchecked")
-                Map.Entry<AdaptedServer, AdaptedServerPing> e = (Map.Entry<AdaptedServer, AdaptedServerPing>) o;
-                AdaptedServerPing value = e.getValue();
-                if(value == null) return -1;
-                return value.getPlayerCount();
-            }).reversed());
-            LinkedHashMap<AdaptedServer, AdaptedServerPing> sortedServers = new LinkedHashMap<>();
-            for(Map.Entry<AdaptedServer, AdaptedServerPing> entry : servers) {
-                sortedServers.put(entry.getKey(), entry.getValue());
-            }
+            List<AdaptedServer> svs = new ArrayList<>(servers);
+            svs.sort(Comparator.comparingInt(o -> ((AdaptedServer)o).getPlayerCount()).reversed());
 
-            for(AdaptedServer si : sortedServers.keySet()) {
-                AdaptedServerPing sp = sortedServers.get(si);
-                if(sp == null) continue;
-                int online = sp.getPlayerCount();
-                int max = sp.getMaxPlayers();
+            for(AdaptedServer si : svs) {
+                if(!si.isOnline()) continue;
+                int online = si.getPlayerCount();
+                int max = si.getMaxPlayers();
                 if(online < max) {
                     return si;
                 }
             }
-            return new ArrayList<AdaptedServer>(sortedServers.keySet().size()).get(sortedServers.keySet().size()-1);
+            return svs.get(svs.size()-1);
         }
     }
 }

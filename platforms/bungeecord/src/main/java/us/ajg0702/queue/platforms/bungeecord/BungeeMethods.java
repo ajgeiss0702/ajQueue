@@ -113,18 +113,44 @@ public class BungeeMethods implements PlatformMethods {
 
     @Override
     public AdaptedServer getServer(String name) {
-        ServerInfo server = proxyServer.getServerInfo(name);
-        if(server == null) return null;
-        return new BungeeServer(server);
+        List<? extends AdaptedServer> servers = getServers();
+        for (AdaptedServer server : servers) {
+            if(server.getName().equals(name)) return server;
+        }
+        return null;
     }
 
+    List<BungeeServer> serverList = new ArrayList<>();
+
     @Override
-    public List<AdaptedServer> getServers() {
-        List<AdaptedServer> result = new ArrayList<>();
+    public List<? extends AdaptedServer> getServers() {
+        for (ServerInfo serverInfo : proxyServer.getServers().values()) {
+            boolean found = false;
+            for(BungeeServer sv : new ArrayList<>(serverList)) {
+                if(sv.getHandle().equals(serverInfo)) {
+                    found = true;
+                    break;
+                }
+            }
+            if(found) continue;
 
-        proxyServer.getServers().forEach((s, serverInfo) -> result.add(new BungeeServer(serverInfo)));
+            serverList.add(new BungeeServer(serverInfo, plugin.getMain()));
+        }
 
-        return result;
+        for(BungeeServer sv : new ArrayList<>(serverList)) {
+            boolean found = false;
+            for (ServerInfo serverInfo : proxyServer.getServers().values()) {
+                if(sv.getHandle().equals(serverInfo)) {
+                    found = true;
+                    break;
+                }
+            }
+            if(found) continue;
+
+            serverList.remove(sv);
+        }
+
+        return serverList;
     }
 
     @Override

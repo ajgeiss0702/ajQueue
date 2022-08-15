@@ -22,6 +22,20 @@ public class QueueServerImpl implements QueueServer {
 
     private final String name;
 
+    private final QueueMain main;
+
+    private final List<AdaptedServer> servers;
+
+    private final List<QueuePlayer> queue = new ArrayList<>();
+
+    private List<Integer> supportedProtocols = new ArrayList<>();
+
+    private Balancer balancer;
+
+    private boolean paused;
+
+    private long lastSentTime = 0;
+
     public QueueServerImpl(String name, QueueMain main, AdaptedServer server, List<QueuePlayer> previousPlayers) {
         this(name, main, Collections.singletonList(server), previousPlayers);
     }
@@ -81,40 +95,6 @@ public class QueueServerImpl implements QueueServer {
         }
     }
 
-    private final QueueMain main;
-
-    private final HashMap<AdaptedServer, AdaptedServerPing> pings = new HashMap<>();
-
-    private final List<AdaptedServer> servers;
-
-    private final List<QueuePlayer> queue = new ArrayList<>();
-
-    private List<Integer> supportedProtocols = new ArrayList<>();
-
-    private Balancer balancer;
-
-
-    private int playerCount;
-    private int maxPlayers;
-
-    private boolean online;
-
-    private boolean paused;
-
-
-    private long lastUpdate = 0;
-
-    private int offlineTime = 0;
-
-    private long lastSentTime = 0;
-
-    private long lastOffline;
-
-
-    boolean whitelisted = false;
-    List<UUID> whitelistedUUIDs = new ArrayList<>();
-
-
     @Override
     public ImmutableList<QueuePlayer> getQueue() {
         return ImmutableList.copyOf(queue);
@@ -123,12 +103,13 @@ public class QueueServerImpl implements QueueServer {
     @Override
     public String getStatusString(AdaptedPlayer p) {
         Messages msgs = main.getMessages();
+        AdaptedServer server = getIdealServer(p);
 
-        if(getOfflineTime() > main.getConfig().getInt("offline-time")) {
+        if(server.getOfflineTime() > main.getConfig().getInt("offline-time")) {
             return msgs.getString("status.offline.offline");
         }
 
-        if(!isOnline()) {
+        if(!server.isOnline()) {
             return msgs.getString("status.offline.restarting");
         }
 
@@ -136,11 +117,11 @@ public class QueueServerImpl implements QueueServer {
             return msgs.getString("status.offline.paused");
         }
 
-        if(p != null && isWhitelisted() && !getWhitelistedPlayers().contains(p.getUniqueId())) {
+        if(p != null && server.isWhitelisted() && !server.getWhitelistedPlayers().contains(p.getUniqueId())) {
             return msgs.getString("status.offline.whitelisted");
         }
 
-        if(isFull() && !canJoinFull(p)) {
+        if(server.isFull() && !server.canJoinFull(p)) {
             return msgs.getString("status.offline.full");
         }
 
@@ -159,11 +140,12 @@ public class QueueServerImpl implements QueueServer {
 
     @Override
     public String getStatus(AdaptedPlayer p) {
-        if(getOfflineTime() > main.getConfig().getInt("offline-time")) {
+        AdaptedServer server = getIdealServer(p);
+        if(server.getOfflineTime() > main.getConfig().getInt("offline-time")) {
             return "offline";
         }
 
-        if(!isOnline()) {
+        if(!server.isOnline()) {
             return "restarting";
         }
 
@@ -171,11 +153,11 @@ public class QueueServerImpl implements QueueServer {
             return "paused";
         }
 
-        if(p != null && isWhitelisted() && !getWhitelistedPlayers().contains(p.getUniqueId())) {
+        if(p != null && server.isWhitelisted() && !server.getWhitelistedPlayers().contains(p.getUniqueId())) {
             return "whitelisted";
         }
 
-        if(isFull() && !canJoinFull(p)) {
+        if(server.isFull() && !server.canJoinFull(p)) {
             return "full";
         }
 
@@ -188,101 +170,7 @@ public class QueueServerImpl implements QueueServer {
 
     @Override
     public String getStatus() {
-        return null;
-    }
-
-    @Override
-    public void updatePing() {
-        boolean pingerDebug = main.getConfig().getBoolean("pinger-debug");
-        HashMap<AdaptedServer, CompletableFuture<AdaptedServerPing>> pingsFutures = new HashMap<>();
-        for(AdaptedServer server : servers) {
-            if(pingerDebug) {
-                main.getLogger().info("[pinger] ["+server.getServerInfo().getName()+"] sending ping");
-            }
-            pingsFutures.put(server, server.ping());
-        }
-
-        int i = 0;
-        for(AdaptedServer server : pingsFutures.keySet()) {
-            CompletableFuture<AdaptedServerPing> futurePing = pingsFutures.get(server);
-            AdaptedServerPing ping = null;
-            try {
-                ping = futurePing.get(5, TimeUnit.SECONDS);
-            } catch (Exception e) {
-                if(pingerDebug) {
-                    main.getLogger().info("[pinger] ["+server.getServerInfo().getName()+"] offline:");
-                    e.printStackTrace();
-                }
-            }
-            if(ping != null && pingerDebug) {
-                main.getLogger().info("[pinger] ["+server.getServerInfo().getName()+"] online. motd: "+ping.getPlainDescription()+"  players: "+ping.getPlayerCount()+"/"+ping.getMaxPlayers());
-            } else if(ping == null && pingerDebug) {
-                main.getLogger().info("[pinger] ["+server.getServerInfo().getName()+"] offline (unknown)");
-            }
-
-            pings.put(server, ping);
-            i++;
-            if(i == servers.size()) {
-                int onlineCount = 0;
-                playerCount = 0;
-                maxPlayers = 0;
-                for(AdaptedServer pingedServer : pings.keySet()) {
-                    AdaptedServerPing serverPing = pings.get(pingedServer);
-                    if(serverPing == null || serverPing.getPlainDescription() == null) {
-                        if(serverPing != null) {
-                            pings.put(pingedServer, null);
-                        }
-                        continue;
-                    }
-                    if(serverPing.getPlainDescription().contains("ajQueue;whitelisted=")) {
-                        if(servers.size() > 1) continue;
-
-                        setWhitelisted(true);
-                        List<UUID> uuids = new ArrayList<>();
-                        for(String uuid : serverPing.getPlainDescription().substring(20).split(",")) {
-                            if(uuid.isEmpty()) continue;
-                            UUID parsedUUID;
-                            try {
-                                parsedUUID = UUID.fromString(uuid);
-                            } catch(IllegalArgumentException e) {
-                                main.getLogger().warn("UUID '"+uuid+"' in whitelist of "+getName()+" is invalid! "+e.getMessage());
-                                continue;
-                            }
-                            uuids.add(parsedUUID);
-                        }
-                        setWhitelistedPlayers(uuids);
-                    } else {
-                        setWhitelisted(false);
-                    }
-                    onlineCount++;
-                    playerCount += serverPing.getPlayerCount();
-                    maxPlayers += serverPing.getMaxPlayers();
-                }
-                online = onlineCount > 0;
-
-                if(lastUpdate == -1) {
-                    lastUpdate = System.currentTimeMillis();
-                    offlineTime = 0;
-                } else {
-                    int timesincelast = (int) Math.round((System.currentTimeMillis() - lastUpdate*1.0)/1000);
-                    lastUpdate = System.currentTimeMillis();
-                    if(!online) {
-                        offlineTime += timesincelast;
-                    } else {
-                        offlineTime = 0;
-                    }
-                }
-            }
-
-            if(pingerDebug) {
-                main.getLogger().info("[pinger] ["+server.getServerInfo().getName()+"] Finished");
-            }
-        }
-    }
-
-    @Override
-    public int getOfflineTime() {
-        return offlineTime;
+        return getStatus(null);
     }
 
     @Override
@@ -295,38 +183,10 @@ public class QueueServerImpl implements QueueServer {
     }
 
     @Override
-    public boolean isWhitelisted() {
-        return whitelisted;
-    }
-
-    @Override
-    public void setWhitelisted(boolean whitelisted) {
-        this.whitelisted = whitelisted;
-    }
-
-    @Override
-    public ImmutableList<UUID> getWhitelistedPlayers() {
-        return ImmutableList.copyOf(whitelistedUUIDs);
-    }
-
-    @Override
-    public synchronized void setWhitelistedPlayers(List<UUID> whitelistedPlayers) {
-        whitelistedUUIDs = whitelistedPlayers;
-    }
-
-    @Override
     public boolean isJoinable(AdaptedPlayer p) {
-        if(p != null) {
-            if (isWhitelisted() && !whitelistedUUIDs.contains(p.getUniqueId())) {
-                return false;
-            }
-            if (isFull() && !canJoinFull(p)) {
-                return false;
-            }
-        }
-        return isOnline() &&
-                canAccess(p) &&
-                !isPaused();
+        AdaptedServer server = getIdealServer(p);
+        if(server == null) return false;
+        return server.isJoinable(p) && !isPaused();
     }
 
     @Override
@@ -337,28 +197,6 @@ public class QueueServerImpl implements QueueServer {
     @Override
     public boolean isPaused() {
         return paused;
-    }
-
-    @Override
-    public boolean isOnline() {
-        if(System.currentTimeMillis()-lastOffline <= (main.getConfig().getInt("wait-after-online")*1000) && online) {
-            return false;
-        }
-        if(!online) {
-            lastOffline = System.currentTimeMillis();
-        }
-        return online;
-    }
-
-    @Override
-    public boolean justWentOnline() {
-        return System.currentTimeMillis()-lastOffline <= (main.getConfig().getDouble("wait-time")) && online;
-    }
-
-    @Override
-    public boolean isFull() {
-        if(!isOnline()) return false;
-        return playerCount >= maxPlayers;
     }
 
     @Override
@@ -460,13 +298,7 @@ public class QueueServerImpl implements QueueServer {
 
     @Override
     public AdaptedServer getIdealServer(AdaptedPlayer player) {
-        Debug.info(getBalancer().toString());
         return getBalancer().getIdealServer(player);
-    }
-
-    @Override
-    public HashMap<AdaptedServer, AdaptedServerPing> getLastPings() {
-        return new HashMap<>(pings);
     }
 
     @Override
@@ -484,26 +316,4 @@ public class QueueServerImpl implements QueueServer {
         return balancer;
     }
 
-    @Override
-    public boolean canJoinFull(AdaptedPlayer player) {
-        if(player == null) return true;
-        return
-                player.hasPermission("ajqueue.joinfull") ||
-                player.hasPermission("ajqueue.joinfullserver."+name) ||
-                player.hasPermission("ajqueue.joinfullandbypassserver."+name) ||
-                player.hasPermission("ajqueue.joinfullandbypass") ||
-                (main.isPremium() && main.getLogic().getPermissionGetter().hasUniqueFullBypass(player, name))
-                ;
-    }
-
-    @Override
-    public void addPlayer(AdaptedServer server) {
-        if(!pings.containsKey(server)) throw new IllegalArgumentException("Server is not in this group!");
-        pings.get(server).addPlayer();
-    }
-
-    @Override
-    public void setOnline(boolean online) {
-        this.online = online;
-    }
 }

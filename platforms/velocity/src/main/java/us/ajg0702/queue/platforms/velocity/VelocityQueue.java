@@ -144,7 +144,7 @@ public class VelocityQueue implements Implementation {
         Optional<Component> reasonOptional = e.getServerKickReason();
         main.getEventHandler().onServerKick(
                 new VelocityPlayer(e.getPlayer()),
-                new VelocityServer(e.getServer()),
+                new VelocityServer(e.getServer(), main),
                 reasonOptional.orElseGet(() -> Component.text("Proxy lost connection")),
                 // According to Tux on discord, velocity doesnt give a reason when the proxy loses connection to the connected server
                 e.kickedDuringServerConnect()
@@ -164,5 +164,9 @@ public class VelocityQueue implements Implementation {
                         .build(),
                 new VelocityCommand(main, (BaseCommand) command)
         );
+    }
+
+    public QueueMain getMain() {
+        return main;
     }
 }

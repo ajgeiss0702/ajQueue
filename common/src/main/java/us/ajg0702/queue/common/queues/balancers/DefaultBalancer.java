@@ -6,9 +6,11 @@ import us.ajg0702.queue.api.queues.QueueServer;
 import us.ajg0702.queue.api.server.AdaptedServer;
 import us.ajg0702.queue.api.server.AdaptedServerPing;
 import us.ajg0702.queue.common.QueueMain;
+import us.ajg0702.queue.common.utils.Debug;
 import us.ajg0702.utils.common.GenUtils;
 
 import java.util.HashMap;
+import java.util.List;
 
 public class DefaultBalancer implements Balancer {
 
@@ -21,29 +23,28 @@ public class DefaultBalancer implements Balancer {
 
     @Override
     public AdaptedServer getIdealServer(AdaptedPlayer player) {
-        HashMap<AdaptedServer, AdaptedServerPing> serverInfos = server.getLastPings();
+        List<AdaptedServer> servers = server.getServers();
         AdaptedServer selected = null;
         int selectednum = 0;
-        if(serverInfos.keySet().size() == 1) {
-            selected = serverInfos.keySet().iterator().next();
+        if(servers.size() == 1) {
+            selected = servers.get(0);
         } else {
-            for(AdaptedServer si : serverInfos.keySet()) {
-                AdaptedServerPing sp = serverInfos.get(si);
-                if(sp == null) continue;
-                int online = sp.getPlayerCount();
+            for(AdaptedServer sv : servers) {
+                if(!sv.isOnline()) continue;
+                int online = sv.getPlayerCount();
                 if(selected == null) {
-                    selected = si;
+                    selected = sv;
                     selectednum = online;
                     continue;
                 }
-                if(selectednum > online && main.getQueueManager().findServer(si.getName()).isJoinable(player)) {
-                    selected = si;
+                if(selectednum > online && main.getQueueManager().findServer(sv.getName()).isJoinable(player)) {
+                    selected = sv;
                     selectednum = online;
                 }
             }
         }
-        if(selected == null && serverInfos.size() > 0) {
-            selected = serverInfos.keySet().iterator().next();
+        if(selected == null && servers.size() > 0) {
+            selected = servers.get(0);
         }
         if(selected == null) {
             main.getLogger().warning("Unable to find ideal server, using random server from group.");
