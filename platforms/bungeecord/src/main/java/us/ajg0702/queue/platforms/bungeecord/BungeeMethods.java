@@ -134,7 +134,7 @@ public class BungeeMethods implements PlatformMethods {
             }
             if(found) continue;
 
-            serverList.add(new BungeeServer(serverInfo, plugin.getMain()));
+            serverList.add(new BungeeServer(serverInfo));
         }
 
         for(BungeeServer sv : new ArrayList<>(serverList)) {

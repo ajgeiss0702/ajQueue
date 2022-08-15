@@ -159,7 +159,7 @@ public class VelocityMethods implements PlatformMethods {
             if(found) continue;
 
             Debug.info("Added "+registeredServer.getServerInfo().getName());
-            serverList.add(new VelocityServer(registeredServer, plugin.getMain()));
+            serverList.add(new VelocityServer(registeredServer));
         }
 
         for(VelocityServer sv : new ArrayList<>(serverList)) {

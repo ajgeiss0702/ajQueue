@@ -2,12 +2,12 @@ package us.ajg0702.queue.platforms.bungeecord.server;
 
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
+import us.ajg0702.queue.api.AjQueueAPI;
 import us.ajg0702.queue.api.players.AdaptedPlayer;
 import us.ajg0702.queue.api.server.AdaptedServer;
 import us.ajg0702.queue.api.server.AdaptedServerInfo;
 import us.ajg0702.queue.api.server.AdaptedServerPing;
 import us.ajg0702.queue.api.util.QueueLogger;
-import us.ajg0702.queue.common.QueueMain;
 import us.ajg0702.queue.platforms.bungeecord.players.BungeePlayer;
 
 import java.util.ArrayList;
@@ -27,12 +27,9 @@ public class BungeeServer implements AdaptedServer {
 
     private int offlineTime = 0;
 
-    private final QueueMain main;
-
-    public BungeeServer(ServerInfo handle, QueueMain main) {
+    public BungeeServer(ServerInfo handle) {
         this.handle = handle;
         serverInfo = new BungeeServerInfo(handle);
-        this.main = main;
     }
 
     @Override
@@ -113,13 +110,13 @@ public class BungeeServer implements AdaptedServer {
                         player.hasPermission("ajqueue.joinfullserver."+getName()) ||
                         player.hasPermission("ajqueue.joinfullandbypassserver."+getName()) ||
                         player.hasPermission("ajqueue.joinfullandbypass") ||
-                        (main.isPremium() && main.getLogic().getPermissionGetter().hasUniqueFullBypass(player, getName()))
+                        (AjQueueAPI.getInstance().isPremium() && AjQueueAPI.getInstance().getLogic().getPermissionGetter().hasUniqueFullBypass(player, getName()))
                 ;
     }
 
     @Override
     public boolean justWentOnline() {
-        return System.currentTimeMillis()-lastOffline <= (main.getConfig().getDouble("wait-time")) && isOnline();
+        return System.currentTimeMillis()-lastOffline <= (AjQueueAPI.getInstance().getConfig().getDouble("wait-time")) && isOnline();
     }
 
     @Override
