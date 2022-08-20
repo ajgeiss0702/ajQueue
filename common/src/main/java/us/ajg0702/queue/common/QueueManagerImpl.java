@@ -103,11 +103,6 @@ public class QueueManagerImpl implements QueueManager {
 
         Debug.info("addToQueue method called for "+player.getName()+" to "+server.getName());
 
-        if(main.getConfig().getBoolean("joinfrom-server-permission") && !player.hasPermission("ajqueue.joinfrom."+player.getServerName())) {
-            player.sendMessage(msgs.getComponent("errors.deny-joining-from-server"));
-            return false;
-        }
-
         int playerVersion = player.getProtocolVersion();
         List<Integer> supportedProtocols = server.getSupportedProtocols();
         if(!supportedProtocols.contains(playerVersion) && supportedProtocols.size() > 0) {

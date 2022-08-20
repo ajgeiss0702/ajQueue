@@ -63,6 +63,10 @@ public class QueueCommand extends BaseCommand {
                 sender.sendMessage(getMessages().getComponent("noperm"));
                 return;
             }
+            if(main.getConfig().getBoolean("joinfrom-server-permission") && !player.hasPermission("ajqueue.joinfrom."+player.getServerName())) {
+                player.sendMessage(getMessages().getComponent("errors.deny-joining-from-server"));
+                return;
+            }
             main.getQueueManager().addToQueue(player, args[0]);
         } else {
             sender.sendMessage(getMessages().getComponent("commands.joinqueue.usage"));
