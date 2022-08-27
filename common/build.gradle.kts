@@ -14,15 +14,15 @@ repositories {
 dependencies {
     testImplementation("junit:junit:4.12")
 
-    compileOnly("net.kyori:adventure-api:4.9.3")
-    compileOnly("net.kyori:adventure-text-serializer-plain:4.9.3")
+    compileOnly("net.kyori:adventure-api:4.11.0")
+    compileOnly("net.kyori:adventure-text-serializer-plain:4.11.0")
 
-    compileOnly("com.google.guava:guava:30.1.1-jre")
+    compileOnly("com.google.guava:guava:31.1-jre")
     compileOnly("us.ajg0702:ajUtils:1.2.10")
 
     compileOnly("org.slf4j:slf4j-log4j12:1.7.29")
 
-    compileOnly("org.spongepowered:configurate-yaml:4.0.0")
+    compileOnly("org.spongepowered:configurate-yaml:4.1.2")
 
     implementation(project(":api"))
 }

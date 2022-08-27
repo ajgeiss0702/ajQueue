@@ -8,24 +8,23 @@ group = "us.ajg0702.queue.platforms.bungeecord"
 repositories {
     //mavenLocal()
     maven { url = uri("https://repo.ajg0702.us") }
-    maven { url = uri("https://nexus.velocitypowered.com/repository/maven-public/") }
     maven { url = uri("https://repo.viaversion.com/") }
     mavenCentral()
 }
 
 dependencies {
-    compileOnly("net.kyori:adventure-api:4.9.3")
-    compileOnly("com.google.guava:guava:30.1.1-jre")
+    compileOnly("net.kyori:adventure-api:4.11.0")
+    compileOnly("com.google.guava:guava:31.1-jre")
     compileOnly("us.ajg0702:ajUtils:1.2.10")
 
     compileOnly("net.md-5:bungeecord-api:1.16-R0.4")
 
-    implementation("net.kyori:adventure-text-minimessage:4.10.0")
+    implementation("net.kyori:adventure-text-minimessage:4.11.0")
 
     implementation("net.kyori:adventure-platform-bungeecord:4.0.0")
     compileOnly("net.kyori:adventure-text-serializer-plain:4.9.3")
 
-    compileOnly("com.viaversion:viaversion-api:4.3.1")
+    compileOnly("com.viaversion:viaversion-api:4.4.2")
 
     implementation("org.bstats:bstats-bungeecord:3.0.0")
 
