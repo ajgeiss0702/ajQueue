@@ -32,7 +32,7 @@ public class MinigameBalancer implements Balancer {
                 if(!si.isOnline()) continue;
                 int online = si.getPlayerCount();
                 int max = si.getMaxPlayers();
-                if(online < max) {
+                if(online < max && si.isJoinable(player)) {
                     return si;
                 }
             }
