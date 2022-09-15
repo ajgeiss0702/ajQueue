@@ -37,7 +37,7 @@ public class DefaultBalancer implements Balancer {
                     selectednum = online;
                     continue;
                 }
-                if(selectednum > online && main.getQueueManager().findServer(sv.getName()).isJoinable(player)) {
+                if(selectednum > online && sv.isJoinable(player)) {
                     selected = sv;
                     selectednum = online;
                 }
