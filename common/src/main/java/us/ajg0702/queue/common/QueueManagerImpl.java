@@ -40,7 +40,7 @@ public class QueueManagerImpl implements QueueManager {
         List<? extends AdaptedServer> servers = main.getPlatformMethods().getServers();
 
         for(AdaptedServer server : servers) {
-            QueueServer previousServer = main.getQueueManager().findServer(server.getName());
+            QueueServer previousServer = findServer(server.getName());
             List<QueuePlayer> previousPlayers = previousServer == null ? new ArrayList<>() : previousServer.getQueue();
             if(previousPlayers.size() > 0) {
                 main.getLogger().info("Adding "+previousPlayers.size()+" players back to the queue for "+server.getName());
@@ -51,6 +51,54 @@ public class QueueManagerImpl implements QueueManager {
                 queueServer.setLastSentTime(previousServer.getLastSentTime());
             }
             result.add(queueServer);
+        }
+
+        List<String> groupsRaw = main.getConfig().getStringList("server-groups");
+        for(String groupRaw : groupsRaw) {
+            if(groupRaw.isEmpty()) {
+                main.getLogger().warning("Empty group string! If you dont want server groups, set server-groups like this: server-groups: []");
+                continue;
+            }
+
+            if(!groupRaw.contains(":")) {
+                main.getLogger().warning("Incorrect formatting! Each server group needs to have a name and a list of servers seperated by a colon (:).");
+                continue;
+            }
+
+            String groupName = groupRaw.split(":")[0];
+            String[] serversraw = groupRaw.split(":")[1].split(",");
+
+            if(findServer(groupName, result) != null) {
+                main.getLogger().warning("The name of a group ('"+groupName+"') cannot be the same as the name of a server!");
+                continue;
+            }
+
+            List<AdaptedServer> groupServers = new ArrayList<>();
+
+            for(String serverraw : serversraw) {
+                QueueServer found = findServer(serverraw, result);
+                if(found == null) {
+                    main.getLogger().warning("Could not find server named '"+serverraw+"' in servergroup '"+groupName+"'!");
+                    continue;
+                }
+                if(found.isGroup()) continue;
+
+                groupServers.add(found.getServers().get(0));
+            }
+
+            if(groupServers.size() == 0) {
+                main.getLogger().warning("Server group '"+groupName+"' has no servers! Ignoring it.");
+                continue;
+            }
+
+
+            QueueServer previousServer = main.getQueueManager().findServer(groupName);
+            List<QueuePlayer> previousPlayers = previousServer == null ? new ArrayList<>() : previousServer.getQueue();
+            if(previousPlayers.size() > 0) {
+                main.getLogger().info("Adding "+previousPlayers.size()+" players back to the queue for "+groupName);
+            }
+
+            result.add(new QueueServerImpl(groupName, main, groupServers, previousPlayers));
         }
 
         List<String> supportedProtocolsRaw = main.getConfig().getStringList("supported-protocols");
@@ -73,13 +121,20 @@ public class QueueManagerImpl implements QueueManager {
             }
 
             for(String serverName : serversRaw.split(",")) {
+                boolean found = false;
                 for(QueueServer server : result) {
                     if(serverName.equalsIgnoreCase(server.getName())) {
                         server.setSupportedProtocols(protocols);
+                        found = true;
+                        Debug.info("Applied " + protocols + " to " + server.getName() + "(" + serverName + ")");
                         break;
                     }
                 }
+                if(!found) {
+                    Debug.info("Found no server named " + serverName);
+                }
             }
+
         }
 
         return result;
@@ -283,58 +338,7 @@ public class QueueManagerImpl implements QueueManager {
             main.getLogger().severe("[MAN] Config is null");
         }
 
-        List<QueueServer> oldServers = ImmutableList.copyOf(servers);
-
         servers = new CopyOnWriteArrayList<>(buildServers());
-
-        List<String> groupsRaw = main.getConfig().getStringList("server-groups");
-        for(String groupRaw : groupsRaw) {
-            if(groupRaw.isEmpty()) {
-                main.getLogger().warning("Empty group string! If you dont want server groups, set server-groups like this: server-groups: []");
-                continue;
-            }
-
-            if(!groupRaw.contains(":")) {
-                main.getLogger().warning("Incorrect formatting! Each server group needs to have a name and a list of servers seperated by a colon (:).");
-                continue;
-            }
-
-            String groupName = groupRaw.split(":")[0];
-            String[] serversraw = groupRaw.split(":")[1].split(",");
-
-            if(findServer(groupName) != null) {
-                main.getLogger().warning("The name of a group ('"+groupName+"') cannot be the same as the name of a server!");
-                continue;
-            }
-
-            List<AdaptedServer> groupServers = new ArrayList<>();
-
-            for(String serverraw : serversraw) {
-                QueueServer found = findServer(serverraw);
-                if(found == null) {
-                    main.getLogger().warning("Could not find server named '"+serverraw+"' in servergroup '"+groupName+"'!");
-                    continue;
-                }
-                if(found.isGroup()) continue;
-
-                groupServers.add(found.getServers().get(0));
-            }
-
-            if(groupServers.size() == 0) {
-                main.getLogger().warning("Server group '"+groupName+"' has no servers! Ignoring it.");
-                continue;
-            }
-
-
-            final List<QueuePlayer> previousPlayers = new ArrayList<>();
-            oldServers.forEach(queueServer -> {
-                if(queueServer.getName().equals(groupName)) {
-                    previousPlayers.addAll(queueServer.getQueue());
-                }
-            });
-
-            this.servers.add(new QueueServerImpl(groupName, main, groupServers, previousPlayers));
-        }
     }
 
     @Override
@@ -516,6 +520,10 @@ public class QueueManagerImpl implements QueueManager {
 
     @Override
     public QueueServer findServer(String name) {
+        return findServer(name, servers);
+    }
+
+    public QueueServer findServer(String name, List<QueueServer> servers) {
         for(QueueServer server : servers) {
             if(server == null) continue;
             if(server.getName().equalsIgnoreCase(name)) {
