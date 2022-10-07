@@ -89,7 +89,7 @@ multi-server-queue-pick: last
 
 
 # THIS FEATURE IS ONLY AVAILABLE ON ajQueuePlus (https://www.spigotmc.org/resources/ajqueueplus.79123/)
-# This will show players a different name than the actual bungeecord server name
+# This will show players a different name than the actual proxy server name
 # for example, instead of showing players "event-a", this option can make it appear as "Event A"
 # With this example, you would use this: - "event-a:Event A"
 # Note that currently players still have to use the normal names in queue commands and leave commands
@@ -147,7 +147,7 @@ tab-complete-queues: true
 send-instantly:
   - "lobbys"
 
-# Should we log to the bungeecord console when a player fails to get sent to a server from the queue?
+# Should we log to the proxy console when a player fails to get sent to a server from the queue?
 # Enable this if you are having an issue with one player stopping the queue
 #  Default: false
 send-fail-debug: false
@@ -173,7 +173,7 @@ check-last-player-sent-time: true
 priority-queue-debug: false
 
 # When a player is kicked from a server, should we automatically add that player to the queue?
-# You will still need to use another plugin to make sure the player doesnt get kicked from bungee completly.
+# You will still need to use another plugin to make sure the player doesnt get kicked from the proxy completly.
 #  Default: false
 auto-add-to-queue-on-kick: false
 # The delay for the above option.
