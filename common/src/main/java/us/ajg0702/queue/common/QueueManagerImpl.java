@@ -187,11 +187,11 @@ public class QueueManagerImpl implements QueueManager {
         int pos = queuePlayer.getPosition();
         int len = list.size();
 
-        boolean sendInstant = main.getConfig().getStringList("send-instantly").contains(server.getName()) || server.isJoinable(player);
+        boolean sendInstant = server.isJoinable(player);
         boolean sendInstantp = list.size() <= 1 && server.isJoinable(player);
         boolean timeGood = !main.getConfig().getBoolean("check-last-player-sent-time") || server.getLastSentTime() > Math.floor(main.getTimeBetweenPlayers() * 1000);
 
-        if((sendInstant && (sendInstantp && timeGood))) {
+        if(main.getConfig().getStringList("send-instantly").contains(server.getName()) || (sendInstant && (sendInstantp && timeGood))) {
             sendPlayers(server);
             if(!msgs.isEmpty("status.now-in-empty-queue")) {
                 player.sendMessage(msgs.getComponent("status.now-in-empty-queue",
