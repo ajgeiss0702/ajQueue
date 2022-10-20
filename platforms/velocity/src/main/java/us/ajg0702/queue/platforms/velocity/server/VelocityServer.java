@@ -128,7 +128,7 @@ public class VelocityServer implements AdaptedServer {
 
     @Override
     public boolean justWentOnline() {
-        return System.currentTimeMillis()-lastOffline <= (AjQueueAPI.getInstance().getConfig().getDouble("wait-time")) && isOnline();
+        return System.currentTimeMillis()-lastOffline <= (AjQueueAPI.getInstance().getConfig().getDouble("wait-time") * 2 * 1000) && isOnline();
     }
 
     @Override

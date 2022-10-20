@@ -562,6 +562,7 @@ public class QueueManagerImpl implements QueueManager {
             if(!server.isOnline()) continue;
             if(server.getQueue().size() == 0) continue;
 
+            Debug.info("should send instantly: " + !server.isGroup() + " && " + main.getConfig().getBoolean("send-all-when-back-online") + " && " + server.getServers().get(0).justWentOnline());
             if(!server.isGroup() && main.getConfig().getBoolean("send-all-when-back-online") && server.getServers().get(0).justWentOnline()) {
                 for(QueuePlayer p : server.getQueue()) {
 
