@@ -13,6 +13,7 @@ import us.ajg0702.utils.common.Updater;
 
 import java.io.File;
 import java.util.LinkedHashMap;
+import java.util.concurrent.ExecutorService;
 import java.util.regex.Pattern;
 
 public class QueueMain extends AjQueueAPI {
@@ -121,6 +122,11 @@ public class QueueMain extends AjQueueAPI {
     public void shutdown() {
         taskManager.shutdown();
         updater.shutdown();
+    }
+
+    @Override
+    public ExecutorService getServersUpdateExecutor() {
+        return taskManager.getServersUpdateExecutor();
     }
 
 

@@ -52,16 +52,7 @@ public class BungeeServer implements AdaptedServer {
 
         handle.ping((pp, error) -> {
             if(error != null) {
-
-                long lastOnline = lastSuccessfullPing == null ? 0 : lastSuccessfullPing.getFetchedTime();
-                offlineTime = (int) Math.min(sent - lastOnline, Integer.MAX_VALUE);
-
-                lastOffline = sent;
-
-                future.completeExceptionally(error);
-                lastPing = null;
-                if(debug) logger.info("[pinger] [" + getName() + "] offline:", error);
-                return;
+                markOffline(debug, logger, future, sent, error);
             }
 
             offlineTime = 0;
@@ -78,6 +69,17 @@ public class BungeeServer implements AdaptedServer {
             lastPing = ping;
         });
         return future;
+    }
+
+    private void markOffline(boolean debug, QueueLogger logger, CompletableFuture<AdaptedServerPing> future, long sent, Throwable e) {
+        long lastOnline = lastSuccessfullPing == null ? 0 : lastSuccessfullPing.getFetchedTime();
+        offlineTime = (int) Math.min(sent - lastOnline, Integer.MAX_VALUE);
+
+        lastOffline = sent;
+
+        future.completeExceptionally(e);
+        lastPing = null;
+        if(debug) logger.info("[pinger] [" + getName() + "] offline:", e);
     }
 
     @Override

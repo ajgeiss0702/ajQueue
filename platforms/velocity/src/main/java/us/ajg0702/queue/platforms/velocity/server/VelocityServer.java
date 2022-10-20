@@ -53,19 +53,12 @@ public class VelocityServer implements AdaptedServer {
         if(debug) logger.info("[pinger] [" + getName() + "] sending ping");
 
         serverPing.thenRunAsync(() -> {
+            System.out.println("thenRunAsync " + getName());
             VelocityServerPing ping;
             try {
                 ping = new VelocityServerPing(serverPing.get(), sent);
             } catch (Throwable e) {
-
-                long lastOnline = lastSuccessfullPing == null ? 0 : lastSuccessfullPing.getFetchedTime();
-                offlineTime = (int) Math.min(sent - lastOnline, Integer.MAX_VALUE);
-
-                lastOffline = sent;
-
-                future.completeExceptionally(e);
-                lastPing = null;
-                if(debug) logger.info("[pinger] [" + getName() + "] offline:", e);
+                markOffline(debug, logger, future, sent, e);
                 return;
             }
 
@@ -79,8 +72,22 @@ public class VelocityServer implements AdaptedServer {
 
             future.complete(ping);
             lastPing = ping;
+        }).exceptionally(e -> {
+            markOffline(debug, logger, future, sent, e);
+            return null;
         });
         return future;
+    }
+
+    private void markOffline(boolean debug, QueueLogger logger, CompletableFuture<AdaptedServerPing> future, long sent, Throwable e) {
+        long lastOnline = lastSuccessfullPing == null ? 0 : lastSuccessfullPing.getFetchedTime();
+        offlineTime = (int) Math.min(sent - lastOnline, Integer.MAX_VALUE);
+
+        lastOffline = sent;
+
+        future.completeExceptionally(e);
+        lastPing = null;
+        if(debug) logger.info("[pinger] [" + getName() + "] offline:", e);
     }
 
     @Override
