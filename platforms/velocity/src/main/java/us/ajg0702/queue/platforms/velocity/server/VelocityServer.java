@@ -53,7 +53,6 @@ public class VelocityServer implements AdaptedServer {
         if(debug) logger.info("[pinger] [" + getName() + "] sending ping");
 
         serverPing.thenRunAsync(() -> {
-            System.out.println("thenRunAsync " + getName());
             VelocityServerPing ping;
             try {
                 ping = new VelocityServerPing(serverPing.get(), sent);
