@@ -120,6 +120,7 @@ public class EventHandlerImpl implements EventHandler {
                 String srv = in.readUTF();
                 QueueServer server = main.getQueueManager().findServer(srv);
                 if(server == null) return;
+                if(!recievingPlayer.isConnected() || recievingPlayer.getServerName() == null) return;
                 main.getPlatformMethods().sendPluginMessage(
                         recievingPlayer,
                         "status",
