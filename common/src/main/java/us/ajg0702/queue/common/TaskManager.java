@@ -10,7 +10,7 @@ public class TaskManager {
     final ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
     final ScheduledExecutorService updateExecutor = Executors.newScheduledThreadPool(1);
 
-    final ExecutorService serversUpdateExecutor = Executors.newCachedThreadPool();
+    final ExecutorService serversUpdateExecutor = Executors.newSingleThreadExecutor();
 
     final QueueMain main;
     public TaskManager(QueueMain main) {

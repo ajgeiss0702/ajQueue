@@ -16,7 +16,8 @@ import us.ajg0702.utils.common.Messages;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class QueueServerImpl implements QueueServer {
 
@@ -83,7 +84,7 @@ public class QueueServerImpl implements QueueServer {
 
     private final QueueMain main;
 
-    private final HashMap<AdaptedServer, AdaptedServerPing> pings = new HashMap<>();
+    private final Map<AdaptedServer, AdaptedServerPing> pings = new ConcurrentHashMap<>();
 
     private final List<AdaptedServer> servers;
 
@@ -195,89 +196,86 @@ public class QueueServerImpl implements QueueServer {
     public void updatePing() {
         boolean pingerDebug = main.getConfig().getBoolean("pinger-debug");
         HashMap<AdaptedServer, CompletableFuture<AdaptedServerPing>> pingsFutures = new HashMap<>();
+
+        AtomicInteger pingCount = new AtomicInteger(0);
+
         for(AdaptedServer server : servers) {
             if(pingerDebug) {
                 main.getLogger().info("[pinger] ["+server.getServerInfo().getName()+"] sending ping");
             }
-            pingsFutures.put(server, server.ping());
-        }
-
-        int i = 0;
-        for(AdaptedServer server : pingsFutures.keySet()) {
-            CompletableFuture<AdaptedServerPing> futurePing = pingsFutures.get(server);
-            AdaptedServerPing ping = null;
-            try {
-                ping = futurePing.get(5, TimeUnit.SECONDS);
-            } catch (Exception e) {
+            pingsFutures.put(server, server.ping().whenComplete((ping, exception) -> {
+                if(exception != null){
+                    exception.printStackTrace();
+                    return;
+                }
                 if(pingerDebug) {
-                    main.getLogger().info("[pinger] ["+server.getServerInfo().getName()+"] offline:");
-                    e.printStackTrace();
-                }
-            }
-            if(ping != null && pingerDebug) {
-                main.getLogger().info("[pinger] ["+server.getServerInfo().getName()+"] online. motd: "+ping.getPlainDescription()+"  players: "+ping.getPlayerCount()+"/"+ping.getMaxPlayers());
-            } else if(ping == null && pingerDebug) {
-                main.getLogger().info("[pinger] ["+server.getServerInfo().getName()+"] offline (unknown)");
-            }
-
-            pings.put(server, ping);
-            i++;
-            if(i == servers.size()) {
-                int onlineCount = 0;
-                playerCount = 0;
-                maxPlayers = 0;
-                for(AdaptedServer pingedServer : pings.keySet()) {
-                    AdaptedServerPing serverPing = pings.get(pingedServer);
-                    if(serverPing == null || serverPing.getPlainDescription() == null) {
-                        if(serverPing != null) {
-                            pings.put(pingedServer, null);
-                        }
-                        continue;
+                    if (ping != null) {
+                        main.getLogger().info("[pinger] [" + server.getServerInfo().getName() + "] online. motd: " + ping.getPlainDescription() + "  players: " + ping.getPlayerCount() + "/" + ping.getMaxPlayers());
+                    } else {
+                        main.getLogger().info("[pinger] [" + server.getServerInfo().getName() + "] offline (unknown)");
                     }
-                    if(serverPing.getPlainDescription().contains("ajQueue;whitelisted=")) {
-                        if(servers.size() > 1) continue;
+                }
 
-                        setWhitelisted(true);
-                        List<UUID> uuids = new ArrayList<>();
-                        for(String uuid : serverPing.getPlainDescription().substring(20).split(",")) {
-                            if(uuid.isEmpty()) continue;
-                            UUID parsedUUID;
-                            try {
-                                parsedUUID = UUID.fromString(uuid);
-                            } catch(IllegalArgumentException e) {
-                                main.getLogger().warn("UUID '"+uuid+"' in whitelist of "+getName()+" is invalid! "+e.getMessage());
-                                continue;
+                pings.put(server, ping);
+                int count = pingCount.addAndGet(1);
+                if(count == servers.size()) {
+                    int onlineCount = 0;
+                    playerCount = 0;
+                    maxPlayers = 0;
+                    for(AdaptedServer pingedServer : pings.keySet()) {
+                        AdaptedServerPing serverPing = pings.get(pingedServer);
+                        if(serverPing == null || serverPing.getPlainDescription() == null) {
+                            if(serverPing != null) {
+                                pings.put(pingedServer, null);
                             }
-                            uuids.add(parsedUUID);
+                            continue;
                         }
-                        setWhitelistedPlayers(uuids);
-                    } else {
-                        setWhitelisted(false);
-                    }
-                    onlineCount++;
-                    playerCount += serverPing.getPlayerCount();
-                    maxPlayers += serverPing.getMaxPlayers();
-                }
-                online = onlineCount > 0;
+                        if(serverPing.getPlainDescription().contains("ajQueue;whitelisted=")) {
+                            if(servers.size() > 1) continue;
 
-                if(lastUpdate == -1) {
-                    lastUpdate = System.currentTimeMillis();
-                    offlineTime = 0;
-                } else {
-                    int timesincelast = (int) Math.round((System.currentTimeMillis() - lastUpdate*1.0)/1000);
-                    lastUpdate = System.currentTimeMillis();
-                    if(!online) {
-                        offlineTime += timesincelast;
-                    } else {
+                            setWhitelisted(true);
+                            List<UUID> uuids = new ArrayList<>();
+                            for(String uuid : serverPing.getPlainDescription().substring(20).split(",")) {
+                                if(uuid.isEmpty()) continue;
+                                UUID parsedUUID;
+                                try {
+                                    parsedUUID = UUID.fromString(uuid);
+                                } catch(IllegalArgumentException e) {
+                                    main.getLogger().warn("UUID '"+uuid+"' in whitelist of "+getName()+" is invalid! "+e.getMessage());
+                                    continue;
+                                }
+                                uuids.add(parsedUUID);
+                            }
+                            setWhitelistedPlayers(uuids);
+                        } else {
+                            setWhitelisted(false);
+                        }
+                        onlineCount++;
+                        playerCount += serverPing.getPlayerCount();
+                        maxPlayers += serverPing.getMaxPlayers();
+                    }
+                    online = onlineCount > 0;
+
+                    if(lastUpdate == -1) {
+                        lastUpdate = System.currentTimeMillis();
                         offlineTime = 0;
+                    } else {
+                        int timesincelast = (int) Math.round((System.currentTimeMillis() - lastUpdate*1.0)/1000);
+                        lastUpdate = System.currentTimeMillis();
+                        if(!online) {
+                            offlineTime += timesincelast;
+                        } else {
+                            offlineTime = 0;
+                        }
                     }
                 }
-            }
 
-            if(pingerDebug) {
-                main.getLogger().info("[pinger] ["+server.getServerInfo().getName()+"] Finished");
-            }
+                if(pingerDebug) {
+                    main.getLogger().info("[pinger] ["+server.getServerInfo().getName()+"] Finished");
+                }
+            }));
         }
+
     }
 
     @Override
@@ -489,10 +487,10 @@ public class QueueServerImpl implements QueueServer {
         if(player == null) return true;
         return
                 player.hasPermission("ajqueue.joinfull") ||
-                player.hasPermission("ajqueue.joinfullserver."+name) ||
-                player.hasPermission("ajqueue.joinfullandbypassserver."+name) ||
-                player.hasPermission("ajqueue.joinfullandbypass") ||
-                (main.isPremium() && main.getLogic().getPermissionGetter().hasUniqueFullBypass(player, name))
+                        player.hasPermission("ajqueue.joinfullserver."+name) ||
+                        player.hasPermission("ajqueue.joinfullandbypassserver."+name) ||
+                        player.hasPermission("ajqueue.joinfullandbypass") ||
+                        (main.isPremium() && main.getLogic().getPermissionGetter().hasUniqueFullBypass(player, name))
                 ;
     }
 
