@@ -1,4 +1,4 @@
-name: Deploy Pre-Release to Polymart
+name: Deploy Pre-Release to Polymart/Modrinth
 
 on:
   push:
@@ -42,10 +42,12 @@ jobs:
           # The desired behavior if no files are found using the provided path.
           if-no-files-found: error
           retention-days: 2
-      - name: Deploy to Polymart
+      - name: Deploy to Polymart/Modrinth
         env:
           POLYMART_TOKEN: ${{ secrets.POLYMART_TOKEN }}
+          MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
         run: |
           export VERSION=`cat build.gradle.kts | grep "version " | awk -F'"' '{print $2}'`
+          curl --no-progress-meter -A "AJUPDATER/1.0" -H "Authorization: $MODRINTH_TOKEN" -F data="{\"project_id\": \"dzacATni\", \"version_number\": \"$VERSION\", \"name\": \"Pre-release v$VERSION\", \"changelog\": \"Note: This is a (most likely) un-tested build. It is not guarenteed to work.<br><br>Change since previous build:<br><a href=\\\"${{ github.event.compare }}\\\" target=\\\"_blank\\\">${{ github.event.head_commit.message }}</a>\", \"file_parts\": [\"file\"], \"version_type\": \"beta\", \"loaders\": [\"bungeecord\", \"velocity\"], \"featured\": false, \"game_versions\": $(curl https://ajg0702.us/pl/updater/mc-versions.php), \"dependencies\": [], \"primary_file\": \"file\"}" -F "file=@build/libs/ajLeaderboards-$VERSION.jar" "https://api.modrinth.com/v2/version"
           curl -F "file=@free/build/libs/ajQueue-$VERSION.jar" -F api_key=$POLYMART_TOKEN -F resource_id="2535" -F version="$VERSION" -F title="Pre-release v$VERSION" -F beta=1 -F message=$'Note: This is a (most likely) un-tested build. It is not guarenteed to work!\n\nChange since previous build:\n[url=${{ github.event.compare }}"]${{ github.event.head_commit.message }}[/url]' "https://api.polymart.org/v1/postUpdate"
           curl -F "file=@premium/build/libs/ajQueuePlus-$VERSION.jar" -F api_key=$POLYMART_TOKEN -F resource_id="2714" -F version="$VERSION" -F title="Pre-release v$VERSION" -F beta=1 -F message=$'Note: This is a (most likely) un-tested build. It is not guarenteed to work!\n\nChange since previous build:\n[url=${{ github.event.compare }}"]${{ github.event.head_commit.message }}[/url]' "https://api.polymart.org/v1/postUpdate"
