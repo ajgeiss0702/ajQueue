@@ -99,7 +99,7 @@ public class VelocityPlayer implements AdaptedPlayer, Audience {
 
     @Override
     public void sendMessage(String message) {
-        sendMessage(Component.text().content(message));
+        sendMessage(Component.text(message));
     }
 
     @Override

@@ -4,6 +4,7 @@ import us.ajg0702.queue.api.AjQueueAPI;
 import us.ajg0702.queue.api.players.AdaptedPlayer;
 import us.ajg0702.queue.api.players.QueuePlayer;
 import us.ajg0702.queue.api.queues.QueueServer;
+import us.ajg0702.queue.api.server.AdaptedServer;
 import us.ajg0702.utils.common.Config;
 
 @SuppressWarnings({"SameReturnValue", "unused"})
@@ -17,10 +18,12 @@ public interface Logic {
 
     /**
      * The priority logic that is executed if the plugin is premium.
-     * @param server The server/group name that is being queued for
-     * @param player The player that is being queued
+     *
+     * @param queueServer The server/group name that is being queued for
+     * @param player      The player that is being queued
+     * @param server      The server/group name that is being queued for
      */
-    QueuePlayer priorityLogic(QueueServer server, AdaptedPlayer player);
+    QueuePlayer priorityLogic(QueueServer queueServer, AdaptedPlayer player, AdaptedServer server);
 
     /**
      * The logic for checking if a player has been disconnected for too long
@@ -35,7 +38,7 @@ public interface Logic {
      */
     PermissionGetter getPermissionGetter();
 
-    static int getUnJoinablePriorities(QueueServer server, AdaptedPlayer player) {
+    static int getUnJoinablePriorities(QueueServer queueServer, AdaptedServer server, AdaptedPlayer player) {
         Config config = AjQueueAPI.getInstance().getConfig();
         int highest = 0;
 
@@ -50,7 +53,7 @@ public interface Logic {
         }
 
         if(bypassPausedPriotity > 0) {
-            if(server.isPaused() && (player.hasPermission("ajqueue.bypasspaused"))) {
+            if(queueServer.isPaused() && (player.hasPermission("ajqueue.bypasspaused"))) {
                 highest = Math.max(highest, bypassPausedPriotity);
             }
         }

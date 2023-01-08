@@ -167,4 +167,8 @@ public class BungeeQueue extends Plugin implements Listener, Implementation {
         getProxy().getPluginManager()
                 .registerCommand(this, bungeeCommand);
     }
+
+    public QueueMain getMain() {
+        return main;
+    }
 }

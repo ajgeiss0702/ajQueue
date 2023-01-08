@@ -165,4 +165,8 @@ public class VelocityQueue implements Implementation {
                 new VelocityCommand(main, (BaseCommand) command)
         );
     }
+
+    public QueueMain getMain() {
+        return main;
+    }
 }

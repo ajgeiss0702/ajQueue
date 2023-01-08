@@ -5,6 +5,7 @@ import us.ajg0702.queue.api.premium.Logic;
 import us.ajg0702.queue.api.players.AdaptedPlayer;
 import us.ajg0702.queue.api.players.QueuePlayer;
 import us.ajg0702.queue.api.queues.QueueServer;
+import us.ajg0702.queue.api.server.AdaptedServer;
 import us.ajg0702.queue.api.util.QueueLogger;
 import us.ajg0702.queue.common.QueueMain;
 import us.ajg0702.queue.common.players.QueuePlayerImpl;
@@ -28,7 +29,7 @@ public class PremiumLogic implements Logic {
     }
 
     @Override
-    public QueuePlayer priorityLogic(QueueServer server, AdaptedPlayer player) {
+    public QueuePlayer priorityLogic(QueueServer queueServer, AdaptedPlayer player, AdaptedServer server) {
         int maxOfflineTime = permissionGetter.getMaxOfflineTime(player);
 
         QueueMain main = QueueMain.getInstance();
@@ -38,32 +39,32 @@ public class PremiumLogic implements Logic {
 
         if(
                 player.hasPermission("ajqueue.bypass") ||
-                player.hasPermission("ajqueue.serverbypass."+server.getName()) ||
-                player.hasPermission("ajqueue.joinfullandbypassserver."+server.getName()) ||
+                player.hasPermission("ajqueue.serverbypass."+ queueServer.getName()) ||
+                player.hasPermission("ajqueue.joinfullandbypassserver."+ queueServer.getName()) ||
                 player.hasPermission("ajqueue.joinfullandbypass") ||
-                permissionGetter.hasContextBypass(player, server.getName()) ||
-                (main.isPremium() && main.getLogic().getPermissionGetter().hasUniqueFullBypass(player, server.getName()))
+                permissionGetter.hasContextBypass(player, queueServer.getName()) ||
+                (main.isPremium() && main.getLogic().getPermissionGetter().hasUniqueFullBypass(player, queueServer.getName()))
         ) {
             if(debug) {
                 logger.info("[priority] "+player.getName()+" bypass");
             }
-            QueuePlayer queuePlayer = new QueuePlayerImpl(player, server, Integer.MAX_VALUE, maxOfflineTime);
-            server.addPlayer(queuePlayer, 0);
-            main.getQueueManager().sendPlayers(server);
+            QueuePlayer queuePlayer = new QueuePlayerImpl(player, queueServer, Integer.MAX_VALUE, maxOfflineTime);
+            queueServer.addPlayer(queuePlayer, 0);
+            main.getQueueManager().sendPlayers(queueServer);
             return queuePlayer;
         }
 
         int priority = permissionGetter.getPriority(player);
-        int serverPriority = permissionGetter.getServerPriotity(server.getName(), player);
+        int serverPriority = permissionGetter.getServerPriotity(queueServer.getName(), player);
 
         if(debug) {
             logger.info("[priority] Using "+permissionGetter.getSelected().getName()+" for permissions");
         }
 
         int highestPriority = Math.max(priority, serverPriority);
-        highestPriority = Math.max(highestPriority, Logic.getUnJoinablePriorities(server, player));
+        highestPriority = Math.max(highestPriority, Logic.getUnJoinablePriorities(queueServer, server, player));
 
-        QueuePlayer queuePlayer = new QueuePlayerImpl(player, server, highestPriority, maxOfflineTime);
+        QueuePlayer queuePlayer = new QueuePlayerImpl(player, queueServer, highestPriority, maxOfflineTime);
 
         if(debug) {
             logger.info("[priority] "+player.getName()+" highestPriority: "+highestPriority);
@@ -75,11 +76,11 @@ public class PremiumLogic implements Logic {
             if(debug) {
                 logger.info("[priority] "+player.getName()+"  No priority" );
             }
-            server.addPlayer(queuePlayer);
+            queueServer.addPlayer(queuePlayer);
             return queuePlayer;
         }
 
-        ImmutableList<QueuePlayer> list = server.getQueue();
+        ImmutableList<QueuePlayer> list = queueServer.getQueue();
 
         for(int i = 0; i < list.size(); i++) {
             QueuePlayer pl = list.get(i);
@@ -87,7 +88,7 @@ public class PremiumLogic implements Logic {
                 if (debug) {
                     logger.info("[priority] " + player.getName() + "  Adding to: " + i);
                 }
-                server.addPlayer(queuePlayer, i);
+                queueServer.addPlayer(queuePlayer, i);
                 return queuePlayer;
             }
         }
@@ -96,7 +97,7 @@ public class PremiumLogic implements Logic {
         if(debug) {
             logger.info("[priority] "+player.getName()+"  Cant go infront of anyone" );
         }
-        server.addPlayer(queuePlayer);
+        queueServer.addPlayer(queuePlayer);
         return queuePlayer;
     }
 

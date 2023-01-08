@@ -3,6 +3,7 @@ package us.ajg0702.queue.commands.commands.manage.debug;
 import com.google.common.collect.ImmutableList;
 import us.ajg0702.queue.api.commands.ICommandSender;
 import us.ajg0702.queue.api.queues.QueueServer;
+import us.ajg0702.queue.api.server.AdaptedServer;
 import us.ajg0702.queue.commands.SubCommand;
 import us.ajg0702.queue.common.QueueMain;
 import us.ajg0702.utils.common.Messages;
@@ -48,7 +49,7 @@ public class Whitelist extends SubCommand {
             sender.sendMessage(main.getMessages().toComponent("<red>Not enough args!"));
             return;
         }
-        QueueServer server = main.getQueueManager().findServer(args[0]);
+        AdaptedServer server = main.getPlatformMethods().getServer(args[0]);
         if(server == null) {
             sender.sendMessage(main.getMessages().toComponent("<red>Server not found"));
             return;

@@ -7,7 +7,7 @@ group = "us.ajg0702.queue.platforms.velocity"
 
 repositories {
     //mavenLocal()
-    maven { url = uri("https://repo.ajg0702.us") }
+    maven { url = uri("https://repo.ajg0702.us/releases/") }
     maven { url = uri("https://repo.papermc.io/repository/maven-public/") }
     maven { url = uri("https://repo.viaversion.com/") }
     mavenCentral()

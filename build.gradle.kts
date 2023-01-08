@@ -5,14 +5,14 @@ plugins {
 }
 
 repositories {
-    maven { url = uri("https://repo.ajg0702.us") }
+    maven { url = uri("https://repo.ajg0702.us/releases/") }
     maven { url = uri("https://oss.sonatype.org/content/repositories/snapshots") }
 
     mavenCentral()
 }
 
 allprojects {
-    version = "2.2.9"
+    version = "2.3.0"
     group = "us.ajg0702"
 
     plugins.apply("java")

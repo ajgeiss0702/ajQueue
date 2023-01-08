@@ -23,12 +23,12 @@ import java.util.HashMap;
 @SuppressWarnings("UnstableApiUsage")
 public class SpigotMain extends JavaPlugin implements PluginMessageListener,Listener {
 	
-	boolean papi = false;
-	Placeholders placeholders;
+	private boolean papi = false;
+	private Placeholders placeholders;
 	
-	ConfigFile config;
+	private ConfigFile config;
 
-	boolean hasProxy = false;
+	private boolean hasProxy = false;
 	
 	@SuppressWarnings("ConstantConditions")
 	public void onEnable() {
@@ -241,5 +241,10 @@ public class SpigotMain extends JavaPlugin implements PluginMessageListener,List
 			whitelist.deleteCharAt(whitelist.length()-1);
 		}
 		e.setMotd("ajQueue;whitelisted="+whitelist);
+	}
+
+
+	public ConfigFile getAConfig() {
+		return config;
 	}
 }

@@ -8,8 +8,10 @@ import us.ajg0702.queue.api.server.AdaptedServerPing;
 public class VelocityServerPing implements AdaptedServerPing {
 
     private final ServerPing handle;
-    public VelocityServerPing(ServerPing handle) {
+    private final long sent;
+    public VelocityServerPing(ServerPing handle, long sent) {
         this.handle = handle;
+        this.sent = sent;
     }
 
     @Override
@@ -37,6 +39,11 @@ public class VelocityServerPing implements AdaptedServerPing {
     @Override
     public void addPlayer() {
         add++;
+    }
+
+    @Override
+    public long getFetchedTime() {
+        return sent;
     }
 
     @Override

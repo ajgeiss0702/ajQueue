@@ -51,17 +51,6 @@ public interface QueueServer {
     String getStatus();
 
     /**
-     * Sends a server ping and uses the response to update online status, player count status, and whitelist status
-     */
-    void updatePing();
-
-    /**
-     * Gets the time the server has been offline, in miliseconds
-     * @return The number of miliseconds the server has been offline for
-     */
-    int getOfflineTime();
-
-    /**
      * Gets how long since the last person was sent
      * @return The number of miliseconds since the last person was sent
      */
@@ -72,30 +61,6 @@ public interface QueueServer {
      * @param lastSentTime the time the last person was sent
      */
     void setLastSentTime(long lastSentTime);
-
-
-
-    /**
-     * Gets if the server is whitelisted or not
-     * @return True if whitelisted, false if not
-     */
-    boolean isWhitelisted();
-
-    /**
-     * Sets if the server is whitelisted or not
-     */
-    void setWhitelisted(boolean whitelisted);
-
-    /**
-     * Gets the list of players who are whitelisted
-     * @return The list of player UUIDs who are whitelisted
-     */
-    ImmutableList<UUID> getWhitelistedPlayers();
-
-    /**
-     * Sets the list of UUIDs that are whitelisted
-     */
-    void setWhitelistedPlayers(List<UUID> whitelistedPlayers);
 
     /**
      * Checks if the server is joinable by a player
@@ -115,24 +80,6 @@ public interface QueueServer {
      * @return True if the server is paused, false if its not
      */
     boolean isPaused();
-
-    /**
-     * Checks if the server is online
-     * @return True if the server is online, false if not
-     */
-    boolean isOnline();
-
-    /**
-     * Checks if the server went online within the time set in the config
-     * @return If the sevrer just came online
-     */
-    boolean justWentOnline();
-
-    /**
-     * Checks if the server is full
-     * @return If the server is full
-     */
-    boolean isFull();
 
     /**
      * Removes a player from the queue
@@ -199,6 +146,16 @@ public interface QueueServer {
      */
     ImmutableList<String> getServerNames();
 
+    /**
+     * Returns true if at least one server in the group is online
+     * @return true if the server is online
+     */
+    default boolean isOnline() {
+        for (AdaptedServer server : getServers()) {
+            if(server.isOnline()) return true;
+        }
+        return false;
+    }
 
     /**
      * Returns if this server is a group
@@ -233,12 +190,6 @@ public interface QueueServer {
     AdaptedServer getIdealServer(AdaptedPlayer player);
 
     /**
-     * Gets the last server pings
-     * @return The last server pings for this server/group
-     */
-    HashMap<AdaptedServer, AdaptedServerPing> getLastPings();
-
-    /**
      * Gets the protocol versions this queue supports.
      * A blank list means all protocols are supported.
      * @return The protocol versions this queue supports
@@ -257,26 +208,6 @@ public interface QueueServer {
      * @return The balancer this server is using
      */
     Balancer getBalancer();
-
-    /**
-     * Checks if the player can join this server even if its full
-     * @param player The player
-     * @return If the player can join this server if its full
-     */
-    boolean canJoinFull(AdaptedPlayer player);
-
-    /**
-     * Adds one to the player count for a server (temporarily until the next server ping)
-     */
-    void addPlayer(AdaptedServer server);
-
-    /**
-     * Sets if this server is online.
-     * Note that this is overrided by the pinger, so if you set
-     *  this, it will most likely be temporary
-     * @param online whether the server is online or not
-     */
-    void setOnline(boolean online);
 
 
     /**

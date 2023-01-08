@@ -7,7 +7,7 @@ group = "us.ajg0702.queue.common"
 
 repositories {
     //mavenLocal()
-    maven { url = uri("https://repo.ajg0702.us") }
+    maven { url = uri("https://repo.ajg0702.us/releases/") }
     mavenCentral()
 }
 

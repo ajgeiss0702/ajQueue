@@ -12,7 +12,7 @@ public interface AdaptedServerPing extends Handle {
     Component getDescriptionComponent();
 
     /**
-     * Gets the description stripped of any color or styling
+     * Gets the description (aka MOTD) stripped of any color or styling
      * @return The description, but no colors
      */
     String getPlainDescription();
@@ -33,4 +33,10 @@ public interface AdaptedServerPing extends Handle {
      * Temporarly adds one player to the player count
      */
     void addPlayer();
+
+    /**
+     * Returns an epoch timestamp of when this ping was <bold>sent</bold>.
+     * @return A long of an epoch timestamp
+     */
+    long getFetchedTime();
 }

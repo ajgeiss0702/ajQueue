@@ -37,10 +37,10 @@ public class QueueManagerImpl implements QueueManager {
 
     public List<QueueServer> buildServers() {
         List<QueueServer> result = new ArrayList<>();
-        List<AdaptedServer> servers = main.getPlatformMethods().getServers();
+        List<? extends AdaptedServer> servers = main.getPlatformMethods().getServers();
 
         for(AdaptedServer server : servers) {
-            QueueServer previousServer = main.getQueueManager().findServer(server.getName());
+            QueueServer previousServer = findServer(server.getName());
             List<QueuePlayer> previousPlayers = previousServer == null ? new ArrayList<>() : previousServer.getQueue();
             if(previousPlayers.size() > 0) {
                 main.getLogger().info("Adding "+previousPlayers.size()+" players back to the queue for "+server.getName());
@@ -49,11 +49,56 @@ public class QueueManagerImpl implements QueueManager {
             if(previousServer != null) {
                 queueServer.setPaused(previousServer.isPaused());
                 queueServer.setLastSentTime(previousServer.getLastSentTime());
-                queueServer.setOnline(previousServer.isOnline());
-                queueServer.setWhitelisted(previousServer.isWhitelisted());
-                queueServer.setWhitelistedPlayers(previousServer.getWhitelistedPlayers());
             }
             result.add(queueServer);
+        }
+
+        List<String> groupsRaw = main.getConfig().getStringList("server-groups");
+        for(String groupRaw : groupsRaw) {
+            if(groupRaw.isEmpty()) {
+                main.getLogger().warning("Empty group string! If you dont want server groups, set server-groups like this: server-groups: []");
+                continue;
+            }
+
+            if(!groupRaw.contains(":")) {
+                main.getLogger().warning("Incorrect formatting! Each server group needs to have a name and a list of servers seperated by a colon (:).");
+                continue;
+            }
+
+            String groupName = groupRaw.split(":")[0];
+            String[] serversraw = groupRaw.split(":")[1].split(",");
+
+            if(findServer(groupName, result) != null) {
+                main.getLogger().warning("The name of a group ('"+groupName+"') cannot be the same as the name of a server!");
+                continue;
+            }
+
+            List<AdaptedServer> groupServers = new ArrayList<>();
+
+            for(String serverraw : serversraw) {
+                QueueServer found = findServer(serverraw, result);
+                if(found == null) {
+                    main.getLogger().warning("Could not find server named '"+serverraw+"' in servergroup '"+groupName+"'!");
+                    continue;
+                }
+                if(found.isGroup()) continue;
+
+                groupServers.add(found.getServers().get(0));
+            }
+
+            if(groupServers.size() == 0) {
+                main.getLogger().warning("Server group '"+groupName+"' has no servers! Ignoring it.");
+                continue;
+            }
+
+
+            QueueServer previousServer = main.getQueueManager().findServer(groupName);
+            List<QueuePlayer> previousPlayers = previousServer == null ? new ArrayList<>() : previousServer.getQueue();
+            if(previousPlayers.size() > 0) {
+                main.getLogger().info("Adding "+previousPlayers.size()+" players back to the queue for "+groupName);
+            }
+
+            result.add(new QueueServerImpl(groupName, main, groupServers, previousPlayers));
         }
 
         List<String> supportedProtocolsRaw = main.getConfig().getStringList("supported-protocols");
@@ -76,13 +121,20 @@ public class QueueManagerImpl implements QueueManager {
             }
 
             for(String serverName : serversRaw.split(",")) {
+                boolean found = false;
                 for(QueueServer server : result) {
                     if(serverName.equalsIgnoreCase(server.getName())) {
                         server.setSupportedProtocols(protocols);
+                        found = true;
+                        Debug.info("Applied " + protocols + " to " + server.getName() + "(" + serverName + ")");
                         break;
                     }
                 }
+                if(!found) {
+                    Debug.info("Found no server named " + serverName);
+                }
             }
+
         }
 
         return result;
@@ -99,12 +151,12 @@ public class QueueManagerImpl implements QueueManager {
             return false;
         }
 
-        Debug.info("addToQueue method called for "+player.getName()+" to "+server.getName());
-
-        if(main.getConfig().getBoolean("joinfrom-server-permission") && !player.hasPermission("ajqueue.joinfrom."+player.getServerName())) {
-            player.sendMessage(msgs.getComponent("errors.deny-joining-from-server"));
+        if(player.getServerName() == null) {
+            main.getLogger().warning("Tried to queue " + player.getName() + " when they aren't connected!");
             return false;
         }
+
+        Debug.info("addToQueue method called for "+player.getName()+" to "+server.getName());
 
         int playerVersion = player.getProtocolVersion();
         List<Integer> supportedProtocols = server.getSupportedProtocols();
@@ -157,12 +209,13 @@ public class QueueManagerImpl implements QueueManager {
 
         ImmutableList<QueuePlayer> list = server.getQueue();
         QueuePlayer queuePlayer;
+        AdaptedServer ideal = server.getIdealServer(player);
         if(main.isPremium()) {
-            queuePlayer = main.getLogic().priorityLogic(server, player);
+            queuePlayer = main.getLogic().priorityLogic(server, player, ideal);
         } else {
             int priority = player.hasPermission("ajqueue.priority") ||
                     player.hasPermission("ajqueue.serverpriority."+server.getName()) ? 1 : 0;
-            priority = Math.max(priority, Logic.getUnJoinablePriorities(server, player) > 0 ? 1 : 0);
+            priority = Math.max(priority, Logic.getUnJoinablePriorities(server, ideal, player) > 0 ? 1 : 0);
             int maxOfflineTime = player.hasPermission("ajqueue.stayqueued") ? 60 : 0;
             queuePlayer = new QueuePlayerImpl(player, server, priority, maxOfflineTime);
             if(
@@ -189,11 +242,11 @@ public class QueueManagerImpl implements QueueManager {
         int pos = queuePlayer.getPosition();
         int len = list.size();
 
-        boolean sendInstant = main.getConfig().getStringList("send-instantly").contains(server.getName()) || server.isJoinable(player);
+        boolean sendInstant = server.isJoinable(player);
         boolean sendInstantp = list.size() <= 1 && server.isJoinable(player);
         boolean timeGood = !main.getConfig().getBoolean("check-last-player-sent-time") || server.getLastSentTime() > Math.floor(main.getTimeBetweenPlayers() * 1000);
 
-        if((sendInstant && (sendInstantp && timeGood))) {
+        if(main.getConfig().getStringList("send-instantly").contains(server.getName()) || (sendInstant && (sendInstantp && timeGood))) {
             sendPlayers(server);
             if(!msgs.isEmpty("status.now-in-empty-queue")) {
                 player.sendMessage(msgs.getComponent("status.now-in-empty-queue",
@@ -285,58 +338,7 @@ public class QueueManagerImpl implements QueueManager {
             main.getLogger().severe("[MAN] Config is null");
         }
 
-        List<QueueServer> oldServers = ImmutableList.copyOf(servers);
-
         servers = new CopyOnWriteArrayList<>(buildServers());
-
-        List<String> groupsRaw = main.getConfig().getStringList("server-groups");
-        for(String groupRaw : groupsRaw) {
-            if(groupRaw.isEmpty()) {
-                main.getLogger().warning("Empty group string! If you dont want server groups, set server-groups like this: server-groups: []");
-                continue;
-            }
-
-            if(!groupRaw.contains(":")) {
-                main.getLogger().warning("Incorrect formatting! Each server group needs to have a name and a list of servers seperated by a colon (:).");
-                continue;
-            }
-
-            String groupName = groupRaw.split(":")[0];
-            String[] serversraw = groupRaw.split(":")[1].split(",");
-
-            if(findServer(groupName) != null) {
-                main.getLogger().warning("The name of a group ('"+groupName+"') cannot be the same as the name of a server!");
-                continue;
-            }
-
-            List<AdaptedServer> groupServers = new ArrayList<>();
-
-            for(String serverraw : serversraw) {
-                QueueServer found = findServer(serverraw);
-                if(found == null) {
-                    main.getLogger().warning("Could not find server named '"+serverraw+"' in servergroup '"+groupName+"'!");
-                    continue;
-                }
-                if(found.isGroup()) continue;
-
-                groupServers.add(found.getServers().get(0));
-            }
-
-            if(servers.size() == 0) {
-                main.getLogger().warning("Server group '"+groupName+"' has no servers! Ignoring it.");
-                continue;
-            }
-
-
-            final List<QueuePlayer> previousPlayers = new ArrayList<>();
-            oldServers.forEach(queueServer -> {
-                if(queueServer.getName().equals(groupName)) {
-                    previousPlayers.addAll(queueServer.getQueue());
-                }
-            });
-
-            this.servers.add(new QueueServerImpl(groupName, main, groupServers, previousPlayers));
-        }
     }
 
     @Override
@@ -344,7 +346,6 @@ public class QueueManagerImpl implements QueueManager {
         if(!main.getConfig().getBoolean("send-actionbar")) return;
 
         for(QueueServer server : servers) {
-            String status = server.getStatusString();
             for(QueuePlayer queuePlayer : server.getQueue()) {
 
                 int pos = queuePlayer.getPosition();
@@ -355,6 +356,8 @@ public class QueueManagerImpl implements QueueManager {
 
                 AdaptedPlayer player = queuePlayer.getPlayer();
                 if(player == null) continue;
+
+                String status = server.getStatusString(player);
 
                 QueueServer singleServer = getSingleServer(player);
                 if(singleServer == null || !singleServer.equals(server)) continue;
@@ -507,8 +510,8 @@ public class QueueManagerImpl implements QueueManager {
                     +((ThreadPoolExecutor) pool).getActiveCount()+" threads");
         }
         try {
-            for(QueueServer server : servers) {
-                pool.submit(server::updatePing);
+            for(AdaptedServer server : main.getPlatformMethods().getServers()) {
+                pool.submit(() -> server.ping(main.getConfig().getBoolean("pinger-debug"), main.getLogger()));
             }
         } catch(Exception e) {
             e.printStackTrace();
@@ -517,6 +520,10 @@ public class QueueManagerImpl implements QueueManager {
 
     @Override
     public QueueServer findServer(String name) {
+        return findServer(name, servers);
+    }
+
+    public QueueServer findServer(String name, List<QueueServer> servers) {
         for(QueueServer server : servers) {
             if(server == null) continue;
             if(server.getName().equalsIgnoreCase(name)) {
@@ -551,21 +558,25 @@ public class QueueManagerImpl implements QueueManager {
                     server.removePlayer(queuePlayer);
                 }
             }
+
             if(!server.isOnline()) continue;
             if(server.getQueue().size() == 0) continue;
 
-            if(main.getConfig().getBoolean("send-all-when-back-online") && server.justWentOnline() && server.isOnline()) {
+            Debug.info("should send instantly: " + !server.isGroup() + " && " + main.getConfig().getBoolean("send-all-when-back-online") + " && " + server.getServers().get(0).justWentOnline());
+            if(!server.isGroup() && main.getConfig().getBoolean("send-all-when-back-online") && server.getServers().get(0).justWentOnline()) {
                 for(QueuePlayer p : server.getQueue()) {
+
                     AdaptedPlayer player = p.getPlayer();
                     if(player == null) continue;
 
-                    if(server.isFull() && !server.canJoinFull(p.getPlayer())) continue;
-
                     AdaptedServer selected = server.getIdealServer(player);
+
                     if(selected == null) {
-                        main.getLogger().severe("Could not find ideal server for server/group '"+server.getName()+"'!");
+                        main.getLogger().severe("Could not find ideal server for server '"+server.getName()+"'!");
                         continue;
                     }
+
+                    if(selected.isFull() && !selected.canJoinFull(p.getPlayer())) continue;
 
                     player.sendMessage(msgs.getComponent("status.sending-now", "SERVER:"+server.getAlias()));
                     player.connect(selected);
@@ -601,11 +612,17 @@ public class QueueManagerImpl implements QueueManager {
 
             if(nextPlayer == null) continue; // None of the players in the queue are online
 
-            if(server.isWhitelisted() && !server.getWhitelistedPlayers().contains(nextPlayer.getUniqueId())) continue;
+            AdaptedServer selected = server.getIdealServer(nextPlayer);
+            if(selected == null) {
+                main.getLogger().severe("Could not find ideal server for server/group '"+server.getName()+"'");
+                continue;
+            }
+
+            if(selected.isWhitelisted() && !selected.getWhitelistedPlayers().contains(nextPlayer.getUniqueId())) continue;
 
             if(!server.canAccess(nextPlayer)) continue;
 
-            if(server.isFull() && !server.canJoinFull(nextPlayer)) continue;
+            if(selected.isFull() && !selected.canJoinFull(nextPlayer)) continue;
 
             if(main.getConfig().getBoolean("enable-bypasspaused-permission")) {
                 if(server.isPaused() && !nextPlayer.hasPermission("ajqueue.bypasspaused")) continue;
@@ -643,17 +660,11 @@ public class QueueManagerImpl implements QueueManager {
                 sendingNowAntiSpam.put(nextPlayer, System.currentTimeMillis());
             }
 
-            AdaptedServer selected = server.getIdealServer(nextPlayer);
-            if(selected == null) {
-                main.getLogger().severe("Could not find ideal server for server/group '"+server.getName()+"'");
-                continue;
-            }
+
             server.setLastSentTime(System.currentTimeMillis());
             nextPlayer.connect(selected);
-            server.addPlayer(selected);
-            if(main.getConfig().getBoolean("debug")) {
-                Debug.info(selected.getName()+" player count is now set to "+ server.getLastPings().get(selected).getPlayerCount());
-            }
+            selected.addPlayer();
+            Debug.info(selected.getName()+" player count is now set to "+ selected.getPlayerCount());
         }
     }
 
