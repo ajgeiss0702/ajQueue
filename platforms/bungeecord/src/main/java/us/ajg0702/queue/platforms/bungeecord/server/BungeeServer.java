@@ -2,6 +2,7 @@ package us.ajg0702.queue.platforms.bungeecord.server;
 
 import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
+import org.jetbrains.annotations.Nullable;
 import us.ajg0702.queue.api.AjQueueAPI;
 import us.ajg0702.queue.api.players.AdaptedPlayer;
 import us.ajg0702.queue.api.server.AdaptedServer;
@@ -51,7 +52,7 @@ public class BungeeServer implements AdaptedServer {
         if(debug) logger.info("[pinger] [" + getName() + "] sending ping");
 
         handle.ping((pp, error) -> {
-            if(error != null) {
+            if(error != null || pp == null) {
                 markOffline(debug, logger, future, sent, error);
             }
 
@@ -71,7 +72,7 @@ public class BungeeServer implements AdaptedServer {
         return future;
     }
 
-    private void markOffline(boolean debug, QueueLogger logger, CompletableFuture<AdaptedServerPing> future, long sent, Throwable e) {
+    private void markOffline(boolean debug, QueueLogger logger, CompletableFuture<AdaptedServerPing> future, long sent, @Nullable Throwable e) {
         long lastOnline = lastSuccessfullPing == null ? 0 : lastSuccessfullPing.getFetchedTime();
         offlineTime = (int) Math.min(sent - lastOnline, Integer.MAX_VALUE);
 
