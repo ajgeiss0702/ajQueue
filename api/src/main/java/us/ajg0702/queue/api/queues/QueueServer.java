@@ -4,9 +4,7 @@ import com.google.common.collect.ImmutableList;
 import us.ajg0702.queue.api.players.AdaptedPlayer;
 import us.ajg0702.queue.api.players.QueuePlayer;
 import us.ajg0702.queue.api.server.AdaptedServer;
-import us.ajg0702.queue.api.server.AdaptedServerPing;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 

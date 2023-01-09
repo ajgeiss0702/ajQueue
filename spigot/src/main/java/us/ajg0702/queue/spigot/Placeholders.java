@@ -79,7 +79,7 @@ public class Placeholders extends PlaceholderExpansion {
     /**
      * This is the version of the expansion.
      * <br>You don't have to use numbers, since it is set as a String.
-     *
+     * <p>
      * For convienience do we return the version from the plugin.yml
      *
      * @return The version as a String.

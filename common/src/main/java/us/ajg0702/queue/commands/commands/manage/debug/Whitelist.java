@@ -2,7 +2,6 @@ package us.ajg0702.queue.commands.commands.manage.debug;
 
 import com.google.common.collect.ImmutableList;
 import us.ajg0702.queue.api.commands.ICommandSender;
-import us.ajg0702.queue.api.queues.QueueServer;
 import us.ajg0702.queue.api.server.AdaptedServer;
 import us.ajg0702.queue.commands.SubCommand;
 import us.ajg0702.queue.common.QueueMain;

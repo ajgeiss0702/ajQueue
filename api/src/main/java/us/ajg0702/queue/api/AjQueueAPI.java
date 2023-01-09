@@ -79,7 +79,7 @@ public abstract class AjQueueAPI {
 
     /**
      * Gets the event handler.
-     *
+     * <p>
      * This class will probably be replaced in the future with an actual event system
      * @return the EventHandler
      */

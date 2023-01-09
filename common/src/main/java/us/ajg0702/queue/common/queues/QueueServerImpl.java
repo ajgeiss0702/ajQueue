@@ -6,7 +6,6 @@ import us.ajg0702.queue.api.players.QueuePlayer;
 import us.ajg0702.queue.api.queues.Balancer;
 import us.ajg0702.queue.api.queues.QueueServer;
 import us.ajg0702.queue.api.server.AdaptedServer;
-import us.ajg0702.queue.api.server.AdaptedServerPing;
 import us.ajg0702.queue.common.QueueMain;
 import us.ajg0702.queue.common.players.QueuePlayerImpl;
 import us.ajg0702.queue.common.queues.balancers.DefaultBalancer;
@@ -15,8 +14,6 @@ import us.ajg0702.queue.common.utils.Debug;
 import us.ajg0702.utils.common.Messages;
 
 import java.util.*;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeUnit;
 
 public class QueueServerImpl implements QueueServer {
 

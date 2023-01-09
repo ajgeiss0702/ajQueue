@@ -14,18 +14,18 @@ repositories {
 }
 
 dependencies {
-    compileOnly("net.kyori:adventure-api:4.9.3")
-    compileOnly("com.google.guava:guava:30.1.1-jre")
+    compileOnly("net.kyori:adventure-api:4.12.0")
+    compileOnly("com.google.guava:guava:31.1-jre")
     compileOnly("us.ajg0702:ajUtils:1.2.10")
 
     compileOnly("net.md-5:bungeecord-api:1.16-R0.4")
 
-    implementation("net.kyori:adventure-text-minimessage:4.10.0")
+    implementation("net.kyori:adventure-text-minimessage:4.12.0")
 
-    implementation("net.kyori:adventure-platform-bungeecord:4.0.0")
-    compileOnly("net.kyori:adventure-text-serializer-plain:4.9.3")
+    implementation("net.kyori:adventure-platform-bungeecord:4.2.0")
+    compileOnly("net.kyori:adventure-text-serializer-plain:4.12.0")
 
-    compileOnly("com.viaversion:viaversion-api:4.3.1")
+    compileOnly("com.viaversion:viaversion-api:4.5.1")
 
     implementation("org.bstats:bstats-bungeecord:3.0.0")
 

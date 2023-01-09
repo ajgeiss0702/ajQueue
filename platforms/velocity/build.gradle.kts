@@ -14,15 +14,15 @@ repositories {
 }
 
 dependencies {
-    compileOnly("net.kyori:adventure-api:4.9.3")
-    compileOnly("com.google.guava:guava:30.1.1-jre")
+    compileOnly("net.kyori:adventure-api:4.12.0")
+    compileOnly("com.google.guava:guava:31.1-jre")
     compileOnly("us.ajg0702:ajUtils:1.2.10")
 
-    compileOnly("com.velocitypowered:velocity-api:3.1.1")
-    annotationProcessor("com.velocitypowered:velocity-api:3.1.1")
-    implementation("net.kyori:adventure-text-minimessage:4.10.0")
+    compileOnly("com.velocitypowered:velocity-api:3.1.2-SNAPSHOT")
+    annotationProcessor("com.velocitypowered:velocity-api:3.2.0-SNAPSHOT")
+    implementation("net.kyori:adventure-text-minimessage:4.12.0")
 
-    compileOnly("com.viaversion:viaversion-api:4.3.1")
+    compileOnly("com.viaversion:viaversion-api:4.5.1")
 
     implementation("org.bstats:bstats-velocity:3.0.0")
 
@@ -39,6 +39,8 @@ tasks.withType<ProcessResources> {
         )
     ).into("$buildDir/src")
 }
+
+
 
 tasks.jar {
     exclude("**/*.java")

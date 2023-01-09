@@ -1,6 +1,6 @@
 plugins {
     java
-    id("com.github.johnrengelman.shadow").version("6.1.0")
+    id("com.github.johnrengelman.shadow").version("7.1.2")
     `maven-publish`
 }
 
@@ -36,7 +36,7 @@ allprojects {
 
 
 dependencies {
-    testImplementation("junit:junit:4.12")
+    testImplementation("junit:junit:4.13.2")
 
     implementation(project(":free"))
 }

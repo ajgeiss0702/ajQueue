@@ -421,7 +421,7 @@ public class QueueManagerImpl implements QueueManager {
                         "TIME:"+ TimeUtils.timeString(time, msgs.getString("format.time.mins"), msgs.getString("format.time.secs"))
                 );
 
-                Title title = Title.title(titleMessage, subTitleMessage, Title.Times.of(Duration.ZERO, Duration.ofSeconds(2L), Duration.ZERO));
+                Title title = Title.title(titleMessage, subTitleMessage, Title.Times.times(Duration.ZERO, Duration.ofSeconds(2L), Duration.ZERO));
                 player.showTitle(title);
             }
         }
@@ -654,7 +654,7 @@ public class QueueManagerImpl implements QueueManager {
                                     "title.sending-now.subtitle",
                                     "SERVER:"+server.getAlias()
                             ),
-                            Title.Times.of(Duration.ZERO, Duration.ofSeconds(2L), Duration.ZERO)
+                            Title.Times.times(Duration.ZERO, Duration.ofSeconds(2L), Duration.ZERO)
                     ));
                 }
                 sendingNowAntiSpam.put(nextPlayer, System.currentTimeMillis());

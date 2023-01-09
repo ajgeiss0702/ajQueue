@@ -56,7 +56,7 @@ public interface QueueManager {
     /**
      * Checks servers that are in bungeecord and adds any it doesnt
      * know about.
-     *
+     * <p>
      * Also creates/edits server groups
      */
     void reloadServers();
