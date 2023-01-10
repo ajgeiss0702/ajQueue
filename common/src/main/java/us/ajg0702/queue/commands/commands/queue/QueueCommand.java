@@ -79,7 +79,11 @@ public class QueueCommand extends BaseCommand {
             return new ArrayList<>();
         }
         if(args.length == 1) {
-            return filterCompletion(main.getQueueManager().getServerNames(), args[0]);
+            List<String> servers = filterCompletion(main.getQueueManager().getServerNames(), args[0]);
+            if(main.getConfig().getBoolean("require-permission")) {
+                servers.removeIf(s -> !sender.hasPermission("ajqueue.queue." + s));
+            }
+            return servers;
         }
         return new ArrayList<>();
     }
