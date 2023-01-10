@@ -18,7 +18,7 @@ dependencies {
     compileOnly("com.google.guava:guava:31.1-jre")
     compileOnly("us.ajg0702:ajUtils:1.2.10")
 
-    compileOnly("com.velocitypowered:velocity-api:3.1.2-SNAPSHOT")
+    compileOnly("com.velocitypowered:velocity-api:3.2.0-SNAPSHOT")
     annotationProcessor("com.velocitypowered:velocity-api:3.2.0-SNAPSHOT")
     implementation("net.kyori:adventure-text-minimessage:4.12.0")
 
