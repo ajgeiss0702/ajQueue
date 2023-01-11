@@ -18,6 +18,7 @@ import us.ajg0702.queue.common.QueueMain;
 import us.ajg0702.queue.common.utils.Debug;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -204,5 +205,18 @@ public class VelocityPlayer implements AdaptedPlayer, Audience {
             return false;
         }
         return true;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        VelocityPlayer that = (VelocityPlayer) o;
+        return handle.equals(that.handle);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(handle);
     }
 }

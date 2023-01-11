@@ -9,6 +9,7 @@ import us.ajg0702.queue.api.players.QueuePlayer;
 import us.ajg0702.queue.api.premium.Logic;
 import us.ajg0702.queue.api.queues.QueueServer;
 import us.ajg0702.queue.api.server.AdaptedServer;
+import us.ajg0702.queue.commands.commands.manage.PauseQueueServer;
 import us.ajg0702.queue.common.players.QueuePlayerImpl;
 import us.ajg0702.queue.common.queues.QueueServerImpl;
 import us.ajg0702.queue.common.utils.Debug;
@@ -427,6 +428,8 @@ public class QueueManagerImpl implements QueueManager {
         }
     }
 
+    protected final Map<AdaptedPlayer, Long> pausedAntiSpam = new ConcurrentHashMap<>();
+
     @Override
     public void sendQueueEvents() {
         if(main.getConfig().getBoolean("force-queue-server-target")) {
@@ -440,6 +443,14 @@ public class QueueManagerImpl implements QueueManager {
                 QueueServer to = findServer(toName);
                 if(from == null || to == null) continue;
                 from.getPlayers().forEach(player -> {
+                    if(PauseQueueServer.pausedPlayers.contains(player)) {
+                        long lastReminder = pausedAntiSpam.getOrDefault(player, 0L);
+                        if(System.currentTimeMillis() - lastReminder > 60e3) { // 60 second cooldown on the reminder messages
+                            player.sendMessage(main.getMessages().getComponent("commands.pausequeueserver.reminder"));
+                            pausedAntiSpam.put(player, System.currentTimeMillis());
+                        }
+                        return;
+                    }
                     if(!getPlayerQueues(player).contains(to)) {
                         addToQueue(player, to);
                     }

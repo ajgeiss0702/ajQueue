@@ -11,6 +11,7 @@ import us.ajg0702.queue.api.players.QueuePlayer;
 import us.ajg0702.queue.api.queues.QueueServer;
 import us.ajg0702.queue.api.server.AdaptedServer;
 import us.ajg0702.queue.commands.commands.PlayerSender;
+import us.ajg0702.queue.commands.commands.manage.PauseQueueServer;
 import us.ajg0702.queue.common.players.QueuePlayerImpl;
 import us.ajg0702.queue.common.utils.Debug;
 import us.ajg0702.utils.common.TimeUtils;
@@ -195,15 +196,17 @@ public class EventHandlerImpl implements EventHandler {
         }
 
 
-        String serverName = player.getServerName();
-        List<String> svs = main.getConfig().getStringList("queue-servers");
-        for(String s : svs) {
-            if(!s.contains(":")) continue;
-            String[] parts = s.split(":");
-            String from = parts[0];
-            QueueServer to = main.getQueueManager().findServer(parts[1]);
-            if(from.equalsIgnoreCase(serverName) && to != null) {
-                main.getQueueManager().addToQueue(player, to);
+        if(!PauseQueueServer.pausedPlayers.contains(player)) {
+            String serverName = player.getServerName();
+            List<String> svs = main.getConfig().getStringList("queue-servers");
+            for(String s : svs) {
+                if(!s.contains(":")) continue;
+                String[] parts = s.split(":");
+                String from = parts[0];
+                QueueServer to = main.getQueueManager().findServer(parts[1]);
+                if(from.equalsIgnoreCase(serverName) && to != null) {
+                    main.getQueueManager().addToQueue(player, to);
+                }
             }
         }
 
