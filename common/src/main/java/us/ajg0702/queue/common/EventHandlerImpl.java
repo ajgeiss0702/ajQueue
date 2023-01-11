@@ -12,6 +12,7 @@ import us.ajg0702.queue.api.queues.QueueServer;
 import us.ajg0702.queue.api.server.AdaptedServer;
 import us.ajg0702.queue.commands.commands.PlayerSender;
 import us.ajg0702.queue.commands.commands.manage.PauseQueueServer;
+import us.ajg0702.queue.commands.commands.queue.QueueCommand;
 import us.ajg0702.queue.common.players.QueuePlayerImpl;
 import us.ajg0702.queue.common.utils.Debug;
 import us.ajg0702.utils.common.TimeUtils;
@@ -193,6 +194,10 @@ public class EventHandlerImpl implements EventHandler {
                 server.setLastSentTime(System.currentTimeMillis());
                 main.getQueueManager().getSendingAttempts().remove(queuePlayer);
             }
+        }
+
+        if(main.getConfig().getBoolean("include-server-switch-in-cooldown")) {
+            QueueCommand.cooldowns.put(player, System.currentTimeMillis());
         }
 
 

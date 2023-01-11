@@ -212,6 +212,7 @@ public class QueueMain extends AjQueueAPI {
         d.put("errors.wrong-version.base", "<red>You must be on {VERSIONS} to join this server!");
         d.put("errors.wrong-version.or", " or ");
         d.put("errors.wrong-version.comma", ", ");
+        d.put("errors.too-fast-queue", "<red>You're queueing too fast!");
 
         d.put("commands.leave-queue", "&aYou left the queue for {SERVER}!");
         d.put("commands.reload", "&aConfig and messages reloaded successfully!");

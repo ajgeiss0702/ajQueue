@@ -11,8 +11,12 @@ import us.ajg0702.utils.common.Messages;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class QueueCommand extends BaseCommand {
+
+    public static Map<AdaptedPlayer, Long> cooldowns = new ConcurrentHashMap<>();
 
     private final QueueMain main;
 
@@ -57,6 +61,14 @@ public class QueueCommand extends BaseCommand {
             return;
         }
         AdaptedPlayer player = main.getPlatformMethods().senderToPlayer(sender);
+
+        long lastUse = cooldowns.getOrDefault(player, 0L);
+        if(System.currentTimeMillis() - lastUse < main.getConfig().getDouble("queue-command-cooldown") * 1000L) {
+            sender.sendMessage(main.getMessages().getComponent("errors.too-fast-queue"));
+            return;
+        }
+
+        cooldowns.put(player, System.currentTimeMillis());
 
         if(args.length > 0) {
             if(main.getConfig().getBoolean("require-permission") && !player.hasPermission("ajqueue.queue."+args[0])) {
