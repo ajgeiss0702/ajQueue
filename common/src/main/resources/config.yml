@@ -314,7 +314,7 @@ give-fulljoin-players-priority: 0
 force-queue-server-target: true
 
 # How long should the cooldown for queue commands be? (in seconds)
-queue-command-cooldown: 15
+queue-command-cooldown: 3
 
 # Should any server switch (including the initial join) count against the queue command cooldown?
 include-server-switch-in-cooldown: false
