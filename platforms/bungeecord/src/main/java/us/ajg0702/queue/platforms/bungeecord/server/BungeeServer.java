@@ -54,6 +54,7 @@ public class BungeeServer implements AdaptedServer {
         handle.ping((pp, error) -> {
             if(error != null || pp == null) {
                 markOffline(debug, logger, future, sent, error);
+                return;
             }
 
             offlineTime = 0;
