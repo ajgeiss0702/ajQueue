@@ -146,11 +146,13 @@ public class EventHandlerImpl implements EventHandler {
 
     @Override
     public void onPlayerJoin(AdaptedPlayer player) {
-        main.getTaskManager().runLater(() -> {
-            if (main.getUpdater().isUpdateAvailable() && !main.getUpdater().isAlreadyDownloaded() && player.hasPermission("ajqueue.manage.update")) {
-                player.sendMessage(main.getMessages().getComponent("updater.update-available"));
-            }
-        }, 2, TimeUnit.SECONDS);
+        if(player.hasPermission("ajqueue.manage.update")) {
+            main.getTaskManager().runLater(() -> {
+                if (main.getUpdater().isUpdateAvailable() && !main.getUpdater().isAlreadyDownloaded()) {
+                    player.sendMessage(main.getMessages().getComponent("updater.update-available"));
+                }
+            }, 2, TimeUnit.SECONDS);
+        }
 
         ImmutableList<QueuePlayer> queues = main.getQueueManager().findPlayerInQueues(player);
         for(QueuePlayer queuePlayer : queues) {
