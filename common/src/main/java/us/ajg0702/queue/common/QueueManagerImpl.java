@@ -314,7 +314,7 @@ public class QueueManagerImpl implements QueueManager {
     @Override
     public QueueServer getSingleServer(AdaptedPlayer player) {
         ImmutableList<QueuePlayer> queued = findPlayerInQueues(player);
-        if(queued.size() <= 0) {
+        if(queued.size() == 0) {
             return null;
         }
         QueueServer selected = queued.get(0).getQueueServer();

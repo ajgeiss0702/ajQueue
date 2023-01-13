@@ -140,7 +140,7 @@ public class VelocityQueue implements Implementation {
 
     @Subscribe
     public void onKick(KickedFromServerEvent e) {
-        if(!e.getPlayer().getCurrentServer().isPresent()) return; // if the player is kicked on initial join, we dont care
+        if(e.getPlayer().getCurrentServer().isEmpty()) return; // if the player is kicked on initial join, we dont care
         Optional<Component> reasonOptional = e.getServerKickReason();
         main.getEventHandler().onServerKick(
                 new VelocityPlayer(e.getPlayer()),

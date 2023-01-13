@@ -70,7 +70,7 @@ public interface AdaptedServer extends Handle {
     }
 
     default boolean isFull() {
-        if(!getLastPing().isPresent()) return false;
+        if(getLastPing().isEmpty()) return false;
         return getLastPing().get().getPlayerCount() >= getLastPing().get().getMaxPlayers();
     }
 
@@ -88,7 +88,7 @@ public interface AdaptedServer extends Handle {
      * @return The number of players online
      */
     default int getPlayerCount() {
-        if(!getLastPing().isPresent()) return 0;
+        if(getLastPing().isEmpty()) return 0;
 
         AdaptedServerPing ping = getLastPing().get();
         return ping.getPlayerCount();
@@ -99,7 +99,7 @@ public interface AdaptedServer extends Handle {
      * @return The maximum number of players that can join this server
      */
     default int getMaxPlayers() {
-        if(!getLastPing().isPresent()) return 0;
+        if(getLastPing().isEmpty()) return 0;
 
         AdaptedServerPing ping = getLastPing().get();
         return ping.getMaxPlayers();
@@ -109,7 +109,7 @@ public interface AdaptedServer extends Handle {
      * Temporarly adds one player to the player count
      */
     default void addPlayer() {
-        if(!getLastPing().isPresent()) return;
+        if(getLastPing().isEmpty()) return;
         getLastPing().get().addPlayer();
     }
 
@@ -118,7 +118,7 @@ public interface AdaptedServer extends Handle {
      * @return True if the server is whitelisted
      */
     default boolean isWhitelisted() {
-        if(!getLastPing().isPresent()) return false;
+        if(getLastPing().isEmpty()) return false;
         return getLastPing().get().getPlainDescription().contains("ajQueue;whitelisted=");
     }
 
@@ -127,7 +127,7 @@ public interface AdaptedServer extends Handle {
      * @return The list of players that are whitelisted
      */
     default List<UUID> getWhitelistedPlayers() {
-        if(!getLastPing().isPresent()) return Collections.emptyList();
+        if(getLastPing().isEmpty()) return Collections.emptyList();
         if(!isWhitelisted()) return Collections.emptyList();
         List<UUID> uuids = new ArrayList<>();
         for(String uuid : getLastPing().get().getPlainDescription().substring(20).split(",")) {

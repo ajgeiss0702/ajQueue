@@ -69,7 +69,7 @@ public class LeaveCommand extends BaseCommand {
         }
 
 
-        if(args.length <= 0) {
+        if(args.length == 0) {
             sender.sendMessage(getMessages().getComponent("commands.leave.more-args", "QUEUES:"+getQueueList(servers)));
             return;
         }

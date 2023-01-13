@@ -40,7 +40,7 @@ public class UltraPermissionsHook implements PermissionHook {
         Optional<User> userOptional =  ultraPermissionsAPI
                 .getUsers()
                 .uuid(player.getUniqueId());
-        if(!userOptional.isPresent()) return new ArrayList<>();
+        if(userOptional.isEmpty()) return new ArrayList<>();
         User user = userOptional.get();
 
         List<String> permissions = new ArrayList<>();

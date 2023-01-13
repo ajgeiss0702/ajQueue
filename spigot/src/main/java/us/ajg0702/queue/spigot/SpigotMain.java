@@ -49,7 +49,7 @@ public class SpigotMain extends JavaPlugin implements PluginMessageListener,List
 		}
 		
 		Bukkit.getScheduler().runTaskTimer(this, () -> {
-			if(Bukkit.getOnlinePlayers().size() <= 0 || queuebatch.size() <= 0) return;
+			if(Bukkit.getOnlinePlayers().size() == 0 || queuebatch.size() == 0) return;
 			StringBuilder msg = new StringBuilder();
 			for(Player p : queuebatch.keySet()) {
 				if(p == null || !p.isOnline()) continue;
