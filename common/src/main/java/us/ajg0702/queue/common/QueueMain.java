@@ -212,6 +212,7 @@ public class QueueMain extends AjQueueAPI {
         d.put("errors.wrong-version.base", "<red>You must be on {VERSIONS} to join this server!");
         d.put("errors.wrong-version.or", " or ");
         d.put("errors.wrong-version.comma", ", ");
+        d.put("errors.too-fast-queue", "<red>You're queueing too fast!");
 
         d.put("commands.leave-queue", "&aYou left the queue for {SERVER}!");
         d.put("commands.reload", "&aConfig and messages reloaded successfully!");
@@ -222,6 +223,9 @@ public class QueueMain extends AjQueueAPI {
         d.put("commands.kick.success", "<green>Kicked <white>{PLAYER} <green>from {NUM} queue{s}!");
         d.put("commands.kickall.usage", "<red>Usage: /ajqueue kickall <queue>");
         d.put("commands.kickall.success", "<green>Kicked <white>{NUM} <green>player{s} from <white>{SERVER}<green>!");
+        d.put("commands.pausequeueserver.unpaused", "<green>You are no longer paused! <gray>You can now use queue-servers normally.");
+        d.put("commands.pausequeueserver.paused", "<green>You are now paused! <gray>You will no longer be sent using queue-servers.");
+        d.put("commands.pausequeueserver.reminder", "<gold>Reminder: <yellow>You are currently paused for queue-servers, so you will not be sent using them!<gray> Use <white>/ajQueue pausequeueserver</white> to un-pause and return to normal behaviour");
 
         d.put("noperm", "&cYou do not have permission to do this!");
 

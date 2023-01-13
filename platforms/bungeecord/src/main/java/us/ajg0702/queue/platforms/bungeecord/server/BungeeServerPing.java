@@ -4,6 +4,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.bungeecord.BungeeComponentSerializer;
 import net.md_5.bungee.api.ServerPing;
 import net.md_5.bungee.api.chat.BaseComponent;
+import org.jetbrains.annotations.NotNull;
 import us.ajg0702.queue.api.server.AdaptedServerPing;
 
 public class BungeeServerPing implements AdaptedServerPing {
@@ -11,7 +12,7 @@ public class BungeeServerPing implements AdaptedServerPing {
     final ServerPing handle;
     private final long sent;
 
-    public BungeeServerPing(ServerPing handle, long sent) {
+    public BungeeServerPing(@NotNull ServerPing handle, long sent) {
         this.handle = handle;
         this.sent = sent;
     }

@@ -11,6 +11,8 @@ import us.ajg0702.queue.api.players.QueuePlayer;
 import us.ajg0702.queue.api.queues.QueueServer;
 import us.ajg0702.queue.api.server.AdaptedServer;
 import us.ajg0702.queue.commands.commands.PlayerSender;
+import us.ajg0702.queue.commands.commands.manage.PauseQueueServer;
+import us.ajg0702.queue.commands.commands.queue.QueueCommand;
 import us.ajg0702.queue.common.players.QueuePlayerImpl;
 import us.ajg0702.queue.common.utils.Debug;
 import us.ajg0702.utils.common.TimeUtils;
@@ -144,15 +146,13 @@ public class EventHandlerImpl implements EventHandler {
 
     @Override
     public void onPlayerJoin(AdaptedPlayer player) {
-        new Thread(() -> {
-            try {
-                TimeUnit.SECONDS.sleep(2);
-            } catch (InterruptedException ignored) {
-            }
-            if (main.getUpdater().isUpdateAvailable() && player.hasPermission("ajqueue.manage.update")) {
-                player.sendMessage(main.getMessages().getComponent("updater.update-available"));
-            }
-        }).start();
+        if(player.hasPermission("ajqueue.manage.update")) {
+            main.getTaskManager().runLater(() -> {
+                if (main.getUpdater().isUpdateAvailable() && !main.getUpdater().isAlreadyDownloaded()) {
+                    player.sendMessage(main.getMessages().getComponent("updater.update-available"));
+                }
+            }, 2, TimeUnit.SECONDS);
+        }
 
         ImmutableList<QueuePlayer> queues = main.getQueueManager().findPlayerInQueues(player);
         for(QueuePlayer queuePlayer : queues) {
@@ -194,16 +194,22 @@ public class EventHandlerImpl implements EventHandler {
             }
         }
 
+        if(main.getConfig().getBoolean("include-server-switch-in-cooldown")) {
+            QueueCommand.cooldowns.put(player, System.currentTimeMillis());
+        }
 
-        String serverName = player.getServerName();
-        List<String> svs = main.getConfig().getStringList("queue-servers");
-        for(String s : svs) {
-            if(!s.contains(":")) continue;
-            String[] parts = s.split(":");
-            String from = parts[0];
-            QueueServer to = main.getQueueManager().findServer(parts[1]);
-            if(from.equalsIgnoreCase(serverName) && to != null) {
-                main.getQueueManager().addToQueue(player, to);
+
+        if(!PauseQueueServer.pausedPlayers.contains(player)) {
+            String serverName = player.getServerName();
+            List<String> svs = main.getConfig().getStringList("queue-servers");
+            for(String s : svs) {
+                if(!s.contains(":")) continue;
+                String[] parts = s.split(":");
+                String from = parts[0];
+                QueueServer to = main.getQueueManager().findServer(parts[1]);
+                if(from.equalsIgnoreCase(serverName) && to != null) {
+                    main.getQueueManager().addToQueue(player, to);
+                }
             }
         }
 
