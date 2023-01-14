@@ -53,10 +53,15 @@ public class Commands implements CommandExecutor {
 			player = tply;
 			srvname = args[1];
 		}
+
+		if(player == null) {
+			sender.sendMessage("I need to know what player to send!");
+			return true;
+		}
+
 		if(pl.getAConfig().getBoolean("send-queue-commands-in-batches")) {
 			pl.queuebatch.put(player, srvname);
 		} else {
-			assert player != null;
 			pl.sendMessage(player, "queue", srvname);
 		}
 		

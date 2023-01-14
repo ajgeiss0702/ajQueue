@@ -8,6 +8,8 @@ import org.jetbrains.annotations.NotNull;
 import us.ajg0702.queue.api.commands.ICommandSender;
 import us.ajg0702.queue.platforms.bungeecord.BungeeQueue;
 
+import java.util.UUID;
+
 public class BungeeSender implements ICommandSender {
 
     final CommandSender handle;
@@ -25,6 +27,12 @@ public class BungeeSender implements ICommandSender {
     @Override
     public boolean isPlayer() {
         return handle instanceof ProxiedPlayer;
+    }
+
+    @Override
+    public UUID getUniqueId() throws IllegalStateException {
+        if(!(handle instanceof ProxiedPlayer)) throw new IllegalStateException("Cannot get UUID of non-player!");
+        return ((ProxiedPlayer) handle).getUniqueId();
     }
 
     @Override

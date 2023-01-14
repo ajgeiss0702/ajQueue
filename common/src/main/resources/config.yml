@@ -1,5 +1,5 @@
 # Dont touch this number please
-config-version: 34
+config-version: 35
 
 
 # This is the main config for ajQueue.
@@ -312,6 +312,12 @@ give-fulljoin-players-priority: 0
 # This will check every few seconds, and if a player in a queue-server is
 #  not in the queue for the target server, it will add them.
 force-queue-server-target: true
+
+# How long should the cooldown for queue commands be? (in seconds)
+queue-command-cooldown: 3
+
+# Should any server switch (including the initial join) count against the queue command cooldown?
+include-server-switch-in-cooldown: false
 
 
 # The minimum time between pinging the server.

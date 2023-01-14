@@ -37,6 +37,7 @@ public class ManageCommand extends BaseCommand {
         addSubCommand(new Update(main));
         addSubCommand(new Kick(main));
         addSubCommand(new KickAll(main));
+        addSubCommand(new PauseQueueServer(main));
     }
 
 
