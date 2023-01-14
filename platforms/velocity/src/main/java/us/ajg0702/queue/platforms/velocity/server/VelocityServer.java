@@ -80,7 +80,7 @@ public class VelocityServer implements AdaptedServer {
 
     private void markOffline(boolean debug, QueueLogger logger, CompletableFuture<AdaptedServerPing> future, long sent, Throwable e) {
         long lastOnline = lastSuccessfullPing == null ? 0 : lastSuccessfullPing.getFetchedTime();
-        offlineTime = (int) Math.min(sent - lastOnline, Integer.MAX_VALUE);
+        offlineTime = (int) Math.min(sent - lastOnline, Integer.MAX_VALUE) / 1000;
 
         lastOffline = sent;
 
