@@ -27,4 +27,9 @@ public class FreeLogic implements Logic {
     public PermissionGetter getPermissionGetter() {
         return null;
     }
+
+    @Override
+    public boolean hasAnyBypass(AdaptedPlayer player, String server) {
+        return false;
+    }
 }

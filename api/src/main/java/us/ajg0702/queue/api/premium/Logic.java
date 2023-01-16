@@ -67,4 +67,6 @@ public interface Logic {
 
         return highest;
     }
+
+    boolean hasAnyBypass(AdaptedPlayer player, String server);
 }

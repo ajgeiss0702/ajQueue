@@ -246,8 +246,13 @@ public class QueueManagerImpl implements QueueManager {
         boolean sendInstant = server.isJoinable(player);
         boolean sendInstantp = list.size() <= 1 && server.isJoinable(player);
         boolean timeGood = !main.getConfig().getBoolean("check-last-player-sent-time") || server.getLastSentTime() > Math.floor(main.getTimeBetweenPlayers() * 1000);
+        boolean alwaysSendInstantly = main.getConfig().getStringList("send-instantly").contains(server.getName());
+        boolean hasBypass = main.getLogic().hasAnyBypass(player, server.getName());
 
-        if(main.getConfig().getStringList("send-instantly").contains(server.getName()) || (sendInstant && (sendInstantp && timeGood))) {
+        boolean sentInstantly = alwaysSendInstantly || (sendInstant && (sendInstantp && timeGood) && !hasBypass);
+
+        Debug.info("should send instantly (" + sentInstantly + "): " + alwaysSendInstantly + " || (" + sendInstant + " && (" + sendInstantp + " && " + timeGood + ") && " + (!hasBypass) + ")");
+        if(sentInstantly) {
             sendPlayers(server);
             if(!msgs.isEmpty("status.now-in-empty-queue")) {
                 player.sendMessage(msgs.getComponent("status.now-in-empty-queue",
@@ -573,7 +578,7 @@ public class QueueManagerImpl implements QueueManager {
             if(!server.isOnline()) continue;
             if(server.getQueue().size() == 0) continue;
 
-            Debug.info("should send instantly: " + !server.isGroup() + " && " + main.getConfig().getBoolean("send-all-when-back-online") + " && " + server.getServers().get(0).justWentOnline());
+            Debug.info("should send when back online: " + !server.isGroup() + " && " + main.getConfig().getBoolean("send-all-when-back-online") + " && " + server.getServers().get(0).justWentOnline());
             if(!server.isGroup() && main.getConfig().getBoolean("send-all-when-back-online") && server.getServers().get(0).justWentOnline()) {
                 for(QueuePlayer p : server.getQueue()) {
 
@@ -590,6 +595,7 @@ public class QueueManagerImpl implements QueueManager {
                     if(selected.isFull() && !selected.canJoinFull(p.getPlayer())) continue;
 
                     player.sendMessage(msgs.getComponent("status.sending-now", "SERVER:"+server.getAlias()));
+                    Debug.info("Calling player.connect for " + player.getName() + "(send when back online)");
                     player.connect(selected);
                 }
                 continue;
@@ -673,6 +679,7 @@ public class QueueManagerImpl implements QueueManager {
 
 
             server.setLastSentTime(System.currentTimeMillis());
+            Debug.info("calling nextPlayer.connect on " + nextPlayer.getName());
             nextPlayer.connect(selected);
             selected.addPlayer();
             Debug.info(selected.getName()+" player count is now set to "+ selected.getPlayerCount());
