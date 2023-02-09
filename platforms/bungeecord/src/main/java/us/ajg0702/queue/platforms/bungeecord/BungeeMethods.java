@@ -127,7 +127,7 @@ public class BungeeMethods implements PlatformMethods {
         for (ServerInfo serverInfo : proxyServer.getServers().values()) {
             boolean found = false;
             for(BungeeServer sv : new ArrayList<>(serverList)) {
-                if(sv.getHandle().equals(serverInfo)) {
+                if(sv.getHandle().equals(serverInfo) && sv.getName().equals(serverInfo.getName())) {
                     found = true;
                     break;
                 }
@@ -140,7 +140,7 @@ public class BungeeMethods implements PlatformMethods {
         for(BungeeServer sv : new ArrayList<>(serverList)) {
             boolean found = false;
             for (ServerInfo serverInfo : proxyServer.getServers().values()) {
-                if(sv.getHandle().equals(serverInfo)) {
+                if(sv.getHandle().equals(serverInfo) && sv.getName().equals(serverInfo.getName())) {
                     found = true;
                     break;
                 }
