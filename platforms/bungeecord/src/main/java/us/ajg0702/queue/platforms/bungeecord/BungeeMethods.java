@@ -35,9 +35,11 @@ public class BungeeMethods implements PlatformMethods {
     public void sendPluginMessage(AdaptedPlayer player, String channel, String... data) {
         Collection<ProxiedPlayer> networkPlayers = ProxyServer.getInstance().getPlayers();
         if (networkPlayers != null && !networkPlayers.isEmpty()) {
+            String playerName = player.getName();
+            if(playerName == null) return;
             ByteArrayDataOutput out = ByteStreams.newDataOutput();
             out.writeUTF(channel);
-            out.writeUTF(player.getName());
+            out.writeUTF(playerName);
 
             for (String s : data) {
                 out.writeUTF(s);
