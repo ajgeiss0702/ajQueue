@@ -118,6 +118,7 @@ public class BungeePlayer implements AdaptedPlayer, Audience {
 
     @Override
     public String getServerName() {
+        if(handle.getServer() == null) return null;
         return handle.getServer().getInfo().getName();
     }
 
