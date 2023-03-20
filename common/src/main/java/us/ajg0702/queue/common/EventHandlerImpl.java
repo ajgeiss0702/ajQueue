@@ -179,6 +179,7 @@ public class EventHandlerImpl implements EventHandler {
             }
         }
         main.getQueueManager().clear(player);
+        QueueCommand.cooldowns.remove(player);
     }
 
     @Override
