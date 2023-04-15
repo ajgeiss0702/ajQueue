@@ -35,9 +35,11 @@ public class BungeeMethods implements PlatformMethods {
     public void sendPluginMessage(AdaptedPlayer player, String channel, String... data) {
         Collection<ProxiedPlayer> networkPlayers = ProxyServer.getInstance().getPlayers();
         if (networkPlayers != null && !networkPlayers.isEmpty()) {
+            String playerName = player.getName();
+            if(playerName == null) return;
             ByteArrayDataOutput out = ByteStreams.newDataOutput();
             out.writeUTF(channel);
-            out.writeUTF(player.getName());
+            out.writeUTF(playerName);
 
             for (String s : data) {
                 out.writeUTF(s);
@@ -127,7 +129,7 @@ public class BungeeMethods implements PlatformMethods {
         for (ServerInfo serverInfo : proxyServer.getServers().values()) {
             boolean found = false;
             for(BungeeServer sv : new ArrayList<>(serverList)) {
-                if(sv.getHandle().equals(serverInfo)) {
+                if(sv.getHandle().equals(serverInfo) && sv.getName().equals(serverInfo.getName())) {
                     found = true;
                     break;
                 }
@@ -140,7 +142,7 @@ public class BungeeMethods implements PlatformMethods {
         for(BungeeServer sv : new ArrayList<>(serverList)) {
             boolean found = false;
             for (ServerInfo serverInfo : proxyServer.getServers().values()) {
-                if(sv.getHandle().equals(serverInfo)) {
+                if(sv.getHandle().equals(serverInfo) && sv.getName().equals(serverInfo.getName())) {
                     found = true;
                     break;
                 }

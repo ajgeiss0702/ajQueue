@@ -37,14 +37,7 @@ public class PremiumLogic implements Logic {
         QueueLogger logger = main.getLogger();
         boolean debug = main.getConfig().getBoolean("priority-queue-debug");
 
-        if(
-                player.hasPermission("ajqueue.bypass") ||
-                player.hasPermission("ajqueue.serverbypass."+ queueServer.getName()) ||
-                player.hasPermission("ajqueue.joinfullandbypassserver."+ queueServer.getName()) ||
-                player.hasPermission("ajqueue.joinfullandbypass") ||
-                permissionGetter.hasContextBypass(player, queueServer.getName()) ||
-                (main.isPremium() && main.getLogic().getPermissionGetter().hasUniqueFullBypass(player, queueServer.getName()))
-        ) {
+        if(hasAnyBypass(player, queueServer.getName())) {
             if(debug) {
                 logger.info("[priority] "+player.getName()+" bypass");
             }
@@ -105,4 +98,14 @@ public class PremiumLogic implements Logic {
     public boolean playerDisconnectedTooLong(QueuePlayer player) {
         return player.getTimeSinceOnline() > player.getMaxOfflineTime()*1000L;
     }
+    @Override
+    public boolean hasAnyBypass(AdaptedPlayer player, String server) {
+        return player.hasPermission("ajqueue.bypass") ||
+                player.hasPermission("ajqueue.serverbypass."+ server) ||
+                player.hasPermission("ajqueue.joinfullandbypassserver."+ server) ||
+                player.hasPermission("ajqueue.joinfullandbypass") ||
+                permissionGetter.hasContextBypass(player, server) ||
+                (QueueMain.getInstance().isPremium() && permissionGetter.hasUniqueFullBypass(player, server));
+    }
+
 }

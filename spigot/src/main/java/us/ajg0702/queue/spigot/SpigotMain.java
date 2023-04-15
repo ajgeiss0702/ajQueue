@@ -221,7 +221,7 @@ public class SpigotMain extends JavaPlugin implements PluginMessageListener,List
 	@EventHandler
 	public void onJoin(PlayerJoinEvent e) {
 		if(hasProxy) return;
-		Bukkit.getScheduler().runTask(this, () -> sendMessage(e.getPlayer(), "ack", ""));
+		Bukkit.getScheduler().runTaskLater(this, () -> sendMessage(e.getPlayer(), "ack", ""), 5);
 	}
 
 	@EventHandler(priority = EventPriority.HIGH)

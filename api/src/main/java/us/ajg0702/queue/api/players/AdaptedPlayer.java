@@ -3,6 +3,7 @@ package us.ajg0702.queue.api.players;
 import net.kyori.adventure.audience.Audience;
 import net.kyori.adventure.text.Component;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import us.ajg0702.queue.api.server.AdaptedServer;
 import us.ajg0702.queue.api.util.Handle;
 
@@ -76,7 +77,7 @@ public interface AdaptedPlayer extends Handle, Audience {
      * Gets the player's username
      * @return the player's username
      */
-    String getName();
+    @Nullable String getName();
 
     /**
      * Kick a player from the proxy

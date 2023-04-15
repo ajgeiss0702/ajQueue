@@ -60,7 +60,7 @@ public class ManageCommand extends BaseCommand {
 
     @Override
     public String getPermission() {
-        return null;
+        return "ajqueue.manage";
     }
 
     @Override

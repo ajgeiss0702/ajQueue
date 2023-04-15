@@ -41,8 +41,10 @@ public class VelocityMethods implements PlatformMethods {
         if(player == null) return;
         Player velocityPlayer = ((VelocityPlayer) player).getHandle();
         @SuppressWarnings("UnstableApiUsage") ByteArrayDataOutput out = ByteStreams.newDataOutput();
+        String playerName = player.getName();
+        if(playerName == null) return;
         out.writeUTF( channel );
-        out.writeUTF(player.getName());
+        out.writeUTF(playerName);
         for(String s : data) {
             out.writeUTF( s );
         }

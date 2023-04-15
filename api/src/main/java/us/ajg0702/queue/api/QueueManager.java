@@ -54,8 +54,8 @@ public interface QueueManager {
     String getQueuedName(AdaptedPlayer player);
 
     /**
-     * Checks servers that are in bungeecord and adds any it doesnt
-     * know about.
+     * Checks servers that are in the proxy and adds any it doesn't
+     * know about. (and removes any that no longer exist)
      *
      * Also creates/edits server groups
      */
