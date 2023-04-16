@@ -42,19 +42,19 @@ public interface Logic {
         Config config = AjQueueAPI.getInstance().getConfig();
         int highest = 0;
 
-        int whitelitedPriority = config.getInt("give-whitelisted-players-priority");
-        int bypassPausedPriotity = config.getInt("give-whitelisted-players-priority");
-        int fulljoinPriority = config.getInt("give-whitelisted-players-priority");
+        int whitelistedPriority = config.getInt("give-whitelisted-players-priority");
+        int bypassPausedPriority = config.getInt("give-pausedbypass-players-priority");
+        int fulljoinPriority = config.getInt("give-fulljoin-players-priority");
 
-        if(whitelitedPriority > 0) {
+        if(whitelistedPriority > 0) {
             if(server.isWhitelisted() && server.getWhitelistedPlayers().contains(player.getUniqueId())) {
-                highest = whitelitedPriority;
+                highest = whitelistedPriority;
             }
         }
 
-        if(bypassPausedPriotity > 0) {
+        if(bypassPausedPriority > 0) {
             if(queueServer.isPaused() && (player.hasPermission("ajqueue.bypasspaused"))) {
-                highest = Math.max(highest, bypassPausedPriotity);
+                highest = Math.max(highest, bypassPausedPriority);
             }
         }
 
