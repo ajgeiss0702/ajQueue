@@ -37,7 +37,7 @@ public class SlashServerCommand extends BaseCommand {
 
     @Override
     public String getPermission() {
-        return null;
+        return main.getConfig().getBoolean("require-permission") ? "ajqueue.queue."+server : null;
     }
 
     @Override
