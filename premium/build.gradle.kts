@@ -25,7 +25,7 @@ dependencies {
 
     compileOnly("us.ajg0702:ajUtils:1.2.10")
 
-    compileOnly("net.kyori:adventure-api:4.9.3")
+    compileOnly("net.kyori:adventure-api:4.13.1")
 
     compileOnly(fileTree(mapOf("dir" to "../libs/private", "include" to listOf("*.jar"))))
     compileOnly(fileTree(mapOf("dir" to "../libs/public", "include" to listOf("*.jar"))))
