@@ -50,7 +50,8 @@ public class VelocityMethods implements PlatformMethods {
         }
         Optional<ServerConnection> server = velocityPlayer.getCurrentServer();
         if(!server.isPresent()) {
-            throw new IllegalStateException("No server to send data to");
+            logger.warn("Unable to send message to " + player.getName() + ", as they are not connected to any server!");
+            return;
         }
         server.get().sendPluginMessage(MinecraftChannelIdentifier.from("ajqueue:tospigot"), out.toByteArray());
     }
