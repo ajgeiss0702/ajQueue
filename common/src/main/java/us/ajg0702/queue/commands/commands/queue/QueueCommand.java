@@ -62,13 +62,17 @@ public class QueueCommand extends BaseCommand {
         }
         AdaptedPlayer player = main.getPlatformMethods().senderToPlayer(sender);
 
-        long lastUse = cooldowns.getOrDefault(player, 0L);
-        if(System.currentTimeMillis() - lastUse < main.getConfig().getDouble("queue-command-cooldown") * 1000L) {
-            sender.sendMessage(main.getMessages().getComponent("errors.too-fast-queue"));
-            return;
-        }
+        double cooldownTime = main.getConfig().getDouble("queue-command-cooldown");
 
-        cooldowns.put(player, System.currentTimeMillis());
+        if(cooldownTime > 0) {
+            long lastUse = cooldowns.getOrDefault(player, 0L);
+            if(System.currentTimeMillis() - lastUse < cooldownTime * 1000L) {
+                sender.sendMessage(main.getMessages().getComponent("errors.too-fast-queue"));
+                return;
+            }
+
+            cooldowns.put(player, System.currentTimeMillis());
+        }
 
         if(args.length > 0) {
             if(main.getConfig().getBoolean("require-permission") && !player.hasPermission("ajqueue.queue."+args[0])) {
