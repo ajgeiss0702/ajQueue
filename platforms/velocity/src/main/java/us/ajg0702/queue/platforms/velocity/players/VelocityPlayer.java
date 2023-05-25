@@ -9,6 +9,7 @@ import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.sound.SoundStop;
 import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import net.kyori.adventure.title.Title;
 import org.jetbrains.annotations.NotNull;
@@ -153,8 +154,10 @@ public class VelocityPlayer implements AdaptedPlayer, Audience {
                             handle.sendMessage(
                                     main.getMessages().getComponent(
                                             "velocity-kick-message",
-                                            "SERVER:"+server.getName(),
-                                            "REASON:"+PlainTextComponentSerializer.plainText().serialize(reason)
+                                            "SERVER:" + server.getName(),
+                                            "REASON:" +
+                                                    LegacyComponentSerializer.legacyAmpersand()
+                                                            .serialize(reason)
                                     )
                             );
                         }
