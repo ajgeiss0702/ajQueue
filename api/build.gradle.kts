@@ -13,6 +13,11 @@ repositories {
     mavenCentral()
 }
 
+java {
+    withJavadocJar()
+    withSourcesJar()
+}
+
 dependencies {
     implementation("net.kyori:adventure-api:4.13.1")
     implementation("net.kyori:adventure-text-serializer-plain:4.13.1")
