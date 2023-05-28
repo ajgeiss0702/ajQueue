@@ -2,6 +2,7 @@ package us.ajg0702.queue.api;
 
 import us.ajg0702.queue.api.premium.Logic;
 import us.ajg0702.queue.api.premium.LogicGetter;
+import us.ajg0702.queue.api.spigot.AjQueueSpigotAPI;
 import us.ajg0702.queue.api.util.QueueLogger;
 import us.ajg0702.utils.common.Config;
 import us.ajg0702.utils.common.Messages;
@@ -11,6 +12,7 @@ import java.util.concurrent.ExecutorService;
 public abstract class AjQueueAPI {
 
     public static AjQueueAPI INSTANCE;
+    public static AjQueueSpigotAPI SPIGOT_INSTANCE;
 
     /**
      * Gets the instance of the ajQueue API
@@ -19,6 +21,10 @@ public abstract class AjQueueAPI {
     @SuppressWarnings("unused")
     public static AjQueueAPI getInstance() {
         return INSTANCE;
+    }
+
+    public static AjQueueSpigotAPI getSpigotInstance() {
+        return SPIGOT_INSTANCE;
     }
 
 
@@ -79,7 +85,6 @@ public abstract class AjQueueAPI {
 
     /**
      * Gets the event handler.
-     *
      * This class will probably be replaced in the future with an actual event system
      * @return the EventHandler
      */
