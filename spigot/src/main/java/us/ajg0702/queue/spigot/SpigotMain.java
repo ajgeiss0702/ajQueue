@@ -15,16 +15,25 @@ import org.bukkit.event.server.ServerListPingEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.plugin.messaging.PluginMessageListener;
 import org.jetbrains.annotations.NotNull;
+import us.ajg0702.queue.api.AjQueueAPI;
+import us.ajg0702.queue.api.communication.ComResponse;
+import us.ajg0702.queue.api.spigot.AjQueueSpigotAPI;
+import us.ajg0702.queue.spigot.api.SpigotAPI;
+import us.ajg0702.queue.spigot.communication.ResponseManager;
+import us.ajg0702.queue.spigot.placeholders.PlaceholderExpansion;
 import us.ajg0702.utils.common.ConfigFile;
 
 import java.io.File;
 import java.util.HashMap;
+import java.util.logging.Level;
 
 @SuppressWarnings("UnstableApiUsage")
 public class SpigotMain extends JavaPlugin implements PluginMessageListener,Listener {
 	
 	private boolean papi = false;
-	private Placeholders placeholders;
+	private PlaceholderExpansion placeholders;
+
+	private ResponseManager responseManager = new ResponseManager();
 	
 	private ConfigFile config;
 
@@ -34,6 +43,9 @@ public class SpigotMain extends JavaPlugin implements PluginMessageListener,List
 	public void onEnable() {
 		getServer().getMessenger().registerIncomingPluginChannel(this, "ajqueue:tospigot", this);
 		getServer().getMessenger().registerOutgoingPluginChannel(this, "ajqueue:toproxy");
+
+		AjQueueAPI.SPIGOT_INSTANCE = new SpigotAPI(responseManager, this);
+		AjQueueSpigotAPI.INSTANCE = AjQueueAPI.SPIGOT_INSTANCE;
 		
 		this.getCommand("move").setExecutor(new Commands(this));
 		this.getCommand("leavequeue").setExecutor(new Commands(this));
@@ -43,7 +55,7 @@ public class SpigotMain extends JavaPlugin implements PluginMessageListener,List
 		papi = Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null;
 		
 		if(papi) {
-			placeholders = new Placeholders(this);
+			placeholders = new PlaceholderExpansion(this);
 			placeholders.register();
 			getLogger().info("Registered PlaceholderAPI placeholders");
 		}
@@ -94,6 +106,7 @@ public class SpigotMain extends JavaPlugin implements PluginMessageListener,List
 
 	    if(subchannel.equals("ack")) {
 	    	hasProxy = true;
+			return;
 		}
 
 	    if(subchannel.equals("inqueueevent")) {
@@ -102,95 +115,15 @@ public class SpigotMain extends JavaPlugin implements PluginMessageListener,List
 	    	if(p == null) return;
 	    	QueueScoreboardActivator e = new QueueScoreboardActivator(p);
 	    	Bukkit.getPluginManager().callEvent(e);
+			return;
 	    }
-	    if(subchannel.equals("queuename") && papi) {
-	    	String playername = in.readUTF();
-	    	Player p = Bukkit.getPlayer(playername);
-	    	if(p == null) return;
-	    	if(!p.isOnline()) return;
-	    	
-	    	String data = in.readUTF();
-	    	HashMap<String, String> phs = placeholders.responseCache.get(p);
-	    	if(phs == null) phs = new HashMap<>();
-	    	phs.put("queued", data);
-	    	placeholders.responseCache.put(p, phs);
-	    }
-	    if(subchannel.equals("position") && papi) {
-	    	String playername = in.readUTF();
-	    	Player p = Bukkit.getPlayer(playername);
-	    	if(p == null) return;
-	    	if(!p.isOnline()) return;
-	    	
-	    	String data = in.readUTF();
-	    	HashMap<String, String> phs = placeholders.responseCache.get(p);
-	    	if(phs == null) phs = new HashMap<>();
-	    	phs.put("position", data);
-	    	placeholders.responseCache.put(p, phs);
-	    }
-	    if(subchannel.equals("positionof") && papi) {
-	    	String playername = in.readUTF();
-	    	Player p = Bukkit.getPlayer(playername);
-	    	if(p == null) return;
-	    	if(!p.isOnline()) return;
-	    	
-	    	String data = in.readUTF();
-	    	HashMap<String, String> phs = placeholders.responseCache.get(p);
-	    	if(phs == null) phs = new HashMap<>();
-	    	phs.put("of", data);
-	    	placeholders.responseCache.put(p, phs);
-	    }
-	    if(subchannel.equals("inqueue") && papi) {
-	    	String playername = in.readUTF();
-	    	Player p = Bukkit.getPlayer(playername);
-	    	if(p == null) return;
-	    	if(!p.isOnline()) return;
-	    	
-	    	String data = in.readUTF();
-	    	HashMap<String, String> phs = placeholders.responseCache.get(p);
-	    	if(phs == null) phs = new HashMap<>();
-	    	phs.put("inqueue", data);
-	    	placeholders.responseCache.put(p, phs);
-	    }
-	    if(subchannel.equals("queuedfor")) {
-	    	String playername = in.readUTF();
-	    	String queuename = in.readUTF();
-	    	
-	    	Player p = Bukkit.getPlayer(playername);
-	    	if(p == null) return;
-	    	if(!p.isOnline()) return;
-	    	
-	    	int number = Integer.parseInt(in.readUTF());
-	    	HashMap<String, String> phs = placeholders.responseCache.get(p);
-	    	if(phs == null) phs = new HashMap<>();
-	    	phs.put("queuedfor_"+queuename, number+"");
-	    	placeholders.responseCache.put(p, phs);
-	    }
-		if(subchannel.equals("estimated_time")) {
-			String playername = in.readUTF();
 
-			Player p = Bukkit.getPlayer(playername);
-			if(p == null) return;
-			if(!p.isOnline()) return;
+		try {
+			ComResponse response = ComResponse.from(subchannel, in);
 
-			String time = in.readUTF();
-			HashMap<String, String> phs = placeholders.responseCache.get(p);
-			if(phs == null) phs = new HashMap<>();
-			phs.put("estimated_time", time);
-			placeholders.responseCache.put(p, phs);
-		}
-		if(subchannel.equals("status")) {
-			String playername = in.readUTF();
-			String server = in.readUTF();
-
-			Player p = Bukkit.getPlayer(playername);
-			if(p == null) return;
-			if(!p.isOnline()) return;
-
-			String status = in.readUTF();
-			HashMap<String, String> phs = placeholders.responseCache.get(p);
-			if(phs == null) phs = new HashMap<>();
-			phs.put("status_"+server, status+"");
-			placeholders.responseCache.put(p, phs);
+			responseManager.executeResponse(response);
+		} catch (Exception e) {
+			getLogger().log(Level.SEVERE, "Error while processing proxy response " + subchannel + ": ", e);
 		}
 	}
 	
@@ -215,7 +148,7 @@ public class SpigotMain extends JavaPlugin implements PluginMessageListener,List
 	@EventHandler
 	public void onLeave(PlayerQuitEvent e) {
 		if(!papi) return;
-		placeholders.cleanCache();
+		placeholders.cleanCache(e.getPlayer());
 	}
 
 	@EventHandler

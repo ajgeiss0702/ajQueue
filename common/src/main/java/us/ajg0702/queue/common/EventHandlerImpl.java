@@ -5,20 +5,16 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.jetbrains.annotations.NotNull;
 import us.ajg0702.queue.api.EventHandler;
-import us.ajg0702.queue.api.commands.IBaseCommand;
 import us.ajg0702.queue.api.players.AdaptedPlayer;
 import us.ajg0702.queue.api.players.QueuePlayer;
 import us.ajg0702.queue.api.queues.QueueServer;
 import us.ajg0702.queue.api.server.AdaptedServer;
-import us.ajg0702.queue.commands.commands.PlayerSender;
 import us.ajg0702.queue.commands.commands.manage.PauseQueueServer;
 import us.ajg0702.queue.commands.commands.queue.QueueCommand;
+import us.ajg0702.queue.common.communication.CommunicationManager;
 import us.ajg0702.queue.common.players.QueuePlayerImpl;
 import us.ajg0702.queue.common.utils.Debug;
-import us.ajg0702.utils.common.TimeUtils;
 
-import java.io.ByteArrayInputStream;
-import java.io.DataInputStream;
 import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -26,121 +22,20 @@ import java.util.concurrent.TimeUnit;
 public class EventHandlerImpl implements EventHandler {
 
     final QueueMain main;
+    CommunicationManager communicationManager;
     public EventHandlerImpl(QueueMain main) {
         this.main = main;
     }
 
     @Override
-    public void handleMessage(AdaptedPlayer recievingPlayer, byte[] data) {
-        IBaseCommand moveCommand = main.getPlatformMethods().getCommands().get(0);
-        IBaseCommand leaveCommand = main.getPlatformMethods().getCommands().get(1);
-        DataInputStream in = new DataInputStream(new ByteArrayInputStream(data));
+    public void handleMessage(AdaptedPlayer receivingPlayer, byte[] data) {
+        if(communicationManager == null) {
+            communicationManager = new CommunicationManager(main);
+        }
         try {
-            String subchannel = in.readUTF();
-
-            if(subchannel.equals("ack")) {
-                main.getPlatformMethods().sendPluginMessage(recievingPlayer, "ack", "yes, im here");
-            }
-
-            if(subchannel.equals("queue")) {
-                String rawData = in.readUTF();
-                String[] args = new String[1];
-                args[0] = rawData;
-                moveCommand.execute(new PlayerSender(recievingPlayer), args);
-            }
-            if(subchannel.equals("massqueue")) {
-                String inData = in.readUTF();
-                String[] parts = inData.split(",");
-                for(String part : parts) {
-                    String[] pparts = part.split(":");
-                    if(pparts.length < 2) continue;
-                    String pname = pparts[0];
-                    String pserver = pparts[1];
-                    AdaptedPlayer p = main.getPlatformMethods().getPlayer(pname);
-                    String[] args = new String[1];
-                    args[0] = pserver;
-                    moveCommand.execute(new PlayerSender(p), args);
-                }
-            }
-            if(subchannel.equals("queuename")) {
-                QueueServer server = main.getQueueManager().getSingleServer(recievingPlayer);
-                String name = main.getMessages().getString("placeholders.position.none");
-                if(server != null) {
-                    name = server.getAlias();
-                }
-                main.getPlatformMethods().sendPluginMessage(recievingPlayer, "queuename", name);
-            }
-            if(subchannel.equals("position")) {
-                QueueServer server = main.getQueueManager().getSingleServer(recievingPlayer);
-                String pos = main.getMessages().getString("placeholders.position.none");
-                if(server != null) {
-                    pos = server.getQueue().indexOf(server.findPlayer(recievingPlayer))+1+"";
-                }
-                main.getPlatformMethods().sendPluginMessage(recievingPlayer, "position", pos);
-            }
-            if(subchannel.equals("positionof")) {
-                QueueServer server = main.getQueueManager().getSingleServer(recievingPlayer);
-                String pos = main.getMessages().getString("placeholders.position.none");
-                if(server != null) {
-                    pos = server.getQueue().size()+"";
-                }
-                main.getPlatformMethods().sendPluginMessage(recievingPlayer, "positionof", pos);
-            }
-            if(subchannel.equals("estimated_time")) {
-                QueueServer server = main.getQueueManager().getSingleServer(recievingPlayer);
-
-                int time;
-                String timeString;
-                if(server != null) {
-                    QueuePlayer queuePlayer = server.findPlayer(recievingPlayer);
-                    time = (int) Math.round(queuePlayer.getPosition() * main.getTimeBetweenPlayers());
-                    timeString = TimeUtils.timeString(
-                            time,
-                            main.getMessages().getString("format.time.mins"),
-                            main.getMessages().getString("format.time.secs")
-                    );
-                } else {
-                    timeString = main.getMessages().getString("placeholders.estimated_time.none");
-                }
-                main.getPlatformMethods().sendPluginMessage(
-                        recievingPlayer,
-                        "estimated_time",
-                        timeString
-                        );
-            }
-            if(subchannel.equals("inqueue")) {
-                QueueServer server = main.getQueueManager().getSingleServer(recievingPlayer);
-                main.getPlatformMethods().sendPluginMessage(recievingPlayer, "inqueue", (server != null)+"");
-            }
-            if(subchannel.equals("queuedfor")) {
-                String srv = in.readUTF();
-                QueueServer server = main.getQueueManager().findServer(srv);
-                if(server == null) return;
-                main.getPlatformMethods().sendPluginMessage(recievingPlayer, "queuedfor", srv, server.getQueue().size()+"");
-            }
-            if(subchannel.equals("status")) {
-                String srv = in.readUTF();
-                QueueServer server = main.getQueueManager().findServer(srv);
-                if(server == null) return;
-                if(!recievingPlayer.isConnected() || recievingPlayer.getServerName() == null) return;
-                main.getPlatformMethods().sendPluginMessage(
-                        recievingPlayer,
-                        "status",
-                        srv,
-                        main.getMessages().getRawString("placeholders.status."+server.getStatus(recievingPlayer))
-                );
-            }
-            if(subchannel.equals("leavequeue")) {
-                String[] args = new String[1];
-                try {
-                    args[0] = in.readUTF();
-                } catch(Exception ignored) {}
-                leaveCommand.execute(new PlayerSender(recievingPlayer), args);
-            }
-
-        } catch (IOException e1) {
-            main.getLogger().warning("An error occured while reading data from spigot side:");
-            e1.printStackTrace();
+            communicationManager.handle(receivingPlayer, data);
+        } catch (IOException e) {
+            main.getLogger().warning("An error occurred while reading data from spigot side:", e);
         }
     }
 

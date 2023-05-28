@@ -39,7 +39,6 @@ public class BungeeMethods implements PlatformMethods {
             if(playerName == null) return;
             ByteArrayDataOutput out = ByteStreams.newDataOutput();
             out.writeUTF(channel);
-            out.writeUTF(playerName);
 
             for (String s : data) {
                 out.writeUTF(s);

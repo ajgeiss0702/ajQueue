@@ -44,7 +44,6 @@ public class VelocityMethods implements PlatformMethods {
         String playerName = player.getName();
         if(playerName == null) return;
         out.writeUTF( channel );
-        out.writeUTF(playerName);
         for(String s : data) {
             out.writeUTF( s );
         }
