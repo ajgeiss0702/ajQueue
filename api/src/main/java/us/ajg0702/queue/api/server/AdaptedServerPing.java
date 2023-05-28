@@ -35,7 +35,7 @@ public interface AdaptedServerPing extends Handle {
     void addPlayer();
 
     /**
-     * Returns an epoch timestamp of when this ping was <bold>sent</bold>.
+     * Returns an epoch timestamp of when this ping was <b>sent</b>.
      * @return A long of an epoch timestamp
      */
     long getFetchedTime();
