@@ -37,6 +37,11 @@ public class DefaultBalancer implements Balancer {
                     selectednum = online;
                     continue;
                 }
+                if(!selected.isJoinable(player) && sv.isJoinable(player)) {
+                    selected = sv;
+                    selectednum = online;
+                    continue;
+                }
                 if(selectednum > online && sv.isJoinable(player)) {
                     selected = sv;
                     selectednum = online;

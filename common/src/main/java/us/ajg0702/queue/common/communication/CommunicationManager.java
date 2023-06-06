@@ -52,8 +52,6 @@ public class CommunicationManager {
 
         if(response == null) return;
 
-        Debug.info("Responding with " + response);
-
         main.getPlatformMethods().sendPluginMessage(
                 receivingPlayer,
                 s(response.getFrom()),
