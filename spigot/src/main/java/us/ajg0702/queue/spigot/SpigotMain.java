@@ -122,6 +122,8 @@ public class SpigotMain extends JavaPlugin implements PluginMessageListener,List
 			ComResponse response = ComResponse.from(subchannel, in);
 
 			responseManager.executeResponse(response);
+		} catch (IllegalStateException ignored) {
+			// This seems to happen often when a player leaves. So, we'll ignore it.
 		} catch (Exception e) {
 			getLogger().log(Level.SEVERE, "Error while processing proxy response " + subchannel + ": ", e);
 		}
