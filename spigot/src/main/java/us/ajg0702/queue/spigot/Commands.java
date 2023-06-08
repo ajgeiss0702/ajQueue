@@ -7,6 +7,7 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+import us.ajg0702.queue.api.spigot.AjQueueSpigotAPI;
 
 public class Commands implements CommandExecutor {
 	
@@ -42,23 +43,32 @@ public class Commands implements CommandExecutor {
 			pl.sendMessage(player, "leavequeue", arg.toString());
 			return true;
 		}
+
+
+		// Queue command
+
+
 		if(args.length < 1) return false;
-		
-		String srvname = args[0];
-		
+
+		String serverName = args[0];
+
+		boolean sudo = true;
+
+		// /queue <player> <server>
 		if(args.length > 1) {
-			pl.getLogger().info("Sending "+args[0]+" to queue '" + args[1] + "'");
+			sudo = false;
 			if(!sender.hasPermission("ajqueue.send")) {
 				sender.sendMessage(color("&cYou do not have permission to do this!"));
 				return true;
 			}
-			Player tply = Bukkit.getPlayer(args[0]);
-			if(tply == null) {
+			pl.getLogger().info("Sending "+args[0]+" to queue '" + args[1] + "'");
+			Player playerToSend = Bukkit.getPlayer(args[0]);
+			if(playerToSend == null) {
 				sender.sendMessage(color("&cCannot find that player!"));
 				return true;
 			}
-			player = tply;
-			srvname = args[1];
+			player = playerToSend;
+			serverName = args[1];
 		}
 
 		if(player == null) {
@@ -66,10 +76,14 @@ public class Commands implements CommandExecutor {
 			return true;
 		}
 
-		if(pl.getAConfig().getBoolean("send-queue-commands-in-batches")) {
-			pl.queuebatch.put(player, srvname);
+		if(sudo) {
+			if(pl.getAConfig().getBoolean("send-queue-commands-in-batches")) {
+				pl.queuebatch.put(player, serverName);
+			} else {
+				AjQueueSpigotAPI.getInstance().sudoQueue(player.getUniqueId(), serverName);
+			}
 		} else {
-			pl.sendMessage(player, "queue", srvname);
+			AjQueueSpigotAPI.getInstance().addToQueue(player.getUniqueId(), serverName);
 		}
 		
 		return true;

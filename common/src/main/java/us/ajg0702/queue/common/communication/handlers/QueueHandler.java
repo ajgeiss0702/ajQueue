@@ -7,6 +7,9 @@ import us.ajg0702.queue.common.QueueMain;
 import us.ajg0702.queue.api.communication.ComResponse;
 import us.ajg0702.queue.common.communication.MessageHandler;
 
+/**
+ * Actually SudoQueue. Confusing naming is due to legacy support and will be removed next major revision.
+ */
 public class QueueHandler extends MessageHandler {
     private final IBaseCommand moveCommand;
 

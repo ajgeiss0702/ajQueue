@@ -4,7 +4,6 @@ import us.ajg0702.queue.api.communication.ComResponse;
 import us.ajg0702.queue.api.players.AdaptedPlayer;
 import us.ajg0702.queue.common.QueueMain;
 import us.ajg0702.queue.common.communication.handlers.*;
-import us.ajg0702.queue.common.utils.Debug;
 import us.ajg0702.queue.common.utils.MapBuilder;
 
 import java.io.ByteArrayInputStream;
@@ -33,7 +32,8 @@ public class CommunicationManager {
                 "inqueue", new InQueueHandler(main),
                 "queuedfor", new QueuedForHandler(main),
                 "status", new StatusHandler(main),
-                "playerstatus", new PlayerStatusHandler(main)
+                "playerstatus", new PlayerStatusHandler(main),
+                "serverqueue", new ServerQueueHandler(main)
         );
     }
 

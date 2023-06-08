@@ -38,7 +38,25 @@ public class SpigotAPI extends AjQueueSpigotAPI {
 
     @Override
     public Future<Boolean> addToQueue(UUID player, String queueName) {
-        throw new UnsupportedOperationException("Not yet implemented!");
+        Player p = Bukkit.getPlayer(player);
+        if(p == null) throw new IllegalArgumentException("Player must be online!");
+
+        CompletableFuture<Boolean> future = new CompletableFuture<>();
+
+        responseManager.awaitResponse(player.toString(), "serverqueue", response -> {
+            future.complete(Boolean.valueOf(response.getResponse()));
+        });
+
+        main.sendMessage(p, "serverqueue", queueName);
+
+        return future;
+    }
+
+    @Override
+    public void sudoQueue(UUID player, String queueName) {
+        Player p = Bukkit.getPlayer(player);
+        if(p == null) throw new IllegalArgumentException("Player must be online!");
+        main.sendMessage(p, "queue", queueName);
     }
 
     @Override
