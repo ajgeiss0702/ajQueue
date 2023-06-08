@@ -22,12 +22,19 @@ public abstract class AjQueueSpigotAPI {
     public abstract Future<Boolean> isInQueue(UUID player);
 
     /**
-     * Adds a player to a queue
+     * Adds a player to a queue (bypassing any permission checks that would prevent it)
      * @param player The player to be added
      * @param queueName The server or group to add the player to
      * @return True if adding was successful, false if not.
      */
     public abstract Future<Boolean> addToQueue(UUID player, String queueName);
+
+    /**
+     * Emulate the player running the queue command for a certain server, including any permission checks
+     * @param player The player to sudo the command for
+     * @param queueName The queue to send the player to
+     */
+    public abstract void sudoQueue(UUID player, String queueName);
 
     /**
      * Gets the name of the queue that the player is in
