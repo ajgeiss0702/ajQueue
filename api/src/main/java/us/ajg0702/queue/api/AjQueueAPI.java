@@ -1,5 +1,6 @@
 package us.ajg0702.queue.api;
 
+import us.ajg0702.queue.api.events.utils.EventReceiver;
 import us.ajg0702.queue.api.premium.Logic;
 import us.ajg0702.queue.api.premium.LogicGetter;
 import us.ajg0702.queue.api.spigot.AjQueueSpigotAPI;
@@ -113,6 +114,8 @@ public abstract class AjQueueAPI {
      * Tells ajQueue to shut down.
      */
     public abstract void shutdown();
+
+    public abstract <E> void listen(Class<E> event, EventReceiver<E> handler);
 
     public abstract ExecutorService getServersUpdateExecutor();
 }

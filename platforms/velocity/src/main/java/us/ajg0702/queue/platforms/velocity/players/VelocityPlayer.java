@@ -17,6 +17,7 @@ import us.ajg0702.queue.api.players.AdaptedPlayer;
 import us.ajg0702.queue.api.server.AdaptedServer;
 import us.ajg0702.queue.common.QueueMain;
 import us.ajg0702.queue.common.utils.Debug;
+import us.ajg0702.queue.platforms.velocity.server.VelocityServer;
 
 import java.util.List;
 import java.util.Objects;
@@ -111,10 +112,17 @@ public class VelocityPlayer implements AdaptedPlayer, Audience {
 
     @Override
     public String getServerName() {
+        AdaptedServer currentServer = getCurrentServer();
+        if(currentServer == null) return null;
+        return currentServer.getName();
+    }
+
+    @Override
+    public AdaptedServer getCurrentServer() {
         Optional<ServerConnection> serverConnection = handle.getCurrentServer();
         if(!serverConnection.isPresent()) return null;
         ServerConnection connection = serverConnection.get();
-        return connection.getServerInfo().getName();
+        return new VelocityServer(connection.getServer());
     }
 
     @Override

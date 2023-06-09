@@ -1,6 +1,7 @@
 package us.ajg0702.queue.common.queues;
 
 import com.google.common.collect.ImmutableList;
+import us.ajg0702.queue.api.events.PositionChangeEvent;
 import us.ajg0702.queue.api.players.AdaptedPlayer;
 import us.ajg0702.queue.api.players.QueuePlayer;
 import us.ajg0702.queue.api.queues.Balancer;
@@ -203,6 +204,7 @@ public class QueueServerImpl implements QueueServer {
     public synchronized void removePlayer(QueuePlayer player) {
         main.getQueueManager().getSendingAttempts().remove(player);
         queue.remove(player);
+        positionChange();
     }
 
     @Override
@@ -226,6 +228,7 @@ public class QueueServerImpl implements QueueServer {
         } else {
             queue.add(player);
         }
+        positionChange();
     }
 
     @Override
@@ -314,6 +317,12 @@ public class QueueServerImpl implements QueueServer {
     @Override
     public Balancer getBalancer() {
         return balancer;
+    }
+
+    private void positionChange() {
+        main.getTaskManager().runNow(
+                () -> queue.forEach(queuePlayer -> main.call(new PositionChangeEvent(queuePlayer)))
+        );
     }
 
 }

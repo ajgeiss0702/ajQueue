@@ -1,5 +1,7 @@
 package us.ajg0702.queue.common;
 
+import us.ajg0702.queue.common.utils.QueueThreadFactory;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.*;
@@ -7,10 +9,9 @@ import java.util.concurrent.*;
 public class TaskManager {
 
 
-    final ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
-    final ScheduledExecutorService updateExecutor = Executors.newScheduledThreadPool(1);
-
-    final ExecutorService serversUpdateExecutor = Executors.newCachedThreadPool();
+    final ScheduledExecutorService executor = Executors.newScheduledThreadPool(1, new QueueThreadFactory("GENERIC"));
+    final ScheduledExecutorService updateExecutor = Executors.newScheduledThreadPool(1, new QueueThreadFactory("UPDATE-EXECUTOR"));
+    final ExecutorService serversUpdateExecutor = Executors.newCachedThreadPool(new QueueThreadFactory("SERVER-UPDATE"));
 
     final QueueMain main;
     public TaskManager(QueueMain main) {
@@ -126,6 +127,10 @@ public class TaskManager {
     @SuppressWarnings("UnusedReturnValue")
     public ScheduledFuture<?> runLater(Runnable runnable, long delay, TimeUnit unit) {
         return executor.schedule(runnable, delay, unit);
+    }
+
+    public Future<?> runNow(Runnable runnable) {
+        return executor.submit(runnable);
     }
 
 

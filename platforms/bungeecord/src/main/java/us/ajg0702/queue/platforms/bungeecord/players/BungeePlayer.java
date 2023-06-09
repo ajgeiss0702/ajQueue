@@ -123,6 +123,12 @@ public class BungeePlayer implements AdaptedPlayer, Audience {
     }
 
     @Override
+    public AdaptedServer getCurrentServer() {
+        if(handle.getServer() == null) return null;
+        return new BungeeServer(handle.getServer().getInfo());
+    }
+
+    @Override
     public UUID getUniqueId() {
         return handle.getUniqueId();
     }

@@ -5,6 +5,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.jetbrains.annotations.NotNull;
 import us.ajg0702.queue.api.EventHandler;
+import us.ajg0702.queue.api.events.SuccessfulSendEvent;
 import us.ajg0702.queue.api.players.AdaptedPlayer;
 import us.ajg0702.queue.api.players.QueuePlayer;
 import us.ajg0702.queue.api.queues.QueueServer;
@@ -87,6 +88,9 @@ public class EventHandlerImpl implements EventHandler {
                 server.removePlayer(player);
                 server.setLastSentTime(System.currentTimeMillis());
                 main.getQueueManager().getSendingAttempts().remove(queuePlayer);
+                main.getTaskManager().runNow(() -> {
+                    main.call(new SuccessfulSendEvent(queuePlayer, player.getCurrentServer()));
+                });
             }
         }
 

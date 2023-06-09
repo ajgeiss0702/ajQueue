@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableList;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.title.Title;
 import us.ajg0702.queue.api.QueueManager;
+import us.ajg0702.queue.api.events.PreQueueEvent;
 import us.ajg0702.queue.api.players.AdaptedPlayer;
 import us.ajg0702.queue.api.players.QueuePlayer;
 import us.ajg0702.queue.api.premium.Logic;
@@ -207,6 +208,14 @@ public class QueueManagerImpl implements QueueManager {
                 }
             }
         }
+
+
+        PreQueueEvent preQueueEvent = new PreQueueEvent(player, server);
+        main.call(preQueueEvent);
+        if(preQueueEvent.isCancelled()) return false;
+
+
+        // Player should be added!
 
         ImmutableList<QueuePlayer> list = server.getQueue();
         QueuePlayer queuePlayer;
