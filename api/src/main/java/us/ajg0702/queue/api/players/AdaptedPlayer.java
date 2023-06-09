@@ -56,6 +56,12 @@ public interface AdaptedPlayer extends Handle, Audience {
     String getServerName();
 
     /**
+     * Gets the server that the player is currently connected to
+     * @return The server that the player is currently connected to.
+     */
+    AdaptedServer getCurrentServer();
+
+    /**
      * Gets the player's unique id (UUID)
      * @return The player's uuid
      */

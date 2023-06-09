@@ -2,6 +2,8 @@ package us.ajg0702.queue.common;
 
 import org.spongepowered.configurate.ConfigurateException;
 import us.ajg0702.queue.api.*;
+import us.ajg0702.queue.api.events.Event;
+import us.ajg0702.queue.api.events.utils.EventReceiver;
 import us.ajg0702.queue.api.premium.Logic;
 import us.ajg0702.queue.api.premium.LogicGetter;
 import us.ajg0702.queue.api.util.QueueLogger;
@@ -12,7 +14,8 @@ import us.ajg0702.utils.common.Messages;
 import us.ajg0702.utils.common.Updater;
 
 import java.io.File;
-import java.util.LinkedHashMap;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.regex.Pattern;
 
@@ -122,6 +125,31 @@ public class QueueMain extends AjQueueAPI {
     public void shutdown() {
         taskManager.shutdown();
         updater.shutdown();
+    }
+
+
+    private final Map<Class<?>, ArrayList<EventReceiver<Event>>> listeners = new ConcurrentHashMap<>();
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public <E> void listen(Class<E> event, EventReceiver<E> handler) {
+        if(!Arrays.asList(event.getInterfaces()).contains(Event.class)) {
+            throw new IllegalArgumentException("You can only listen to ajQueue events!");
+        }
+        List<EventReceiver<Event>> existingList = listeners.computeIfAbsent(event, (k) -> new ArrayList<>());
+        existingList.add((e) -> handler.execute((E) e));
+    }
+
+    public void call(Event event) {
+        List<EventReceiver<Event>> list = listeners.computeIfAbsent(event.getClass(), (k) -> new ArrayList<>());
+        list.forEach(eventReceiver -> {
+            try {
+                eventReceiver.execute(event);
+            } catch(Exception e) {
+                logger.severe("An external plugin threw an error while handling an event (this is probably not the fault of ajQueue!)", e);
+            }
+        });
+
     }
 
     @Override
