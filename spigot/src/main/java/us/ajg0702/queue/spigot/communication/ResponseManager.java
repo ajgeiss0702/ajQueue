@@ -21,10 +21,7 @@ public class ResponseManager {
     public void executeResponse(ComResponse response) {
         ResponseKey key = new ResponseKey(response.getIdentifier(), response.getFrom());
         Consumer<ComResponse> callback = responseMap.get(key);
-        if(callback == null) {
-            System.out.println("[ajQueue] No callback for " + key + " with " + response);
-            return;
-        }
+        if(callback == null) return;
         responseMap.remove(key);
         callback.accept(response);
     }
