@@ -21,6 +21,8 @@ public class QueuePlayerImpl implements QueuePlayer {
 
     private final int maxOfflineTime;
 
+    public int lastPosition;
+
     public QueuePlayerImpl(UUID uuid, String name, QueueServer server, int highestPriority, int maxOfflineTime) {
         this(null, name, uuid, server, highestPriority, maxOfflineTime);
     }
@@ -39,6 +41,8 @@ public class QueuePlayerImpl implements QueuePlayer {
         this.name = name;
 
         this.maxOfflineTime = maxOfflineTime;
+
+        lastPosition = getPosition();
     }
 
     @Override

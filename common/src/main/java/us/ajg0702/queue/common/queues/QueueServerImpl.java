@@ -321,7 +321,11 @@ public class QueueServerImpl implements QueueServer {
 
     private void positionChange() {
         main.getTaskManager().runNow(
-                () -> queue.forEach(queuePlayer -> main.call(new PositionChangeEvent(queuePlayer)))
+                () -> queue.forEach(queuePlayer -> {
+                    if(((QueuePlayerImpl) queuePlayer).lastPosition != queuePlayer.getPosition()) {
+                        main.call(new PositionChangeEvent(queuePlayer));
+                    }
+                })
         );
     }
 
