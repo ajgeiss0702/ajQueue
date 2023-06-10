@@ -51,6 +51,7 @@ public class CommunicationManager {
         ComResponse response = handler.handleMessage(receivingPlayer, in.readUTF());
 
         if(response == null) return;
+        if(!receivingPlayer.isConnected()) return;
 
         main.getPlatformMethods().sendPluginMessage(
                 receivingPlayer,

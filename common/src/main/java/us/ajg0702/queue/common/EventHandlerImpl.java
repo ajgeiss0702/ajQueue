@@ -30,6 +30,7 @@ public class EventHandlerImpl implements EventHandler {
 
     @Override
     public void handleMessage(AdaptedPlayer receivingPlayer, byte[] data) {
+        if(!receivingPlayer.isConnected()) return;
         if(communicationManager == null) {
             communicationManager = new CommunicationManager(main);
         }
