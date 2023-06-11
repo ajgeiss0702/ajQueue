@@ -10,6 +10,7 @@ repositories {
     //mavenLocal()
     maven { url = uri("https://repo.ajg0702.us/releases/") }
     maven { url = uri("https://oss.sonatype.org/content/repositories/snapshots") }
+    maven { url = uri("https://repo.techscode.com/repository/maven-releases/") }
     mavenCentral()
 }
 
@@ -21,7 +22,7 @@ dependencies {
 
     compileOnly("com.google.guava:guava:30.1.1-jre")
 
-    compileOnly("me.TechsCode:FakeUltraPerms:1.0.2")
+    compileOnly("me.TechsCode:UltraPermissionsAPI:1.0.0")
 
     compileOnly("us.ajg0702:ajUtils:1.2.14")
 
