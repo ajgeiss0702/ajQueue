@@ -121,6 +121,7 @@ public class SpigotAPI extends AjQueueSpigotAPI {
             String responseString = response.getResponse();
             if(responseString.equals("invalid_server")) {
                 future.completeExceptionally(new IllegalArgumentException(queueName + " does not exist!"));
+                return;
             }
             future.complete(Integer.valueOf(responseString));
         });
@@ -148,6 +149,7 @@ public class SpigotAPI extends AjQueueSpigotAPI {
             String responseString = response.getResponse();
             if(responseString.equals("invalid_server")) {
                 future.completeExceptionally(new IllegalArgumentException(queueName + " does not exist!"));
+                return;
             }
             future.complete(responseString);
         });
