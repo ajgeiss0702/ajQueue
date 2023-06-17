@@ -26,7 +26,7 @@ public class PermissionList extends SubCommand {
 
     @Override
     public ImmutableList<String> getAliases() {
-        return ImmutableList.of();
+        return ImmutableList.of("permissionslist", "listpermissions", "listpermission");
     }
 
     @Override
