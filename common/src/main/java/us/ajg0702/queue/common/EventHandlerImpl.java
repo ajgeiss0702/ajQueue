@@ -108,7 +108,13 @@ public class EventHandlerImpl implements EventHandler {
                 String[] parts = s.split(":");
                 String from = parts[0];
                 QueueServer to = main.getQueueManager().findServer(parts[1]);
-                if(from.equalsIgnoreCase(serverName) && to != null) {
+                if(
+                        from.equalsIgnoreCase(serverName) && to != null &&
+                            (
+                                    !main.getConfig().getBoolean("require-queueserver-permission") ||
+                                            player.hasPermission("ajqueue.queueserver." + to.getName())
+                            )
+                ) {
                     main.getQueueManager().addToQueue(player, to);
                 }
             }

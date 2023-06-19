@@ -467,7 +467,13 @@ public class QueueManagerImpl implements QueueManager {
                         }
                         return;
                     }
-                    if(!getPlayerQueues(player).contains(to)) {
+                    if(
+                            !getPlayerQueues(player).contains(to) &&
+                                    (
+                                            !main.getConfig().getBoolean("require-queueserver-permission") ||
+                                                    player.hasPermission("ajqueue.queueserver." + to.getName())
+                                    )
+                    ) {
                         addToQueue(player, to);
                     }
                 });

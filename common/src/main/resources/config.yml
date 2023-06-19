@@ -255,18 +255,25 @@ tab-complete-queues: true
 
 # Should we have no wait time for these servers?
 # If the server is joinable, the plugin will attempt to send players who join these queues as soon as they join.
-# If the server is not immidiatly joinable, they will have to wait for the normal wait-time
+# If the server is not immediately joinable, they will have to wait for the normal wait-time
 # This also works with group
 # NOTE: Server names are caps sensitive
 send-instantly:
   - "lobbys"
 
-# After how many (unsuccessfull) attempts of sending the player should we remove them from the queue?
+# Should we require permissions for queue-servers to work?
+# If enabled, players will need to have the ajqueue.queueserver.<server> permission
+#   <server> being the target server
+# Note that this will only affect queue-servers
+#  Default: false
+require-queueserver-permission: false
+
+# After how many (unsuccessful) attempts of sending the player should we remove them from the queue?
 # Set to -1 to disable
 #  Default: 10
 max-tries: 10
 
-# Should we check to make sure that people dont get sent quicker than wait-time?
+# Should we check to make sure that people don't get sent quicker than wait-time?
 #  Default: true
 check-last-player-sent-time: true
 
