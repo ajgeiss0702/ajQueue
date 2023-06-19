@@ -118,7 +118,7 @@ public class QueueServerImpl implements QueueServer {
             return msgs.getString("status.offline.paused");
         }
 
-        if(p != null && server.isWhitelisted() && !server.getWhitelistedPlayers().contains(p.getUniqueId())) {
+        if(server.isWhitelisted() && (p == null || !server.getWhitelistedPlayers().contains(p.getUniqueId()))) {
             return msgs.getString("status.offline.whitelisted");
         }
 
@@ -154,7 +154,7 @@ public class QueueServerImpl implements QueueServer {
             return "paused";
         }
 
-        if(p != null && server.isWhitelisted() && !server.getWhitelistedPlayers().contains(p.getUniqueId())) {
+        if(server.isWhitelisted() && (p == null || !server.getWhitelistedPlayers().contains(p.getUniqueId()))) {
             return "whitelisted";
         }
 
