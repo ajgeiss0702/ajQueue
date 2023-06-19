@@ -29,8 +29,8 @@ public class PlaceholderExpansion extends me.clip.placeholderapi.expansion.Place
         placeholders.add(new PositionOf(plugin));
         placeholders.add(new Queued(plugin));
         placeholders.add(new QueuedFor(plugin));
-        placeholders.add(new Status(plugin));
         placeholders.add(new StatusPlayer(plugin));
+        placeholders.add(new Status(plugin));
 
     }
 

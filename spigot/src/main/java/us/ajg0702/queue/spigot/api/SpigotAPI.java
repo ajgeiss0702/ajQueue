@@ -142,10 +142,11 @@ public class SpigotAPI extends AjQueueSpigotAPI {
         if(p == null) throw new IllegalArgumentException("Player must be online!");
 
         String channel = player == null ? "status" : "playerstatus";
+        String id = player == null ? queueName : player + queueName;
 
         CompletableFuture<String> future = new CompletableFuture<>();
 
-        responseManager.awaitResponse(queueName, channel, response -> {
+        responseManager.awaitResponse(id, channel, response -> {
             String responseString = response.getResponse();
             if(responseString.equals("invalid_server")) {
                 future.completeExceptionally(new IllegalArgumentException(queueName + " does not exist!"));
