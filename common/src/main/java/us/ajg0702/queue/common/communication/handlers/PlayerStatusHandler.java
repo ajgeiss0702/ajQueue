@@ -17,7 +17,7 @@ public class PlayerStatusHandler extends MessageHandler {
         if(server == null) {
             return ComResponse
                     .from("playerstatus")
-                    .id(data)
+                    .id(player.getUniqueId() + data)
                     .with("invalid_server");
         }
         if(!player.isConnected() || player.getServerName() == null) return null;
