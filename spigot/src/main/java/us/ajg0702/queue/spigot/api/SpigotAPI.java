@@ -7,6 +7,7 @@ import us.ajg0702.queue.api.spigot.MessagedResponse;
 import us.ajg0702.queue.spigot.SpigotMain;
 import us.ajg0702.queue.spigot.communication.ResponseManager;
 
+import java.util.Collection;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
@@ -113,7 +114,7 @@ public class SpigotAPI extends AjQueueSpigotAPI {
 
     @Override
     public Future<Integer> getPlayersInQueue(String queueName) {
-        Player p = Bukkit.getOnlinePlayers().iterator().next();
+        Player p = getSomePlayer();
 
         CompletableFuture<Integer> future = new CompletableFuture<>();
 
@@ -138,7 +139,7 @@ public class SpigotAPI extends AjQueueSpigotAPI {
 
     @Override
     public Future<String> getServerStatusString(String queueName, UUID player) {
-        Player p = player == null ? Bukkit.getOnlinePlayers().iterator().next() : Bukkit.getPlayer(player);
+        Player p = player == null ? getSomePlayer() : Bukkit.getPlayer(player);
         if(p == null) throw new IllegalArgumentException("Player must be online!");
 
         String channel = player == null ? "status" : "playerstatus";
@@ -174,5 +175,11 @@ public class SpigotAPI extends AjQueueSpigotAPI {
         main.sendMessage(p, "estimated_time", "");
 
         return future;
+    }
+
+    private Player getSomePlayer() {
+        Collection<? extends Player> players = Bukkit.getOnlinePlayers();
+        if(players.size() == 0) return null;
+        return players.iterator().next();
     }
 }

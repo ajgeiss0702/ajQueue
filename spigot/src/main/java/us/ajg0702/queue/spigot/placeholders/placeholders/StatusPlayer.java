@@ -35,6 +35,8 @@ public class StatusPlayer extends Placeholder {
         String queue = matcher.group(1);
         UUIDStringKey key = new UUIDStringKey(p.getUniqueId(), queue);
 
+        if(!p.isOnline()) return "You aren't online!";
+
         Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
             try {
                 String response = AjQueueSpigotAPI.getInstance()
