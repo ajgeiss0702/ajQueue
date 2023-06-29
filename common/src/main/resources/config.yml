@@ -350,6 +350,12 @@ include-server-switch-in-cooldown: false
 # If ajQueue is pinging your backend servers too often, raise this number
 minimum-ping-time: 1.0
 
+# In ajQueuePlus, if your permission plugin isn't yet supported, you can use this workaround to
+#  be able to use levels 1-10 for priority, or 15, 30, 60, and 120 for stayqueued
+# If you want more levels than that, contact aj to add support for your permission plugin if possible.
+# Does nothing if you are not on ajQueuePlus, or if you have a supported permission plugin
+plus-level-fallback: false
+
 # Should we print some extra stuff to the console that might help aj diagnose some issues?
 debug: false
 
@@ -364,5 +370,5 @@ debug: false
 
 
 
-# Dont touch this number please
-config-version: 36
+# Don't touch this number please
+config-version: 37
