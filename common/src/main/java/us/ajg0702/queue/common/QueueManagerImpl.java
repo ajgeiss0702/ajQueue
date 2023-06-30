@@ -481,7 +481,7 @@ public class QueueManagerImpl implements QueueManager {
         }
         for (QueueServer s : servers) {
             for (QueuePlayer queuePlayer : s.getQueue()) {
-                AdaptedPlayer player =  queuePlayer.getPlayer();
+                AdaptedPlayer player = queuePlayer.getPlayer();
                 if (player == null || !player.isConnected()) continue;
                 if(player.getServerName() == null) continue;
                 main.getPlatformMethods().sendPluginMessage(player, "inqueueevent", "true");
