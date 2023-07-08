@@ -17,6 +17,7 @@ import us.ajg0702.utils.common.Messages;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.TimeUnit;
 
 public class QueueServerImpl implements QueueServer {
@@ -27,7 +28,7 @@ public class QueueServerImpl implements QueueServer {
 
     private final List<AdaptedServer> servers;
 
-    private final List<QueuePlayer> queue = new ArrayList<>();
+    private final List<QueuePlayer> queue = new CopyOnWriteArrayList<>();
 
     private List<Integer> supportedProtocols = new ArrayList<>();
 
