@@ -46,9 +46,7 @@ public class StatusPlayer extends Placeholder {
                 cache.put(key, response);
             } catch (InterruptedException | ExecutionException e) {
                 throw new RuntimeException(e);
-            } catch (TimeoutException e) {
-                plugin.getLogger().log(Level.WARNING, "Timed out while trying to get placeholder data from proxy: ", e);
-            }
+            } catch (TimeoutException ignored) {}
         });
 
         return cache.getOrDefault(key, "...");

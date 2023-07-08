@@ -40,9 +40,7 @@ public class EstimatedTime extends Placeholder {
                 cache.put(p.getUniqueId(), response.getEither());
             } catch (InterruptedException | ExecutionException e) {
                 throw new RuntimeException(e);
-            } catch (TimeoutException e) {
-                plugin.getLogger().log(Level.WARNING, "Timed out while trying to get placeholder data from proxy: ", e);
-            }
+            } catch (TimeoutException ignored) {}
         });
 
         return cache.getOrDefault(p.getUniqueId(), "...");
