@@ -202,7 +202,7 @@ public class QueueServerImpl implements QueueServer {
     }
 
     @Override
-    public synchronized void removePlayer(QueuePlayer player) {
+    public void removePlayer(QueuePlayer player) {
         main.getQueueManager().getSendingAttempts().remove(player);
         queue.remove(player);
         positionChange();
@@ -221,7 +221,7 @@ public class QueueServerImpl implements QueueServer {
     }
 
     @Override
-    public synchronized void addPlayer(QueuePlayer player, int position) {
+    public void addPlayer(QueuePlayer player, int position) {
         if(!player.getQueueServer().equals(this) || queue.contains(player)) return;
 
         if(position >= 0) {
@@ -291,7 +291,7 @@ public class QueueServerImpl implements QueueServer {
         return findPlayer(player.getUniqueId());
     }
     @Override
-    public synchronized QueuePlayer findPlayer(UUID uuid) {
+    public QueuePlayer findPlayer(UUID uuid) {
         for(QueuePlayer queuePlayer : queue) {
             if(queuePlayer.getUniqueId().toString().equals(uuid.toString())) {
                 return queuePlayer;
