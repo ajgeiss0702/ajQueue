@@ -1,15 +1,13 @@
 package us.ajg0702.queue.common.queues.balancers;
 
+import org.jetbrains.annotations.Nullable;
 import us.ajg0702.queue.api.players.AdaptedPlayer;
 import us.ajg0702.queue.api.queues.Balancer;
 import us.ajg0702.queue.api.queues.QueueServer;
 import us.ajg0702.queue.api.server.AdaptedServer;
-import us.ajg0702.queue.api.server.AdaptedServerPing;
 import us.ajg0702.queue.common.QueueMain;
-import us.ajg0702.queue.common.utils.Debug;
 import us.ajg0702.utils.common.GenUtils;
 
-import java.util.HashMap;
 import java.util.List;
 
 public class DefaultBalancer implements Balancer {
@@ -22,7 +20,13 @@ public class DefaultBalancer implements Balancer {
     }
 
     @Override
-    public AdaptedServer getIdealServer(AdaptedPlayer player) {
+    public AdaptedServer getIdealServer(@Nullable AdaptedPlayer player) {
+        AdaptedServer alreadyConnected;
+        if(player == null) {
+            alreadyConnected = null;
+        } else {
+            alreadyConnected = player.getCurrentServer();
+        }
         List<AdaptedServer> servers = server.getServers();
         AdaptedServer selected = null;
         int selectednum = 0;
@@ -31,6 +35,7 @@ public class DefaultBalancer implements Balancer {
         } else {
             for(AdaptedServer sv : servers) {
                 if(!sv.isOnline()) continue;
+                if(sv.equals(alreadyConnected)) continue;
                 int online = sv.getPlayerCount();
                 if(selected == null) {
                     selected = sv;
