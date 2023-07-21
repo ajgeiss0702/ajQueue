@@ -108,6 +108,12 @@ server-groups:
 balancer-types:
   - "bedwars:minigame"
 
+# If a player is in a server that is in a group and they re-queue for that group, should we allow it?
+# false - prevent player from re-queueing; say "already connected" message
+# true - let player re-queue; will send them to a server other than the one they're connected to
+#  Default: false
+allow-group-requeue: false
+
 
 # What priority should we give whitelisted players priority when the server is whitelisted?
 # This will have no effect if the server isn't whitelisted
@@ -371,4 +377,4 @@ debug: false
 
 
 # Don't touch this number please
-config-version: 37
+config-version: 38
