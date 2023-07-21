@@ -626,7 +626,9 @@ public class QueueManagerImpl implements QueueManager {
 
             // If the first person int the queue is offline or already in the server, find the next online player in the queue
             int i = 0;
-            while((nextPlayer == null || server.getServerNames().contains(nextPlayer.getServerName())) && i < server.getQueue().size()) {
+            List<String> excludableServers = new ArrayList<>(server.getServerNames());
+            if(nextQueuePlayer.getInitialServer() != null) excludableServers.remove(nextQueuePlayer.getInitialServer().getName());
+            while((nextPlayer == null || excludableServers.contains(nextPlayer.getServerName())) && i < server.getQueue().size()) {
                 if(nextPlayer != null) { // Remove them if they are already in the server
                     server.removePlayer(nextQueuePlayer);
                     if(server.getQueue().size() > i) {

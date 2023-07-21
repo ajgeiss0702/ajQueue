@@ -5,6 +5,7 @@ import org.jetbrains.annotations.Nullable;
 import us.ajg0702.queue.api.players.AdaptedPlayer;
 import us.ajg0702.queue.api.players.QueuePlayer;
 import us.ajg0702.queue.api.queues.QueueServer;
+import us.ajg0702.queue.api.server.AdaptedServer;
 
 import java.util.UUID;
 
@@ -20,6 +21,8 @@ public class QueuePlayerImpl implements QueuePlayer {
     private final String name;
 
     private final int maxOfflineTime;
+
+    private final AdaptedServer initialServer;
 
     public int lastPosition;
 
@@ -41,6 +44,8 @@ public class QueuePlayerImpl implements QueuePlayer {
         this.name = name;
 
         this.maxOfflineTime = maxOfflineTime;
+
+        initialServer = player != null ? player.getCurrentServer() : null;
 
         lastPosition = getPosition();
     }
@@ -104,6 +109,11 @@ public class QueuePlayerImpl implements QueuePlayer {
     @Override
     public int getMaxOfflineTime() {
         return maxOfflineTime;
+    }
+
+    @Override
+    public AdaptedServer getInitialServer() {
+        return initialServer;
     }
 
 
