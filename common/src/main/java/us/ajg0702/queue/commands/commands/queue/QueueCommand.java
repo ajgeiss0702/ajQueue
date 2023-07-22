@@ -8,10 +8,7 @@ import us.ajg0702.queue.commands.BaseCommand;
 import us.ajg0702.queue.common.QueueMain;
 import us.ajg0702.utils.common.Messages;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class QueueCommand extends BaseCommand {
@@ -92,7 +89,7 @@ public class QueueCommand extends BaseCommand {
     @Override
     public List<String> autoComplete(ICommandSender sender, String[] args) {
         if(!main.getConfig().getBoolean("tab-complete-queues")) {
-            return new ArrayList<>();
+            return Collections.emptyList();
         }
         if(args.length == 1) {
             List<String> servers = filterCompletion(main.getQueueManager().getServerNames(), args[0]);
@@ -101,6 +98,6 @@ public class QueueCommand extends BaseCommand {
             }
             return servers;
         }
-        return new ArrayList<>();
+        return Collections.emptyList();
     }
 }

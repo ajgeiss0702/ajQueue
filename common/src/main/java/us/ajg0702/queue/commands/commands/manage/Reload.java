@@ -9,7 +9,7 @@ import us.ajg0702.queue.commands.SubCommand;
 import us.ajg0702.queue.common.QueueMain;
 import us.ajg0702.utils.common.Messages;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class Reload extends SubCommand {
@@ -63,6 +63,6 @@ public class Reload extends SubCommand {
 
     @Override
     public List<String> autoComplete(ICommandSender sender, String[] args) {
-        return new ArrayList<>();
+        return Collections.emptyList();
     }
 }

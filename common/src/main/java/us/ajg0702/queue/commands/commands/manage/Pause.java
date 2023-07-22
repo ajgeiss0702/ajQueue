@@ -77,11 +77,11 @@ public class Pause extends SubCommand {
         if(args.length == 1) {
             List<String> servers = new ArrayList<>(main.getQueueManager().getServerNames());
             servers.add("all");
-            return servers;
+            return filterCompletion(servers, args[0]);
         }
         if(args.length == 2) {
-            return Arrays.asList("on", "off", "true", "false");
+            return filterCompletion(Arrays.asList("on", "off", "true", "false"), args[1]);
         }
-        return new ArrayList<>();
+        return Collections.emptyList();
     }
 }

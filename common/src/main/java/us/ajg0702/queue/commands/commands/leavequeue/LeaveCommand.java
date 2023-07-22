@@ -11,6 +11,7 @@ import us.ajg0702.queue.common.QueueMain;
 import us.ajg0702.utils.common.Messages;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class LeaveCommand extends BaseCommand {
@@ -105,11 +106,12 @@ public class LeaveCommand extends BaseCommand {
 
     @Override
     public List<String> autoComplete(ICommandSender sender, String[] args) {
+        if(args.length > 1) return Collections.emptyList();
         List<QueuePlayer> servers = main.getQueueManager().findPlayerInQueues(main.getPlatformMethods().senderToPlayer(sender));
         List<String> serverNames = new ArrayList<>();
         for(QueuePlayer queuePlayer : servers) {
             serverNames.add(queuePlayer.getQueueServer().getName());
         }
-        return serverNames;
+        return filterCompletion(serverNames, args[0]);
     }
 }
