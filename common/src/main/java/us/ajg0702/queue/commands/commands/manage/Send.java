@@ -10,6 +10,7 @@ import us.ajg0702.queue.common.QueueMain;
 import us.ajg0702.utils.common.Messages;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class Send extends SubCommand {
@@ -93,12 +94,12 @@ public class Send extends SubCommand {
         if(args.length == 1) {
             List<String> options = new ArrayList<>(main.getPlatformMethods().getServerNames());
             options.addAll(main.getPlatformMethods().getPlayerNames(false));
-            return options;
+            return filterCompletion(options, args[0]);
         }
         if(args.length == 2) {
-            return main.getQueueManager().getServerNames();
+            return filterCompletion(main.getQueueManager().getServerNames(), args[1]);
         }
-        return new ArrayList<>();
+        return Collections.emptyList();
     }
 
 

@@ -104,6 +104,6 @@ public class ManageCommand extends BaseCommand {
             commands.add(subCommand.getName());
             commands.addAll(subCommand.getAliases());
         }
-        return commands;
+        return filterCompletion(commands, args[0]);
     }
 }
