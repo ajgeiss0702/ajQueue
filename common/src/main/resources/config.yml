@@ -129,6 +129,7 @@ give-pausedbypass-players-priority: 0
 
 # What priority should we give players that are able to bypass full servers priority when the server is full?
 # This will have no effect if the server isn't full
+# If you are using make-room, this also applies to that
 # If you set to 0, this will be disabled
 # If you have the free version, set it to 1 to enable
 give-fulljoin-players-priority: 0
@@ -279,6 +280,27 @@ require-queueserver-permission: false
 #  Default: 10
 max-tries: 10
 
+
+# Should we enable the ajqueue.make-room permission?
+# The make-room permission will force there to be room in a server.
+#  So, if a player with this permission queues for a server and has this permission,
+#   someone from the server will be moved to the lobby to make room
+# This can be further configured using the next few options
+#  Default: false
+enable-make-room-permission: false
+
+# What server should the make-room permission move players to?
+#  Default: lobby
+make-room-kick-to: lobby
+
+# For the make-room permission, players with the lowest priority are kicked first.
+# Of those players, this option decides which to kick.
+#  true - kick players who have been on the server the longest
+#  false - kick players who have been on nthe server the shortest
+#  Default: true
+make-room-kick-longest-playtime: true
+
+
 # Should we check to make sure that people don't get sent quicker than wait-time?
 #  Default: true
 check-last-player-sent-time: true
@@ -377,4 +399,4 @@ debug: false
 
 
 # Don't touch this number please
-config-version: 38
+config-version: 39

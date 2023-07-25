@@ -27,6 +27,14 @@ public class QueueMain extends AjQueueAPI {
     }
 
     private double timeBetweenPlayers;
+
+    protected ServerTimeManagerImpl serverTimeManager = new ServerTimeManagerImpl();
+
+    @Override
+    public ServerTimeManager getServerTimeManager() {
+        return serverTimeManager;
+    }
+
     @Override
     public double getTimeBetweenPlayers() {
         return timeBetweenPlayers;
@@ -230,6 +238,7 @@ public class QueueMain extends AjQueueAPI {
         d.put("status.now-in-queue", "&aYou are now queued for {SERVER}! &7You are in position &f{POS}&7 of &f{LEN}&7.\n&7Type &f/leavequeue&7 or &f<click:run_command:/leavequeue {SERVERNAME}>click here</click>&7 to leave the queue!");
         d.put("status.now-in-empty-queue", "");
         d.put("status.sending-now", "&aSending you to &f{SERVER} &anow..");
+        d.put("status.making-room", "<gold>Making room for you..");
 
         d.put("errors.server-not-exist", "&cThe server {SERVER} does not exist!");
         d.put("errors.already-queued", "&cYou are already queued for that server!");
@@ -241,6 +250,10 @@ public class QueueMain extends AjQueueAPI {
         d.put("errors.wrong-version.or", " or ");
         d.put("errors.wrong-version.comma", ", ");
         d.put("errors.too-fast-queue", "<red>You're queueing too fast!");
+        d.put("errors.kicked-to-make-room", "<red>You were moved to the lobby to make room for another player.");
+        d.put("errors.make-room-failed.player", "<red>Failed to make room for you in that server.");
+        d.put("errors.make-room-failed.admin", "<red>Failed to make room for you in that server. Check the console for more information.");
+
 
         d.put("commands.leave-queue", "&aYou left the queue for {SERVER}!");
         d.put("commands.reload", "&aConfig and messages reloaded successfully!");

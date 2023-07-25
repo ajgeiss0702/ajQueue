@@ -41,6 +41,12 @@ public abstract class AjQueueAPI {
     public abstract void setTimeBetweenPlayers();
 
     /**
+     * Gets the server time manager instance, which tracks when players last changed servers
+     * @return The server time manager instance
+     */
+    public abstract ServerTimeManager getServerTimeManager();
+
+    /**
      * Gets the ajQueue config
      * @return the ajQueue config
      */
