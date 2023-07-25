@@ -59,7 +59,12 @@ public interface Logic {
         }
 
         if(fulljoinPriority > 0) {
-            if(server.isFull() && server.canJoinFull(player)) {
+            if(server.isFull() && (server.canJoinFull(player) ||
+                    (
+                            player.hasPermission("ajqueue.make-room") &&
+                                    AjQueueAPI.getInstance().getConfig().getBoolean("enable-make-room-permission")
+                    )
+            )) {
                 highest = Math.max(highest, fulljoinPriority);
             }
         }

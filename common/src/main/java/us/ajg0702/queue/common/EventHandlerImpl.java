@@ -58,6 +58,8 @@ public class EventHandlerImpl implements EventHandler {
         if(queues.size() > 0) {
             main.getQueueManager().sendMessage(main.getQueueManager().getSingleServer(player).findPlayer(player));
         }
+
+        main.serverTimeManager.playerChanged(player);
     }
 
     @Override
@@ -77,6 +79,7 @@ public class EventHandlerImpl implements EventHandler {
         }
         main.getQueueManager().clear(player);
         QueueCommand.cooldowns.remove(player);
+        main.serverTimeManager.removePlayer(player);
     }
 
     @Override
@@ -119,6 +122,8 @@ public class EventHandlerImpl implements EventHandler {
                 }
             }
         }
+
+        main.serverTimeManager.playerChanged(player);
 
     }
 

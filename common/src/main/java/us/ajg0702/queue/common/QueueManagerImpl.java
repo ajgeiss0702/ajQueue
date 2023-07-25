@@ -660,7 +660,93 @@ public class QueueManagerImpl implements QueueManager {
 
             if(!server.canAccess(nextPlayer)) continue;
 
-            if(selected.isFull() && !selected.canJoinFull(nextPlayer)) continue;
+            if(
+                    selected.isFull() &&
+                            !selected.canJoinFull(nextPlayer) &&
+                            !(
+                                    nextPlayer.hasPermission("ajqueue.make-room") &&
+                                            main.getConfig().getBoolean("enable-make-room-permission")
+                            )
+            ) continue;
+
+
+            // ajqueue.make-room logic
+            if(
+                    selected.isFull() &&
+                            !selected.canJoinFull(nextPlayer) &&
+                            main.getConfig().getBoolean("enable-make-room-permission") &&
+                            nextPlayer.hasPermission("ajqueue.make-room") &&
+                            !server.isGroup()
+            ) {
+                List<AdaptedPlayer> players = selected.getPlayers();
+
+                // first, we need to find what the lowest priority on the server is
+                int lowestPriority = Integer.MAX_VALUE;
+                for (AdaptedPlayer player : players) {
+                    int priority = main.getLogic().getPermissionGetter().getPriority(player);
+                    if(priority < lowestPriority) lowestPriority = priority;
+                }
+
+                boolean kickLongest = main.getConfig().getBoolean("make-room-kick-longest-playtime");
+
+                long selectedTime = kickLongest ? Long.MAX_VALUE : 0;
+                AdaptedPlayer selectedPlayer = null;
+                for (AdaptedPlayer player : players) {
+                    long switchTime = main.getServerTimeManager().getLastServerChange(player);
+                    if(selectedPlayer == null) {
+                        selectedPlayer = player;
+                        selectedTime = switchTime;
+                        continue;
+                    }
+                    if(kickLongest) {
+                        if(switchTime < selectedTime) {
+                            selectedTime = switchTime;
+                            selectedPlayer = player;
+                        }
+                    } else {
+                        if(switchTime > selectedTime) {
+                            selectedTime = switchTime;
+                            selectedPlayer = player;
+                        }
+                    }
+                }
+
+
+                if(selectedPlayer == null) {
+                    main.getLogger().warn(
+                            "Unable to find player to kick from " + selected.getName() + " " +
+                                    "to let " + nextPlayer.getName() + "join!"
+                    );
+                } else {
+                    Debug.info(
+                            "Selected " + selectedPlayer.getName() + " " +
+                                    "to make room for " + nextPlayer.getName() + " in " + selected.getName()
+                    );
+                    String kickToName = main.getConfig().getString("make-room-kick-to");
+                    AdaptedServer kickTo = main.getPlatformMethods().getServer(kickToName);
+                    if(kickTo == null) {
+                        main.getLogger().warn(
+                                "Unable to make room due to '" + kickToName + "' not existing! " +
+                                        "Please configure make-room-kick-to in the config"
+                        );
+                        boolean isAdmin = nextPlayer.hasPermission("ajqueue.manage");
+                        nextPlayer.sendMessage(
+                                main.getMessages().getComponent(
+                                        isAdmin ? "errors.make-room-failed.admin" : "errors.make-room-failed.player"
+                                )
+                        );
+                    } else {
+                        selectedPlayer.connect(kickTo);
+                        selectedPlayer.sendMessage(main.getMessages().getComponent("errors.kicked-to-make-room"));
+
+                        if(main.getTimeBetweenPlayers() >= 1d) {
+                            nextPlayer.sendMessage(main.getMessages().getComponent("status.making-room"));
+                        }
+
+                        continue;
+                    }
+                }
+            }
 
             if(main.getConfig().getBoolean("enable-bypasspaused-permission")) {
                 if(server.isPaused() && !nextPlayer.hasPermission("ajqueue.bypasspaused")) continue;
