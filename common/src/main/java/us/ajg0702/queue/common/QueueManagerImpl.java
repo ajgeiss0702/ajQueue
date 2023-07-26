@@ -692,6 +692,8 @@ public class QueueManagerImpl implements QueueManager {
                 long selectedTime = kickLongest ? Long.MAX_VALUE : 0;
                 AdaptedPlayer selectedPlayer = null;
                 for (AdaptedPlayer player : players) {
+                    int priority = main.getLogic().getPermissionGetter().getPriority(player);
+                    if(priority > lowestPriority) continue; // dont select players with higher priorities
                     long switchTime = main.getServerTimeManager().getLastServerChange(player);
                     if(selectedPlayer == null) {
                         selectedPlayer = player;
