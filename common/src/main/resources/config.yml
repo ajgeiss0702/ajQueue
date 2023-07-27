@@ -326,43 +326,6 @@ priority-queue-debug: false
 supported-protocols:
   - "1.17:755,756"
 
-# These are the protocol names the plugin should use.
-# If you are on velocity, if the protocol is not listed here then the velocity
-#  api will be used to find the name of the protocol.
-# If you are on bungee, only this list can be used.
-protocol-names:
-  - "757:1.18.1"
-  - "756:1.17.1"
-  - "755:1.17"
-  - "754:1.16.5"
-  - "753:1.16.3"
-  - "751:1.16.2"
-  - "736:1.16.1"
-  - "735:1.16"
-  - "578:1.15.2"
-  - "575:1.15.1"
-  - "573:1.15"
-  - "498:1.14.4"
-  - "490:1.14.3"
-  - "485:1.14.2"
-  - "480:1.14.1"
-  - "477:1.14"
-  - "404:1.13.2"
-  - "401:1.13.1"
-  - "393:1.13"
-  - "340:1.12.2"
-  - "338:1.12.1"
-  - "335:1.12"
-  - "316:1.11.2"
-  - "315:1.11"
-  - "210:1.10.2"
-  - "110:1.9.4"
-  - "109:1.9.2"
-  - "108:1.9.1"
-  - "107:1.9"
-  - "47:1.8.9"
-  - "5:1.7.10"
-
 # Should the updater be enabled?
 enable-updater: true
 
@@ -404,4 +367,9 @@ debug: false
 
 
 # Don't touch this number please
-config-version: 40
+config-version: 41
+
+
+# This is ONLY here so that they can be moved to messages.yml. Please edit these in messages.yml!
+protocol-names: []
+# ^ only edit these in messages.yml
