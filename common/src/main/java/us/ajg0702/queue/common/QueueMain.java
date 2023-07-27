@@ -239,6 +239,7 @@ public class QueueMain extends AjQueueAPI {
         d.put("status.now-in-empty-queue", "");
         d.put("status.sending-now", "&aSending you to &f{SERVER} &anow..");
         d.put("status.making-room", "<gold>Making room for you..");
+        d.put("status.priority-increased", "<gold>You now have higher priority! <green>Moving you up in the queue..");
 
         d.put("errors.server-not-exist", "&cThe server {SERVER} does not exist!");
         d.put("errors.already-queued", "&cYou are already queued for that server!");

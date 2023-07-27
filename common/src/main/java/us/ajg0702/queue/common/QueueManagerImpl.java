@@ -447,6 +447,7 @@ public class QueueManagerImpl implements QueueManager {
     }
 
     protected final Map<AdaptedPlayer, Long> pausedAntiSpam = new ConcurrentHashMap<>();
+    private boolean skipPriorityCheck = true;
 
     @Override
     public void sendQueueEvents() {
@@ -487,6 +488,27 @@ public class QueueManagerImpl implements QueueManager {
                 if (player == null || !player.isConnected()) continue;
                 if(player.getServerName() == null) continue;
                 main.getPlatformMethods().sendPluginMessage(player, "inqueueevent", "true");
+            }
+        }
+        if(main.getConfig().getBoolean("re-check-priority")) {
+            if(skipPriorityCheck) {
+                skipPriorityCheck = false;
+            } else {
+                for (QueueServer server : servers) {
+                    for (QueuePlayer queuePlayer : server.getQueue()) {
+                        if(queuePlayer.getPlayer() == null) continue;
+                        AdaptedPlayer player = queuePlayer.getPlayer();
+                        AdaptedServer ideal = server.getIdealServer(player);
+
+                        int currentHighestPriority = main.getLogic().getHighestPriority(server, ideal, player);
+                        if(queuePlayer.getPriority() >= currentHighestPriority) continue;
+
+                        player.sendMessage(main.getMessages().getComponent("status.priority-increased"));
+
+                        server.removePlayer(queuePlayer);
+                        addToQueue(player, server);
+                    }
+                }
             }
         }
     }
@@ -683,7 +705,7 @@ public class QueueManagerImpl implements QueueManager {
                 // first, we need to find what the lowest priority on the server is
                 int lowestPriority = Integer.MAX_VALUE;
                 for (AdaptedPlayer player : players) {
-                    int priority = main.getLogic().getPermissionGetter().getPriority(player);
+                    int priority = main.getLogic().getHighestPriority(server, selected, player);
                     if(priority < lowestPriority) lowestPriority = priority;
                 }
 
@@ -692,8 +714,8 @@ public class QueueManagerImpl implements QueueManager {
                 long selectedTime = kickLongest ? Long.MAX_VALUE : 0;
                 AdaptedPlayer selectedPlayer = null;
                 for (AdaptedPlayer player : players) {
-                    int priority = main.getLogic().getPermissionGetter().getPriority(player);
-                    if(priority > lowestPriority) continue; // dont select players with higher priorities
+                    int priority = main.getLogic().getHighestPriority(server, selected, player);
+                    if(priority > lowestPriority) continue; // don't select players with higher priorities
                     long switchTime = main.getServerTimeManager().getLastServerChange(player);
                     if(selectedPlayer == null) {
                         selectedPlayer = player;

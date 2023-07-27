@@ -38,6 +38,8 @@ public interface Logic {
      */
     PermissionGetter getPermissionGetter();
 
+    int getHighestPriority(QueueServer queueServer, AdaptedServer server, AdaptedPlayer player);
+
     static int getUnJoinablePriorities(QueueServer queueServer, AdaptedServer server, AdaptedPlayer player) {
         Config config = AjQueueAPI.getInstance().getConfig();
         int highest = 0;
