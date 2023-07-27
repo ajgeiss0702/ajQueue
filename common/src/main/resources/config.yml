@@ -301,6 +301,11 @@ make-room-kick-to: lobby
 make-room-kick-longest-playtime: true
 
 
+# Should we check every 4 seconds if a player has a higher priority permission than before
+# If they do, they are removed and re-added to the queue (only if they would be put in a higher position)
+#  Default: false
+re-check-priority: false
+
 # Should we check to make sure that people don't get sent quicker than wait-time?
 #  Default: true
 check-last-player-sent-time: true
@@ -399,4 +404,4 @@ debug: false
 
 
 # Don't touch this number please
-config-version: 39
+config-version: 40

@@ -29,6 +29,11 @@ public class FreeLogic implements Logic {
     }
 
     @Override
+    public int getHighestPriority(QueueServer queueServer, AdaptedServer server, AdaptedPlayer player) {
+        return player.hasPermission("ajqueue.priority") ? 1 : 0;
+    }
+
+    @Override
     public boolean hasAnyBypass(AdaptedPlayer player, String server) {
         return false;
     }
