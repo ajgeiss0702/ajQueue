@@ -598,9 +598,10 @@ public class QueueManagerImpl implements QueueManager {
 
     final ConcurrentHashMap<AdaptedPlayer, Long> sendingNowAntiSpam = new ConcurrentHashMap<>();
     final Map<QueuePlayer, Integer> sendingAttempts = new WeakHashMap<>();
+    final Map<QueuePlayer, Long> makeRoomAntispam = new WeakHashMap<>();
 
     @Override
-    public void sendPlayers(QueueServer queueServer) {
+    public synchronized void sendPlayers(QueueServer queueServer) {
         List<QueueServer> sendingServers;
         if(queueServer == null) {
             sendingServers = new ArrayList<>(servers);
@@ -633,7 +634,10 @@ public class QueueManagerImpl implements QueueManager {
                         continue;
                     }
 
-                    if(selected.isFull() && !selected.canJoinFull(p.getPlayer())) continue;
+                    if(
+                            (selected.isFull() && !selected.canJoinFull(player)) ||
+                                    (server.isManuallyFull() && !AdaptedServer.canJoinFull(player, server.getName()))
+                    ) continue;
 
                     player.sendMessage(msgs.getComponent("status.sending-now", "SERVER:"+server.getAlias()));
                     Debug.info("Calling player.connect for " + player.getName() + "(send when back online)");
@@ -683,23 +687,33 @@ public class QueueManagerImpl implements QueueManager {
             if(!server.canAccess(nextPlayer)) continue;
 
             if(
-                    selected.isFull() &&
-                            !selected.canJoinFull(nextPlayer) &&
+                    (
+                            (selected.isFull() && !selected.canJoinFull(nextPlayer)) ||
+                            (server.isManuallyFull() && !AdaptedServer.canJoinFull(nextPlayer, server.getName()))
+                    ) &&
                             !(
                                     nextPlayer.hasPermission("ajqueue.make-room") &&
-                                            main.getConfig().getBoolean("enable-make-room-permission")
+                                            main.getConfig().getBoolean("enable-make-room-permission") &&
+                                            (!server.isGroup() || server.isManuallyFull()) // only use make-room on groups if the server is manually full
                             )
             ) continue;
 
 
             // ajqueue.make-room logic
             if(
-                    selected.isFull() &&
-                            !selected.canJoinFull(nextPlayer) &&
+                    (
+                            (selected.isFull() && !selected.canJoinFull(nextPlayer)) ||
+                                    (server.isManuallyFull() && !AdaptedServer.canJoinFull(nextPlayer, server.getName()))
+                    ) &&
                             main.getConfig().getBoolean("enable-make-room-permission") &&
                             nextPlayer.hasPermission("ajqueue.make-room") &&
-                            !server.isGroup()
+                            (!server.isGroup() || server.isManuallyFull()) && // only use make-room on groups if the server is manually full
+                            ( // don't make room more than the minimum ping time
+                                    System.currentTimeMillis() - makeRoomAntispam.getOrDefault(nextQueuePlayer, 0L)
+                                            >= (main.getConfig().getDouble("minimum-ping-time") * 1e3)
+                            )
             ) {
+                makeRoomAntispam.put(nextQueuePlayer, System.currentTimeMillis());
                 List<AdaptedPlayer> players = selected.getPlayers();
 
                 // first, we need to find what the lowest priority on the server is

@@ -91,6 +91,14 @@ queue-servers:
 #  Default: true
 kick-kicked-players: true
 
+# This option allows you to manually set player caps for servers
+# Note that this does NOT override the player cap returned by the server.
+#  Format: - '<server>:<max-players>'
+#  Example: - 'lobbys:50'
+# The example above will limit the lobbys group to have a total of 50 players.
+# This works on both groups and individual servers
+manual-max-players: []
+
 
 # Server groups are a group of servers that you can queue for. It will send you to the server that is the least full.
 # If all servers in the group are full, it will act the same as it would when a single server is full.
@@ -101,10 +109,12 @@ server-groups:
 
 # What balancer should we use for groups?
 # If a group is not specified here, then the default one is used
-# Example entry: - "bedwars:minigame"
+#  Example: - "bedwars:minigame"
+# The example above will set the bedwars group to use the minigame balancer
 # Balancers:
 #  default - Will send the player to the server in the group with the least number of players
 #  minigame - Will send the player to the server with the most players, until that server is full, which it will then send to the next server
+#  first - Will send the player to the first available server in the group (as long as it is joinable)
 balancer-types:
   - "bedwars:minigame"
 
@@ -211,12 +221,12 @@ wait-to-load-servers: false
 
 # How long should we wait after the server finishes loading to load the server list?
 # Only works if the above is enabled.
-# This is in miliseconds so 1000 = 1 second
+# This is in milliseconds so 1000 = 1 second
 #  Default: 500
 wait-to-load-servers-delay: 500
 
 # How often (in seconds) we should check for new servers to add queues for.
-# If you dynamicly add servers, set this to something other than 0.
+# If you dynamically add servers, set this to something other than 0.
 # To disable, set to 0
 #  Default: 0
 reload-servers-interval: 0
@@ -296,7 +306,7 @@ make-room-kick-to: lobby
 # For the make-room permission, players with the lowest priority are kicked first.
 # Of those players, this option decides which to kick.
 #  true - kick players who have been on the server the longest
-#  false - kick players who have been on nthe server the shortest
+#  false - kick players who have been on the server the shortest
 #  Default: true
 make-room-kick-longest-playtime: true
 
@@ -367,7 +377,7 @@ debug: false
 
 
 # Don't touch this number please
-config-version: 41
+config-version: 42
 
 
 # This is ONLY here so that they can be moved to messages.yml. Please edit these in messages.yml!

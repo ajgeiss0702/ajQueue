@@ -61,12 +61,10 @@ public interface Logic {
         }
 
         if(fulljoinPriority > 0) {
-            if(server.isFull() && (server.canJoinFull(player) ||
-                    (
-                            player.hasPermission("ajqueue.make-room") &&
-                                    AjQueueAPI.getInstance().getConfig().getBoolean("enable-make-room-permission")
-                    )
-            )) {
+            boolean hasMakeRoom = player.hasPermission("ajqueue.make-room") && AjQueueAPI.getInstance().getConfig().getBoolean("enable-make-room-permission");
+            if(
+                    (server.isFull() && (server.canJoinFull(player) || hasMakeRoom)) ||
+                            (queueServer.isManuallyFull() && (AdaptedServer.canJoinFull(player, queueServer.getName()) || hasMakeRoom))) {
                 highest = Math.max(highest, fulljoinPriority);
             }
         }

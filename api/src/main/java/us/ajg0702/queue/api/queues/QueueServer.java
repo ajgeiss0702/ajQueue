@@ -4,9 +4,7 @@ import com.google.common.collect.ImmutableList;
 import us.ajg0702.queue.api.players.AdaptedPlayer;
 import us.ajg0702.queue.api.players.QueuePlayer;
 import us.ajg0702.queue.api.server.AdaptedServer;
-import us.ajg0702.queue.api.server.AdaptedServerPing;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
@@ -68,6 +66,18 @@ public interface QueueServer {
      * @return If the server is joinable
      */
     boolean isJoinable(AdaptedPlayer p);
+
+    /**
+     * Gets the manually-set max player count for this server/group
+     * @return The manually-set max player count
+     */
+    int getManualMaxPlayers();
+
+    /**
+     * Checks if the total number of players in this server/group is above the manually-set max player count
+     * @return If the server is at or above the manually-set player limit
+     */
+    boolean isManuallyFull();
 
     /**
      * Pauses or unpauses a server
