@@ -9,7 +9,6 @@ import us.ajg0702.queue.api.server.AdaptedServer;
 import us.ajg0702.queue.api.server.AdaptedServerInfo;
 import us.ajg0702.queue.api.server.AdaptedServerPing;
 import us.ajg0702.queue.api.util.QueueLogger;
-import us.ajg0702.queue.common.utils.Debug;
 import us.ajg0702.queue.platforms.velocity.players.VelocityPlayer;
 
 import java.util.ArrayList;
@@ -111,19 +110,6 @@ public class VelocityServer implements AdaptedServer {
     @Override
     public int getOfflineTime() {
         return offlineTime;
-    }
-
-    @Override
-    public boolean canJoinFull(AdaptedPlayer player) {
-        if(player == null) return true;
-        Debug.info("on "+getName());
-        return
-                player.hasPermission("ajqueue.joinfull") ||
-                        player.hasPermission("ajqueue.joinfullserver."+getName()) ||
-                        player.hasPermission("ajqueue.joinfullandbypassserver."+getName()) ||
-                        player.hasPermission("ajqueue.joinfullandbypass") ||
-                        (AjQueueAPI.getInstance().isPremium() && AjQueueAPI.getInstance().getLogic().getPermissionGetter().hasUniqueFullBypass(player, getName()))
-                ;
     }
 
     @Override

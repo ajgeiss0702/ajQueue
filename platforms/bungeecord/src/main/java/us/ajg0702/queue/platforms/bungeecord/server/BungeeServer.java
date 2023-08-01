@@ -106,17 +106,6 @@ public class BungeeServer implements AdaptedServer {
         return offlineTime;
     }
 
-    @Override
-    public boolean canJoinFull(AdaptedPlayer player) {
-        if(player == null) return true;
-        return
-                player.hasPermission("ajqueue.joinfull") ||
-                        player.hasPermission("ajqueue.joinfullserver."+getName()) ||
-                        player.hasPermission("ajqueue.joinfullandbypassserver."+getName()) ||
-                        player.hasPermission("ajqueue.joinfullandbypass") ||
-                        (AjQueueAPI.getInstance().isPremium() && AjQueueAPI.getInstance().getLogic().getPermissionGetter().hasUniqueFullBypass(player, getName()))
-                ;
-    }
 
     @Override
     public boolean justWentOnline() {

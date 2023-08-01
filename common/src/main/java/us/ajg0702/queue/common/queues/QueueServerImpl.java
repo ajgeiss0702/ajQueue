@@ -11,14 +11,13 @@ import us.ajg0702.queue.api.server.AdaptedServerPing;
 import us.ajg0702.queue.common.QueueMain;
 import us.ajg0702.queue.common.players.QueuePlayerImpl;
 import us.ajg0702.queue.common.queues.balancers.DefaultBalancer;
+import us.ajg0702.queue.common.queues.balancers.FirstBalancer;
 import us.ajg0702.queue.common.queues.balancers.MinigameBalancer;
 import us.ajg0702.queue.common.utils.Debug;
 import us.ajg0702.utils.common.Messages;
 
 import java.util.*;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.concurrent.TimeUnit;
 
 public class QueueServerImpl implements QueueServer {
 
@@ -38,6 +37,9 @@ public class QueueServerImpl implements QueueServer {
 
     private long lastSentTime = 0;
 
+    private int manualMaxPlayers = Integer.MAX_VALUE;
+
+
     public QueueServerImpl(String name, QueueMain main, AdaptedServer server, List<QueuePlayer> previousPlayers) {
         this(name, main, Collections.singletonList(server), previousPlayers);
     }
@@ -55,10 +57,12 @@ public class QueueServerImpl implements QueueServer {
             String balancerType = type.substring(colon+1);
 
             if(groupName.equals(name)) {
-                //noinspection SwitchStatementWithTooFewBranches
                 switch(balancerType.toLowerCase(Locale.ROOT)) {
                     case "minigame":
                         balancer = new MinigameBalancer(this, main);
+                        break;
+                    case "first":
+                        balancer = new FirstBalancer(this, main);
                         break;
                     default:
                         balancerType = "default";
@@ -71,6 +75,26 @@ public class QueueServerImpl implements QueueServer {
         if(balancer == null) {
             balancer = new DefaultBalancer(this, main);
             Debug.info("Using default balancer for "+name);
+        }
+
+        List<String> manualLimits = main.getConfig().getStringList("manual-max-players");
+        for (String manualLimit : manualLimits) {
+            String[] parts = manualLimit.split(":");
+            if(parts.length != 2) {
+                main.getLogger().warn("Invalid manual limit: " + manualLimit);
+                continue;
+            }
+            String limitFor = parts[0];
+
+            if(!limitFor.equals(name)) continue;
+
+            String limitStr = parts[1];
+            try {
+                manualMaxPlayers = Integer.parseInt(limitStr);
+            } catch(NumberFormatException e) {
+                main.getLogger().warn("Invalid limit number for " + limitFor);
+            }
+            break;
         }
 
         for(QueuePlayer queuePlayer : previousPlayers) {
@@ -123,7 +147,7 @@ public class QueueServerImpl implements QueueServer {
             return msgs.getString("status.offline.whitelisted");
         }
 
-        if(server.isFull() && !server.canJoinFull(p)) {
+        if((server.isFull() && !server.canJoinFull(p)) || (isManuallyFull() && !AdaptedServer.canJoinFull(p, getName()))) {
             return msgs.getString("status.offline.full");
         }
 
@@ -159,7 +183,7 @@ public class QueueServerImpl implements QueueServer {
             return "whitelisted";
         }
 
-        if(server.isFull() && !server.canJoinFull(p)) {
+        if(((server.isFull() && !server.canJoinFull(p)) || (isManuallyFull() && !AdaptedServer.canJoinFull(p, getName())))) {
             return "full";
         }
 
@@ -186,9 +210,29 @@ public class QueueServerImpl implements QueueServer {
 
     @Override
     public boolean isJoinable(AdaptedPlayer p) {
+        if(isManuallyFull() && !AdaptedServer.canJoinFull(p, getName())) return false;
         AdaptedServer server = getIdealServer(p);
         if(server == null) return false;
         return server.isJoinable(p) && !isPaused();
+    }
+
+    @Override
+    public int getManualMaxPlayers() {
+        return manualMaxPlayers;
+    }
+
+    @Override
+    public boolean isManuallyFull() {
+        int total = 0;
+        for (AdaptedServer server : servers) {
+            Optional<AdaptedServerPing> lastPing = server.getLastPing();
+            if(!lastPing.isPresent()) continue;
+            total += lastPing.get().getPlayerCount();
+        }
+
+//        Debug.info(total + " >= " + getManualMaxPlayers() + " = " + (total >= getManualMaxPlayers()));
+
+        return total >= getManualMaxPlayers();
     }
 
     @Override
@@ -270,6 +314,11 @@ public class QueueServerImpl implements QueueServer {
             names.add(server.getName());
         }
         return ImmutableList.copyOf(names);
+    }
+
+    @Override
+    public boolean isOnline() {
+        return QueueServer.super.isOnline();
     }
 
     @Override
