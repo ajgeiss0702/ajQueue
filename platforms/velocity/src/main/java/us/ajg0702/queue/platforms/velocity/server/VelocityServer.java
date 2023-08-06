@@ -118,6 +118,11 @@ public class VelocityServer implements AdaptedServer {
     }
 
     @Override
+    public boolean shouldWaitAfterOnline() {
+        return System.currentTimeMillis()-lastOffline <= (AjQueueAPI.getInstance().getConfig().getDouble("wait-after-online") * 2 * 1000) && getLastPing().isPresent();
+    }
+
+    @Override
     public RegisteredServer getHandle() {
         return handle;
     }

@@ -89,13 +89,15 @@ public interface AdaptedServer extends Handle {
     }
 
     /**
-     * Gets if the last ping was successfull
+     * Gets if the last ping was successful
      * (which almost always means the server is online)
      * @return If the server is determined to be online or not
      */
     default boolean isOnline() {
-        return getLastPing().isPresent();
+        return getLastPing().isPresent() && !shouldWaitAfterOnline();
     }
+
+    boolean shouldWaitAfterOnline();
 
     /**
      * Gets the number of players currently online
