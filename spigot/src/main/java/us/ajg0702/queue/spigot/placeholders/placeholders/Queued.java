@@ -32,6 +32,7 @@ public class Queued extends Placeholder {
     @Override
     public String parse(Matcher matcher, OfflinePlayer p) {
         Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+            if(!p.isOnline()) return;
             try {
                 MessagedResponse<String> response = AjQueueSpigotAPI.getInstance()
                         .getQueueName(p.getUniqueId())
