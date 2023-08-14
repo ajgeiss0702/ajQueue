@@ -38,6 +38,7 @@ public class StatusPlayer extends Placeholder {
         if(!p.isOnline()) return "You aren't online!";
 
         Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+            if(!p.isOnline()) return;
             try {
                 String response = AjQueueSpigotAPI.getInstance()
                         .getServerStatusString(queue, p.getUniqueId())

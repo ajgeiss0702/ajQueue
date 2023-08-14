@@ -35,6 +35,7 @@ public class Status extends Placeholder {
         String cached = cache.getOrDefault(queue, "...");
 
         Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+            if(!p.isOnline()) return;
             try {
                 String response = AjQueueSpigotAPI.getInstance()
                         .getServerStatusString(queue)

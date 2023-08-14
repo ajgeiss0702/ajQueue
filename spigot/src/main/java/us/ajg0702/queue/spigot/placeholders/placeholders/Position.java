@@ -32,6 +32,7 @@ public class Position extends Placeholder {
     @Override
     public String parse(Matcher matcher, OfflinePlayer p) {
         Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+            if(!p.isOnline()) return;
             try {
                 MessagedResponse<Integer> response = AjQueueSpigotAPI.getInstance()
                         .getPosition(p.getUniqueId())
