@@ -50,7 +50,7 @@ public class Status extends Placeholder {
                 } else {
                     throw new RuntimeException(e);
                 }
-            } catch (TimeoutException ignored) {}
+            } catch (TimeoutException | IllegalArgumentException ignored) {}
         });
 
         return cached;
