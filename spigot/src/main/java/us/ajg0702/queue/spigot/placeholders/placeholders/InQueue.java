@@ -40,7 +40,7 @@ public class InQueue extends Placeholder {
                 cache.put(p.getUniqueId(), response + "");
             } catch (InterruptedException | ExecutionException e) {
                 throw new RuntimeException(e);
-            } catch (TimeoutException ignored) {}
+            } catch (TimeoutException | IllegalArgumentException ignored) {}
         });
 
         return cache.getOrDefault(p.getUniqueId(), "...");

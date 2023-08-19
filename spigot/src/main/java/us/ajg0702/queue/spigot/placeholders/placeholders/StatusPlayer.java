@@ -47,7 +47,7 @@ public class StatusPlayer extends Placeholder {
                 cache.put(key, response);
             } catch (InterruptedException | ExecutionException e) {
                 throw new RuntimeException(e);
-            } catch (TimeoutException ignored) {}
+            } catch (TimeoutException | IllegalArgumentException ignored) {}
         });
 
         return cache.getOrDefault(key, "...");

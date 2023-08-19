@@ -41,7 +41,7 @@ public class EstimatedTime extends Placeholder {
                 cache.put(p.getUniqueId(), response.getEither());
             } catch (InterruptedException | ExecutionException e) {
                 throw new RuntimeException(e);
-            } catch (TimeoutException ignored) {}
+            } catch (TimeoutException | IllegalArgumentException ignored) {}
         });
 
         return cache.getOrDefault(p.getUniqueId(), "...");
