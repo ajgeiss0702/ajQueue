@@ -3,6 +3,7 @@ package us.ajg0702.queue.api.queues;
 import com.google.common.collect.ImmutableList;
 import us.ajg0702.queue.api.players.AdaptedPlayer;
 import us.ajg0702.queue.api.players.QueuePlayer;
+import us.ajg0702.queue.api.queueholders.QueueHolder;
 import us.ajg0702.queue.api.server.AdaptedServer;
 
 import java.util.List;
@@ -17,7 +18,9 @@ public interface QueueServer {
     /**
      * Get the players who are queued.
      * @return The players who are queued
+     * @deprecated It is recommended to not use this method unless you absolutely have to. If you have to, use getQueueHolder().getAllPlayers()
      */
+    @Deprecated
     ImmutableList<QueuePlayer> getQueue();
 
     /**
@@ -218,6 +221,12 @@ public interface QueueServer {
      * @return The balancer this server is using
      */
     Balancer getBalancer();
+
+    /**
+     * Gets the QueueHolder for this queue
+     * @return the QueueHolder that holds the queue
+     */
+    QueueHolder getQueueHolder();
 
 
     /**

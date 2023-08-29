@@ -1,9 +1,11 @@
 package us.ajg0702.queue.common.queues;
 
 import com.google.common.collect.ImmutableList;
+import us.ajg0702.queue.api.AjQueueAPI;
 import us.ajg0702.queue.api.events.PositionChangeEvent;
 import us.ajg0702.queue.api.players.AdaptedPlayer;
 import us.ajg0702.queue.api.players.QueuePlayer;
+import us.ajg0702.queue.api.queueholders.QueueHolder;
 import us.ajg0702.queue.api.queues.Balancer;
 import us.ajg0702.queue.api.queues.QueueServer;
 import us.ajg0702.queue.api.server.AdaptedServer;
@@ -17,7 +19,6 @@ import us.ajg0702.queue.common.utils.Debug;
 import us.ajg0702.utils.common.Messages;
 
 import java.util.*;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 public class QueueServerImpl implements QueueServer {
 
@@ -27,7 +28,7 @@ public class QueueServerImpl implements QueueServer {
 
     private final List<AdaptedServer> servers;
 
-    private final List<QueuePlayer> queue = new CopyOnWriteArrayList<>();
+    private final QueueHolder queueHolder = AjQueueAPI.getQueueHolderRegistry().getQueueHolder(this);
 
     private List<Integer> supportedProtocols = new ArrayList<>();
 
@@ -123,7 +124,7 @@ public class QueueServerImpl implements QueueServer {
 
     @Override
     public ImmutableList<QueuePlayer> getQueue() {
-        return ImmutableList.copyOf(queue);
+        return ImmutableList.copyOf(queueHolder.getAllPlayers());
     }
 
     @Override
@@ -248,7 +249,7 @@ public class QueueServerImpl implements QueueServer {
     @Override
     public void removePlayer(QueuePlayer player) {
         main.getQueueManager().getSendingAttempts().remove(player);
-        queue.remove(player);
+        queueHolder.removePlayer(player);
         positionChange();
     }
 
@@ -266,12 +267,12 @@ public class QueueServerImpl implements QueueServer {
 
     @Override
     public void addPlayer(QueuePlayer player, int position) {
-        if(!player.getQueueServer().equals(this) || queue.contains(player)) return;
+        if(!player.getQueueServer().equals(this) || queueHolder.findPlayer(player.getUniqueId()) != null) return;
 
         if(position >= 0) {
-            queue.add(position, player);
+            queueHolder.addPlayer(player, position);
         } else {
-            queue.add(player);
+            queueHolder.addPlayer(player);
         }
         positionChange();
     }
@@ -328,12 +329,7 @@ public class QueueServerImpl implements QueueServer {
 
     @Override
     public QueuePlayer findPlayer(String player) {
-        for(QueuePlayer queuePlayer : queue) {
-            if(queuePlayer.getName().equalsIgnoreCase(player)) {
-                return queuePlayer;
-            }
-        }
-        return null;
+        return queueHolder.findPlayer(player);
     }
     @Override
     public QueuePlayer findPlayer(AdaptedPlayer player) {
@@ -341,12 +337,7 @@ public class QueueServerImpl implements QueueServer {
     }
     @Override
     public QueuePlayer findPlayer(UUID uuid) {
-        for(QueuePlayer queuePlayer : queue) {
-            if(queuePlayer.getUniqueId().toString().equals(uuid.toString())) {
-                return queuePlayer;
-            }
-        }
-        return null;
+        return queueHolder.findPlayer(uuid);
     }
 
     @Override
@@ -369,9 +360,14 @@ public class QueueServerImpl implements QueueServer {
         return balancer;
     }
 
+    @Override
+    public QueueHolder getQueueHolder() {
+        return queueHolder;
+    }
+
     private void positionChange() {
         main.getTaskManager().runNow(
-                () -> queue.forEach(queuePlayer -> {
+                () -> queueHolder.getAllPlayers().forEach(queuePlayer -> {
                     if(((QueuePlayerImpl) queuePlayer).lastPosition != queuePlayer.getPosition()) {
                         main.call(new PositionChangeEvent(queuePlayer));
                     }

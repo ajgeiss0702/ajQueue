@@ -290,6 +290,11 @@ require-queueserver-permission: false
 #  Default: 10
 max-tries: 10
 
+# What QueueHolder should we use?
+# By default, the only QueueHolder available is 'default'
+# But more may be available via addons (registered via the API)
+queue-holder: default
+
 
 # Should we enable the ajqueue.make-room permission?
 # The make-room permission will force there to be room in a server.
@@ -377,7 +382,7 @@ debug: false
 
 
 # Don't touch this number please
-config-version: 42
+config-version: 43
 
 
 # This is ONLY here so that they can be moved to messages.yml. Please edit these in messages.yml!

@@ -3,6 +3,7 @@ package us.ajg0702.queue.api;
 import us.ajg0702.queue.api.events.utils.EventReceiver;
 import us.ajg0702.queue.api.premium.Logic;
 import us.ajg0702.queue.api.premium.LogicGetter;
+import us.ajg0702.queue.api.queueholders.QueueHolderRegistry;
 import us.ajg0702.queue.api.spigot.AjQueueSpigotAPI;
 import us.ajg0702.queue.api.util.QueueLogger;
 import us.ajg0702.utils.common.Config;
@@ -11,6 +12,8 @@ import us.ajg0702.utils.common.Messages;
 import java.util.concurrent.ExecutorService;
 
 public abstract class AjQueueAPI {
+
+    public static QueueHolderRegistry queueHolderRegistry = new QueueHolderRegistry();
 
     public static AjQueueAPI INSTANCE;
     public static AjQueueSpigotAPI SPIGOT_INSTANCE;
@@ -120,6 +123,10 @@ public abstract class AjQueueAPI {
      * Tells ajQueue to shut down.
      */
     public abstract void shutdown();
+
+    public static QueueHolderRegistry getQueueHolderRegistry() {
+        return queueHolderRegistry;
+    }
 
     public abstract <E> void listen(Class<E> event, EventReceiver<E> handler);
 
