@@ -200,6 +200,8 @@ public class QueueMain extends AjQueueAPI {
 
         constructMessages();
 
+        getQueueHolderRegistry().register("default", DefaultQueueHolder.class);
+
         logic = logicGetter.constructLogic();
         aliasManager = logicGetter.constructAliasManager(config);
 
