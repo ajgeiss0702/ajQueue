@@ -1,9 +1,11 @@
 package us.ajg0702.queue.logic.permissions;
 
+import us.ajg0702.queue.api.AjQueueAPI;
 import us.ajg0702.queue.api.players.AdaptedPlayer;
 import us.ajg0702.queue.api.premium.PermissionGetter;
 import us.ajg0702.queue.api.premium.PermissionHook;
 import us.ajg0702.queue.common.QueueMain;
+import us.ajg0702.queue.common.utils.Debug;
 import us.ajg0702.queue.logic.permissions.hooks.AquaCoreHook;
 import us.ajg0702.queue.logic.permissions.hooks.BuiltInHook;
 import us.ajg0702.queue.logic.permissions.hooks.LuckPermsHook;
@@ -13,16 +15,15 @@ import java.util.*;
 
 public class PermissionGetterImpl implements PermissionGetter {
 
-    private final List<PermissionHook> hooks;
-
     private final QueueMain main;
+    private PermissionHook builtInHook;
     public PermissionGetterImpl(QueueMain main) {
-        hooks = Arrays.asList(
-                new BuiltInHook(main),
+        AjQueueAPI.getPermissionHookRegistry().register(
                 new LuckPermsHook(main),
                 new UltraPermissionsHook(main),
                 new AquaCoreHook(main)
         );
+        builtInHook = new BuiltInHook(main);
         this.main = main;
     }
 
@@ -30,16 +31,15 @@ public class PermissionGetterImpl implements PermissionGetter {
     @Override
     public PermissionHook getSelected() {
         if(selected != null) return selected;
-        if(hooks == null) {
-            throw new IllegalStateException("Hooks are not initialized yet!");
-        }
-        for(PermissionHook hook : hooks) {
-            if(hook.canUse()) {
+        for(PermissionHook hook : AjQueueAPI.getPermissionHookRegistry().getRegisteredHooks()) {
+            boolean canUse = hook.canUse();
+            Debug.info(hook.getName() + " "+ canUse);
+            if(canUse) {
                 selected = hook;
             }
         }
         if(selected == null) {
-            throw new IllegalStateException("All hooks are unusable!");
+            selected = builtInHook;
         }
         main.getLogger().info("Using "+selected.getName()+" for permissions.");
         return selected;
