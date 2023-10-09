@@ -84,6 +84,13 @@ auto-add-kick-reasons:
 queue-servers:
   - 'limbo:lobbys'
 
+# How much should we delay queueing players in queue servers?
+# You should only use this if you have issues with the instant sending.
+# Set to 0 or any negative number to disable
+# In milliseconds. Maximum value is 3000 (3 seconds)
+#  Default: 0
+queue-server-delay: 0
+
 # Should we completely kick the user from the server if they are in a queue-server
 #  and are kicked from the server with one of the above reasons?
 # Note this will do nothing on servers that aren't queue-servers
@@ -382,7 +389,7 @@ debug: false
 
 
 # Don't touch this number please
-config-version: 43
+config-version: 44
 
 
 # This is ONLY here so that they can be moved to messages.yml. Please edit these in messages.yml!
