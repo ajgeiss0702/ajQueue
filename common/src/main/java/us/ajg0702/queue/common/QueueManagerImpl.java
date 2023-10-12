@@ -471,8 +471,9 @@ public class QueueManagerImpl implements QueueManager {
                         return;
                     }
                     long lastSwitch = main.getServerTimeManager().getLastServerChange(player);
-                    int delay = Math.min(Math.max(main.getConfig().getInt("queue-server-delay"), 0), 3000);
-                    if(System.currentTimeMillis() - lastSwitch > delay + 1000 || !player.getCurrentServer().equals(from)) {
+                    int minDelay = (player.getProtocolVersion() >= 764) ? 1000 : 0; // Temporary fix for 1.20.2+ client
+                    int delay = Math.min(Math.max(main.getConfig().getInt("queue-server-delay"), minDelay), 3000);
+                    if(System.currentTimeMillis() - lastSwitch < delay || !player.getCurrentServer().equals(from)) {
                         return;
                     }
                     if(
