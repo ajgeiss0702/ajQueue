@@ -27,6 +27,14 @@ public class QueueMain extends AjQueueAPI {
     }
 
     private double timeBetweenPlayers;
+
+    protected ServerTimeManagerImpl serverTimeManager = new ServerTimeManagerImpl();
+
+    @Override
+    public ServerTimeManager getServerTimeManager() {
+        return serverTimeManager;
+    }
+
     @Override
     public double getTimeBetweenPlayers() {
         return timeBetweenPlayers;
@@ -182,8 +190,6 @@ public class QueueMain extends AjQueueAPI {
         this.platformMethods = platformMethods;
         this.dataFolder = dataFolder;
 
-        constructMessages();
-
         try {
             config = new Config(dataFolder, new LogConverter(logger));
         } catch (ConfigurateException e) {
@@ -191,6 +197,10 @@ public class QueueMain extends AjQueueAPI {
             e.printStackTrace();
             return;
         }
+
+        constructMessages();
+
+        getQueueHolderRegistry().register("default", DefaultQueueHolder.class);
 
         logic = logicGetter.constructLogic();
         aliasManager = logicGetter.constructAliasManager(config);
@@ -230,6 +240,8 @@ public class QueueMain extends AjQueueAPI {
         d.put("status.now-in-queue", "&aYou are now queued for {SERVER}! &7You are in position &f{POS}&7 of &f{LEN}&7.\n&7Type &f/leavequeue&7 or &f<click:run_command:/leavequeue {SERVERNAME}>click here</click>&7 to leave the queue!");
         d.put("status.now-in-empty-queue", "");
         d.put("status.sending-now", "&aSending you to &f{SERVER} &anow..");
+        d.put("status.making-room", "<gold>Making room for you..");
+        d.put("status.priority-increased", "<gold>You now have higher priority! <green>Moving you up in the queue..");
 
         d.put("errors.server-not-exist", "&cThe server {SERVER} does not exist!");
         d.put("errors.already-queued", "&cYou are already queued for that server!");
@@ -241,6 +253,10 @@ public class QueueMain extends AjQueueAPI {
         d.put("errors.wrong-version.or", " or ");
         d.put("errors.wrong-version.comma", ", ");
         d.put("errors.too-fast-queue", "<red>You're queueing too fast!");
+        d.put("errors.kicked-to-make-room", "<red>You were moved to the lobby to make room for another player.");
+        d.put("errors.make-room-failed.player", "<red>Failed to make room for you in that server.");
+        d.put("errors.make-room-failed.admin", "<red>Failed to make room for you in that server. Check the console for more information.");
+
 
         d.put("commands.leave-queue", "&aYou left the queue for {SERVER}!");
         d.put("commands.reload", "&aConfig and messages reloaded successfully!");
@@ -321,6 +337,58 @@ public class QueueMain extends AjQueueAPI {
         d.put("updater.success", "<green>The update has been downloaded! Now just restart the server");
         d.put("updater.fail", "<red>An error occurred while downloading the update. Check the console for more info.");
         d.put("updater.already-downloaded", "<red>The update has already been downloaded.");
+
+        List<String> oldProtocolNames = config.getStringList("protocol-names");
+        for (String oldProtocolName : oldProtocolNames) {
+            String[] parts = oldProtocolName.split(":");
+            if(parts.length != 2) {
+                logger.warn("Invalid old (in the config) protocol name '" + oldProtocolName + "'. Skipping.");
+                continue;
+            }
+            String protocol = parts[0];
+            String name = parts[1];
+
+            d.put("protocol-names." + protocol, name);
+        }
+
+
+        d.putIfAbsent("protocol-names.763", "1.20.1");
+        d.putIfAbsent("protocol-names.762", "1.19.4");
+        d.putIfAbsent("protocol-names.761", "1.19.3");
+        d.putIfAbsent("protocol-names.760", "1.19.2");
+        d.putIfAbsent("protocol-names.759", "1.19");
+        d.putIfAbsent("protocol-names.758", "1.18.2");
+        d.putIfAbsent("protocol-names.757", "1.18.1");
+        d.putIfAbsent("protocol-names.756", "1.17.1");
+        d.putIfAbsent("protocol-names.755", "1.17");
+        d.putIfAbsent("protocol-names.754", "1.16.5");
+        d.putIfAbsent("protocol-names.753", "1.16.3");
+        d.putIfAbsent("protocol-names.751", "1.16.2");
+        d.putIfAbsent("protocol-names.736", "1.16.1");
+        d.putIfAbsent("protocol-names.735", "1.16");
+        d.putIfAbsent("protocol-names.578", "1.15.2");
+        d.putIfAbsent("protocol-names.575", "1.15.1");
+        d.putIfAbsent("protocol-names.573", "1.15");
+        d.putIfAbsent("protocol-names.498", "1.14.4");
+        d.putIfAbsent("protocol-names.490", "1.14.3");
+        d.putIfAbsent("protocol-names.485", "1.14.2");
+        d.putIfAbsent("protocol-names.480", "1.14.1");
+        d.putIfAbsent("protocol-names.477", "1.14");
+        d.putIfAbsent("protocol-names.404", "1.13.2");
+        d.putIfAbsent("protocol-names.401", "1.13.1");
+        d.putIfAbsent("protocol-names.393", "1.13");
+        d.putIfAbsent("protocol-names.340", "1.12.2");
+        d.putIfAbsent("protocol-names.338", "1.12.1");
+        d.putIfAbsent("protocol-names.335", "1.12");
+        d.putIfAbsent("protocol-names.316", "1.11.2");
+        d.putIfAbsent("protocol-names.315", "1.11");
+        d.putIfAbsent("protocol-names.210", "1.10.2");
+        d.putIfAbsent("protocol-names.110", "1.9.4");
+        d.putIfAbsent("protocol-names.109", "1.9.2");
+        d.putIfAbsent("protocol-names.108", "1.9.1");
+        d.putIfAbsent("protocol-names.107", "1.9");
+        d.putIfAbsent("protocol-names.47", "1.8.9");
+        d.putIfAbsent("protocol-names.5", "1.7.10");
 
         messages = new Messages(dataFolder, new LogConverter(logger), d);
     }

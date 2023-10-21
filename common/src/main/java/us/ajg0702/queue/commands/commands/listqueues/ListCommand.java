@@ -10,7 +10,7 @@ import us.ajg0702.queue.commands.BaseCommand;
 import us.ajg0702.queue.common.QueueMain;
 import us.ajg0702.utils.common.Messages;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class ListCommand extends BaseCommand {
@@ -79,6 +79,6 @@ public class ListCommand extends BaseCommand {
 
     @Override
     public List<String> autoComplete(ICommandSender sender, String[] args) {
-        return new ArrayList<>();
+        return Collections.emptyList();
     }
 }

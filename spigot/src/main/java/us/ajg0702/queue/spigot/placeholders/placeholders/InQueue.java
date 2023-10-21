@@ -31,6 +31,7 @@ public class InQueue extends Placeholder {
     @Override
     public String parse(Matcher matcher, OfflinePlayer p) {
         Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+            if(!p.isOnline()) return;
             try {
                 Boolean response = AjQueueSpigotAPI.getInstance()
                         .isInQueue(p.getUniqueId())
@@ -39,9 +40,7 @@ public class InQueue extends Placeholder {
                 cache.put(p.getUniqueId(), response + "");
             } catch (InterruptedException | ExecutionException e) {
                 throw new RuntimeException(e);
-            } catch (TimeoutException e) {
-                plugin.getLogger().log(Level.WARNING, "Timed out while trying to get placeholder data from proxy: ", e);
-            }
+            } catch (TimeoutException | IllegalArgumentException ignored) {}
         });
 
         return cache.getOrDefault(p.getUniqueId(), "...");

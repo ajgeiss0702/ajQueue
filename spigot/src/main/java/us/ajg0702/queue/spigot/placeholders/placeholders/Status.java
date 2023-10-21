@@ -35,6 +35,7 @@ public class Status extends Placeholder {
         String cached = cache.getOrDefault(queue, "...");
 
         Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+            if(!p.isOnline()) return;
             try {
                 String response = AjQueueSpigotAPI.getInstance()
                         .getServerStatusString(queue)
@@ -43,15 +44,13 @@ public class Status extends Placeholder {
                 cache.put(queue, response);
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
-            } catch (TimeoutException e) {
-                plugin.getLogger().log(Level.WARNING, "Timed out while trying to get placeholder data from proxy: ", e);
             } catch (ExecutionException e) {
                 if(e.getCause() instanceof IllegalArgumentException) {
                     cache.put(queue, invalidMessage);
                 } else {
                     throw new RuntimeException(e);
                 }
-            }
+            } catch (TimeoutException | IllegalArgumentException ignored) {}
         });
 
         return cached;

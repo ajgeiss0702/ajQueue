@@ -1,179 +1,66 @@
-# Dont touch this number please
-config-version: 35
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+#                                                                                                           #
+#                                 _   ___                                                                   #
+#                                (_) / _ \                                                                  #
+#                           __ _  _ | | | | _   _   ___  _   _   ___                                        #
+#                          / _` || || | | || | | | / _ \| | | | / _ \                                       #
+#                         | (_| || |\ \/' /| |_| ||  __/| |_| ||  __/                                       #
+#                          \__,_|| | \_/\_\ \__,_| \___| \__,_| \___|                                       #
+#                               _/ |                                                                        #
+#                              |__/                                                                         #
+#                                                                                                           #
+#          Welcome to the config for ajQueue!                                                               #
+#                                                                                                           #
+#          Make sure to read the comments above each option to know what that option does.                  #
+#                                                                                                           #
+#          If you have any questions, first make sure you've read the comment above the option, then        #
+#           feel free to join my discord and ask there (invite link is on the plugin page)                  #
+#                                                                                                           #
+#          Happy configuring!                                                                               #
+#                                                                                                           #
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 
-# This is the main config for ajQueue.
-# If you have any questions, make sure to read the comment above the options first,
-#  then feel free to join my discord and ask for support.
-# Discord invite link is on the plugin page.
-
-
-
-# The time the server will wait between sending people in the queue
+# The time the server will wait between sending people in the queue (in seconds, supports decimals)
 #  Default: 5
 wait-time: 5.0
 
-# The time that a server has to be offline to be marked as offline instead of restarting
-#  Default: 120
-offline-time: 120
-
-# The time the server will wait between sending players update messages on what position they are in the queue.
+# The time ajQueue will wait between sending players update messages on
+#  what position they are in the queue, their ETA, and status of the queue (in seconds)
+# You can set to any negative number to disable the messages
 # Default: 10
 message-time: 10
-
-# If a player is in a server, you can have the plugin make them automatically join a queue for another server
-# Example with the default values: Player joins the limbo server, they will auto-join the queue for the lobbys group
-# Note that you dont have to use groups. Just put the name of a server to use a single server instead.
-queue-servers:
-  - 'limbo:lobbys'
-
-# Should the plugin send an actionbar to the player?
-# The actionbar contains some info such as which server they are queued for, what position they are in, estimated time remaining, etc.
-send-actionbar: true
-
-# What kick reasons should cause the player to be removed from the queue?
-# For example, if one of the below kick reasons is 'banned' and the player gets kicked when trying to connect to
-#  a server in a queue with a message saying "You are banned from this server!" then it will kick them from the queue too.
-kick-reasons:
-  - 'banned'
-  - 'blacklisted'
-
-# Should we completly kick the user from the server if they are in a queue-server
-#  and are kicked from the server with one of the above reasons?
-# Note this will do nothing on servers that arent queue-servers
-#  (as in the config option queue-servers)
-#  Default: true
-kick-kicked-players: true
-
-# Should we remove a player from the queue if they move servers?
-# This will remove the player from if they switch to any other server
-#  Default: false
-remove-player-on-server-switch: false
-
-
-# Should we wait until the server is done loading to load the servers?
-# Enable this if you have a plugin that adds servers to the server list during startup.
-#  Default: false
-wait-to-load-servers: false
-
-# How long should we wait after the server finishes loading to load the server list?
-# Only works if the above is enabled.
-# This is in miliseconds so 1000 = 1 second
-#  Default: 500
-wait-to-load-servers-delay: 500
-
-
-# How often (in seconds) we should check for new servers to add queues for.
-# If you dynamicly add servers, set this to something other than 0.
-# To disable, set to 0
-#  Default: 0
-reload-servers-interval: 0
 
 
 # Should we require permissions for players to be able to join queues?
 # If enabled, players will be required to have the permission ajqueue.queue.<server> to be able to join queues
+# Replace <server> with the name of the server or group to let the player queue for
 #  Default: false
 require-permission: false
 
-
-# Should we let players join more than one queue?
-# If enabled, players will be able to be in multiple queues at once.
-# If disabled, players will be removed from the previous queue when joining a new queue
-#  Default: true
-allow-multiple-queues: true
-
-# If the player is queued for multiple servers, which server should we pick to use in things like placeholders and actionbars
-# Options are first and last
-#  Default: last
-multi-server-queue-pick: last
-
-
-# THIS FEATURE IS ONLY AVAILABLE ON ajQueuePlus (https://www.spigotmc.org/resources/ajqueueplus.79123/)
-# This will show players a different name than the actual proxy server name
-# for example, instead of showing players "event-a", this option can make it appear as "Event A"
-# With this example, you would use this: - "event-a:Event A"
-# Note that currently players still have to use the normal names in queue commands and leave commands
-#  Format: "realname:Alias"
-server-aliases:
-  - "event-a:Event A"
-
-
-# How long should we wait after a server is online before sending players?
-# The server will still show up as offline or restarting until this amount of time after its up
-# Meant to let your server 'cool down' after lag from starting up
-# In seconds
-#  Default: 1
-wait-after-online: 1
-
-
-# This is for helping with finding issues with the server pinged
-# This will spam the console when enabled
-# When this enabled, if servers are offline then it will spam errors. You can ignore them.
-#  Default: false
-pinger-debug: false
-
-
-# When a queue is paused, should we prevent players from joining it?
-#  Default: false
-prevent-joining-paused: false
-
-# When a server goes back online, should we send all players in the queue instantly?
-# Default: false
-send-all-when-back-online: false
-
-# Require a permission for players to be able to join a queue from a server
+# Require a permission for players to be able to join a queue from a server.
 # If enabled, players will need the permission ajqueue.joinfrom.<server> to join queues.
 # Replace <server> with the name of the server
 #  Default: false
 joinfrom-server-permission: false
-
-# Server groups are a group of servers that you can queue for. It will send you to the server that is the least full.
-# If all servers in the group are full, it will act the same as it would when a single server is full.
-# Same if all servers are offline. It will only send players to servers that are online.
-#  Format: "groupname:server1,server2,etc"
-server-groups:
-  - "lobbys:lobby-1,lobby-2,lobby-3"
-
-
-# Should we allow tab-completing in the /queue command?
-#  Default: true
-tab-complete-queues: true
-
-# Should we have no wait time for these servers?
-# If the server is joinable, the plugin will attempt to send players who join these queues as soon as they join.
-# If the server is not immidiatly joinable, they will have to wait for the normal wait-time
-# This also works with group
-# NOTE: Server names are caps sensitive
-send-instantly:
-  - "lobbys"
-
-# Should we log to the proxy console when a player fails to get sent to a server from the queue?
-# Enable this if you are having an issue with one player stopping the queue
-#  Default: false
-send-fail-debug: false
-
-# After how many (unsuccessfull) attempts of sending the player should we remove them from the queue?
-# Set to -1 to disable
-#  Default: 10
-max-tries: 10
 
 # Should we enable the ajqueue.bypasspaused permission?
 # If enabled, anyone with the permission ajqueue.bypasspaused will be able to join paused servers
 #  Default: false
 enable-bypasspaused-permission: false
 
-# Should we check to make sure that people dont get sent quicker than wait-time?
-#  Default: true
-check-last-player-sent-time: true
 
-# Should we send debug info to the console when priority queue is used?
-# This will print several lines to the console when a player joins a queue,
-# so you should probably only use this for debugging purposes
-#  Default: false
-priority-queue-debug: false
+# What kick reasons should cause the player to be removed from the queue?
+# This works on contains, so you only need to include a word or two from the kick message.
+# For example, if one of the below kick reasons is 'banned' and the player gets kicked when trying to connect to
+#  a server in a queue with a message saying "You are banned from this server!" then it will kick them from the queue too.
+kick-reasons:
+  - 'banned'
+  - 'blacklisted'
+
 
 # When a player is kicked from a server, should we automatically add that player to the queue?
-# You will still need to use another plugin to make sure the player doesnt get kicked from the proxy completly.
+# On BungeeCord, you will still need to use another plugin to make sure the player doesn't get kicked from the proxy completely.
 #  Default: false
 auto-add-to-queue-on-kick: false
 # The delay for the above option.
@@ -182,18 +69,110 @@ auto-add-to-queue-on-kick: false
 auto-add-to-queue-on-kick-delay: 1
 
 # With what kick reasons should we auto-add the player to the queue
-# This wont work if auto-add-to-queue-on-kick is disabled.
+# This won't work if auto-add-to-queue-on-kick is disabled.
 # If you set it to [], then all kick messages will cause the player to be added to the queue
-# This works on contains, so you dont have to include the whole kick message, just a few words.
+# This works on contains, so you don't have to include the whole kick message, just a few words.
 auto-add-kick-reasons:
   - "restarting"
   - "closed"
+
+
+# If a player is in a server, you can have the plugin make them automatically join a queue for another server
+# Example with the default values: Player joins the limbo server, they will auto-join the queue for the lobbys group
+# Note that you don't have to use groups. Just put the name of a server to use a single server instead.
+# You do NOT have to set a queue server to use queues.
+queue-servers:
+  - 'limbo:lobbys'
+
+# How much should we delay queueing players in queue servers?
+# You should only use this if you have issues with the instant sending.
+# Set to 0 or any negative number to disable
+# In milliseconds. Maximum value is 3000 (3 seconds)
+#  Default: 0
+queue-server-delay: 0
+
+# Should we completely kick the user from the server if they are in a queue-server
+#  and are kicked from the server with one of the above reasons?
+# Note this will do nothing on servers that aren't queue-servers
+#  (as in the config option queue-servers)
+#  Default: true
+kick-kicked-players: true
+
+# This option allows you to manually set player caps for servers
+# Note that this does NOT override the player cap returned by the server.
+#  Format: - '<server>:<max-players>'
+#  Example: - 'lobbys:50'
+# The example above will limit the lobbys group to have a total of 50 players.
+# This works on both groups and individual servers
+manual-max-players: []
+
+
+# Server groups are a group of servers that you can queue for. It will send you to the server that is the least full.
+# If all servers in the group are full, it will act the same as it would when a single server is full.
+# Same if all servers are offline. It will only send players to servers that are online.
+#  Format: "groupname:server1,server2,etc"
+server-groups:
+  - "lobbys:lobby-1,lobby-2,lobby-3"
+
+# What balancer should we use for groups?
+# If a group is not specified here, then the default one is used
+#  Example: - "bedwars:minigame"
+# The example above will set the bedwars group to use the minigame balancer
+# Balancers:
+#  default - Will send the player to the server in the group with the least number of players
+#  minigame - Will send the player to the server with the most players, until that server is full, which it will then send to the next server
+#  first - Will send the player to the first available server in the group (as long as it is joinable)
+balancer-types:
+  - "bedwars:minigame"
+
+# If a player is in a server that is in a group and they re-queue for that group, should we allow it?
+# false - prevent player from re-queueing; say "already connected" message
+# true - let player re-queue; will send them to a server other than the one they're connected to
+#  Default: false
+allow-group-requeue: false
+
+
+# What priority should we give whitelisted players priority when the server is whitelisted?
+# This will have no effect if the server isn't whitelisted
+# If you set to 0, this will be disabled
+# If you have the free version, set it to 1 to enable
+give-whitelisted-players-priority: 0
+
+# What priority should we give players that are able to bypass paused priority when the server is paused?
+# This will have no effect if the server isn't paused
+# If you set to 0, this will be disabled
+# If you have the free version, set it to 1 to enable
+give-pausedbypass-players-priority: 0
+
+# What priority should we give players that are able to bypass full servers priority when the server is full?
+# This will have no effect if the server isn't full
+# If you are using make-room, this also applies to that
+# If you set to 0, this will be disabled
+# If you have the free version, set it to 1 to enable
+give-fulljoin-players-priority: 0
+
+
+# Should we remove a player from the queue if they move servers?
+# This will remove the player from if they switch to any other server
+#  Default: false
+remove-player-on-server-switch: false
 
 # Should we enable the server command being a queue command?
 # This may require extra setup on bungeecord. See the wiki:
 # https://wiki.ajg0702.us/ajqueue/setup/replacing-server-command
 #  Default: false
 enable-server-command: false
+
+# What servers should we make slash server commands for?
+# For example, if survival is in this list, then if a player executes /survival
+#  then they will be put in the queue for survival
+# This works for both servers and groups
+# If you have ajQueuePlus, you can also make aliases.
+#  For example, if you have a server called lobby, and you want people to be able to use /hub, you can use this:
+#   - "hub:lobby"
+#  If you have the free version, you can only put the server name, no aliases.
+slash-servers: []
+
 
 # Should we enable priority messages?
 # Configure the priority messages in the option below.
@@ -209,10 +188,155 @@ priority-messages:
   - "*:<green>Joining the queue with a priority of {PRIORITY}!"
   - "100:<yellow>Wow! You have a priority of 100!"
 
+
 # Should the plugin send a title to the player?
 # The title shows what position the player is in the queue
 #  Default: false
 send-title: false
+
+# Should we log to the proxy console when a player fails to get sent to a server from the queue?
+# Enable this if you are having an issue with one player stopping the queue
+#  Default: false
+send-fail-debug: false
+
+# Should the plugin send an actionbar to the player?
+# The actionbar contains some info such as which server they are queued for, what position they are in, estimated time remaining, etc.
+send-actionbar: true
+
+# THIS FEATURE IS ONLY AVAILABLE ON ajQueuePlus (https://www.spigotmc.org/resources/ajqueueplus.79123/)
+# This will show players a different name than the actual proxy server name
+# for example, instead of showing players "event-a", this option can make it appear as "Event A"
+# With this example, you would use this: - "event-a:Event A"
+# Note that currently players still have to use the normal names in queue commands and leave commands
+#  Format: "realname:Alias"
+server-aliases:
+  - "event-a:Event A"
+
+# The time that a server has to be offline to be marked as offline instead of restarting (in seconds)
+#  Default: 120
+offline-time: 120
+
+# On velocity, should we end a player a message when they are kicked while trying to connect to a server with the queue?
+# This has no effect on bungee, because the message is sent from bungee and there's no way to change that in ajQueue
+#  Default: false
+velocity-kick-message: false
+
+# Should we wait until the server is done loading to load the servers?
+# Enable this if you have a plugin that adds servers to the server list during startup.
+#  Default: false
+wait-to-load-servers: false
+
+# How long should we wait after the server finishes loading to load the server list?
+# Only works if the above is enabled.
+# This is in milliseconds so 1000 = 1 second
+#  Default: 500
+wait-to-load-servers-delay: 500
+
+# How often (in seconds) we should check for new servers to add queues for.
+# If you dynamically add servers, set this to something other than 0.
+# To disable, set to 0
+#  Default: 0
+reload-servers-interval: 0
+
+# Should we let players join more than one queue?
+# If enabled, players will be able to be in multiple queues at once.
+# If disabled, players will be removed from the previous queue when joining a new queue
+#  Default: true
+allow-multiple-queues: true
+
+# If the player is queued for multiple servers, which server should we pick to use in things like placeholders and actionbars
+# Options are first and last
+#  Default: last
+multi-server-queue-pick: last
+
+# How long should we wait after a server is online before sending players?
+# The server will still show up as offline or restarting until this amount of time after its up
+# Meant to let your server 'cool down' after lag from starting up
+# In seconds
+#  Default: 1
+wait-after-online: 1
+
+# This is for helping with finding issues with the server pinged
+# This will spam the console when enabled
+# When this enabled, if servers are offline then it will spam errors. You can ignore them.
+#  Default: false
+pinger-debug: false
+
+# When a queue is paused, should we prevent players from joining it?
+#  (instead of having players wait in the queue until it's unpaused)
+#  Default: false
+prevent-joining-paused: false
+
+# When a server goes back online, should we send all players in the queue instantly?
+# Default: false
+send-all-when-back-online: false
+
+# Should we allow tab-completing in the /queue command?
+# Any server the player doesn't have permission for (require-permission)
+#  will not tab-complete
+#  Default: true
+tab-complete-queues: true
+
+# Should we have no wait time for these servers?
+# If the server is joinable, the plugin will attempt to send players who join these queues as soon as they join.
+# If the server is not immediately joinable, they will have to wait for the normal wait-time
+# This also works with group
+# NOTE: Server names are caps sensitive
+send-instantly:
+  - "lobbys"
+
+# Should we require permissions for queue-servers to work?
+# If enabled, players will need to have the ajqueue.queueserver.<server> permission
+#   <server> being the target server
+# Note that this will only affect queue-servers
+#  Default: false
+require-queueserver-permission: false
+
+# After how many (unsuccessful) attempts of sending the player should we remove them from the queue?
+# Set to -1 to disable
+#  Default: 10
+max-tries: 10
+
+# What QueueHolder should we use?
+# By default, the only QueueHolder available is 'default'
+# But more may be available via addons (registered via the API)
+queue-holder: default
+
+
+# Should we enable the ajqueue.make-room permission?
+# The make-room permission will force there to be room in a server.
+#  So, if a player with this permission queues for a server and has this permission,
+#   someone from the server will be moved to the lobby to make room
+# This can be further configured using the next few options
+#  Default: false
+enable-make-room-permission: false
+
+# What server should the make-room permission move players to?
+#  Default: lobby
+make-room-kick-to: lobby
+
+# For the make-room permission, players with the lowest priority are kicked first.
+# Of those players, this option decides which to kick.
+#  true - kick players who have been on the server the longest
+#  false - kick players who have been on the server the shortest
+#  Default: true
+make-room-kick-longest-playtime: true
+
+
+# Should we check every 4 seconds if a player has a higher priority permission than before
+# If they do, they are removed and re-added to the queue (only if they would be put in a higher position)
+#  Default: false
+re-check-priority: false
+
+# Should we check to make sure that people don't get sent quicker than wait-time?
+#  Default: true
+check-last-player-sent-time: true
+
+# Should we send debug info to the console when priority queue is used?
+# This will print several lines to the console when a player joins a queue,
+# so you should probably only use this for debugging purposes
+#  Default: false
+priority-queue-debug: false
 
 # What protocols do servers support?
 # The protocol version number list can be found here: https://wiki.vg/Protocol_version_numbers
@@ -224,89 +348,8 @@ send-title: false
 supported-protocols:
   - "1.17:755,756"
 
-
-# These are the protocol names the plugin should use.
-# If you are on velocity, if the protocol is not listed here then the velocity
-#  api will be used to find the name of the protocol.
-# If you are on bungee, only this list can be used.
-protocol-names:
-  - "757:1.18.1"
-  - "756:1.17.1"
-  - "755:1.17"
-  - "754:1.16.5"
-  - "753:1.16.3"
-  - "751:1.16.2"
-  - "736:1.16.1"
-  - "735:1.16"
-  - "578:1.15.2"
-  - "575:1.15.1"
-  - "573:1.15"
-  - "498:1.14.4"
-  - "490:1.14.3"
-  - "485:1.14.2"
-  - "480:1.14.1"
-  - "477:1.14"
-  - "404:1.13.2"
-  - "401:1.13.1"
-  - "393:1.13"
-  - "340:1.12.2"
-  - "338:1.12.1"
-  - "335:1.12"
-  - "316:1.11.2"
-  - "315:1.11"
-  - "210:1.10.2"
-  - "110:1.9.4"
-  - "109:1.9.2"
-  - "108:1.9.1"
-  - "107:1.9"
-  - "47:1.8.9"
-  - "5:1.7.10"
-
-# On velocity, should we end a player a message when they are kicked while trying to connect to a server with the queue?
-# This has no effect on bungee, because the message is sent from bungee and theres no way to change that in ajQueue
-#  Default: false
-velocity-kick-message: false
-
 # Should the updater be enabled?
 enable-updater: true
-
-# What servers should we make slash server commands for?
-# For example, if survival is in this list, then if a player executes /survival
-#  then they will be put in the queue for survival
-# This works for both servers and groups
-# If you have ajQueuePlus, you can also make aliases.
-#  For example, if you have a server called lobby, and you want people to be able to use /hub, you can use this:
-#   - "hub:lobby"
-#  If you have the free version, you can only put the server name, no aliases.
-slash-servers: []
-
-# What balancer should we use?
-# If a group is not specified here, then the default one is used
-# Example entry: - "bedwars:minigame"
-# Balancers:
-#  default - Will send the player to the server in the group with the least number of players
-#  minigame - Will send the player to the server with the most players, until that server is full, which it will then send to the next server
-balancer-types:
-  - "bedwars:minigame"
-
-# What priority should we give whitelisted players priority when the server is whitelisted?
-# This will have no effect if the server isnt whitelisted
-# If you set to 0, this will be disabled
-# If you have the free version, set it to 1 to enable
-give-whitelisted-players-priority: 0
-
-# What priority should we give players that are able to bypass paused priority when the server is paused?
-# This will have no effect if the server isnt paused
-# If you set to 0, this will be disabled
-# If you have the free version, set it to 1 to enable
-give-pausedbypass-players-priority: 0
-
-# What priority should we give players that are able to bypass full servers priority when the server is full?
-# This will have no effect if the server isnt full
-# If you set to 0, this will be disabled
-# If you have the free version, set it to 1 to enable
-give-fulljoin-players-priority: 0
-
 
 # Should we force players to be queued every few seconds for queue-servers?
 # This will check every few seconds, and if a player in a queue-server is
@@ -321,10 +364,34 @@ queue-command-cooldown: 3
 # Should any server switch (including the initial join) count against the queue command cooldown?
 include-server-switch-in-cooldown: false
 
-
-# The minimum time between pinging the server.
+# The minimum time between pinging the server. (in seconds)
 # If ajQueue is pinging your backend servers too often, raise this number
 minimum-ping-time: 1.0
 
+# In ajQueuePlus, if your permission plugin isn't yet supported, you can use this workaround to
+#  be able to use levels 1-10 for priority, or 15, 30, 60, and 120 for stayqueued
+# If you want more levels than that, contact aj to add support for your permission plugin if possible.
+# Does nothing if you are not on ajQueuePlus, or if you have a supported permission plugin
+plus-level-fallback: false
+
 # Should we print some extra stuff to the console that might help aj diagnose some issues?
 debug: false
+
+
+
+# # # # # # # # # # # # # # # # # # # # #
+#                                       #
+#   End of config. Happy queue-ing :)   #
+#                                       #
+# # # # # # # # # # # # # # # # # # # # #
+
+
+
+
+# Don't touch this number please
+config-version: 44
+
+
+# This is ONLY here so that they can be moved to messages.yml. Please edit these in messages.yml!
+protocol-names: []
+# ^ only edit these in messages.yml

@@ -38,6 +38,8 @@ public interface Logic {
      */
     PermissionGetter getPermissionGetter();
 
+    int getHighestPriority(QueueServer queueServer, AdaptedServer server, AdaptedPlayer player);
+
     static int getUnJoinablePriorities(QueueServer queueServer, AdaptedServer server, AdaptedPlayer player) {
         Config config = AjQueueAPI.getInstance().getConfig();
         int highest = 0;
@@ -59,7 +61,10 @@ public interface Logic {
         }
 
         if(fulljoinPriority > 0) {
-            if(server.isFull() && server.canJoinFull(player)) {
+            boolean hasMakeRoom = player.hasPermission("ajqueue.make-room") && AjQueueAPI.getInstance().getConfig().getBoolean("enable-make-room-permission");
+            if(
+                    (server.isFull() && (server.canJoinFull(player) || hasMakeRoom)) ||
+                            (queueServer.isManuallyFull() && (AdaptedServer.canJoinFull(player, queueServer.getName()) || hasMakeRoom))) {
                 highest = Math.max(highest, fulljoinPriority);
             }
         }

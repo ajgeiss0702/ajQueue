@@ -188,11 +188,13 @@ public class QueueManagerImpl implements QueueManager {
             }
         }
 
-        List<AdaptedServer> notInServers = new ArrayList<>(server.getServers());
-        notInServers.removeIf(adaptedServer -> !adaptedServer.getName().equals(player.getServerName()));
-        if(notInServers.size() > 0) {
-            player.sendMessage(msgs.getComponent("errors.already-connected", "SERVER:"+server.getAlias()));
-            return false;
+        if(!server.isGroup() || !main.getConfig().getBoolean("allow-group-requeue"))  {
+            List<AdaptedServer> notInServers = new ArrayList<>(server.getServers());
+            notInServers.removeIf(adaptedServer -> !adaptedServer.getName().equals(player.getServerName()));
+            if(notInServers.size() > 0) {
+                player.sendMessage(msgs.getComponent("errors.already-connected", "SERVER:"+server.getAlias()));
+                return false;
+            }
         }
 
         ImmutableList<QueueServer> beforeQueues = getPlayerQueues(player);
@@ -438,13 +440,14 @@ public class QueueManagerImpl implements QueueManager {
                         "TIME:"+ TimeUtils.timeString(time, msgs.getString("format.time.mins"), msgs.getString("format.time.secs"))
                 );
 
-                Title title = Title.title(titleMessage, subTitleMessage, Title.Times.of(Duration.ZERO, Duration.ofSeconds(2L), Duration.ZERO));
+                Title title = Title.title(titleMessage, subTitleMessage, Title.Times.times(Duration.ZERO, Duration.ofSeconds(2L), Duration.ZERO));
                 player.showTitle(title);
             }
         }
     }
 
     protected final Map<AdaptedPlayer, Long> pausedAntiSpam = new ConcurrentHashMap<>();
+    private boolean skipPriorityCheck = true;
 
     @Override
     public void sendQueueEvents() {
@@ -467,7 +470,18 @@ public class QueueManagerImpl implements QueueManager {
                         }
                         return;
                     }
-                    if(!getPlayerQueues(player).contains(to)) {
+                    long lastSwitch = main.getServerTimeManager().getLastServerChange(player);
+                    int delay = Math.min(Math.max(main.getConfig().getInt("queue-server-delay"), 0), 3000);
+                    if(System.currentTimeMillis() - lastSwitch < delay + 1000 || !player.getCurrentServer().equals(from)) {
+                        return;
+                    }
+                    if(
+                            !getPlayerQueues(player).contains(to) &&
+                                    (
+                                            !main.getConfig().getBoolean("require-queueserver-permission") ||
+                                                    player.hasPermission("ajqueue.queueserver." + to.getName())
+                                    )
+                    ) {
                         addToQueue(player, to);
                     }
                 });
@@ -475,10 +489,31 @@ public class QueueManagerImpl implements QueueManager {
         }
         for (QueueServer s : servers) {
             for (QueuePlayer queuePlayer : s.getQueue()) {
-                AdaptedPlayer player =  queuePlayer.getPlayer();
+                AdaptedPlayer player = queuePlayer.getPlayer();
                 if (player == null || !player.isConnected()) continue;
                 if(player.getServerName() == null) continue;
                 main.getPlatformMethods().sendPluginMessage(player, "inqueueevent", "true");
+            }
+        }
+        if(main.getConfig().getBoolean("re-check-priority")) {
+            if(skipPriorityCheck) {
+                skipPriorityCheck = false;
+            } else {
+                for (QueueServer server : servers) {
+                    for (QueuePlayer queuePlayer : server.getQueue()) {
+                        if(queuePlayer.getPlayer() == null) continue;
+                        AdaptedPlayer player = queuePlayer.getPlayer();
+                        AdaptedServer ideal = server.getIdealServer(player);
+
+                        int currentHighestPriority = main.getLogic().getHighestPriority(server, ideal, player);
+                        if(queuePlayer.getPriority() >= currentHighestPriority) continue;
+
+                        player.sendMessage(main.getMessages().getComponent("status.priority-increased"));
+
+                        server.removePlayer(queuePlayer);
+                        addToQueue(player, server);
+                    }
+                }
             }
         }
     }
@@ -568,9 +603,10 @@ public class QueueManagerImpl implements QueueManager {
 
     final ConcurrentHashMap<AdaptedPlayer, Long> sendingNowAntiSpam = new ConcurrentHashMap<>();
     final Map<QueuePlayer, Integer> sendingAttempts = new WeakHashMap<>();
+    final Map<QueuePlayer, Long> makeRoomAntispam = new WeakHashMap<>();
 
     @Override
-    public void sendPlayers(QueueServer queueServer) {
+    public synchronized void sendPlayers(QueueServer queueServer) {
         List<QueueServer> sendingServers;
         if(queueServer == null) {
             sendingServers = new ArrayList<>(servers);
@@ -603,7 +639,10 @@ public class QueueManagerImpl implements QueueManager {
                         continue;
                     }
 
-                    if(selected.isFull() && !selected.canJoinFull(p.getPlayer())) continue;
+                    if(
+                            (selected.isFull() && !selected.canJoinFull(player)) ||
+                                    (server.isManuallyFull() && !AdaptedServer.canJoinFull(player, server.getName()))
+                    ) continue;
 
                     player.sendMessage(msgs.getComponent("status.sending-now", "SERVER:"+server.getAlias()));
                     Debug.info("Calling player.connect for " + player.getName() + "(send when back online)");
@@ -618,7 +657,9 @@ public class QueueManagerImpl implements QueueManager {
 
             // If the first person int the queue is offline or already in the server, find the next online player in the queue
             int i = 0;
-            while((nextPlayer == null || server.getServerNames().contains(nextPlayer.getServerName())) && i < server.getQueue().size()) {
+            List<String> excludableServers = new ArrayList<>(server.getServerNames());
+            if(nextQueuePlayer.getInitialServer() != null) excludableServers.remove(nextQueuePlayer.getInitialServer().getName());
+            while((nextPlayer == null || excludableServers.contains(nextPlayer.getServerName())) && i < server.getQueue().size()) {
                 if(nextPlayer != null) { // Remove them if they are already in the server
                     server.removePlayer(nextQueuePlayer);
                     if(server.getQueue().size() > i) {
@@ -650,7 +691,105 @@ public class QueueManagerImpl implements QueueManager {
 
             if(!server.canAccess(nextPlayer)) continue;
 
-            if(selected.isFull() && !selected.canJoinFull(nextPlayer)) continue;
+            if(
+                    (
+                            (selected.isFull() && !selected.canJoinFull(nextPlayer)) ||
+                            (server.isManuallyFull() && !AdaptedServer.canJoinFull(nextPlayer, server.getName()))
+                    ) &&
+                            !(
+                                    nextPlayer.hasPermission("ajqueue.make-room") &&
+                                            main.getConfig().getBoolean("enable-make-room-permission") &&
+                                            (!server.isGroup() || server.isManuallyFull()) // only use make-room on groups if the server is manually full
+                            )
+            ) continue;
+
+
+            // ajqueue.make-room logic
+            if(
+                    (
+                            (selected.isFull() && !selected.canJoinFull(nextPlayer)) ||
+                                    (server.isManuallyFull() && !AdaptedServer.canJoinFull(nextPlayer, server.getName()))
+                    ) &&
+                            main.getConfig().getBoolean("enable-make-room-permission") &&
+                            nextPlayer.hasPermission("ajqueue.make-room") &&
+                            (!server.isGroup() || server.isManuallyFull()) && // only use make-room on groups if the server is manually full
+                            ( // don't make room more than the minimum ping time
+                                    System.currentTimeMillis() - makeRoomAntispam.getOrDefault(nextQueuePlayer, 0L)
+                                            >= (main.getConfig().getDouble("minimum-ping-time") * 1e3)
+                            )
+            ) {
+                makeRoomAntispam.put(nextQueuePlayer, System.currentTimeMillis());
+                List<AdaptedPlayer> players = selected.getPlayers();
+
+                // first, we need to find what the lowest priority on the server is
+                int lowestPriority = Integer.MAX_VALUE;
+                for (AdaptedPlayer player : players) {
+                    int priority = main.getLogic().getHighestPriority(server, selected, player);
+                    if(priority < lowestPriority) lowestPriority = priority;
+                }
+
+                boolean kickLongest = main.getConfig().getBoolean("make-room-kick-longest-playtime");
+
+                long selectedTime = kickLongest ? Long.MAX_VALUE : 0;
+                AdaptedPlayer selectedPlayer = null;
+                for (AdaptedPlayer player : players) {
+                    int priority = main.getLogic().getHighestPriority(server, selected, player);
+                    if(priority > lowestPriority) continue; // don't select players with higher priorities
+                    long switchTime = main.getServerTimeManager().getLastServerChange(player);
+                    if(selectedPlayer == null) {
+                        selectedPlayer = player;
+                        selectedTime = switchTime;
+                        continue;
+                    }
+                    if(kickLongest) {
+                        if(switchTime < selectedTime) {
+                            selectedTime = switchTime;
+                            selectedPlayer = player;
+                        }
+                    } else {
+                        if(switchTime > selectedTime) {
+                            selectedTime = switchTime;
+                            selectedPlayer = player;
+                        }
+                    }
+                }
+
+
+                if(selectedPlayer == null) {
+                    main.getLogger().warn(
+                            "Unable to find player to kick from " + selected.getName() + " " +
+                                    "to let " + nextPlayer.getName() + "join!"
+                    );
+                } else {
+                    Debug.info(
+                            "Selected " + selectedPlayer.getName() + " " +
+                                    "to make room for " + nextPlayer.getName() + " in " + selected.getName()
+                    );
+                    String kickToName = main.getConfig().getString("make-room-kick-to");
+                    AdaptedServer kickTo = main.getPlatformMethods().getServer(kickToName);
+                    if(kickTo == null) {
+                        main.getLogger().warn(
+                                "Unable to make room due to '" + kickToName + "' not existing! " +
+                                        "Please configure make-room-kick-to in the config"
+                        );
+                        boolean isAdmin = nextPlayer.hasPermission("ajqueue.manage");
+                        nextPlayer.sendMessage(
+                                main.getMessages().getComponent(
+                                        isAdmin ? "errors.make-room-failed.admin" : "errors.make-room-failed.player"
+                                )
+                        );
+                    } else {
+                        selectedPlayer.connect(kickTo);
+                        selectedPlayer.sendMessage(main.getMessages().getComponent("errors.kicked-to-make-room"));
+
+                        if(main.getTimeBetweenPlayers() >= 1d) {
+                            nextPlayer.sendMessage(main.getMessages().getComponent("status.making-room"));
+                        }
+
+                        continue;
+                    }
+                }
+            }
 
             if(main.getConfig().getBoolean("enable-bypasspaused-permission")) {
                 if(server.isPaused() && !nextPlayer.hasPermission("ajqueue.bypasspaused")) continue;
@@ -682,7 +821,7 @@ public class QueueManagerImpl implements QueueManager {
                                     "title.sending-now.subtitle",
                                     "SERVER:"+server.getAlias()
                             ),
-                            Title.Times.of(Duration.ZERO, Duration.ofSeconds(2L), Duration.ZERO)
+                            Title.Times.times(Duration.ZERO, Duration.ofSeconds(2L), Duration.ZERO)
                     ));
                 }
                 sendingNowAntiSpam.put(nextPlayer, System.currentTimeMillis());

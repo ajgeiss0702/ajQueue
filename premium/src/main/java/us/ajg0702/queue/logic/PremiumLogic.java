@@ -18,6 +18,15 @@ public class PremiumLogic implements Logic {
         return permissionGetter;
     }
 
+    @Override
+    public int getHighestPriority(QueueServer queueServer, AdaptedServer server, AdaptedPlayer player) {
+        int normalPriority = permissionGetter.getPriority(player);
+        int serverPriority = permissionGetter.getServerPriotity(queueServer.getName(), player);
+        int unJoinablePriority = Logic.getUnJoinablePriorities(queueServer, server, player);
+
+        return Math.max(normalPriority, Math.max(serverPriority, unJoinablePriority));
+    }
+
     private final PermissionGetter permissionGetter;
     public PremiumLogic(QueueMain main) {
         permissionGetter = new PermissionGetterImpl(main);

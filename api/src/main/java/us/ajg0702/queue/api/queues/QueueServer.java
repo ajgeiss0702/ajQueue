@@ -3,10 +3,9 @@ package us.ajg0702.queue.api.queues;
 import com.google.common.collect.ImmutableList;
 import us.ajg0702.queue.api.players.AdaptedPlayer;
 import us.ajg0702.queue.api.players.QueuePlayer;
+import us.ajg0702.queue.api.queueholders.QueueHolder;
 import us.ajg0702.queue.api.server.AdaptedServer;
-import us.ajg0702.queue.api.server.AdaptedServerPing;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
@@ -19,7 +18,9 @@ public interface QueueServer {
     /**
      * Get the players who are queued.
      * @return The players who are queued
+     * @deprecated It is recommended to not use this method unless you absolutely have to. If you have to, use getQueueHolder().getAllPlayers()
      */
+    @Deprecated
     ImmutableList<QueuePlayer> getQueue();
 
     /**
@@ -68,6 +69,18 @@ public interface QueueServer {
      * @return If the server is joinable
      */
     boolean isJoinable(AdaptedPlayer p);
+
+    /**
+     * Gets the manually-set max player count for this server/group
+     * @return The manually-set max player count
+     */
+    int getManualMaxPlayers();
+
+    /**
+     * Checks if the total number of players in this server/group is above the manually-set max player count
+     * @return If the server is at or above the manually-set player limit
+     */
+    boolean isManuallyFull();
 
     /**
      * Pauses or unpauses a server
@@ -208,6 +221,12 @@ public interface QueueServer {
      * @return The balancer this server is using
      */
     Balancer getBalancer();
+
+    /**
+     * Gets the QueueHolder for this queue
+     * @return the QueueHolder that holds the queue
+     */
+    QueueHolder getQueueHolder();
 
 
     /**

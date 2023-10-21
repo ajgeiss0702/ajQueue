@@ -9,7 +9,6 @@ import us.ajg0702.queue.api.server.AdaptedServer;
 import us.ajg0702.queue.api.server.AdaptedServerInfo;
 import us.ajg0702.queue.api.server.AdaptedServerPing;
 import us.ajg0702.queue.api.util.QueueLogger;
-import us.ajg0702.queue.common.utils.Debug;
 import us.ajg0702.queue.platforms.velocity.players.VelocityPlayer;
 
 import java.util.ArrayList;
@@ -114,21 +113,13 @@ public class VelocityServer implements AdaptedServer {
     }
 
     @Override
-    public boolean canJoinFull(AdaptedPlayer player) {
-        if(player == null) return true;
-        Debug.info("on "+getName());
-        return
-                player.hasPermission("ajqueue.joinfull") ||
-                        player.hasPermission("ajqueue.joinfullserver."+getName()) ||
-                        player.hasPermission("ajqueue.joinfullandbypassserver."+getName()) ||
-                        player.hasPermission("ajqueue.joinfullandbypass") ||
-                        (AjQueueAPI.getInstance().isPremium() && AjQueueAPI.getInstance().getLogic().getPermissionGetter().hasUniqueFullBypass(player, getName()))
-                ;
+    public boolean justWentOnline() {
+        return System.currentTimeMillis()-lastOffline <= (AjQueueAPI.getInstance().getConfig().getDouble("wait-time") * 2 * 1000) && isOnline();
     }
 
     @Override
-    public boolean justWentOnline() {
-        return System.currentTimeMillis()-lastOffline <= (AjQueueAPI.getInstance().getConfig().getDouble("wait-time") * 2 * 1000) && isOnline();
+    public boolean shouldWaitAfterOnline() {
+        return System.currentTimeMillis()-lastOffline <= (AjQueueAPI.getInstance().getConfig().getDouble("wait-after-online") * 2 * 1000) && getLastPing().isPresent();
     }
 
     @Override

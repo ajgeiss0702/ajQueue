@@ -32,6 +32,7 @@ public class Position extends Placeholder {
     @Override
     public String parse(Matcher matcher, OfflinePlayer p) {
         Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+            if(!p.isOnline()) return;
             try {
                 MessagedResponse<Integer> response = AjQueueSpigotAPI.getInstance()
                         .getPosition(p.getUniqueId())
@@ -40,9 +41,7 @@ public class Position extends Placeholder {
                 cache.put(p.getUniqueId(), response.getEither());
             } catch (InterruptedException | ExecutionException e) {
                 throw new RuntimeException(e);
-            } catch (TimeoutException e) {
-                plugin.getLogger().log(Level.WARNING, "Timed out while trying to get placeholder data from proxy: ", e);
-            }
+            } catch (TimeoutException | IllegalArgumentException ignored) {}
         });
 
         return cache.getOrDefault(p.getUniqueId(), "...");

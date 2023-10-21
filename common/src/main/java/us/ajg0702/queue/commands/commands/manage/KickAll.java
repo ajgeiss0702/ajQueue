@@ -9,6 +9,7 @@ import us.ajg0702.queue.common.QueueMain;
 import us.ajg0702.utils.common.Messages;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class KickAll extends SubCommand {
@@ -65,9 +66,9 @@ public class KickAll extends SubCommand {
     @Override
     public List<String> autoComplete(ICommandSender sender, String[] args) {
         if(args.length == 1) {
-            return main.getQueueManager().getServerNames();
+            return filterCompletion(main.getQueueManager().getServerNames(), args[0]);
         }
-        return new ArrayList<>();
+        return Collections.emptyList();
     }
 }
 

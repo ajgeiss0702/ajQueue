@@ -58,6 +58,8 @@ public class EventHandlerImpl implements EventHandler {
         if(queues.size() > 0) {
             main.getQueueManager().sendMessage(main.getQueueManager().getSingleServer(player).findPlayer(player));
         }
+
+        main.serverTimeManager.playerChanged(player);
     }
 
     @Override
@@ -77,6 +79,7 @@ public class EventHandlerImpl implements EventHandler {
         }
         main.getQueueManager().clear(player);
         QueueCommand.cooldowns.remove(player);
+        main.serverTimeManager.removePlayer(player);
     }
 
     @Override
@@ -108,11 +111,31 @@ public class EventHandlerImpl implements EventHandler {
                 String[] parts = s.split(":");
                 String from = parts[0];
                 QueueServer to = main.getQueueManager().findServer(parts[1]);
-                if(from.equalsIgnoreCase(serverName) && to != null) {
-                    main.getQueueManager().addToQueue(player, to);
+                if(
+                        from.equalsIgnoreCase(serverName) && to != null &&
+                            (
+                                    !main.getConfig().getBoolean("require-queueserver-permission") ||
+                                            player.hasPermission("ajqueue.queueserver." + to.getName())
+                            )
+                ) {
+                    int delay = Math.min(main.getConfig().getInt("queue-server-delay"), 3000);
+                    Runnable task = () -> {
+                        if(to.getServers().contains(player.getCurrentServer())) return;
+                        main.getQueueManager().addToQueue(player, to);
+                    };
+
+                    Debug.info("Delaying queue-server by " + delay);
+
+                    if(delay > 0) {
+                        main.getTaskManager().executor.schedule(task, delay, TimeUnit.MILLISECONDS);
+                    } else {
+                        task.run();
+                    }
                 }
             }
         }
+
+        main.serverTimeManager.playerChanged(player);
 
     }
 

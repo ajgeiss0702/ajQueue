@@ -81,10 +81,10 @@ public class Kick extends SubCommand {
     @Override
     public List<String> autoComplete(ICommandSender sender, String[] args) {
         if(args.length == 1) {
-            return main.getPlatformMethods().getPlayerNames(false);
+            return filterCompletion(main.getPlatformMethods().getPlayerNames(false), args[0]);
         }
         if(args.length == 2) {
-            return main.getQueueManager().getServerNames();
+            return filterCompletion(main.getQueueManager().getServerNames(), args[1]);
         }
         return new ArrayList<>();
     }

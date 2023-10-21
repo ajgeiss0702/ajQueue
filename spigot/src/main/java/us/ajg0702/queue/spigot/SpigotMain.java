@@ -110,10 +110,7 @@ public class SpigotMain extends JavaPlugin implements PluginMessageListener,List
 		}
 
 	    if(subchannel.equals("inqueueevent")) {
-	    	String playername = in.readUTF();
-	    	Player p = Bukkit.getPlayer(playername);
-	    	if(p == null) return;
-	    	QueueScoreboardActivator e = new QueueScoreboardActivator(p);
+	    	QueueScoreboardActivator e = new QueueScoreboardActivator(player);
 	    	Bukkit.getPluginManager().callEvent(e);
 			return;
 	    }

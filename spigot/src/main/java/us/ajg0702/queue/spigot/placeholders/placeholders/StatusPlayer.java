@@ -35,7 +35,10 @@ public class StatusPlayer extends Placeholder {
         String queue = matcher.group(1);
         UUIDStringKey key = new UUIDStringKey(p.getUniqueId(), queue);
 
+        if(!p.isOnline()) return "You aren't online!";
+
         Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+            if(!p.isOnline()) return;
             try {
                 String response = AjQueueSpigotAPI.getInstance()
                         .getServerStatusString(queue, p.getUniqueId())
@@ -44,9 +47,7 @@ public class StatusPlayer extends Placeholder {
                 cache.put(key, response);
             } catch (InterruptedException | ExecutionException e) {
                 throw new RuntimeException(e);
-            } catch (TimeoutException e) {
-                plugin.getLogger().log(Level.WARNING, "Timed out while trying to get placeholder data from proxy: ", e);
-            }
+            } catch (TimeoutException | IllegalArgumentException ignored) {}
         });
 
         return cache.getOrDefault(key, "...");

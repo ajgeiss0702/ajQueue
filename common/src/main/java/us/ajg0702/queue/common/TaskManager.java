@@ -61,11 +61,14 @@ public class TaskManager {
                 TimeUnit.MILLISECONDS
         );
 
-        messageTask = scheduleAtFixedRate(
-                main.getQueueManager()::sendMessages,
-                main.getConfig().getInt("message-time"),
-                TimeUnit.SECONDS
-        );
+        int messageTime = main.getConfig().getInt("message-time");
+        if(messageTime > 0) {
+            messageTask = scheduleAtFixedRate(
+                    main.getQueueManager()::sendMessages,
+                    messageTime,
+                    TimeUnit.SECONDS
+            );
+        }
 
         actionBarTask = scheduleAtFixedRate(
                 main.getQueueManager()::sendActionBars,

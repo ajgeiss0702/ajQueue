@@ -1,6 +1,7 @@
 package us.ajg0702.queue.api.players;
 
 import us.ajg0702.queue.api.queues.QueueServer;
+import us.ajg0702.queue.api.server.AdaptedServer;
 
 import javax.annotation.Nullable;
 import java.util.UUID;
@@ -68,4 +69,10 @@ public interface QueuePlayer {
      * @return the max number of seconds this player can be offline before being removed from the queue
      */
     int getMaxOfflineTime();
+
+    /**
+     * Gets the server that the player was in when they joined the queue
+     * @return the server that the player was in when they joined the queue
+     */
+    AdaptedServer getInitialServer();
 }

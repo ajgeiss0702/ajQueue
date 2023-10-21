@@ -1,5 +1,6 @@
 package us.ajg0702.queue.api.server;
 
+import us.ajg0702.queue.api.AjQueueAPI;
 import us.ajg0702.queue.api.players.AdaptedPlayer;
 import us.ajg0702.queue.api.util.Handle;
 import us.ajg0702.queue.api.util.QueueLogger;
@@ -52,7 +53,20 @@ public interface AdaptedServer extends Handle {
      */
     int getOfflineTime();
 
-    boolean canJoinFull(AdaptedPlayer player);
+    default boolean canJoinFull(AdaptedPlayer player) {
+        return canJoinFull(player, getName());
+    }
+
+    static boolean canJoinFull(AdaptedPlayer player, String serverName) {
+        if(player == null) return true;
+        return
+                player.hasPermission("ajqueue.joinfull") ||
+                        player.hasPermission("ajqueue.joinfullserver." + serverName) ||
+                        player.hasPermission("ajqueue.joinfullandbypassserver." + serverName) ||
+                        player.hasPermission("ajqueue.joinfullandbypass") ||
+                        (AjQueueAPI.getInstance().isPremium() && AjQueueAPI.getInstance().getLogic().getPermissionGetter().hasUniqueFullBypass(player, serverName))
+                ;
+    }
 
     boolean justWentOnline();
 
@@ -75,13 +89,15 @@ public interface AdaptedServer extends Handle {
     }
 
     /**
-     * Gets if the last ping was successfull
+     * Gets if the last ping was successful
      * (which almost always means the server is online)
      * @return If the server is determined to be online or not
      */
     default boolean isOnline() {
-        return getLastPing().isPresent();
+        return getLastPing().isPresent() && !shouldWaitAfterOnline();
     }
+
+    boolean shouldWaitAfterOnline();
 
     /**
      * Gets the number of players currently online

@@ -1,9 +1,11 @@
 package us.ajg0702.queue.common.queues;
 
 import com.google.common.collect.ImmutableList;
+import us.ajg0702.queue.api.AjQueueAPI;
 import us.ajg0702.queue.api.events.PositionChangeEvent;
 import us.ajg0702.queue.api.players.AdaptedPlayer;
 import us.ajg0702.queue.api.players.QueuePlayer;
+import us.ajg0702.queue.api.queueholders.QueueHolder;
 import us.ajg0702.queue.api.queues.Balancer;
 import us.ajg0702.queue.api.queues.QueueServer;
 import us.ajg0702.queue.api.server.AdaptedServer;
@@ -11,13 +13,12 @@ import us.ajg0702.queue.api.server.AdaptedServerPing;
 import us.ajg0702.queue.common.QueueMain;
 import us.ajg0702.queue.common.players.QueuePlayerImpl;
 import us.ajg0702.queue.common.queues.balancers.DefaultBalancer;
+import us.ajg0702.queue.common.queues.balancers.FirstBalancer;
 import us.ajg0702.queue.common.queues.balancers.MinigameBalancer;
 import us.ajg0702.queue.common.utils.Debug;
 import us.ajg0702.utils.common.Messages;
 
 import java.util.*;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeUnit;
 
 public class QueueServerImpl implements QueueServer {
 
@@ -27,7 +28,7 @@ public class QueueServerImpl implements QueueServer {
 
     private final List<AdaptedServer> servers;
 
-    private final List<QueuePlayer> queue = new ArrayList<>();
+    private final QueueHolder queueHolder = AjQueueAPI.getQueueHolderRegistry().getQueueHolder(this);
 
     private List<Integer> supportedProtocols = new ArrayList<>();
 
@@ -36,6 +37,9 @@ public class QueueServerImpl implements QueueServer {
     private boolean paused;
 
     private long lastSentTime = 0;
+
+    private int manualMaxPlayers = Integer.MAX_VALUE;
+
 
     public QueueServerImpl(String name, QueueMain main, AdaptedServer server, List<QueuePlayer> previousPlayers) {
         this(name, main, Collections.singletonList(server), previousPlayers);
@@ -54,10 +58,12 @@ public class QueueServerImpl implements QueueServer {
             String balancerType = type.substring(colon+1);
 
             if(groupName.equals(name)) {
-                //noinspection SwitchStatementWithTooFewBranches
                 switch(balancerType.toLowerCase(Locale.ROOT)) {
                     case "minigame":
                         balancer = new MinigameBalancer(this, main);
+                        break;
+                    case "first":
+                        balancer = new FirstBalancer(this, main);
                         break;
                     default:
                         balancerType = "default";
@@ -70,6 +76,26 @@ public class QueueServerImpl implements QueueServer {
         if(balancer == null) {
             balancer = new DefaultBalancer(this, main);
             Debug.info("Using default balancer for "+name);
+        }
+
+        List<String> manualLimits = main.getConfig().getStringList("manual-max-players");
+        for (String manualLimit : manualLimits) {
+            String[] parts = manualLimit.split(":");
+            if(parts.length != 2) {
+                main.getLogger().warn("Invalid manual limit: " + manualLimit);
+                continue;
+            }
+            String limitFor = parts[0];
+
+            if(!limitFor.equals(name)) continue;
+
+            String limitStr = parts[1];
+            try {
+                manualMaxPlayers = Integer.parseInt(limitStr);
+            } catch(NumberFormatException e) {
+                main.getLogger().warn("Invalid limit number for " + limitFor);
+            }
+            break;
         }
 
         for(QueuePlayer queuePlayer : previousPlayers) {
@@ -98,7 +124,7 @@ public class QueueServerImpl implements QueueServer {
 
     @Override
     public ImmutableList<QueuePlayer> getQueue() {
-        return ImmutableList.copyOf(queue);
+        return ImmutableList.copyOf(queueHolder.getAllPlayers());
     }
 
     @Override
@@ -118,11 +144,11 @@ public class QueueServerImpl implements QueueServer {
             return msgs.getString("status.offline.paused");
         }
 
-        if(p != null && server.isWhitelisted() && !server.getWhitelistedPlayers().contains(p.getUniqueId())) {
+        if(server.isWhitelisted() && (p == null || !server.getWhitelistedPlayers().contains(p.getUniqueId()))) {
             return msgs.getString("status.offline.whitelisted");
         }
 
-        if(server.isFull() && !server.canJoinFull(p)) {
+        if((server.isFull() && !server.canJoinFull(p)) || (isManuallyFull() && !AdaptedServer.canJoinFull(p, getName()))) {
             return msgs.getString("status.offline.full");
         }
 
@@ -154,11 +180,11 @@ public class QueueServerImpl implements QueueServer {
             return "paused";
         }
 
-        if(p != null && server.isWhitelisted() && !server.getWhitelistedPlayers().contains(p.getUniqueId())) {
+        if(server.isWhitelisted() && (p == null || !server.getWhitelistedPlayers().contains(p.getUniqueId()))) {
             return "whitelisted";
         }
 
-        if(server.isFull() && !server.canJoinFull(p)) {
+        if(((server.isFull() && !server.canJoinFull(p)) || (isManuallyFull() && !AdaptedServer.canJoinFull(p, getName())))) {
             return "full";
         }
 
@@ -185,9 +211,29 @@ public class QueueServerImpl implements QueueServer {
 
     @Override
     public boolean isJoinable(AdaptedPlayer p) {
+        if(isManuallyFull() && !AdaptedServer.canJoinFull(p, getName())) return false;
         AdaptedServer server = getIdealServer(p);
         if(server == null) return false;
         return server.isJoinable(p) && !isPaused();
+    }
+
+    @Override
+    public int getManualMaxPlayers() {
+        return manualMaxPlayers;
+    }
+
+    @Override
+    public boolean isManuallyFull() {
+        int total = 0;
+        for (AdaptedServer server : servers) {
+            Optional<AdaptedServerPing> lastPing = server.getLastPing();
+            if(!lastPing.isPresent()) continue;
+            total += lastPing.get().getPlayerCount();
+        }
+
+//        Debug.info(total + " >= " + getManualMaxPlayers() + " = " + (total >= getManualMaxPlayers()));
+
+        return total >= getManualMaxPlayers();
     }
 
     @Override
@@ -201,9 +247,9 @@ public class QueueServerImpl implements QueueServer {
     }
 
     @Override
-    public synchronized void removePlayer(QueuePlayer player) {
+    public void removePlayer(QueuePlayer player) {
         main.getQueueManager().getSendingAttempts().remove(player);
-        queue.remove(player);
+        queueHolder.removePlayer(player);
         positionChange();
     }
 
@@ -220,13 +266,13 @@ public class QueueServerImpl implements QueueServer {
     }
 
     @Override
-    public synchronized void addPlayer(QueuePlayer player, int position) {
-        if(!player.getQueueServer().equals(this) || queue.contains(player)) return;
+    public void addPlayer(QueuePlayer player, int position) {
+        if(!player.getQueueServer().equals(this) || queueHolder.findPlayer(player.getUniqueId()) != null) return;
 
         if(position >= 0) {
-            queue.add(position, player);
+            queueHolder.addPlayer(player, position);
         } else {
-            queue.add(player);
+            queueHolder.addPlayer(player);
         }
         positionChange();
     }
@@ -272,31 +318,26 @@ public class QueueServerImpl implements QueueServer {
     }
 
     @Override
+    public boolean isOnline() {
+        return QueueServer.super.isOnline();
+    }
+
+    @Override
     public boolean isGroup() {
         return servers.size() > 1;
     }
 
     @Override
     public QueuePlayer findPlayer(String player) {
-        for(QueuePlayer queuePlayer : queue) {
-            if(queuePlayer.getName().equalsIgnoreCase(player)) {
-                return queuePlayer;
-            }
-        }
-        return null;
+        return queueHolder.findPlayer(player);
     }
     @Override
     public QueuePlayer findPlayer(AdaptedPlayer player) {
         return findPlayer(player.getUniqueId());
     }
     @Override
-    public synchronized QueuePlayer findPlayer(UUID uuid) {
-        for(QueuePlayer queuePlayer : queue) {
-            if(queuePlayer.getUniqueId().toString().equals(uuid.toString())) {
-                return queuePlayer;
-            }
-        }
-        return null;
+    public QueuePlayer findPlayer(UUID uuid) {
+        return queueHolder.findPlayer(uuid);
     }
 
     @Override
@@ -319,9 +360,14 @@ public class QueueServerImpl implements QueueServer {
         return balancer;
     }
 
+    @Override
+    public QueueHolder getQueueHolder() {
+        return queueHolder;
+    }
+
     private void positionChange() {
         main.getTaskManager().runNow(
-                () -> queue.forEach(queuePlayer -> {
+                () -> queueHolder.getAllPlayers().forEach(queuePlayer -> {
                     if(((QueuePlayerImpl) queuePlayer).lastPosition != queuePlayer.getPosition()) {
                         main.call(new PositionChangeEvent(queuePlayer));
                     }
