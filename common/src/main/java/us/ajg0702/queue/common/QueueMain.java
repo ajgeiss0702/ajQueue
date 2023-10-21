@@ -341,6 +341,10 @@ public class QueueMain extends AjQueueAPI {
         List<String> oldProtocolNames = config.getStringList("protocol-names");
         for (String oldProtocolName : oldProtocolNames) {
             String[] parts = oldProtocolName.split(":");
+            if(parts.length != 2) {
+                logger.warn("Invalid old (in the config) protocol name '" + oldProtocolName + "'. Skipping.");
+                continue;
+            }
             String protocol = parts[0];
             String name = parts[1];
 
