@@ -118,7 +118,7 @@ public class EventHandlerImpl implements EventHandler {
                                             player.hasPermission("ajqueue.queueserver." + to.getName())
                             )
                 ) {
-                    int delay = Math.min(main.getConfig().getInt("queue-server-delay"), 3000);
+                    int delay = Math.min(main.getConfig().getInt("queue-server-delay"), 15000);
                     Runnable task = () -> {
                         if(to.getServers().contains(player.getCurrentServer())) return;
                         main.getQueueManager().addToQueue(player, to);

@@ -87,7 +87,7 @@ queue-servers:
 # How much should we delay queueing players in queue servers?
 # You should only use this if you have issues with the instant sending.
 # Set to 0 or any negative number to disable
-# In milliseconds. Maximum value is 3000 (3 seconds)
+# In milliseconds. Maximum value is 15000 (15 seconds)
 #  Default: 0
 queue-server-delay: 0
 
