@@ -30,7 +30,7 @@ public class InQueue extends Placeholder {
 
     @Override
     public String parse(Matcher matcher, OfflinePlayer p) {
-        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+        plugin.getScheduler().runTaskAsynchronously(() -> {
             if(!p.isOnline()) return;
             try {
                 Boolean response = AjQueueSpigotAPI.getInstance()

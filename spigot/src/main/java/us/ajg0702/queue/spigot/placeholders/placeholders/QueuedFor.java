@@ -34,7 +34,7 @@ public class QueuedFor extends Placeholder {
         String queue = matcher.group(1);
         String cached = cache.getOrDefault(queue, "...");
 
-        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+        plugin.getScheduler().runTaskAsynchronously(() -> {
             if(!p.isOnline()) return;
             try {
                 Integer response = AjQueueSpigotAPI.getInstance()
