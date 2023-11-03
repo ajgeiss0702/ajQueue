@@ -6,7 +6,9 @@ import us.ajg0702.queue.api.events.Event;
 import us.ajg0702.queue.api.events.utils.EventReceiver;
 import us.ajg0702.queue.api.premium.Logic;
 import us.ajg0702.queue.api.premium.LogicGetter;
+import us.ajg0702.queue.api.queues.QueueServer;
 import us.ajg0702.queue.api.util.QueueLogger;
+import us.ajg0702.queue.common.utils.Debug;
 import us.ajg0702.queue.common.utils.LogConverter;
 import us.ajg0702.queue.logic.LogicGetterImpl;
 import us.ajg0702.utils.common.Config;
@@ -112,6 +114,23 @@ public class QueueMain extends AjQueueAPI {
     @Override
     public ProtocolNameManager getProtocolNameManager() {
         return protocolNameManager;
+    }
+
+    @Override
+    public Map<String, String> getQueueServers() {
+        List<String> rawQueueServers = getConfig().getStringList("queue-servers");
+        Map<String, String> r = new HashMap<>();
+        for(String rawQueueServer : rawQueueServers) {
+            if(!rawQueueServer.contains(":")) continue;
+            String[] parts = rawQueueServer.split(":");
+            String fromName = parts[0];
+            String toName = parts[1];
+            QueueServer toServer = getQueueManager().findServer(toName);
+            if(toServer == null) continue;
+
+            r.put(fromName, toName);
+        }
+        return r;
     }
 
     private Updater updater;

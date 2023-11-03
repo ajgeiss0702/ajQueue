@@ -219,7 +219,7 @@ public class QueueManagerImpl implements QueueManager {
 
         // Player should be added!
 
-        ImmutableList<QueuePlayer> list = server.getQueue();
+        List<QueuePlayer> list = server.getQueueHolder().getAllPlayers();
         QueuePlayer queuePlayer;
         AdaptedServer ideal = server.getIdealServer(player);
         if(main.isPremium()) {
@@ -249,20 +249,15 @@ public class QueueManagerImpl implements QueueManager {
             }
         }
 
-        list = server.getQueue();
+        list = server.getQueueHolder().getAllPlayers();
 
         int pos = queuePlayer.getPosition();
         int len = list.size();
 
-        boolean sendInstant = server.isJoinable(player);
-        boolean sendInstantp = list.size() <= 1 && server.isJoinable(player);
-        boolean timeGood = !main.getConfig().getBoolean("check-last-player-sent-time") || server.getLastSentTime() > Math.floor(main.getTimeBetweenPlayers() * 1000);
-        boolean alwaysSendInstantly = main.getConfig().getStringList("send-instantly").contains(server.getName());
+        boolean sentInstantly = canSendInstantly(player, server);
         boolean hasBypass = main.getLogic().hasAnyBypass(player, server.getName());
 
-        boolean sentInstantly = alwaysSendInstantly || (sendInstant && (sendInstantp && timeGood)) || hasBypass;
 
-        Debug.info("should send instantly (" + sentInstantly + "): " + alwaysSendInstantly + " || (" + sendInstant + " && (" + sendInstantp + " && " + timeGood + ") && " + (!hasBypass) + ")");
         if(sentInstantly) {
             if(!hasBypass) {
                 sendPlayers(server);
@@ -314,6 +309,19 @@ public class QueueManagerImpl implements QueueManager {
             return false;
         }
         return addToQueue(player, server);
+    }
+
+    @Override
+    public boolean canSendInstantly(AdaptedPlayer player, QueueServer queueServer) {
+        boolean isJoinable = queueServer.isJoinable(player);
+        boolean sizeGood = queueServer.getQueueHolder().getQueueSize() <= 1 && isJoinable;
+        boolean timeGood = !main.getConfig().getBoolean("check-last-player-sent-time") || queueServer.getLastSentTime() > Math.floor(main.getTimeBetweenPlayers() * 1000);
+        boolean alwaysSendInstantly = main.getConfig().getStringList("send-instantly").contains(queueServer.getName());
+        boolean hasBypass = main.getLogic().hasAnyBypass(player, queueServer.getName());
+
+        boolean sentInstantly =  alwaysSendInstantly || (isJoinable && (sizeGood && timeGood)) || hasBypass;
+        Debug.info("should send instantly (" + sentInstantly + "): " + alwaysSendInstantly + " || (" + isJoinable + " && (" + sizeGood + " && " + timeGood + ") && " + (!hasBypass) + ")");
+        return sentInstantly;
     }
 
     @Override

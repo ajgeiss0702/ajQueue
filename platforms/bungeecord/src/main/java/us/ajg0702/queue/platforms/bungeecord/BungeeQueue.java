@@ -4,6 +4,7 @@ import net.kyori.adventure.platform.bungeecord.BungeeAudiences;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.bungeecord.BungeeComponentSerializer;
 import net.md_5.bungee.api.ProxyServer;
+import net.md_5.bungee.api.config.ServerInfo;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import net.md_5.bungee.api.event.*;
 import net.md_5.bungee.api.plugin.Listener;
@@ -12,8 +13,11 @@ import net.md_5.bungee.event.EventHandler;
 import org.bstats.bungeecord.Metrics;
 import org.bstats.charts.SimplePie;
 import org.checkerframework.checker.nullness.qual.NonNull;
+import us.ajg0702.queue.api.AjQueueAPI;
 import us.ajg0702.queue.api.Implementation;
 import us.ajg0702.queue.api.commands.IBaseCommand;
+import us.ajg0702.queue.api.server.AdaptedServer;
+import us.ajg0702.queue.api.server.AdaptedServerInfo;
 import us.ajg0702.queue.api.util.QueueLogger;
 import us.ajg0702.queue.commands.BaseCommand;
 import us.ajg0702.queue.commands.commands.leavequeue.LeaveCommand;
@@ -150,6 +154,15 @@ public class BungeeQueue extends Plugin implements Listener, Implementation {
                     false
             );
         });
+    }
+
+    @EventHandler
+    public void onServerConnect(ServerConnectEvent e) {
+        AdaptedServer newServer = main.getEventHandler().changeTargetServer(new BungeePlayer(e.getPlayer()), new BungeeServer(e.getTarget()));
+
+        if(newServer == null) return;
+
+        e.setTarget((ServerInfo) newServer.getHandle());
     }
 
     @Override

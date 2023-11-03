@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableList;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import us.ajg0702.queue.api.EventHandler;
 import us.ajg0702.queue.api.events.SuccessfulSendEvent;
 import us.ajg0702.queue.api.players.AdaptedPlayer;
@@ -18,6 +19,7 @@ import us.ajg0702.queue.common.utils.Debug;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 public class EventHandlerImpl implements EventHandler {
@@ -212,5 +214,26 @@ public class EventHandlerImpl implements EventHandler {
                 }
             }
         }
+    }
+
+    @Override
+    public @Nullable AdaptedServer changeTargetServer(AdaptedPlayer player, AdaptedServer initialChoice) {
+
+        if(!main.getConfig().getBoolean("skip-queue-server-if-possible")) return null;
+
+        Map<String, String> queueServers = main.getQueueServers();
+
+        String toName = queueServers.get(initialChoice.getName());
+
+        // don't change if initial target server isn't a queue-server
+        if(toName == null) return null;
+
+        QueueServer to = main.getQueueManager().findServer(toName);
+
+        if(!main.getQueueManager().canSendInstantly(player, to)) return null;
+
+        Debug.info("Skipping queue-server " + initialChoice.getName() + " for " + player.getName() + " because they would be sent instantly! (skip-queue-server-if-possible)");
+
+        return to.getIdealServer(player);
     }
 }

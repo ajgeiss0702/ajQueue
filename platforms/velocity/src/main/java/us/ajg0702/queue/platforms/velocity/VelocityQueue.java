@@ -7,6 +7,7 @@ import com.velocitypowered.api.event.connection.DisconnectEvent;
 import com.velocitypowered.api.event.connection.PluginMessageEvent;
 import com.velocitypowered.api.event.player.KickedFromServerEvent;
 import com.velocitypowered.api.event.player.ServerPostConnectEvent;
+import com.velocitypowered.api.event.player.ServerPreConnectEvent;
 import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
 import com.velocitypowered.api.event.proxy.ProxyShutdownEvent;
 import com.velocitypowered.api.plugin.Plugin;
@@ -14,12 +15,14 @@ import com.velocitypowered.api.plugin.annotation.DataDirectory;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.proxy.messages.MinecraftChannelIdentifier;
+import com.velocitypowered.api.proxy.server.RegisteredServer;
 import net.kyori.adventure.text.Component;
 import org.bstats.charts.SimplePie;
 import org.bstats.velocity.Metrics;
 import org.slf4j.Logger;
 import us.ajg0702.queue.api.Implementation;
 import us.ajg0702.queue.api.commands.IBaseCommand;
+import us.ajg0702.queue.api.server.AdaptedServer;
 import us.ajg0702.queue.commands.BaseCommand;
 import us.ajg0702.queue.commands.commands.leavequeue.LeaveCommand;
 import us.ajg0702.queue.commands.commands.listqueues.ListCommand;
@@ -149,6 +152,19 @@ public class VelocityQueue implements Implementation {
                 // According to Tux on discord, velocity doesnt give a reason when the proxy loses connection to the connected server
                 e.kickedDuringServerConnect()
         );
+    }
+
+    @Subscribe
+    public void onPreConnect(ServerPreConnectEvent e) {
+        RegisteredServer to = e.getResult().getServer().orElse(null);
+
+        if(to == null) return;
+
+        AdaptedServer newServer = main.getEventHandler().changeTargetServer(new VelocityPlayer(e.getPlayer()), new VelocityServer(to));
+
+        if(newServer == null) return;
+
+        e.setResult(ServerPreConnectEvent.ServerResult.allowed((RegisteredServer) newServer.getHandle()));
     }
 
     @Override

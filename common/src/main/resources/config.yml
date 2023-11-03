@@ -91,6 +91,11 @@ queue-servers:
 #  Default: 0
 queue-server-delay: 0
 
+# Before a player connects to a queue-server, check if they would be instantly sent to the target server.
+# If they would, this option will bypass the queue-server completely and connect them directly to the target server.
+skip-queue-server-if-possible: true
+
+
 # Should we completely kick the user from the server if they are in a queue-server
 #  and are kicked from the server with one of the above reasons?
 # Note this will do nothing on servers that aren't queue-servers
@@ -389,7 +394,7 @@ debug: false
 
 
 # Don't touch this number please
-config-version: 44
+config-version: 45
 
 
 # This is ONLY here so that they can be moved to messages.yml. Please edit these in messages.yml!
