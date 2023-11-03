@@ -93,6 +93,8 @@ queue-server-delay: 0
 
 # Before a player connects to a queue-server, check if they would be instantly sent to the target server.
 # If they would, this option will bypass the queue-server completely and connect them directly to the target server.
+# If they would not be sent instantly, then they will be put in the queue in the queue-server as normal.
+#  Default: true
 skip-queue-server-if-possible: true
 
 
