@@ -232,8 +232,14 @@ public class EventHandlerImpl implements EventHandler {
 
         if(!main.getQueueManager().canSendInstantly(player, to)) return null;
 
+        AdaptedServer ideal = to.getIdealServer(player);
+
+        if(ideal == null) return null;
+        if(!ideal.isJoinable(player)) return null;
+
         Debug.info("Skipping queue-server " + initialChoice.getName() + " for " + player.getName() + " because they would be sent instantly! (skip-queue-server-if-possible)");
 
-        return to.getIdealServer(player);
+        ideal.addPlayer();
+        return ideal;
     }
 }
