@@ -24,16 +24,14 @@ import us.ajg0702.queue.commands.commands.leavequeue.LeaveCommand;
 import us.ajg0702.queue.commands.commands.listqueues.ListCommand;
 import us.ajg0702.queue.commands.commands.manage.ManageCommand;
 import us.ajg0702.queue.commands.commands.queue.QueueCommand;
+import us.ajg0702.queue.commands.commands.send.SendAlias;
 import us.ajg0702.queue.common.QueueMain;
 import us.ajg0702.queue.platforms.bungeecord.commands.BungeeCommand;
 import us.ajg0702.queue.platforms.bungeecord.players.BungeePlayer;
 import us.ajg0702.queue.platforms.bungeecord.server.BungeeServer;
 
 import java.io.File;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @SuppressWarnings("unused")
 public class BungeeQueue extends Plugin implements Listener, Implementation {
@@ -63,16 +61,22 @@ public class BungeeQueue extends Plugin implements Listener, Implementation {
         getProxy().registerChannel("ajqueue:tospigot");
         getProxy().registerChannel("ajqueue:toproxy");
 
-        commands = Arrays.asList(
+        commands = new ArrayList<>(Arrays.asList(
                 new QueueCommand(main),
                 new LeaveCommand(main),
                 new ListCommand(main),
                 new ManageCommand(main)
-        );
+        ));
+
+        if(main.getConfig().getBoolean("enable-send-alias")) {
+            commands.add(new SendAlias(main));
+        }
 
         for(IBaseCommand command : commands) {
             registerCommand(command);
         }
+
+
 
         getProxy().getPluginManager().registerListener(this, this);
 

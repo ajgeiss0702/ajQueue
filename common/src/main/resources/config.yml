@@ -180,6 +180,12 @@ enable-server-command: false
 #  If you have the free version, you can only put the server name, no aliases.
 slash-servers: []
 
+# Should we enable /send as an alias for /ajQueue send?
+# If on bungeecord, this requires extra setup (same as replacing the server command but with send instead)
+# Requires a server restart to apply.
+#  Default: false
+enable-send-alias: false
+
 
 # Should we enable priority messages?
 # Configure the priority messages in the option below.
@@ -396,7 +402,7 @@ debug: false
 
 
 # Don't touch this number please
-config-version: 45
+config-version: 46
 
 
 # This is ONLY here so that they can be moved to messages.yml. Please edit these in messages.yml!

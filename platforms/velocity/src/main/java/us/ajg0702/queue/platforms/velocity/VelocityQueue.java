@@ -28,6 +28,7 @@ import us.ajg0702.queue.commands.commands.leavequeue.LeaveCommand;
 import us.ajg0702.queue.commands.commands.listqueues.ListCommand;
 import us.ajg0702.queue.commands.commands.manage.ManageCommand;
 import us.ajg0702.queue.commands.commands.queue.QueueCommand;
+import us.ajg0702.queue.commands.commands.send.SendAlias;
 import us.ajg0702.queue.common.QueueMain;
 import us.ajg0702.queue.platforms.velocity.commands.VelocityCommand;
 import us.ajg0702.queue.platforms.velocity.players.VelocityPlayer;
@@ -35,6 +36,7 @@ import us.ajg0702.queue.platforms.velocity.server.VelocityServer;
 
 import java.io.File;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -84,12 +86,16 @@ public class VelocityQueue implements Implementation {
                 dataFolder
         );
 
-        commands = Arrays.asList(
+        commands = new ArrayList<>(Arrays.asList(
                 new QueueCommand(main),
                 new LeaveCommand(main),
                 new ListCommand(main),
                 new ManageCommand(main)
-        );
+        ));
+
+        if(main.getConfig().getBoolean("enable-send-alias")) {
+            commands.add(new SendAlias(main));
+        }
 
 
         proxyServer.getChannelRegistrar().register(MinecraftChannelIdentifier.create("ajqueue", "tospigot"));
