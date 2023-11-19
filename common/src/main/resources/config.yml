@@ -167,6 +167,7 @@ remove-player-on-server-switch: false
 # Should we enable the server command being a queue command?
 # This may require extra setup on bungeecord. See the wiki:
 # https://wiki.ajg0702.us/ajqueue/setup/replacing-server-command
+# Requires a server restart after changing to apply
 #  Default: false
 enable-server-command: false
 
@@ -402,7 +403,7 @@ debug: false
 
 
 # Don't touch this number please
-config-version: 46
+config-version: 47
 
 
 # This is ONLY here so that they can be moved to messages.yml. Please edit these in messages.yml!

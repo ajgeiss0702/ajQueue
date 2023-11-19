@@ -86,6 +86,11 @@ public class VelocityQueue implements Implementation {
                 dataFolder
         );
 
+        // unregister velocity's built-in server command if we are going to override it
+        if(main.getConfig().getBoolean("enable-server-command")) {
+            commandManager.unregister("server");
+        }
+
         commands = new ArrayList<>(Arrays.asList(
                 new QueueCommand(main),
                 new LeaveCommand(main),
