@@ -1,11 +1,13 @@
 package us.ajg0702.queue.logic;
 
+import us.ajg0702.queue.api.events.PriorityCalculationEvent;
 import us.ajg0702.queue.api.premium.Logic;
 import us.ajg0702.queue.api.players.AdaptedPlayer;
 import us.ajg0702.queue.api.players.QueuePlayer;
 import us.ajg0702.queue.api.premium.PermissionGetter;
 import us.ajg0702.queue.api.queues.QueueServer;
 import us.ajg0702.queue.api.server.AdaptedServer;
+import us.ajg0702.queue.common.QueueMain;
 
 public class FreeLogic implements Logic {
     @Override
@@ -30,7 +32,13 @@ public class FreeLogic implements Logic {
 
     @Override
     public int getHighestPriority(QueueServer queueServer, AdaptedServer server, AdaptedPlayer player) {
-        return player.hasPermission("ajqueue.priority") ? 1 : 0;
+        int existingPriority = player.hasPermission("ajqueue.priority") ? 1 : 0;
+
+        PriorityCalculationEvent event = new PriorityCalculationEvent(player, existingPriority);
+
+        QueueMain.getInstance().call(event);
+
+        return event.getHighestPriority() > 0 ? 1 : 0;
     }
 
     @Override

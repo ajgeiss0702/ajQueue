@@ -1,6 +1,8 @@
 package us.ajg0702.queue.logic;
 
 import com.google.common.collect.ImmutableList;
+import us.ajg0702.queue.api.AjQueueAPI;
+import us.ajg0702.queue.api.events.PriorityCalculationEvent;
 import us.ajg0702.queue.api.premium.Logic;
 import us.ajg0702.queue.api.players.AdaptedPlayer;
 import us.ajg0702.queue.api.players.QueuePlayer;
@@ -24,7 +26,13 @@ public class PremiumLogic implements Logic {
         int serverPriority = permissionGetter.getServerPriotity(queueServer.getName(), player);
         int unJoinablePriority = Logic.getUnJoinablePriorities(queueServer, server, player);
 
-        return Math.max(normalPriority, Math.max(serverPriority, unJoinablePriority));
+        int highest = Math.max(normalPriority, Math.max(serverPriority, unJoinablePriority));
+
+        PriorityCalculationEvent event = new PriorityCalculationEvent(player, highest);
+
+        QueueMain.getInstance().call(event);
+
+        return event.getHighestPriority();
     }
 
     private final PermissionGetter permissionGetter;
