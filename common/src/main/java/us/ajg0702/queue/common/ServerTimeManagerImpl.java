@@ -14,15 +14,18 @@ public class ServerTimeManagerImpl implements ServerTimeManager {
 
 
     @Override
-    public long getLastServerChange(@NotNull AdaptedPlayer player) {
+    public long getLastServerChange(AdaptedPlayer player) {
+        if(player == null) return -1;
         return serverSwitches.get(player.getUniqueId());
     }
 
-    public void playerChanged(@NotNull AdaptedPlayer player) {
+    public void playerChanged(AdaptedPlayer player) {
+        if(player == null) return;
         serverSwitches.put(player.getUniqueId(), System.currentTimeMillis());
     }
 
-    public void removePlayer(@NotNull AdaptedPlayer player) {
+    public void removePlayer(AdaptedPlayer player) {
+        if(player == null) return;
         serverSwitches.remove(player.getUniqueId());
     }
 }
