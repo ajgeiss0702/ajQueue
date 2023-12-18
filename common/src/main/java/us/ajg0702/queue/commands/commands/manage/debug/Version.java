@@ -13,8 +13,12 @@ import java.util.List;
 public class Version extends SubCommand {
 
     final QueueMain main;
+    final Component message;
     public Version(QueueMain main) {
         this.main = main;
+        message = main.getMessages().toComponent(
+                "&a" + (main.isPremium() ? "ajQueuePlus" : "ajQueue") + " v&f" + main.getPlatformMethods().getPluginVersion() + " &aby &fajgeiss0702"
+        );
     }
 
     @Override
@@ -40,7 +44,7 @@ public class Version extends SubCommand {
     @Override
     public void execute(ICommandSender sender, String[] args) {
         if(!checkPermission(sender)) return;
-        sender.sendMessage(Component.text(main.getPlatformMethods().getPluginVersion()));
+        sender.sendMessage(message);
     }
 
     @Override
