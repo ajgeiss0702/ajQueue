@@ -61,7 +61,7 @@ public class Kick extends SubCommand {
             kickPlayers = Collections.singletonList(queue.findPlayer(args[0]));
         }
 
-        if(kickPlayers.size() == 0) {
+        if(kickPlayers.isEmpty()) {
             sender.sendMessage(getMessages().getComponent("commands.kick.no-player", "PLAYER:"+args[0]));
             return;
         }
