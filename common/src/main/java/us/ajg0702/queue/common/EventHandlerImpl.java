@@ -236,6 +236,7 @@ public class EventHandlerImpl implements EventHandler {
 
         if(ideal == null) return null;
         if(!ideal.isJoinable(player)) return null;
+        if(!(!main.getConfig().getBoolean("require-queueserver-permission") || player.hasPermission("ajqueue.queueserver." + to.getName()))) return null;
 
         Debug.info("Skipping queue-server " + initialChoice.getName() + " for " + player.getName() + " because they would be sent instantly! (skip-queue-server-if-possible)");
 
