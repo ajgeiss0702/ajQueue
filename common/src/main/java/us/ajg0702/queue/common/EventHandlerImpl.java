@@ -221,27 +221,31 @@ public class EventHandlerImpl implements EventHandler {
 
         if(!main.getConfig().getBoolean("skip-queue-server-if-possible")) return null;
 
-        Map<String, String> queueServers = main.getQueueServers();
+        Map<String, List<String>> queueServers = main.getQueueServers();
 
-        String toName = queueServers.get(initialChoice.getName());
+        List<String> toNames = queueServers.get(initialChoice.getName());
 
         // don't change if initial target server isn't a queue-server
-        if(toName == null) return null;
+        if(toNames == null || toNames.isEmpty()) return null;
 
-        QueueServer to = main.getQueueManager().findServer(toName);
+        for (String toName : toNames) {
+            QueueServer to = main.getQueueManager().findServer(toName);
 
-        if(!main.getQueueManager().canSendInstantly(player, to)) return null;
+            if(!main.getQueueManager().canSendInstantly(player, to)) continue;
 
-        AdaptedServer ideal = to.getIdealServer(player);
+            AdaptedServer ideal = to.getIdealServer(player);
 
-        if(ideal == null) return null;
-        if(!to.isJoinable(player)) return null;
-        if(!ideal.isJoinable(player)) return null;
-        if(!(!main.getConfig().getBoolean("require-queueserver-permission") || player.hasPermission("ajqueue.queueserver." + to.getName()))) return null;
+            if(ideal == null) continue;
+            if(!to.isJoinable(player)) continue;
+            if(!ideal.isJoinable(player)) continue;
+            if(!(!main.getConfig().getBoolean("require-queueserver-permission") || player.hasPermission("ajqueue.queueserver." + to.getName()))) continue;
 
-        Debug.info("Skipping queue-server " + initialChoice.getName() + " for " + player.getName() + " because they would be sent instantly! (skip-queue-server-if-possible)");
+            Debug.info("Skipping queue-server " + initialChoice.getName() + " for " + player.getName() + " because they would be sent instantly! (skip-queue-server-if-possible)");
 
-        ideal.addPlayer();
-        return ideal;
+            ideal.addPlayer();
+            return ideal;
+        }
+
+        return null;
     }
 }

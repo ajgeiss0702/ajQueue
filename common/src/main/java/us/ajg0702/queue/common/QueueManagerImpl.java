@@ -626,6 +626,7 @@ public class QueueManagerImpl implements QueueManager {
             for(QueuePlayer queuePlayer : server.getQueue()) {
                 if(queuePlayer.getPlayer() != null) continue;
                 if(main.getLogic().playerDisconnectedTooLong(queuePlayer)) {
+                    Debug.info("Removing " + queuePlayer.getName() + " due to them being disconnected too long");
                     server.removePlayer(queuePlayer);
                 }
             }

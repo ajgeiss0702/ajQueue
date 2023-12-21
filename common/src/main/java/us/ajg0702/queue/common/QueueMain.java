@@ -8,7 +8,6 @@ import us.ajg0702.queue.api.premium.Logic;
 import us.ajg0702.queue.api.premium.LogicGetter;
 import us.ajg0702.queue.api.queues.QueueServer;
 import us.ajg0702.queue.api.util.QueueLogger;
-import us.ajg0702.queue.common.utils.Debug;
 import us.ajg0702.queue.common.utils.LogConverter;
 import us.ajg0702.queue.logic.LogicGetterImpl;
 import us.ajg0702.utils.common.Config;
@@ -117,9 +116,9 @@ public class QueueMain extends AjQueueAPI {
     }
 
     @Override
-    public Map<String, String> getQueueServers() {
+    public Map<String, List<String>> getQueueServers() {
         List<String> rawQueueServers = getConfig().getStringList("queue-servers");
-        Map<String, String> r = new HashMap<>();
+        Map<String, List<String>> r = new HashMap<>();
         for(String rawQueueServer : rawQueueServers) {
             if(!rawQueueServer.contains(":")) continue;
             String[] parts = rawQueueServer.split(":");
@@ -128,7 +127,9 @@ public class QueueMain extends AjQueueAPI {
             QueueServer toServer = getQueueManager().findServer(toName);
             if(toServer == null) continue;
 
-            r.put(fromName, toName);
+            List<String> existing = r.computeIfAbsent(fromName, key -> new ArrayList<>());
+            existing.add(toName);
+            r.put(fromName, existing);
         }
         return r;
     }
