@@ -69,15 +69,6 @@ public class EventHandlerImpl implements EventHandler {
         ImmutableList<QueuePlayer> queues = main.getQueueManager().findPlayerInQueues(player);
         for(QueuePlayer queuePlayer : queues) {
             ((QueuePlayerImpl) queuePlayer).setLeaveTime(System.currentTimeMillis());
-            List<String> svs = main.getConfig().getStringList("queue-servers");
-            for(String s : svs) {
-                if(!s.contains(":")) continue;
-                String[] parts = s.split(":");
-                String from = parts[0];
-                if(queuePlayer.getQueueServer().getServerNames().contains(from)) {
-                    queuePlayer.getQueueServer().removePlayer(queuePlayer);
-                }
-            }
         }
         main.getQueueManager().clear(player);
         QueueCommand.cooldowns.remove(player);
@@ -123,6 +114,7 @@ public class EventHandlerImpl implements EventHandler {
                     int delay = Math.min(main.getConfig().getInt("queue-server-delay"), 3000);
                     Runnable task = () -> {
                         if(to.getServers().contains(player.getCurrentServer())) return;
+                        if(to.findPlayer(player) != null) return;
                         main.getQueueManager().addToQueue(player, to);
                     };
 
