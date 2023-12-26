@@ -135,7 +135,9 @@ public interface AdaptedServer extends Handle {
      */
     default boolean isWhitelisted() {
         if(!getLastPing().isPresent()) return false;
-        return getLastPing().get().getPlainDescription().contains("ajQueue;whitelisted=");
+        String plainDescription = getLastPing().get().getPlainDescription();
+        if(plainDescription == null) return false;
+        return plainDescription.contains("ajQueue;whitelisted=");
     }
 
     /**
