@@ -122,7 +122,7 @@ public interface AdaptedServer extends Handle {
     }
 
     /**
-     * Temporarly adds one player to the player count
+     * Temporarily adds one player to the player count
      */
     default void addPlayer() {
         if(!getLastPing().isPresent()) return;
