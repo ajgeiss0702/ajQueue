@@ -134,20 +134,11 @@ public class QueuePlayerImpl implements QueuePlayer {
 
         PreConnectEvent preConnectEvent = new PreConnectEvent(server, player);
         QueueMain.getInstance().call(preConnectEvent);
+
+        // Event declares that the addon/developer handle notifying the player of this cancellation
+        if (preConnectEvent.isCancelled()) { return; }
+
         // Fetch an addon-supplied handle if available, or use the existing server handle (default behavior)
-        server = preConnectEvent.getTargetServer();
-        if (preConnectEvent.getDelayStatus() != null) {
-            Messages msgs = QueueMain.getInstance().getMessages();
-
-            player.sendActionBar(msgs.getComponent("spigot.actionbar.offline",
-                    "POS:"+getPosition(),
-                    "LEN:"+getQueueServer().getQueue().size(),
-                    "SERVER:"+server.getName(),
-                    "STATUS:"+preConnectEvent.getDelayStatus()
-            ));
-            return;
-        }
-
-        player.connect(server);
+        player.connect(preConnectEvent.getTargetServer());
     }
 }
