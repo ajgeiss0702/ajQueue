@@ -2,10 +2,13 @@ package us.ajg0702.queue.common.players;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import us.ajg0702.queue.api.events.PreConnectEvent;
 import us.ajg0702.queue.api.players.AdaptedPlayer;
 import us.ajg0702.queue.api.players.QueuePlayer;
 import us.ajg0702.queue.api.queues.QueueServer;
 import us.ajg0702.queue.api.server.AdaptedServer;
+import us.ajg0702.queue.common.QueueMain;
+import us.ajg0702.utils.common.Messages;
 
 import java.util.UUID;
 
@@ -120,5 +123,31 @@ public class QueuePlayerImpl implements QueuePlayer {
     private long leaveTime = 0;
     public void setLeaveTime(long leaveTime) {
         this.leaveTime = leaveTime;
+    }
+
+    @Override
+    public void connect(@NotNull AdaptedServer server) {
+        AdaptedPlayer player = getPlayer();
+        if (player == null) {
+            throw new IllegalArgumentException("Player must be online!");
+        }
+
+        PreConnectEvent preConnectEvent = new PreConnectEvent(server, player);
+        QueueMain.getInstance().call(preConnectEvent);
+        // Fetch an addon-supplied handle if available, or use the existing server handle (default behavior)
+        server = preConnectEvent.getTargetServer();
+        if (preConnectEvent.getDelayStatus() != null) {
+            Messages msgs = QueueMain.getInstance().getMessages();
+
+            player.sendActionBar(msgs.getComponent("spigot.actionbar.offline",
+                    "POS:"+getPosition(),
+                    "LEN:"+getQueueServer().getQueue().size(),
+                    "SERVER:"+server.getName(),
+                    "STATUS:"+preConnectEvent.getDelayStatus()
+            ));
+            return;
+        }
+
+        player.connect(server);
     }
 }

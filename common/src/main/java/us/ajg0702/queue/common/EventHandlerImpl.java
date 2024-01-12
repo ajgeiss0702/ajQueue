@@ -6,6 +6,7 @@ import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import us.ajg0702.queue.api.EventHandler;
+import us.ajg0702.queue.api.events.AutoQueueEvent;
 import us.ajg0702.queue.api.events.SuccessfulSendEvent;
 import us.ajg0702.queue.api.players.AdaptedPlayer;
 import us.ajg0702.queue.api.players.QueuePlayer;
@@ -162,7 +163,10 @@ public class EventHandlerImpl implements EventHandler {
                 main.getTaskManager().runLater(() -> {
                     if(!player.isConnected()) return;
 
-                    String toName = from.getName();
+                    AutoQueueEvent event = new AutoQueueEvent(player, from.getName());
+                    main.call(event);
+                    String toName = event.getTargetServer();
+
                     player.sendMessage(main.getMessages().getComponent("auto-queued", "SERVER:"+toName));
                     main.getQueueManager().addToQueue(player, toName);
                 }, (long) (main.getConfig().getDouble("auto-add-to-queue-on-kick-delay")*1000), TimeUnit.MILLISECONDS);
