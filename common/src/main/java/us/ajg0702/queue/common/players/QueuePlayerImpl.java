@@ -132,7 +132,7 @@ public class QueuePlayerImpl implements QueuePlayer {
             throw new IllegalArgumentException("Player must be online!");
         }
 
-        PreConnectEvent preConnectEvent = new PreConnectEvent(server, player);
+        PreConnectEvent preConnectEvent = new PreConnectEvent(server, this);
         QueueMain.getInstance().call(preConnectEvent);
 
         // Event declares that the addon/developer handle notifying the player of this cancellation

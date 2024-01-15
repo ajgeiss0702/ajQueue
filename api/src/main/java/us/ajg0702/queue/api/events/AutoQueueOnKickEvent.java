@@ -3,15 +3,19 @@ package us.ajg0702.queue.api.events;
 import us.ajg0702.queue.api.players.AdaptedPlayer;
 
 /**
- * Called before AjQueue queues a player for a server.
- * Use Case: View/Change the server that the player is re-queued for.
+ * Called before AjQueue auto-queues a player for a server. (on player kick)
+ * Use Case: View/Change the server that the player is auto-queued for.
+ * If canceled, the player will not be queued to any server.
+ * If you cancel this event, it is up to you to send a message telling the player why they were not auto-queued.
  */
 @SuppressWarnings("unused")
-public class AutoQueueEvent implements Event {
+public class AutoQueueOnKickEvent implements Event, Cancellable {
     private final AdaptedPlayer player;
     private String targetServer;
 
-    public AutoQueueEvent(AdaptedPlayer player, String targetServer) {
+    private boolean cancelled = false;
+
+    public AutoQueueOnKickEvent(AdaptedPlayer player, String targetServer) {
         this.player = player;
         this.targetServer = targetServer;
     }
@@ -36,6 +40,14 @@ public class AutoQueueEvent implements Event {
      */
     public void setTargetServer(String targetServer) {
         this.targetServer = targetServer;
+    }
+
+    public boolean isCancelled() {
+        return cancelled;
+    }
+
+    public void setCancelled(boolean cancelled) {
+        this.cancelled = cancelled;
     }
 }
 

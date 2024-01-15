@@ -77,5 +77,8 @@ public interface QueuePlayer {
      */
     AdaptedServer getInitialServer();
 
+    /**
+     * Attempts a connection to the provided AdaptedServer, calling PreConnectEvent before AdaptedPlayer.connect(...)
+     */
     void connect(@NotNull AdaptedServer server);
 }
