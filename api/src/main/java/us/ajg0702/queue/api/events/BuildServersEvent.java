@@ -12,6 +12,7 @@ import java.util.*;
 @SuppressWarnings("unused")
 public class BuildServersEvent implements Event {
     private final Map<String, AdaptedServer> servers = new HashMap<>();
+    private final Map<String, List<AdaptedServer>> groups = new HashMap<>();
 
     public BuildServersEvent(List<? extends AdaptedServer> servers) {
         // Compile a map of server names to servers
@@ -56,4 +57,41 @@ public class BuildServersEvent implements Event {
     public boolean removeServer(String name) {
         return servers.remove(name) != null;
     }
+
+
+    /**
+     * @see #addGroup(String, List)
+     * @see #removeGroup(String)
+     * @return an immutable list of the sets of servers that will be registered as group QueueServers.
+     */
+    public List<List<AdaptedServer>> getGroups() {
+        return Collections.unmodifiableList(new ArrayList<>(groups.values()));
+    }
+
+    /**
+     * Used internally
+     */
+    public Set<Map.Entry<String, List<AdaptedServer>>> groupEntrySet() {
+        return groups.entrySet();
+    }
+
+    /**
+     * Add a server-group to be registered by the Queue Manager.
+     * @param name The name of the server-group
+     * @param servers The servers to add to the group
+     * @return The previous server list with that name, or null if there was no previous data
+     */
+    public @Nullable List<AdaptedServer> addGroup(String name, List<AdaptedServer> servers) {
+        return groups.put(name, servers);
+    }
+
+    /**
+     * Remove a server, preventing it from being registered as a QueueServer.
+     * @param name The name of the server to remove
+     * @return true if the server was removed, false if it was not found
+     */
+    public boolean removeGroup(String name) {
+        return groups.remove(name) != null;
+    }
+
 }

@@ -59,6 +59,28 @@ public class QueueManagerImpl implements QueueManager {
             result.add(queueServer);
         }
 
+        // Mirror the logic from below regarding server groups, just using the ones supplied from the event
+        for (Map.Entry<String, List<AdaptedServer>> groups : buildServersEvent.groupEntrySet()) {
+            String groupName = groups.getKey();
+            if (findServer(groupName, result) != null) {
+                main.getLogger().warning("The name of a group ('"+groupName+"') cannot be the same as the name of a server!");
+                continue;
+            }
+
+            List<AdaptedServer> groupServers = groups.getValue();
+            if (groupServers.size() == 0) {
+                main.getLogger().warning("Server group '"+groupName+"' has no servers! Ignoring it.");
+                continue;
+            }
+
+            QueueServer previousServer = main.getQueueManager().findServer(groupName);
+            List<QueuePlayer> previousPlayers = previousServer == null ? new ArrayList<>() : previousServer.getQueue();
+            if (previousPlayers.size() > 0) {
+                Debug.info("Adding "+previousPlayers.size()+" players back to the queue for "+groupName);
+            }
+            result.add(new QueueServerImpl(groupName, main, groupServers, previousPlayers));
+        }
+
         List<String> groupsRaw = main.getConfig().getStringList("server-groups");
         for(String groupRaw : groupsRaw) {
             if(groupRaw.isEmpty()) {
