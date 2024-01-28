@@ -158,16 +158,20 @@ public class VelocityPlayer implements AdaptedPlayer, Audience {
                             }
                         }
 
-                        if(main.getConfig().getBoolean("velocity-kick-message")) {
-                            handle.sendMessage(
-                                    main.getMessages().getComponent(
-                                            "velocity-kick-message",
-                                            "SERVER:" + server.getName(),
-                                            "REASON:" +
-                                                    LegacyComponentSerializer.legacyAmpersand()
-                                                            .serialize(reason)
-                                    )
-                            );
+                        try {
+                            if(main.getConfig().getBoolean("velocity-kick-message")) {
+                                handle.sendMessage(
+                                        main.getMessages().getComponent(
+                                                "velocity-kick-message",
+                                                "SERVER:" + server.getName(),
+                                                "REASON:" +
+                                                        LegacyComponentSerializer.legacyAmpersand()
+                                                                .serialize(reason)
+                                        )
+                                );
+                            }
+                        } catch(Exception e) {
+                            main.getLogger().warn("Error while sending velocity-kick-message:", e);
                         }
                         main.getEventHandler().onServerKick(
                                 this,
