@@ -230,7 +230,7 @@ server-aliases:
 #  Default: 120
 offline-time: 120
 
-# On velocity, should we end a player a message when they are kicked while trying to connect to a server with the queue?
+# On velocity, should we send a player a message when they are kicked while trying to connect to a server with the queue?
 # This has no effect on bungee, because the message is sent from bungee and there's no way to change that in ajQueue
 #  Default: false
 velocity-kick-message: false
