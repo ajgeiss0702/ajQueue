@@ -547,7 +547,7 @@ public class QueueManagerImpl implements QueueManager {
         QueueServer server = queuePlayer.getQueueServer();
 
         int pos = queuePlayer.getPosition();
-        int len = server.getQueue().size();
+        int len = server.getQueueHolder().getQueueSize();
 
         if(!server.isJoinable(player)) {
             String status = server.getStatusString(player);
