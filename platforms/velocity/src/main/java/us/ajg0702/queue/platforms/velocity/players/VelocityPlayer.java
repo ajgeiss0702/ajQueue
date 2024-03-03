@@ -167,6 +167,7 @@ public class VelocityPlayer implements AdaptedPlayer, Audience {
                                                 "REASON:" +
                                                         LegacyComponentSerializer.legacyAmpersand()
                                                                 .serialize(reason)
+                                                                .replaceAll("§", "&")
                                         )
                                 );
                             }
