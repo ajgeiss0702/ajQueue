@@ -16,7 +16,8 @@ public class ServerTimeManagerImpl implements ServerTimeManager {
     @Override
     public long getLastServerChange(AdaptedPlayer player) {
         if(player == null) return -1;
-        return serverSwitches.get(player.getUniqueId());
+        Long r = serverSwitches.get(player.getUniqueId());
+        return r == null ? -1 : r;
     }
 
     public void playerChanged(AdaptedPlayer player) {
