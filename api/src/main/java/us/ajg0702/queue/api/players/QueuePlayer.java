@@ -1,5 +1,6 @@
 package us.ajg0702.queue.api.players;
 
+import org.jetbrains.annotations.NotNull;
 import us.ajg0702.queue.api.queues.QueueServer;
 import us.ajg0702.queue.api.server.AdaptedServer;
 
@@ -75,4 +76,9 @@ public interface QueuePlayer {
      * @return the server that the player was in when they joined the queue
      */
     AdaptedServer getInitialServer();
+
+    /**
+     * Attempts a connection to the provided AdaptedServer, calling PreConnectEvent before AdaptedPlayer.connect(...)
+     */
+    void connect(@NotNull AdaptedServer server);
 }
