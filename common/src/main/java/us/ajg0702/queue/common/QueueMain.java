@@ -235,7 +235,7 @@ public class QueueMain extends AjQueueAPI {
 
         queueManager = new QueueManagerImpl(this);
 
-        protocolNameManager = new ProtocolNameManagerImpl(config, platformMethods);
+        protocolNameManager = new ProtocolNameManagerImpl(messages, platformMethods);
 
         taskManager.rescheduleTasks();
 
