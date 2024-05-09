@@ -55,6 +55,7 @@ public class Reload extends SubCommand {
         main.getQueueManager().reloadServers();
         main.getMessages().reload();
         main.getSlashServerManager().reload();
+        main.getImplementation().reload();
 
         main.getUpdater().setEnabled(main.getConfig().getBoolean("enable-updater"));
 

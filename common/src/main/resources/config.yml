@@ -163,6 +163,13 @@ remove-player-on-server-switch: false
 #  Default: false
 enable-server-command: false
 
+# When set: /queue and its aliases are not registered, making slash-servers commands the only way for players
+# to queue-up.
+# Warning: This setting only effects the proxy commands, if the plugin is also installed on your Bukkit server
+# the queue command will still be available.
+#  Default: false
+allow-only-slash-servers-for-queueing: false
+
 # What servers should we make slash server commands for?
 # For example, if survival is in this list, then if a player executes /survival
 #  then they will be put in the queue for survival
@@ -389,7 +396,7 @@ debug: false
 
 
 # Don't touch this number please
-config-version: 44
+config-version: 45
 
 
 # This is ONLY here so that they can be moved to messages.yml. Please edit these in messages.yml!

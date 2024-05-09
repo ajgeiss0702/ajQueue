@@ -66,8 +66,9 @@ public class BungeeQueue extends Plugin implements Listener, Implementation {
                 new ManageCommand(main)
         );
 
-        for(IBaseCommand command : commands) {
-            registerCommand(command);
+        int i = main.getConfig().getBoolean("allow-only-slash-servers-for-queueing") ? 1 : 0;
+        for(; i < commands.size(); i++) {
+            registerCommand(commands.get(i));
         }
 
         getProxy().getPluginManager().registerListener(this, this);
@@ -166,6 +167,20 @@ public class BungeeQueue extends Plugin implements Listener, Implementation {
         commandMap.put(command.getName(), bungeeCommand);
         getProxy().getPluginManager()
                 .registerCommand(this, bungeeCommand);
+    }
+
+    @Override
+    public void reload() {
+        boolean wantQueueCommandRegistered = !main.getConfig().getBoolean("allow-only-slash-servers-for-queueing");
+        if (wantQueueCommandRegistered != commandMap.containsKey(commands.get(0).getName())) {
+            if (!wantQueueCommandRegistered) {
+                main.getLogger().warn("Reload is unregistering /queue command");
+                unregisterCommand(commands.get(0).getName());
+            } else {
+                main.getLogger().warn("Reload is registering /queue command");
+                registerCommand(commands.get(0));
+            }
+        }
     }
 
     public QueueMain getMain() {
