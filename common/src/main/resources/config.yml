@@ -38,6 +38,14 @@ message-time: 10
 #  Default: false
 require-permission: false
 
+# Should we act like servers a player doesn't have permission for doesn't exist?
+# So if a player doesn't have permission to queue for a server, and they try to queue for it,
+#  ajQueue will send the server-not-exist message instead of the noperm message.
+# This option does nothing if require-permission is disabled.
+# IMO this is pointless, but people keep asking for it so here you go...
+#  Default: false
+act-like-no-permission-servers-dont-exist: false
+
 # Require a permission for players to be able to join a queue from a server.
 # If enabled, players will need the permission ajqueue.joinfrom.<server> to join queues.
 # Replace <server> with the name of the server
