@@ -36,10 +36,7 @@ import us.ajg0702.queue.platforms.velocity.server.VelocityServer;
 
 import java.io.File;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Plugin(
         id = "ajqueue",
@@ -154,7 +151,19 @@ public class VelocityQueue implements Implementation {
 
     @Subscribe
     public void onKick(KickedFromServerEvent e) {
-        if(!e.getPlayer().getCurrentServer().isPresent()) return; // if the player is kicked on initial join, we dont care
+
+
+        if(!e.getPlayer().getCurrentServer().isPresent()) {
+            if(changedTargetPlayers.containsKey(e.getPlayer())) {
+                // If the player failed to connect to the server we changed them to, redirect them to the original server
+                e.setResult(
+                        KickedFromServerEvent.RedirectPlayer
+                                .create(changedTargetPlayers.get(e.getPlayer()))
+                );
+            } else {
+                return; // if the player is kicked on initial join, we don't care
+            }
+        }
         Optional<Component> reasonOptional = e.getServerKickReason();
         main.getEventHandler().onServerKick(
                 new VelocityPlayer(e.getPlayer()),
@@ -165,6 +174,8 @@ public class VelocityQueue implements Implementation {
         );
     }
 
+    private final WeakHashMap<Player, RegisteredServer> changedTargetPlayers = new WeakHashMap<>();
+
     @Subscribe
     public void onPreConnect(ServerPreConnectEvent e) {
         RegisteredServer to = e.getResult().getServer().orElse(null);
@@ -174,6 +185,8 @@ public class VelocityQueue implements Implementation {
         AdaptedServer newServer = main.getEventHandler().changeTargetServer(new VelocityPlayer(e.getPlayer()), new VelocityServer(to));
 
         if(newServer == null) return;
+
+        changedTargetPlayers.put(e.getPlayer(), to); // save the original server so we can revert it if it fails
 
         e.setResult(ServerPreConnectEvent.ServerResult.allowed((RegisteredServer) newServer.getHandle()));
     }
