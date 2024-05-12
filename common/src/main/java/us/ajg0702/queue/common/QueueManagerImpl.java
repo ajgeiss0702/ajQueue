@@ -3,7 +3,9 @@ package us.ajg0702.queue.common;
 import com.google.common.collect.ImmutableList;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.title.Title;
+import us.ajg0702.queue.api.AjQueueAPI;
 import us.ajg0702.queue.api.QueueManager;
+import us.ajg0702.queue.api.events.BuildServersEvent;
 import us.ajg0702.queue.api.events.PreQueueEvent;
 import us.ajg0702.queue.api.players.AdaptedPlayer;
 import us.ajg0702.queue.api.players.QueuePlayer;
@@ -39,13 +41,15 @@ public class QueueManagerImpl implements QueueManager {
 
     public List<QueueServer> buildServers() {
         List<QueueServer> result = new ArrayList<>();
-        List<? extends AdaptedServer> servers = main.getPlatformMethods().getServers();
 
-        for(AdaptedServer server : servers) {
+        BuildServersEvent buildServersEvent = new BuildServersEvent(main.getPlatformMethods().getServers());
+        main.call(buildServersEvent);
+
+        for(AdaptedServer server : buildServersEvent.getServers()) {
             QueueServer previousServer = findServer(server.getName());
             List<QueuePlayer> previousPlayers = previousServer == null ? new ArrayList<>() : previousServer.getQueue();
             if(previousPlayers.size() > 0) {
-                main.getLogger().info("Adding "+previousPlayers.size()+" players back to the queue for "+server.getName());
+                Debug.info("Adding "+previousPlayers.size()+" players back to the queue for "+server.getName());
             }
             QueueServer queueServer = new QueueServerImpl(server.getName(), main, server, previousPlayers);
             if(previousServer != null) {
@@ -53,6 +57,28 @@ public class QueueManagerImpl implements QueueManager {
                 queueServer.setLastSentTime(previousServer.getLastSentTime());
             }
             result.add(queueServer);
+        }
+
+        // Mirror the logic from below regarding server groups, just using the ones supplied from the event
+        for (Map.Entry<String, List<AdaptedServer>> groups : buildServersEvent.groupEntrySet()) {
+            String groupName = groups.getKey();
+            if (findServer(groupName, result) != null) {
+                main.getLogger().warning("The name of a group ('"+groupName+"') cannot be the same as the name of a server!");
+                continue;
+            }
+
+            List<AdaptedServer> groupServers = groups.getValue();
+            if (groupServers.size() == 0) {
+                main.getLogger().warning("Server group '"+groupName+"' has no servers! Ignoring it.");
+                continue;
+            }
+
+            QueueServer previousServer = main.getQueueManager().findServer(groupName);
+            List<QueuePlayer> previousPlayers = previousServer == null ? new ArrayList<>() : previousServer.getQueue();
+            if (previousPlayers.size() > 0) {
+                Debug.info("Adding "+previousPlayers.size()+" players back to the queue for "+groupName);
+            }
+            result.add(new QueueServerImpl(groupName, main, groupServers, previousPlayers));
         }
 
         List<String> groupsRaw = main.getConfig().getStringList("server-groups");
@@ -93,11 +119,10 @@ public class QueueManagerImpl implements QueueManager {
                 continue;
             }
 
-
             QueueServer previousServer = main.getQueueManager().findServer(groupName);
             List<QueuePlayer> previousPlayers = previousServer == null ? new ArrayList<>() : previousServer.getQueue();
             if(previousPlayers.size() > 0) {
-                main.getLogger().info("Adding "+previousPlayers.size()+" players back to the queue for "+groupName);
+                Debug.info("Adding "+previousPlayers.size()+" players back to the queue for "+groupName);
             }
 
             result.add(new QueueServerImpl(groupName, main, groupServers, previousPlayers));
@@ -580,7 +605,13 @@ public class QueueManagerImpl implements QueueManager {
                     +((ThreadPoolExecutor) pool).getActiveCount()+" threads");
         }
         try {
-            for(AdaptedServer server : main.getPlatformMethods().getServers()) {
+            // Create a 'set' of AdaptedServer by server name
+            Map<String, AdaptedServer> serverMap = new HashMap<>();
+            for (QueueServer qServer : servers) {
+                qServer.getServers().forEach(server -> serverMap.put(server.getName(), server));
+            }
+            // Ping each server (registered in buildServers and affected by BuildServersEvent)
+            for (AdaptedServer server : serverMap.values()) {
                 pool.submit(() -> server.ping(main.getConfig().getBoolean("pinger-debug"), main.getLogger()));
             }
         } catch(Exception e) {
@@ -654,8 +685,9 @@ public class QueueManagerImpl implements QueueManager {
                     ) continue;
 
                     player.sendMessage(msgs.getComponent("status.sending-now", "SERVER:"+server.getAlias()));
-                    Debug.info("Calling player.connect for " + player.getName() + "(send when back online)");
-                    player.connect(selected);
+                    Debug.info("Calling QueuePlayer.connect for " + player.getName() + "(send when back online)");
+                    // Use QueuePlayer.connect which will fire the PreConnectEvent then call player.connect
+                    p.connect(selected);
                 }
                 continue;
             }
@@ -788,6 +820,7 @@ public class QueueManagerImpl implements QueueManager {
                                 )
                         );
                     } else {
+                        // Use direct connect method, as opposed to the QueuePlayer connect
                         selectedPlayer.connect(kickTo);
                         selectedPlayer.sendMessage(main.getMessages().getComponent("errors.kicked-to-make-room"));
 
@@ -838,8 +871,9 @@ public class QueueManagerImpl implements QueueManager {
 
 
             server.setLastSentTime(System.currentTimeMillis());
-            Debug.info("calling nextPlayer.connect on " + nextPlayer.getName());
-            nextPlayer.connect(selected);
+            Debug.info("calling nextQueuePlayer.connect on " + nextPlayer.getName());
+            // Use QueuePlayer.connect which will fire the PreConnectEvent then call player.connect
+            nextQueuePlayer.connect(selected);
             selected.addPlayer();
             Debug.info(selected.getName()+" player count is now set to "+ selected.getPlayerCount());
         }
