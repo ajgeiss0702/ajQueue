@@ -83,10 +83,4 @@ public interface QueuePlayer {
      * Attempts a connection to the provided AdaptedServer, calling PreConnectEvent before AdaptedPlayer.connect(...)
      */
     void connect(@NotNull AdaptedServer server);
-
-    /**
-     * Returns the estimated time until a player is connected
-     * @return The number of seconds (estimated) until the player is connected to the server. -1 means that no estimate is available currently
-     */
-    int getEstimatedTime();
 }
