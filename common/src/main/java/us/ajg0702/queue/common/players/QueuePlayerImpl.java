@@ -64,11 +64,6 @@ public class QueuePlayerImpl implements QueuePlayer {
         return server;
     }
 
-    @Override
-    public int getPosition() {
-        return getQueueServer().getQueue().indexOf(this)+1;
-    }
-
     @Nullable
     @Override
     public AdaptedPlayer getPlayer() {

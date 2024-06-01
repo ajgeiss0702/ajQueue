@@ -228,6 +228,10 @@ public interface QueueServer {
      */
     QueueHolder getQueueHolder();
 
+    default int getPosition(QueuePlayer player) {
+        return getQueueHolder().getPosition(player);
+    }
+
 
     /**
      * elliot is bad

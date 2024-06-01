@@ -25,7 +25,9 @@ public interface QueuePlayer {
      * Gets the player's position in the queue
      * @return The player's position. 1 being 1st, 2 being 2nd, etc
      */
-    int getPosition();
+    default int getPosition() {
+        return getQueueServer().getPosition(this);
+    }
 
     /**
      * Get the player this represents.
@@ -81,4 +83,10 @@ public interface QueuePlayer {
      * Attempts a connection to the provided AdaptedServer, calling PreConnectEvent before AdaptedPlayer.connect(...)
      */
     void connect(@NotNull AdaptedServer server);
+
+    /**
+     * Returns the estimated time until a player is connected
+     * @return The number of seconds (estimated) until the player is connected to the server. -1 means that no estimate is available currently
+     */
+    int getEstimatedTime();
 }
