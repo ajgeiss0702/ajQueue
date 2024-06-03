@@ -155,7 +155,7 @@ public class SpigotMain extends JavaPlugin implements PluginMessageListener,List
 
 	@EventHandler
 	public void onJoin(PlayerJoinEvent e) {
-		if(hasProxy) return;
+		if(hasProxy || !config.getBoolean("check-proxy-response")) return;
 		getScheduler().runTaskLaterAsynchronously(() -> sendMessage(e.getPlayer(), "ack", ""), 5);
 	}
 
