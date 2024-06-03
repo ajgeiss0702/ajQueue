@@ -14,11 +14,11 @@ repositories {
 }
 
 dependencies {
-    compileOnly("net.kyori:adventure-api:4.13.1")
+    compileOnly("net.kyori:adventure-api:4.15.0")
     compileOnly("com.google.guava:guava:30.1.1-jre")
     compileOnly("org.spongepowered:configurate-yaml:4.0.0")
 
-    implementation("us.ajg0702:ajUtils:1.2.14")
+    implementation("us.ajg0702:ajUtils:1.2.25")
 
     implementation(project(":platforms:velocity"))
     implementation(project(":platforms:bungeecord"))

@@ -63,6 +63,11 @@ public class DefaultQueueHolder extends QueueHolder {
     }
 
     @Override
+    public int getPosition(QueuePlayer player) {
+        return queue.indexOf(player) + 1;
+    }
+
+    @Override
     public List<QueuePlayer> getAllPlayers() {
         return ImmutableList.copyOf(queue);
     }

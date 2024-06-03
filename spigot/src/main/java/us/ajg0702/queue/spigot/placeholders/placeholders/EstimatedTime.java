@@ -23,6 +23,7 @@ public class EstimatedTime extends Placeholder {
     }
 
     private final Map<UUID, String> cache = new ConcurrentHashMap<>();
+    private final Map<UUID, Long> lastFetch = new ConcurrentHashMap<>();
 
     @Override
     public String getRegex() {
@@ -31,18 +32,22 @@ public class EstimatedTime extends Placeholder {
 
     @Override
     public String parse(Matcher matcher, OfflinePlayer p) {
-        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
-            if(!p.isOnline()) return;
-            try {
-                MessagedResponse<String> response = AjQueueSpigotAPI.getInstance()
-                        .getEstimatedTime(p.getUniqueId())
-                        .get(30, TimeUnit.SECONDS);
 
-                cache.put(p.getUniqueId(), response.getEither());
-            } catch (InterruptedException | ExecutionException e) {
-                throw new RuntimeException(e);
-            } catch (TimeoutException | IllegalArgumentException ignored) {}
-        });
+        if(System.currentTimeMillis() - lastFetch.getOrDefault(p.getUniqueId(), 0L) > 2000) {
+            lastFetch.put(p.getUniqueId(), System.currentTimeMillis());
+            plugin.getScheduler().runTaskAsynchronously(() -> {
+                if(!p.isOnline()) return;
+                try {
+                    MessagedResponse<String> response = AjQueueSpigotAPI.getInstance()
+                            .getEstimatedTime(p.getUniqueId())
+                            .get(30, TimeUnit.SECONDS);
+
+                    cache.put(p.getUniqueId(), response.getEither());
+                } catch (InterruptedException | ExecutionException e) {
+                    throw new RuntimeException(e);
+                } catch (TimeoutException | IllegalArgumentException ignored) {}
+            });
+        }
 
         return cache.getOrDefault(p.getUniqueId(), "...");
     }
@@ -50,5 +55,6 @@ public class EstimatedTime extends Placeholder {
     @Override
     public void cleanCache(Player player) {
         cache.remove(player.getUniqueId());
+        lastFetch.remove(player.getUniqueId());
     }
 }

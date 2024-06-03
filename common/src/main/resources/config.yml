@@ -38,6 +38,14 @@ message-time: 10
 #  Default: false
 require-permission: false
 
+# Should we act like servers a player doesn't have permission for doesn't exist?
+# So if a player doesn't have permission to queue for a server, and they try to queue for it,
+#  ajQueue will send the server-not-exist message instead of the noperm message.
+# This option does nothing if require-permission is disabled.
+# IMO this is pointless, but people keep asking for it so here you go...
+#  Default: false
+act-like-no-permission-servers-dont-exist: false
+
 # Require a permission for players to be able to join a queue from a server.
 # If enabled, players will need the permission ajqueue.joinfrom.<server> to join queues.
 # Replace <server> with the name of the server
@@ -90,6 +98,13 @@ queue-servers:
 # In milliseconds. Maximum value is 3000 (3 seconds)
 #  Default: 0
 queue-server-delay: 0
+
+# Before a player connects to a queue-server, check if they would be instantly sent to the target server.
+# If they would, this option will bypass the queue-server completely and connect them directly to the target server.
+# If they would not be sent instantly, then they will be put in the queue in the queue-server as normal.
+#  Default: true
+skip-queue-server-if-possible: true
+
 
 # Should we completely kick the user from the server if they are in a queue-server
 #  and are kicked from the server with one of the above reasons?
@@ -160,6 +175,7 @@ remove-player-on-server-switch: false
 # Should we enable the server command being a queue command?
 # This may require extra setup on bungeecord. See the wiki:
 # https://wiki.ajg0702.us/ajqueue/setup/replacing-server-command
+# Requires a server restart after changing to apply
 #  Default: false
 enable-server-command: false
 
@@ -172,6 +188,12 @@ enable-server-command: false
 #   - "hub:lobby"
 #  If you have the free version, you can only put the server name, no aliases.
 slash-servers: []
+
+# Should we enable /send as an alias for /ajQueue send?
+# If on bungeecord, this requires extra setup (same as replacing the server command but with send instead)
+# Requires a server restart to apply.
+#  Default: false
+enable-send-alias: false
 
 
 # Should we enable priority messages?
@@ -216,7 +238,7 @@ server-aliases:
 #  Default: 120
 offline-time: 120
 
-# On velocity, should we end a player a message when they are kicked while trying to connect to a server with the queue?
+# On velocity, should we send a player a message when they are kicked while trying to connect to a server with the queue?
 # This has no effect on bungee, because the message is sent from bungee and there's no way to change that in ajQueue
 #  Default: false
 velocity-kick-message: false
@@ -389,7 +411,7 @@ debug: false
 
 
 # Don't touch this number please
-config-version: 44
+config-version: 47
 
 
 # This is ONLY here so that they can be moved to messages.yml. Please edit these in messages.yml!

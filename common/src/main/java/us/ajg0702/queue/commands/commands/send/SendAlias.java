@@ -1,29 +1,30 @@
-package us.ajg0702.queue.commands.commands.manage.debug;
+package us.ajg0702.queue.commands.commands.send;
 
 import com.google.common.collect.ImmutableList;
-import net.kyori.adventure.text.Component;
+import us.ajg0702.queue.api.commands.IBaseCommand;
 import us.ajg0702.queue.api.commands.ICommandSender;
-import us.ajg0702.queue.commands.SubCommand;
+import us.ajg0702.queue.commands.BaseCommand;
 import us.ajg0702.queue.common.QueueMain;
 import us.ajg0702.utils.common.Messages;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
-public class Version extends SubCommand {
+public class SendAlias extends BaseCommand {
 
     final QueueMain main;
-    final Component message;
-    public Version(QueueMain main) {
+
+    private final IBaseCommand sendCommand;
+
+
+    public SendAlias(QueueMain main) {
         this.main = main;
-        message = main.getMessages().toComponent(
-                "&a" + (main.isPremium() ? "ajQueuePlus" : "ajQueue") + " v&f" + main.getPlatformMethods().getPluginVersion() + " &aby &fajgeiss0702"
-        );
+        sendCommand = main.getPlatformMethods().getCommands().get(3).getSubCommands().get(9);
     }
 
     @Override
     public String getName() {
-        return "version";
+        return "send";
     }
 
     @Override
@@ -33,7 +34,7 @@ public class Version extends SubCommand {
 
     @Override
     public String getPermission() {
-        return null;
+        return sendCommand.getPermission();
     }
 
     @Override
@@ -44,11 +45,13 @@ public class Version extends SubCommand {
     @Override
     public void execute(ICommandSender sender, String[] args) {
         if(!checkPermission(sender)) return;
-        sender.sendMessage(message);
+        sendCommand.execute(sender, args);
     }
 
     @Override
     public List<String> autoComplete(ICommandSender sender, String[] args) {
-        return new ArrayList<>();
+        if(!checkPermission(sender)) return Collections.emptyList();
+        return sendCommand.autoComplete(sender, args);
     }
+
 }

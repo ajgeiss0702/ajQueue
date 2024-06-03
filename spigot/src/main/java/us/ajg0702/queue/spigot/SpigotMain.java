@@ -22,6 +22,7 @@ import us.ajg0702.queue.spigot.api.SpigotAPI;
 import us.ajg0702.queue.spigot.communication.ResponseManager;
 import us.ajg0702.queue.spigot.placeholders.PlaceholderExpansion;
 import us.ajg0702.utils.common.ConfigFile;
+import us.ajg0702.utils.foliacompat.CompatScheduler;
 
 import java.io.File;
 import java.util.HashMap;
@@ -34,6 +35,8 @@ public class SpigotMain extends JavaPlugin implements PluginMessageListener,List
 	private PlaceholderExpansion placeholders;
 
 	private ResponseManager responseManager = new ResponseManager();
+
+	private final CompatScheduler compatScheduler = new CompatScheduler(this);
 	
 	private ConfigFile config;
 
@@ -60,7 +63,7 @@ public class SpigotMain extends JavaPlugin implements PluginMessageListener,List
 			getLogger().info("Registered PlaceholderAPI placeholders");
 		}
 		
-		Bukkit.getScheduler().runTaskTimer(this, () -> {
+		getScheduler().runTaskTimerAsynchronously(() -> {
 			if(Bukkit.getOnlinePlayers().size() <= 0 || queuebatch.size() <= 0) return;
 			StringBuilder msg = new StringBuilder();
 			for(Player p : queuebatch.keySet()) {
@@ -152,8 +155,8 @@ public class SpigotMain extends JavaPlugin implements PluginMessageListener,List
 
 	@EventHandler
 	public void onJoin(PlayerJoinEvent e) {
-		if(hasProxy) return;
-		Bukkit.getScheduler().runTaskLater(this, () -> sendMessage(e.getPlayer(), "ack", ""), 5);
+		if(hasProxy || !config.getBoolean("check-proxy-response")) return;
+		getScheduler().runTaskLaterAsynchronously(() -> sendMessage(e.getPlayer(), "ack", ""), 5);
 	}
 
 	@EventHandler(priority = EventPriority.HIGH)
@@ -175,6 +178,9 @@ public class SpigotMain extends JavaPlugin implements PluginMessageListener,List
 		e.setMotd("ajQueue;whitelisted="+whitelist);
 	}
 
+	public CompatScheduler getScheduler() {
+		return compatScheduler;
+	}
 
 	public ConfigFile getAConfig() {
 		return config;

@@ -4,7 +4,9 @@ import com.google.common.collect.ImmutableList;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import us.ajg0702.queue.api.EventHandler;
+import us.ajg0702.queue.api.events.AutoQueueOnKickEvent;
 import us.ajg0702.queue.api.events.SuccessfulSendEvent;
 import us.ajg0702.queue.api.players.AdaptedPlayer;
 import us.ajg0702.queue.api.players.QueuePlayer;
@@ -18,6 +20,7 @@ import us.ajg0702.queue.common.utils.Debug;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 public class EventHandlerImpl implements EventHandler {
@@ -67,15 +70,6 @@ public class EventHandlerImpl implements EventHandler {
         ImmutableList<QueuePlayer> queues = main.getQueueManager().findPlayerInQueues(player);
         for(QueuePlayer queuePlayer : queues) {
             ((QueuePlayerImpl) queuePlayer).setLeaveTime(System.currentTimeMillis());
-            List<String> svs = main.getConfig().getStringList("queue-servers");
-            for(String s : svs) {
-                if(!s.contains(":")) continue;
-                String[] parts = s.split(":");
-                String from = parts[0];
-                if(queuePlayer.getQueueServer().getServerNames().contains(from)) {
-                    queuePlayer.getQueueServer().removePlayer(queuePlayer);
-                }
-            }
         }
         main.getQueueManager().clear(player);
         QueueCommand.cooldowns.remove(player);
@@ -121,6 +115,7 @@ public class EventHandlerImpl implements EventHandler {
                     int delay = Math.min(main.getConfig().getInt("queue-server-delay"), 3000);
                     Runnable task = () -> {
                         if(to.getServers().contains(player.getCurrentServer())) return;
+                        if(to.findPlayer(player) != null) return;
                         main.getQueueManager().addToQueue(player, to);
                     };
 
@@ -168,9 +163,15 @@ public class EventHandlerImpl implements EventHandler {
                 main.getTaskManager().runLater(() -> {
                     if(!player.isConnected()) return;
 
-                    String toName = from.getName();
-                    player.sendMessage(main.getMessages().getComponent("auto-queued", "SERVER:"+toName));
-                    main.getQueueManager().addToQueue(player, toName);
+                    AutoQueueOnKickEvent event = new AutoQueueOnKickEvent(player, from.getName());
+                    main.call(event);
+                    // Event declares that the addon/developer handle notifying the player of this cancellation
+                    if (!event.isCancelled()) {
+                        String toName = event.getTargetServer();
+
+                        player.sendMessage(main.getMessages().getComponent("auto-queued", "SERVER:"+toName));
+                        main.getQueueManager().addToQueue(player, toName);
+                    }
                 }, (long) (main.getConfig().getDouble("auto-add-to-queue-on-kick-delay")*1000), TimeUnit.MILLISECONDS);
                 return;
             }
@@ -212,5 +213,38 @@ public class EventHandlerImpl implements EventHandler {
                 }
             }
         }
+    }
+
+    @Override
+    public @Nullable AdaptedServer changeTargetServer(AdaptedPlayer player, AdaptedServer initialChoice) {
+
+        if(!main.getConfig().getBoolean("skip-queue-server-if-possible")) return null;
+
+        Map<String, List<String>> queueServers = main.getQueueServers();
+
+        List<String> toNames = queueServers.get(initialChoice.getName());
+
+        // don't change if initial target server isn't a queue-server
+        if(toNames == null || toNames.isEmpty()) return null;
+
+        for (String toName : toNames) {
+            QueueServer to = main.getQueueManager().findServer(toName);
+
+            if(!main.getQueueManager().canSendInstantly(player, to)) continue;
+
+            AdaptedServer ideal = to.getIdealServer(player);
+
+            if(ideal == null) continue;
+            if(!to.isJoinable(player)) continue;
+            if(!ideal.isJoinable(player)) continue;
+            if(!(!main.getConfig().getBoolean("require-queueserver-permission") || player.hasPermission("ajqueue.queueserver." + to.getName()))) continue;
+
+            Debug.info("Skipping queue-server " + initialChoice.getName() + " for " + player.getName() + " because they would be sent instantly! (skip-queue-server-if-possible)");
+
+            ideal.addPlayer();
+            return ideal;
+        }
+
+        return null;
     }
 }

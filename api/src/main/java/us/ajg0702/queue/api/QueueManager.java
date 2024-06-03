@@ -13,7 +13,7 @@ public interface QueueManager {
      * Adds a player to a queue
      * @param player The player to be added
      * @param server The server or group to add the player to
-     * @return True if adding was successfull, false if not.
+     * @return True if adding was successful, false if not.
      */
     boolean addToQueue(AdaptedPlayer player, QueueServer server);
 
@@ -21,14 +21,23 @@ public interface QueueManager {
      * Adds a player to a queue
      * @param player The player to be added
      * @param serverName The name of the server or group to add the player too
-     * @return True if adding was successfull, false if not.
+     * @return True if adding was successful, false if not.
      */
     @SuppressWarnings("UnusedReturnValue")
     boolean addToQueue(AdaptedPlayer player, String serverName);
 
     /**
+     * Checks if a player would be sent instantly if they were to join the queue right now
+     * @param player the player to check
+     * @param queueServer The QueueServer to check for
+     * @return if the player would be sent instantly if they join the queue now
+     */
+    boolean canSendInstantly(AdaptedPlayer player, QueueServer queueServer);
+
+
+    /**
      * Gets a list of QueueServers (servers and groups)
-     * @return A list of QueueServerss
+     * @return A list of QueueServers
      */
     ImmutableList<QueueServer> getServers();
 

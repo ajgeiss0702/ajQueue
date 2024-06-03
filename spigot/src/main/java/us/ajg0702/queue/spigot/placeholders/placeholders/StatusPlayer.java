@@ -24,6 +24,7 @@ public class StatusPlayer extends Placeholder {
     }
 
     private final Map<UUIDStringKey, String> cache = new ConcurrentHashMap<>();
+    private final Map<UUIDStringKey, Long> lastFetch = new ConcurrentHashMap<>();
 
     @Override
     public String getRegex() {
@@ -35,20 +36,25 @@ public class StatusPlayer extends Placeholder {
         String queue = matcher.group(1);
         UUIDStringKey key = new UUIDStringKey(p.getUniqueId(), queue);
 
-        if(!p.isOnline()) return "You aren't online!";
+        if(!p.isOnline()) return "You aren't online!?!";
 
-        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
-            if(!p.isOnline()) return;
-            try {
-                String response = AjQueueSpigotAPI.getInstance()
-                        .getServerStatusString(queue, p.getUniqueId())
-                        .get(30, TimeUnit.SECONDS);
+        if(System.currentTimeMillis() - lastFetch.getOrDefault(key, 0L) > 2000) {
+            lastFetch.put(key, System.currentTimeMillis());
 
-                cache.put(key, response);
-            } catch (InterruptedException | ExecutionException e) {
-                throw new RuntimeException(e);
-            } catch (TimeoutException | IllegalArgumentException ignored) {}
-        });
+            plugin.getScheduler().runTaskAsynchronously(() -> {
+                if (!p.isOnline()) return;
+                try {
+                    String response = AjQueueSpigotAPI.getInstance()
+                            .getServerStatusString(queue, p.getUniqueId())
+                            .get(30, TimeUnit.SECONDS);
+
+                    cache.put(key, response);
+                } catch (InterruptedException | ExecutionException e) {
+                    throw new RuntimeException(e);
+                } catch (TimeoutException | IllegalArgumentException ignored) {
+                }
+            });
+        }
 
         return cache.getOrDefault(key, "...");
     }
@@ -56,5 +62,6 @@ public class StatusPlayer extends Placeholder {
     @Override
     public void cleanCache(Player player) {
         cache.entrySet().removeIf(entry -> entry.getKey().getUuid().equals(player.getUniqueId()));
+        lastFetch.entrySet().removeIf(entry -> entry.getKey().getUuid().equals(player.getUniqueId()));
     }
 }

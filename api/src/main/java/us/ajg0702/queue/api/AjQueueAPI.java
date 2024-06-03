@@ -10,6 +10,8 @@ import us.ajg0702.queue.api.util.QueueLogger;
 import us.ajg0702.utils.common.Config;
 import us.ajg0702.utils.common.Messages;
 
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 
 public abstract class AjQueueAPI {
@@ -121,6 +123,8 @@ public abstract class AjQueueAPI {
      * @return The ProtocolNameManager
      */
     public abstract ProtocolNameManager getProtocolNameManager();
+
+    public abstract Map<String, List<String>> getQueueServers();
 
     /**
      * Tells ajQueue to shut down.

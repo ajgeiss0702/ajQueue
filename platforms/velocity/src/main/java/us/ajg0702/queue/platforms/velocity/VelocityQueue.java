@@ -7,6 +7,7 @@ import com.velocitypowered.api.event.connection.DisconnectEvent;
 import com.velocitypowered.api.event.connection.PluginMessageEvent;
 import com.velocitypowered.api.event.player.KickedFromServerEvent;
 import com.velocitypowered.api.event.player.ServerPostConnectEvent;
+import com.velocitypowered.api.event.player.ServerPreConnectEvent;
 import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
 import com.velocitypowered.api.event.proxy.ProxyShutdownEvent;
 import com.velocitypowered.api.plugin.Plugin;
@@ -14,17 +15,20 @@ import com.velocitypowered.api.plugin.annotation.DataDirectory;
 import com.velocitypowered.api.proxy.Player;
 import com.velocitypowered.api.proxy.ProxyServer;
 import com.velocitypowered.api.proxy.messages.MinecraftChannelIdentifier;
+import com.velocitypowered.api.proxy.server.RegisteredServer;
 import net.kyori.adventure.text.Component;
 import org.bstats.charts.SimplePie;
 import org.bstats.velocity.Metrics;
 import org.slf4j.Logger;
 import us.ajg0702.queue.api.Implementation;
 import us.ajg0702.queue.api.commands.IBaseCommand;
+import us.ajg0702.queue.api.server.AdaptedServer;
 import us.ajg0702.queue.commands.BaseCommand;
 import us.ajg0702.queue.commands.commands.leavequeue.LeaveCommand;
 import us.ajg0702.queue.commands.commands.listqueues.ListCommand;
 import us.ajg0702.queue.commands.commands.manage.ManageCommand;
 import us.ajg0702.queue.commands.commands.queue.QueueCommand;
+import us.ajg0702.queue.commands.commands.send.SendAlias;
 import us.ajg0702.queue.common.QueueMain;
 import us.ajg0702.queue.platforms.velocity.commands.VelocityCommand;
 import us.ajg0702.queue.platforms.velocity.players.VelocityPlayer;
@@ -32,9 +36,7 @@ import us.ajg0702.queue.platforms.velocity.server.VelocityServer;
 
 import java.io.File;
 import java.nio.file.Path;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Plugin(
         id = "ajqueue",
@@ -81,12 +83,21 @@ public class VelocityQueue implements Implementation {
                 dataFolder
         );
 
-        commands = Arrays.asList(
+        // unregister velocity's built-in server command if we are going to override it
+        if(main.getConfig().getBoolean("enable-server-command")) {
+            commandManager.unregister("server");
+        }
+
+        commands = new ArrayList<>(Arrays.asList(
                 new QueueCommand(main),
                 new LeaveCommand(main),
                 new ListCommand(main),
                 new ManageCommand(main)
-        );
+        ));
+
+        if(main.getConfig().getBoolean("enable-send-alias")) {
+            commands.add(new SendAlias(main));
+        }
 
 
         proxyServer.getChannelRegistrar().register(MinecraftChannelIdentifier.create("ajqueue", "tospigot"));
@@ -140,7 +151,19 @@ public class VelocityQueue implements Implementation {
 
     @Subscribe
     public void onKick(KickedFromServerEvent e) {
-        if(!e.getPlayer().getCurrentServer().isPresent()) return; // if the player is kicked on initial join, we dont care
+
+
+        if(!e.getPlayer().getCurrentServer().isPresent()) {
+            if(changedTargetPlayers.containsKey(e.getPlayer())) {
+                // If the player failed to connect to the server we changed them to, redirect them to the original server
+                e.setResult(
+                        KickedFromServerEvent.RedirectPlayer
+                                .create(changedTargetPlayers.get(e.getPlayer()))
+                );
+            } else {
+                return; // if the player is kicked on initial join, we don't care
+            }
+        }
         Optional<Component> reasonOptional = e.getServerKickReason();
         main.getEventHandler().onServerKick(
                 new VelocityPlayer(e.getPlayer()),
@@ -149,6 +172,23 @@ public class VelocityQueue implements Implementation {
                 // According to Tux on discord, velocity doesnt give a reason when the proxy loses connection to the connected server
                 e.kickedDuringServerConnect()
         );
+    }
+
+    private final WeakHashMap<Player, RegisteredServer> changedTargetPlayers = new WeakHashMap<>();
+
+    @Subscribe
+    public void onPreConnect(ServerPreConnectEvent e) {
+        RegisteredServer to = e.getResult().getServer().orElse(null);
+
+        if(to == null) return;
+
+        AdaptedServer newServer = main.getEventHandler().changeTargetServer(new VelocityPlayer(e.getPlayer()), new VelocityServer(to));
+
+        if(newServer == null) return;
+
+        changedTargetPlayers.put(e.getPlayer(), to); // save the original server so we can revert it if it fails
+
+        e.setResult(ServerPreConnectEvent.ServerResult.allowed((RegisteredServer) newServer.getHandle()));
     }
 
     @Override

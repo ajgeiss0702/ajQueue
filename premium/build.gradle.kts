@@ -24,9 +24,9 @@ dependencies {
 
     compileOnly("me.TechsCode:FakeUltraPerms:1.0.2")
 
-    compileOnly("us.ajg0702:ajUtils:1.2.14")
+    compileOnly("us.ajg0702:ajUtils:1.2.25")
 
-    compileOnly("net.kyori:adventure-api:4.13.1")
+    compileOnly("net.kyori:adventure-api:4.15.0")
 
     compileOnly(fileTree(mapOf("dir" to "../libs/private", "include" to listOf("*.jar"))))
     compileOnly(fileTree(mapOf("dir" to "../libs/public", "include" to listOf("*.jar"))))

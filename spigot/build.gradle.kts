@@ -19,13 +19,13 @@ repositories {
 }
 
 dependencies {
-    implementation("net.kyori:adventure-api:4.13.1")
+    implementation("net.kyori:adventure-api:4.15.0")
     compileOnly(project(":api"))
     compileOnly("com.google.guava:guava:30.1.1-jre")
 
     compileOnly("org.spongepowered:configurate-yaml:4.1.2")
 
-    compileOnly("us.ajg0702:ajUtils:1.2.14")
+    compileOnly("us.ajg0702:ajUtils:1.2.25")
 
     compileOnly(group = "org.spigotmc", name = "spigot", version = "1.16.5-R0.1-SNAPSHOT")
     compileOnly("me.clip:placeholderapi:2.10.4")
