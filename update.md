@@ -14,3 +14,11 @@ This is for me when releasing updates, because otherwise I forget things
     * Modrinth
     * Hangar
     * Polymart
+
+All plugin pages:
+ - Spigot (+)
+ - Spigot (free)
+ - Polymart (+)
+ - Polymart (free)
+ - Modrinth (free)
+ - Hangar (free)

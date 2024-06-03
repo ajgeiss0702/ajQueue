@@ -32,18 +32,18 @@ jobs:
           # The desired behavior if no files are found using the provided path.
           if-no-files-found: error
           retention-days: 2
-      - name: Download changelogs
-        run: |
-          curl "https://ajg0702.us/pl/updater/changelogs.php?project=${{ github.repository }}" > changelogs.bb
-          curl "https://ajg0702.us/pl/updater/changelogs.php?project=${{ github.repository }}&format=html" > changelogs.html
-      - name: Deploy to Polymart/Modrinth
-        env:
-          POLYMART_TOKEN: ${{ secrets.POLYMART_TOKEN }}
-          MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
-          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
-        run: |
-          export VERSION=`cat build.gradle.kts | grep "version " | awk -F'"' '{print $2}'`
-          curl --no-progress-meter -A "AJUPDATER/1.0" -H "Authorization: $MODRINTH_TOKEN" -F data="{\"project_id\": \"dzacATni\", \"version_number\": \"$VERSION\", \"name\": \"v$VERSION\", \"changelog\": \"$(cat changelogs.html)\", \"file_parts\": [\"file\"], \"version_type\": \"release\", \"loaders\": [\"bungeecord\", \"velocity\"], \"featured\": true, \"game_versions\": $(curl https://ajg0702.us/pl/updater/mc-versions.php), \"dependencies\": [], \"primary_file\": \"file\"}" -F "file=@free/build/libs/ajQueue-$VERSION.jar" "https://api.modrinth.com/v2/version"          
-          curl -F "file=@free/build/libs/ajQueue-$VERSION.jar" -F api_key=$POLYMART_TOKEN -F resource_id="2535" -F version="$VERSION" -F title="v$VERSION" -F message="$(cat changelogs.bb)" "https://api.polymart.org/v1/postUpdate"
-          curl -F "file=@premium/build/libs/ajQueuePlus-$VERSION.jar" -F api_key=$POLYMART_TOKEN -F resource_id="2714" -F version="$VERSION" -F title="v$VERSION" -F message="$(cat changelogs.bb)" "https://api.polymart.org/v1/postUpdate"
-          curl -v --no-progress-meter -H "Content-Type: application/json" --request POST -d "{\"content\": \"<@&861713403080999003>\", \"embeds\": [{\"title\": \"${{ github.event.repository.name }} v$VERSION\", \"description\": \"Changelogs\n\n$(curl "https://ajg0702.us/pl/updater/changelogs.php?project=${{ github.repository }}&format=markdown")\n\n[Modrinth (free)](https://modrinth.com/plugin/ajQueue/version/$VERSION)\n[Polymart (free)](https://polymart.org/resource/2535/updates)\n[Polymart (plus)](https://polymart.org/resource/2714/updates)\", \"color\": 14845503, \"thumbnail\": {\"url\": \"https://ajg0702.us/pl/icons/${{ github.event.repository.name }}.png\"}}]}" "$DISCORD_WEBHOOK"
+#      - name: Download changelogs
+#        run: |
+#          curl "https://ajg0702.us/pl/updater/changelogs.php?project=${{ github.repository }}" > changelogs.bb
+#          curl "https://ajg0702.us/pl/updater/changelogs.php?project=${{ github.repository }}&format=html" > changelogs.html
+#      - name: Deploy to Polymart/Modrinth
+#        env:
+#          POLYMART_TOKEN: ${{ secrets.POLYMART_TOKEN }}
+#          MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
+#          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+#        run: |
+#          export VERSION=`cat build.gradle.kts | grep "version " | awk -F'"' '{print $2}'`
+#          curl --no-progress-meter -A "AJUPDATER/1.0" -H "Authorization: $MODRINTH_TOKEN" -F data="{\"project_id\": \"dzacATni\", \"version_number\": \"$VERSION\", \"name\": \"v$VERSION\", \"changelog\": \"$(cat changelogs.html)\", \"file_parts\": [\"file\"], \"version_type\": \"release\", \"loaders\": [\"bungeecord\", \"velocity\"], \"featured\": true, \"game_versions\": $(curl https://ajg0702.us/pl/updater/mc-versions.php), \"dependencies\": [], \"primary_file\": \"file\"}" -F "file=@free/build/libs/ajQueue-$VERSION.jar" "https://api.modrinth.com/v2/version"
+#          curl -F "file=@free/build/libs/ajQueue-$VERSION.jar" -F api_key=$POLYMART_TOKEN -F resource_id="2535" -F version="$VERSION" -F title="v$VERSION" -F message="$(cat changelogs.bb)" "https://api.polymart.org/v1/postUpdate"
+#          curl -F "file=@premium/build/libs/ajQueuePlus-$VERSION.jar" -F api_key=$POLYMART_TOKEN -F resource_id="2714" -F version="$VERSION" -F title="v$VERSION" -F message="$(cat changelogs.bb)" "https://api.polymart.org/v1/postUpdate"
+#          curl -v --no-progress-meter -H "Content-Type: application/json" --request POST -d "{\"content\": \"<@&861713403080999003>\", \"embeds\": [{\"title\": \"${{ github.event.repository.name }} v$VERSION\", \"description\": \"Changelogs\n\n$(curl "https://ajg0702.us/pl/updater/changelogs.php?project=${{ github.repository }}&format=markdown")\n\n[Modrinth (free)](https://modrinth.com/plugin/ajQueue/version/$VERSION)\n[Polymart (free)](https://polymart.org/resource/2535/updates)\n[Polymart (plus)](https://polymart.org/resource/2714/updates)\", \"color\": 14845503, \"thumbnail\": {\"url\": \"https://ajg0702.us/pl/icons/${{ github.event.repository.name }}.png\"}}]}" "$DISCORD_WEBHOOK"
