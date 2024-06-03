@@ -10,7 +10,7 @@ repositories {
     //mavenLocal()
     maven { url = uri("https://repo.ajg0702.us/releases/") }
     maven { url = uri("https://oss.sonatype.org/content/repositories/snapshots") }
-    maven { url = uri("https://repo.techscode.com/repository/maven-releases/") }
+//    maven { url = uri("https://repo.techscode.com/repository/maven-releases/") }
     mavenCentral()
 }
 
