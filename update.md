@@ -14,6 +14,7 @@ This is for me when releasing updates, because otherwise I forget things
     * Modrinth
     * Hangar
     * Polymart
+9. Announce on discord
 
 All plugin pages:
  - Spigot (+)
