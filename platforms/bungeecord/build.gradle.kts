@@ -22,7 +22,7 @@ dependencies {
 
     implementation("net.kyori:adventure-text-minimessage:4.15.0")
 
-    implementation("net.kyori:adventure-platform-bungeecord:4.3.2")
+    implementation("net.kyori:adventure-platform-bungeecord:4.3.3")
     compileOnly("net.kyori:adventure-text-serializer-plain:4.15.0")
 
     compileOnly("com.viaversion:viaversion-api:4.3.1")
