@@ -48,7 +48,7 @@ public class EventHandlerImpl implements EventHandler {
     public void onPlayerJoin(AdaptedPlayer player) {
         if(player.hasPermission("ajqueue.manage.update")) {
             main.getTaskManager().runLater(() -> {
-                if (main.getUpdater().isUpdateAvailable() && !main.getUpdater().isAlreadyDownloaded()) {
+                if (main.getUpdateManager().isUpdateAvailable() && !main.getUpdateManager().isAlreadyDownloaded()) {
                     player.sendMessage(main.getMessages().getComponent("updater.update-available"));
                 }
             }, 2, TimeUnit.SECONDS);
