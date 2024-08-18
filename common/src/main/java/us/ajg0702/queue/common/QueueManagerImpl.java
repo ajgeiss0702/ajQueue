@@ -344,8 +344,8 @@ public class QueueManagerImpl implements QueueManager {
         boolean alwaysSendInstantly = main.getConfig().getStringList("send-instantly").contains(queueServer.getName());
         boolean hasBypass = main.getLogic().hasAnyBypass(player, queueServer.getName());
 
-        boolean sentInstantly =  alwaysSendInstantly || (isJoinable && (sizeGood && timeGood)) || hasBypass;
-        Debug.info("should send instantly (" + sentInstantly + "): " + alwaysSendInstantly + " || (" + isJoinable + " && (" + sizeGood + " && " + timeGood + ") && " + (!hasBypass) + ")");
+        boolean sentInstantly = isJoinable && (alwaysSendInstantly || (sizeGood && timeGood) || hasBypass);
+        Debug.info("should send instantly (" + sentInstantly + "): " + isJoinable + " && (" + alwaysSendInstantly + " || (" + sizeGood + " && " + timeGood + ") || " + hasBypass + ")");
         return sentInstantly;
     }
 
