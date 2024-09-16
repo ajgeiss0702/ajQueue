@@ -69,6 +69,8 @@ public class VelocityQueue implements Implementation {
 
     List<IBaseCommand> commands;
 
+    private boolean isQueueCommandRegistered;
+
     CommandManager commandManager;
 
     @Subscribe
@@ -103,9 +105,10 @@ public class VelocityQueue implements Implementation {
         proxyServer.getChannelRegistrar().register(MinecraftChannelIdentifier.create("ajqueue", "tospigot"));
         proxyServer.getChannelRegistrar().register(MinecraftChannelIdentifier.from("ajqueue:toproxy"));
 
-
-        for(IBaseCommand command : commands) {
-            registerCommand(command);
+        isQueueCommandRegistered = !main.getConfig().getBoolean("allow-only-slash-servers-for-queueing");
+        int i = isQueueCommandRegistered ? 0 : 1;
+        for(; i < commands.size(); i++) {
+            registerCommand(commands.get(i));
         }
 
 
@@ -204,6 +207,22 @@ public class VelocityQueue implements Implementation {
                         .build(),
                 new VelocityCommand(main, (BaseCommand) command)
         );
+    }
+
+    @Override
+    public void reload() {
+        boolean wantQueueCommandRegistered = !main.getConfig().getBoolean("allow-only-slash-servers-for-queueing");
+        if (wantQueueCommandRegistered != isQueueCommandRegistered) {
+            if (!wantQueueCommandRegistered) {
+                main.getLogger().warn("Reload is unregistering /queue command");
+                unregisterCommand(commands.get(0).getName());
+                isQueueCommandRegistered = false;
+            } else {
+                main.getLogger().warn("Reload is registering /queue command");
+                registerCommand(commands.get(0));
+                isQueueCommandRegistered = true;
+            }
+        }
     }
 
     public QueueMain getMain() {

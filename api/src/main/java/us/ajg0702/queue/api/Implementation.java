@@ -8,4 +8,5 @@ public interface Implementation {
     default void unregisterCommand(IBaseCommand command) {
         unregisterCommand(command.getName());
     }
+    void reload();
 }
