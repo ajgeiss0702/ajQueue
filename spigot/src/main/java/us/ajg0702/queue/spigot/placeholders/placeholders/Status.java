@@ -23,6 +23,7 @@ public class Status extends Placeholder {
     private final String invalidMessage = "Invalid queue name";
 
     private final Map<String, String> cache = new ConcurrentHashMap<>();
+    private final Map<String, Long> lastFetch = new ConcurrentHashMap<>();
 
     @Override
     public String getRegex() {
@@ -34,24 +35,29 @@ public class Status extends Placeholder {
         String queue = matcher.group(1);
         String cached = cache.getOrDefault(queue, "...");
 
-        Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
-            if(!p.isOnline()) return;
-            try {
-                String response = AjQueueSpigotAPI.getInstance()
-                        .getServerStatusString(queue)
-                        .get(30, TimeUnit.SECONDS);
+        if(System.currentTimeMillis() - lastFetch.getOrDefault(queue, 0L) > 2000) {
+            lastFetch.put(queue, System.currentTimeMillis());
 
-                cache.put(queue, response);
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            } catch (ExecutionException e) {
-                if(e.getCause() instanceof IllegalArgumentException) {
-                    cache.put(queue, invalidMessage);
-                } else {
+            plugin.getScheduler().runTaskAsynchronously(() -> {
+                if (!p.isOnline()) return;
+                try {
+                    String response = AjQueueSpigotAPI.getInstance()
+                            .getServerStatusString(queue)
+                            .get(30, TimeUnit.SECONDS);
+
+                    cache.put(queue, response);
+                } catch (InterruptedException e) {
                     throw new RuntimeException(e);
+                } catch (ExecutionException e) {
+                    if (e.getCause() instanceof IllegalArgumentException) {
+                        cache.put(queue, invalidMessage);
+                    } else {
+                        throw new RuntimeException(e);
+                    }
+                } catch (TimeoutException | IllegalArgumentException ignored) {
                 }
-            } catch (TimeoutException | IllegalArgumentException ignored) {}
-        });
+            });
+        }
 
         return cached;
     }

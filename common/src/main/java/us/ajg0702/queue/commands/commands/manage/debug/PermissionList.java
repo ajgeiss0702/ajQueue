@@ -52,6 +52,7 @@ public class PermissionList extends SubCommand {
                     Component.text("You need to run this as a player with priority!")
                     .color(NamedTextColor.RED)
             );
+            return;
         }
 
         List<String> permissions = main.getLogicGetter()

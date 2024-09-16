@@ -136,7 +136,7 @@ public class Placeholders extends PlaceholderExpansion {
         	}
     	}
     	
-    	Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
+    	plugin.getScheduler().runTaskAsynchronously(() -> {
 			HashMap<String, String> playerCache;
 			if(responseCache.containsKey(player)) {
 				playerCache = responseCache.get(player);
@@ -147,7 +147,7 @@ public class Placeholders extends PlaceholderExpansion {
 				try {
 					playerCache.remove(playerCache.keySet().toArray()[0]);
 				} catch(ConcurrentModificationException e) {
-					Bukkit.getScheduler().runTask(plugin, () -> playerCache.remove(playerCache.keySet().toArray()[0]));
+					plugin.getScheduler().runTaskAsynchronously(() -> playerCache.remove(playerCache.keySet().toArray()[0]));
 				}
 			}
 			String resp = parsePlaceholder(player, identifier);

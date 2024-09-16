@@ -106,7 +106,7 @@ public class LeaveCommand extends BaseCommand {
 
     @Override
     public List<String> autoComplete(ICommandSender sender, String[] args) {
-        if(args.length > 1) return Collections.emptyList();
+        if(!sender.isPlayer() || args.length > 1) return Collections.emptyList();
         List<QueuePlayer> servers = main.getQueueManager().findPlayerInQueues(main.getPlatformMethods().senderToPlayer(sender));
         List<String> serverNames = new ArrayList<>();
         for(QueuePlayer queuePlayer : servers) {

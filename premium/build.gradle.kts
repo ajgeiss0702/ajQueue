@@ -10,7 +10,7 @@ repositories {
     //mavenLocal()
     maven { url = uri("https://repo.ajg0702.us/releases/") }
     maven { url = uri("https://oss.sonatype.org/content/repositories/snapshots") }
-    maven { url = uri("https://repo.techscode.com/repository/maven-releases/") }
+//    maven { url = uri("https://repo.techscode.com/repository/maven-releases/") }
     mavenCentral()
 }
 
@@ -24,9 +24,9 @@ dependencies {
 
     compileOnly("me.TechsCode:FakeUltraPerms:1.0.2")
 
-    compileOnly("us.ajg0702:ajUtils:1.2.14")
+    compileOnly("us.ajg0702:ajUtils:1.2.25")
 
-    compileOnly("net.kyori:adventure-api:4.13.1")
+    compileOnly("net.kyori:adventure-api:4.15.0")
 
     compileOnly(fileTree(mapOf("dir" to "../libs/private", "include" to listOf("*.jar"))))
     compileOnly(fileTree(mapOf("dir" to "../libs/public", "include" to listOf("*.jar"))))

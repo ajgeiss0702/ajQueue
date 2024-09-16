@@ -6,6 +6,7 @@ import us.ajg0702.queue.api.events.Event;
 import us.ajg0702.queue.api.events.utils.EventReceiver;
 import us.ajg0702.queue.api.premium.Logic;
 import us.ajg0702.queue.api.premium.LogicGetter;
+import us.ajg0702.queue.api.queues.QueueServer;
 import us.ajg0702.queue.api.util.QueueLogger;
 import us.ajg0702.queue.common.utils.LogConverter;
 import us.ajg0702.queue.logic.LogicGetterImpl;
@@ -114,6 +115,25 @@ public class QueueMain extends AjQueueAPI {
         return protocolNameManager;
     }
 
+    @Override
+    public Map<String, List<String>> getQueueServers() {
+        List<String> rawQueueServers = getConfig().getStringList("queue-servers");
+        Map<String, List<String>> r = new HashMap<>();
+        for(String rawQueueServer : rawQueueServers) {
+            if(!rawQueueServer.contains(":")) continue;
+            String[] parts = rawQueueServer.split(":");
+            String fromName = parts[0];
+            String toName = parts[1];
+            QueueServer toServer = getQueueManager().findServer(toName);
+            if(toServer == null) continue;
+
+            List<String> existing = r.computeIfAbsent(fromName, key -> new ArrayList<>());
+            existing.add(toName);
+            r.put(fromName, existing);
+        }
+        return r;
+    }
+
     private Updater updater;
     public Updater getUpdater() {
         return updater;
@@ -215,7 +235,7 @@ public class QueueMain extends AjQueueAPI {
 
         queueManager = new QueueManagerImpl(this);
 
-        protocolNameManager = new ProtocolNameManagerImpl(config, platformMethods);
+        protocolNameManager = new ProtocolNameManagerImpl(messages, platformMethods);
 
         taskManager.rescheduleTasks();
 
@@ -352,43 +372,44 @@ public class QueueMain extends AjQueueAPI {
         }
 
 
-        d.putIfAbsent("protocol-names.763", "1.20.1");
-        d.putIfAbsent("protocol-names.762", "1.19.4");
-        d.putIfAbsent("protocol-names.761", "1.19.3");
-        d.putIfAbsent("protocol-names.760", "1.19.2");
-        d.putIfAbsent("protocol-names.759", "1.19");
-        d.putIfAbsent("protocol-names.758", "1.18.2");
-        d.putIfAbsent("protocol-names.757", "1.18.1");
-        d.putIfAbsent("protocol-names.756", "1.17.1");
-        d.putIfAbsent("protocol-names.755", "1.17");
-        d.putIfAbsent("protocol-names.754", "1.16.5");
-        d.putIfAbsent("protocol-names.753", "1.16.3");
-        d.putIfAbsent("protocol-names.751", "1.16.2");
-        d.putIfAbsent("protocol-names.736", "1.16.1");
-        d.putIfAbsent("protocol-names.735", "1.16");
-        d.putIfAbsent("protocol-names.578", "1.15.2");
-        d.putIfAbsent("protocol-names.575", "1.15.1");
-        d.putIfAbsent("protocol-names.573", "1.15");
-        d.putIfAbsent("protocol-names.498", "1.14.4");
-        d.putIfAbsent("protocol-names.490", "1.14.3");
-        d.putIfAbsent("protocol-names.485", "1.14.2");
-        d.putIfAbsent("protocol-names.480", "1.14.1");
-        d.putIfAbsent("protocol-names.477", "1.14");
-        d.putIfAbsent("protocol-names.404", "1.13.2");
-        d.putIfAbsent("protocol-names.401", "1.13.1");
-        d.putIfAbsent("protocol-names.393", "1.13");
-        d.putIfAbsent("protocol-names.340", "1.12.2");
-        d.putIfAbsent("protocol-names.338", "1.12.1");
-        d.putIfAbsent("protocol-names.335", "1.12");
-        d.putIfAbsent("protocol-names.316", "1.11.2");
-        d.putIfAbsent("protocol-names.315", "1.11");
-        d.putIfAbsent("protocol-names.210", "1.10.2");
-        d.putIfAbsent("protocol-names.110", "1.9.4");
-        d.putIfAbsent("protocol-names.109", "1.9.2");
-        d.putIfAbsent("protocol-names.108", "1.9.1");
-        d.putIfAbsent("protocol-names.107", "1.9");
-        d.putIfAbsent("protocol-names.47", "1.8.9");
         d.putIfAbsent("protocol-names.5", "1.7.10");
+        d.putIfAbsent("protocol-names.47", "1.8.9");
+        d.putIfAbsent("protocol-names.107", "1.9");
+        d.putIfAbsent("protocol-names.108", "1.9.1");
+        d.putIfAbsent("protocol-names.109", "1.9.2");
+        d.putIfAbsent("protocol-names.110", "1.9.4");
+        d.putIfAbsent("protocol-names.210", "1.10.2");
+        d.putIfAbsent("protocol-names.315", "1.11");
+        d.putIfAbsent("protocol-names.316", "1.11.2");
+        d.putIfAbsent("protocol-names.335", "1.12");
+        d.putIfAbsent("protocol-names.338", "1.12.1");
+        d.putIfAbsent("protocol-names.340", "1.12.2");
+        d.putIfAbsent("protocol-names.393", "1.13");
+        d.putIfAbsent("protocol-names.401", "1.13.1");
+        d.putIfAbsent("protocol-names.404", "1.13.2");
+        d.putIfAbsent("protocol-names.477", "1.14");
+        d.putIfAbsent("protocol-names.480", "1.14.1");
+        d.putIfAbsent("protocol-names.485", "1.14.2");
+        d.putIfAbsent("protocol-names.490", "1.14.3");
+        d.putIfAbsent("protocol-names.498", "1.14.4");
+        d.putIfAbsent("protocol-names.573", "1.15");
+        d.putIfAbsent("protocol-names.575", "1.15.1");
+        d.putIfAbsent("protocol-names.578", "1.15.2");
+        d.putIfAbsent("protocol-names.735", "1.16");
+        d.putIfAbsent("protocol-names.736", "1.16.1");
+        d.putIfAbsent("protocol-names.751", "1.16.2");
+        d.putIfAbsent("protocol-names.753", "1.16.3");
+        d.putIfAbsent("protocol-names.754", "1.16.5");
+        d.putIfAbsent("protocol-names.755", "1.17");
+        d.putIfAbsent("protocol-names.756", "1.17.1");
+        d.putIfAbsent("protocol-names.757", "1.18.1");
+        d.putIfAbsent("protocol-names.758", "1.18.2");
+        d.putIfAbsent("protocol-names.759", "1.19");
+        d.putIfAbsent("protocol-names.760", "1.19.2");
+        d.putIfAbsent("protocol-names.761", "1.19.3");
+        d.putIfAbsent("protocol-names.762", "1.19.4");
+        d.putIfAbsent("protocol-names.763", "1.20.1");
+        d.putIfAbsent("protocol-names.764", "1.20.2");
 
         messages = new Messages(dataFolder, new LogConverter(logger), d);
     }

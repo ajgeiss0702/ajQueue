@@ -73,7 +73,11 @@ public class QueueCommand extends BaseCommand {
 
         if(args.length > 0) {
             if(main.getConfig().getBoolean("require-permission") && !player.hasPermission("ajqueue.queue."+args[0])) {
-                sender.sendMessage(getMessages().getComponent("noperm"));
+                sender.sendMessage(
+                        main.getConfig().getBoolean("act-like-no-permission-servers-dont-exist") ?
+                                getMessages().getComponent("errors.server-not-exist", "SERVER:"+args[0]) :
+                                getMessages().getComponent("noperm")
+                );
                 return;
             }
             if(main.getConfig().getBoolean("joinfrom-server-permission") && !player.hasPermission("ajqueue.joinfrom."+player.getServerName())) {

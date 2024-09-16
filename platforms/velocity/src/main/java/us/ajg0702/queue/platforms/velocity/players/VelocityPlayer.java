@@ -77,11 +77,11 @@ public class VelocityPlayer implements AdaptedPlayer, Audience {
 
     final Player handle;
 
-    private final boolean viaAvailable;
+    private static Boolean viaAvailable = null;
 
     public VelocityPlayer(Player player) {
         handle = player;
-        viaAvailable = isClassAvailable("com.viaversion.viaversion.api.Via");
+        if(viaAvailable == null) viaAvailable = isClassAvailable("com.viaversion.viaversion.api.Via");
     }
 
     @Override
@@ -167,8 +167,8 @@ public class VelocityPlayer implements AdaptedPlayer, Audience {
                                                 "REASON:" +
                                                         LegacyComponentSerializer.legacyAmpersand()
                                                                 .serialize(reason)
-                                        )
-                                );
+                                                                .replaceAll("§", "&")
+                                ));
                             }
                         } catch(Exception e) {
                             main.getLogger().warn("Error while sending velocity-kick-message:", e);

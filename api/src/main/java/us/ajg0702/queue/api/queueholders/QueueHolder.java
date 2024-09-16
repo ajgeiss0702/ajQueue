@@ -76,6 +76,8 @@ public abstract class QueueHolder {
      */
     public abstract int getQueueSize();
 
+    public abstract int getPosition(QueuePlayer player);
+
     /**
      * Get all players that are in the queue
      * @return a list of players in the queue

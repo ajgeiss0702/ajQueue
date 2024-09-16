@@ -21,7 +21,9 @@ public class VelocityServerPing implements AdaptedServerPing {
 
     @Override
     public String getPlainDescription() {
-        return PlainTextComponentSerializer.plainText().serialize(handle.getDescriptionComponent());
+        Component description = handle.getDescriptionComponent();
+        if(description == null) return null;
+        return PlainTextComponentSerializer.plainText().serialize(description);
     }
 
     int add = 0;

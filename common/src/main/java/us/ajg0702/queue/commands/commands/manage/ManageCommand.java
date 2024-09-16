@@ -2,6 +2,7 @@ package us.ajg0702.queue.commands.commands.manage;
 
 import com.google.common.collect.ImmutableList;
 import net.kyori.adventure.text.Component;
+import us.ajg0702.queue.api.commands.IBaseCommand;
 import us.ajg0702.queue.api.commands.ICommandSender;
 import us.ajg0702.queue.api.commands.ISubCommand;
 import us.ajg0702.queue.commands.BaseCommand;
@@ -13,10 +14,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.stream.Collectors;
 
 public class ManageCommand extends BaseCommand {
 
     final QueueMain main;
+
+    final Component usage;
 
     public ManageCommand(QueueMain main) {
         this.main = main;
@@ -38,6 +42,17 @@ public class ManageCommand extends BaseCommand {
         addSubCommand(new Kick(main));
         addSubCommand(new KickAll(main));
         addSubCommand(new PauseQueueServer(main));
+
+
+
+        usage = main.getMessages().toComponent(
+                "/ajQueue &7<&r" +
+                        subCommands.stream()
+                                .filter(IBaseCommand::showInTabComplete)
+                                .map(IBaseCommand::getName)
+                                .collect(Collectors.joining("&7|&r")) +
+                        "&7>&r"
+        );
     }
 
 
@@ -83,7 +98,7 @@ public class ManageCommand extends BaseCommand {
                 }
             }
         }
-        sender.sendMessage(Component.text("/ajQueue <reload|list|send|pause>"));
+        sender.sendMessage(usage);
     }
 
     @Override
