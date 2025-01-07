@@ -169,7 +169,7 @@ public class EventHandlerImpl implements EventHandler {
                     if (!event.isCancelled()) {
                         String toName = event.getTargetServer();
 
-                        player.sendMessage(main.getMessages().getComponent("auto-queued", "SERVER:"+toName));
+                        player.sendMessage(main.getMessages().getComponent("auto-queued", "SERVER:"+main.getAliasManager().getAlias(toName)));
                         main.getQueueManager().addToQueue(player, toName);
                     }
                 }, (long) (main.getConfig().getDouble("auto-add-to-queue-on-kick-delay")*1000), TimeUnit.MILLISECONDS);
