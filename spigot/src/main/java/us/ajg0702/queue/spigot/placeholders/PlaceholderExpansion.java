@@ -86,4 +86,8 @@ public class PlaceholderExpansion extends me.clip.placeholderapi.expansion.Place
     public void cleanCache(Player player) {
         placeholders.forEach(p -> p.cleanCache(player));
     }
+
+    public List<Placeholder> getPlaceholderImplementations() {
+        return placeholders;
+    }
 }

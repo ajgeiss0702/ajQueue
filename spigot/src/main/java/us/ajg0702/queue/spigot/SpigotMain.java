@@ -20,12 +20,15 @@ import us.ajg0702.queue.api.communication.ComResponse;
 import us.ajg0702.queue.api.spigot.AjQueueSpigotAPI;
 import us.ajg0702.queue.spigot.api.SpigotAPI;
 import us.ajg0702.queue.spigot.communication.ResponseManager;
+import us.ajg0702.queue.spigot.placeholders.Placeholder;
 import us.ajg0702.queue.spigot.placeholders.PlaceholderExpansion;
+import us.ajg0702.queue.spigot.placeholders.RefetchablePlaceholder;
 import us.ajg0702.utils.common.ConfigFile;
 import us.ajg0702.utils.foliacompat.CompatScheduler;
 
 import java.io.File;
 import java.util.HashMap;
+import java.util.UUID;
 import java.util.logging.Level;
 
 @SuppressWarnings("UnstableApiUsage")
@@ -117,6 +120,16 @@ public class SpigotMain extends JavaPlugin implements PluginMessageListener,List
 	    	Bukkit.getPluginManager().callEvent(e);
 			return;
 	    }
+
+		if(subchannel.equals("player-joined-queue")) {
+			String playerUUID = in.readUTF();
+			for (Placeholder placeholderImplementation : placeholders.getPlaceholderImplementations()) {
+				if(!(placeholderImplementation instanceof RefetchablePlaceholder)) continue;
+				RefetchablePlaceholder placeholder = (RefetchablePlaceholder) placeholderImplementation;
+				placeholder.refetch(Bukkit.getOfflinePlayer(UUID.fromString(playerUUID)));
+			}
+			return;
+		}
 
 		try {
 			ComResponse response = ComResponse.from(subchannel, in);

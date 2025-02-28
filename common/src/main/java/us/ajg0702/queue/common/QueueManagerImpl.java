@@ -318,11 +318,7 @@ public class QueueManagerImpl implements QueueManager {
         if(!server.isJoinable(player)) {
             sendMessage(queuePlayer);
         }
-        main.getPlatformMethods().sendPluginMessage(player, "position", pos+"");
-        main.getPlatformMethods().sendPluginMessage(player, "positionof", len+"");
-        main.getPlatformMethods().sendPluginMessage(player, "queuename", server.getAlias());
-        main.getPlatformMethods().sendPluginMessage(player, "inqueue", "true");
-        main.getPlatformMethods().sendPluginMessage(player, "inqueueevent", "true");
+        main.getPlatformMethods().sendPluginMessage(player, "player-joined-queue", player.getUniqueId().toString());
         return true;
     }
 
