@@ -9,3 +9,5 @@ build
 .nosync
 libs/private/*
 !libs/private/README.md
+
+node_modules
