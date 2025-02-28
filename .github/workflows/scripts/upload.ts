@@ -127,9 +127,9 @@ ${changes.length > 1 ? `<br><a href="${github.event.compare}">View combined chan
     const polymartFreeResponse = await uploadToPolymart(github.event, "2535", version, changes, file);
 
     if(!polymartFreeResponse.ok) {
-        console.warn("Polymart free response failed.", await polymartPlusResponse.text());
+        console.warn("Polymart free response failed.", await polymartFreeResponse.text());
     } else {
-        console.warn("Polymart free succeeded.", await polymartPlusResponse.text());
+        console.warn("Polymart free succeeded.", await polymartFreeResponse.text());
     }
 
 })();
