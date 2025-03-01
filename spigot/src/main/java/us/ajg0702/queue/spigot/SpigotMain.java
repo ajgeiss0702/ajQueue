@@ -122,11 +122,10 @@ public class SpigotMain extends JavaPlugin implements PluginMessageListener,List
 	    }
 
 		if(subchannel.equals("player-joined-queue")) {
-			String playerUUID = in.readUTF();
 			for (Placeholder placeholderImplementation : placeholders.getPlaceholderImplementations()) {
 				if(!(placeholderImplementation instanceof RefetchablePlaceholder)) continue;
 				RefetchablePlaceholder placeholder = (RefetchablePlaceholder) placeholderImplementation;
-				placeholder.refetch(Bukkit.getOfflinePlayer(UUID.fromString(playerUUID)));
+				placeholder.refetch(player);
 			}
 			return;
 		}
