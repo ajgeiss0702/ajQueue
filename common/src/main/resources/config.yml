@@ -396,6 +396,14 @@ minimum-ping-time: 1.0
 # Does nothing if you are not on ajQueuePlus, or if you have a supported permission plugin
 plus-level-fallback: false
 
+
+# Enabling this option will prevent ajQueue from communicating with ajQueue on the backend using Plugin Messaging.
+# Generally you should leave this on the default of false, to allow ajQueue to communicate.
+# Enabling this will cause all features of ajQueue on the backend to not work!
+# ** If you do not fully understand this option, please leave it disabled! **
+#  Default: false
+disable-proxy-communication: false
+
 # Should we print some extra stuff to the console that might help aj diagnose some issues?
 debug: false
 
