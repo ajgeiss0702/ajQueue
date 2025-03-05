@@ -91,6 +91,7 @@ public class BungeeServer implements AdaptedServer {
 
     @Override
     public boolean canAccess(AdaptedPlayer player) {
+        if(player == null) return !handle.isRestricted();
         return handle.canAccess((ProxiedPlayer) player.getHandle());
     }
 
