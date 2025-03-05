@@ -219,6 +219,7 @@ public class EventHandlerImpl implements EventHandler {
     public @Nullable AdaptedServer changeTargetServer(AdaptedPlayer player, AdaptedServer initialChoice) {
 
         if(!main.getConfig().getBoolean("skip-queue-server-if-possible")) return null;
+        if(PauseQueueServer.pausedPlayers.contains(player)) return null;
 
         Map<String, List<String>> queueServers = main.getQueueServers();
 
