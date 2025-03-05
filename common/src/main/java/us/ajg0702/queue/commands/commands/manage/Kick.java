@@ -58,7 +58,12 @@ public class Kick extends SubCommand {
                 sender.sendMessage(getMessages().getComponent("commands.kick.unknown-server", "QUEUE:"+args[1]));
                 return;
             }
-            kickPlayers = Collections.singletonList(queue.findPlayer(args[0]));
+            QueuePlayer player = queue.findPlayer(args[0]);
+            if(player == null) {
+                kickPlayers = Collections.emptyList();
+            } else {
+                kickPlayers = Collections.singletonList(player);
+            }
         }
 
         if(kickPlayers.isEmpty()) {
