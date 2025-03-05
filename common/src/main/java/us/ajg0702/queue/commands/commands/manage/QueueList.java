@@ -11,9 +11,11 @@ import us.ajg0702.queue.commands.SubCommand;
 import us.ajg0702.queue.common.QueueMain;
 import us.ajg0702.utils.common.Messages;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public class QueueList extends SubCommand {
 
@@ -48,40 +50,31 @@ public class QueueList extends SubCommand {
         int total = 0;
         for(QueueServer server : main.getQueueManager().getServers()) {
 
-            Component msg = getMessages().getComponent("list.format",
+            String msg = getMessages().getRawString("list.format",
                     "SERVER:"+server.getName()
             );
-            Component playerList = Component.empty();
+            StringBuilder playerList = new StringBuilder();
             List<QueuePlayer> players = server.getQueue();
             boolean none = true;
             for(QueuePlayer p : players) {
-                playerList = playerList.append(getMessages().getComponent("list.playerlist",
+                playerList.append(getMessages().getRawString("list.playerlist",
                         "NAME:" + p.getName()
                 ));
                 none = false;
             }
             if(none) {
-                playerList = playerList.append(getMessages().getComponent("list.none"));
-                playerList = playerList.append(Component.text(", "));
+                playerList.append(getMessages().getRawString("list.none"));
+                playerList.append(", ");
             }
-            Component finalPlayerList = playerList;
-            msg = msg.replaceText(b -> b.match(Pattern.compile("\\{LIST}")).replacement(finalPlayerList));
-            char[] commaCountString = PlainTextComponentSerializer.plainText().serialize(msg).toCharArray();
-            int commas = 0;
-            for(Character fChar : commaCountString) {
-                if(fChar == ',') commas++;
-            }
+            msg = msg.replaceAll("\\{LIST}", playerList.toString());
 
-            int finalCommas = commas;
-            msg = msg.replaceText(b -> b.match(",(?!.*,)").replacement("").condition((r, c, re) -> {
-                if(c == finalCommas) {
-                    return PatternReplacementResult.REPLACE;
-                }
-                return PatternReplacementResult.CONTINUE;
-            }));
+            msg = Arrays.stream(msg.split("\n"))
+                    .map(String::trim)
+                    .map(c -> c.endsWith(",") ? c.substring(0, c.length() - 1) : c) // removes comma from the end of the line
+                    .collect(Collectors.joining("\n"));
             total += players.size();
-            msg = msg.replaceText(b -> b.match(Pattern.compile("\\{COUNT}")).replacement(players.size()+""));
-            sender.sendMessage(msg);
+            msg = msg.replaceAll("\\{COUNT}", players.size()+"");
+            sender.sendMessage(main.getMessages().toComponent(msg));
         }
         sender.sendMessage(getMessages().getComponent("list.total", "TOTAL:"+total));
     }
