@@ -19,9 +19,11 @@ import us.ajg0702.queue.common.players.QueuePlayerImpl;
 import us.ajg0702.queue.common.utils.Debug;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 public class EventHandlerImpl implements EventHandler {
 
@@ -74,6 +76,11 @@ public class EventHandlerImpl implements EventHandler {
         main.getQueueManager().clear(player);
         QueueCommand.cooldowns.remove(player);
         main.serverTimeManager.removePlayer(player);
+
+        List<String> changedKeys = recentlyChanged.keySet().stream()
+                .filter(k -> k.startsWith(player.getUniqueId().toString()))
+                .collect(Collectors.toList());
+        changedKeys.forEach(recentlyChanged::remove);
     }
 
     @Override
@@ -215,6 +222,8 @@ public class EventHandlerImpl implements EventHandler {
         }
     }
 
+    private final Map<String, Long> recentlyChanged = new HashMap<>();
+
     @Override
     public @Nullable AdaptedServer changeTargetServer(AdaptedPlayer player, AdaptedServer initialChoice) {
 
@@ -240,9 +249,16 @@ public class EventHandlerImpl implements EventHandler {
             if(!ideal.isJoinable(player)) continue;
             if(!(!main.getConfig().getBoolean("require-queueserver-permission") || player.hasPermission("ajqueue.queueserver." + to.getName()))) continue;
 
+            String key = player.getUniqueId() + ":" + toName;
+            // don't redirect player if we've already redirected them recently
+            if(System.currentTimeMillis() - recentlyChanged.getOrDefault(key, 0L) <= main.getConfig().getDouble("wait-time") * 1000L) {
+                continue;
+            }
+
             Debug.info("Skipping queue-server " + initialChoice.getName() + " for " + player.getName() + " because they would be sent instantly! (skip-queue-server-if-possible)");
 
             ideal.addPlayer();
+            recentlyChanged.put(key, System.currentTimeMillis());
             return ideal;
         }
 
