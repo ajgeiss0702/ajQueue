@@ -167,20 +167,23 @@ public class EventHandlerImpl implements EventHandler {
             }
 
             if(shouldqueue || reasons.isEmpty()) {
-                main.getTaskManager().runLater(() -> {
-                    if(!player.isConnected()) return;
+                List<String> excludedServers = main.getConfig().getStringList("auto-add-excluded-servers");
+                if(!excludedServers.contains(from.getName())) {
+                    main.getTaskManager().runLater(() -> {
+                        if(!player.isConnected()) return;
 
-                    AutoQueueOnKickEvent event = new AutoQueueOnKickEvent(player, from.getName());
-                    main.call(event);
-                    // Event declares that the addon/developer handle notifying the player of this cancellation
-                    if (!event.isCancelled()) {
-                        String toName = event.getTargetServer();
+                        AutoQueueOnKickEvent event = new AutoQueueOnKickEvent(player, from.getName());
+                        main.call(event);
+                        // Event declares that the addon/developer handle notifying the player of this cancellation
+                        if (!event.isCancelled()) {
+                            String toName = event.getTargetServer();
 
-                        player.sendMessage(main.getMessages().getComponent("auto-queued", "SERVER:"+main.getAliasManager().getAlias(toName)));
-                        main.getQueueManager().addToQueue(player, toName);
-                    }
-                }, (long) (main.getConfig().getDouble("auto-add-to-queue-on-kick-delay")*1000), TimeUnit.MILLISECONDS);
-                return;
+                            player.sendMessage(main.getMessages().getComponent("auto-queued", "SERVER:"+main.getAliasManager().getAlias(toName)));
+                            main.getQueueManager().addToQueue(player, toName);
+                        }
+                    }, (long) (main.getConfig().getDouble("auto-add-to-queue-on-kick-delay")*1000), TimeUnit.MILLISECONDS);
+                    return;
+                }
             }
 
         }

@@ -84,6 +84,11 @@ auto-add-kick-reasons:
   - "restarting"
   - "closed"
 
+# Server names in this list will be excluded from auto-add-to-queue-on-kick
+# For example, if "survival" is in this list, if a player is kicked from the "survival" server they will not
+#  be auto-added to queue
+auto-add-excluded-servers: []
+
 
 # If a player is in a server, you can have the plugin make them automatically join a queue for another server
 # Example with the default values: Player joins the limbo server, they will auto-join the queue for the lobbys group
@@ -420,7 +425,7 @@ debug: false
 
 
 # Don't touch this number please
-config-version: 49
+config-version: 50
 
 
 # This is ONLY here so that they can be moved to messages.yml. Please edit these in messages.yml!
