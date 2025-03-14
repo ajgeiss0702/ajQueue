@@ -367,7 +367,7 @@ check-last-player-sent-time: true
 priority-queue-debug: false
 
 # What protocols do servers support?
-# The protocol version number list can be found here: https://wiki.vg/Protocol_version_numbers
+# The protocol version number list can be found here: https://minecraft.wiki/w/Minecraft_Wiki:Projects/wiki.vg_merge/Protocol_version_numbers
 # Format: server(s):protocol(s)
 # Example: 1.17:755,756
 #  This example will only allow 1.17 and 1.17.1 on the server called 1.17
@@ -425,7 +425,7 @@ debug: false
 
 
 # Don't touch this number please
-config-version: 50
+config-version: 51
 
 
 # This is ONLY here so that they can be moved to messages.yml. Please edit these in messages.yml!
