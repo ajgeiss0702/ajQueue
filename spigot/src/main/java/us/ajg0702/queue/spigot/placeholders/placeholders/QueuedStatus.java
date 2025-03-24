@@ -69,7 +69,7 @@ public class QueuedStatus extends Placeholder implements RefetchablePlaceholder 
             if (!p.isOnline()) return;
             try {
                 MessagedResponse<String> queueNameResponse = AjQueueSpigotAPI.getInstance()
-                        .getQueueName(p.getUniqueId())
+                        .getRawQueueName(p.getUniqueId())
                         .get(30, TimeUnit.SECONDS);
 
                 String queueName = queueNameResponse.getResponse();

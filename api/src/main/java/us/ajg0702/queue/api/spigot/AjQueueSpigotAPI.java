@@ -44,6 +44,14 @@ public abstract class AjQueueSpigotAPI {
     public abstract Future<MessagedResponse<String>> getQueueName(UUID player);
 
     /**
+     * Gets the raw name of the queue that the player is in
+     * (doesn't use server aliases)
+     * @param player the player
+     * @return the name of the queue that the player is in
+     */
+    public abstract Future<MessagedResponse<String>> getRawQueueName(UUID player);
+
+    /**
      * Gets the position of the player in their queue
      * @param player The player
      * @return The position of the player in their queue
