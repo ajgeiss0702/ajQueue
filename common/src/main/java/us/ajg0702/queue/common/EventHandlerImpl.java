@@ -262,6 +262,7 @@ public class EventHandlerImpl implements EventHandler {
 
             ideal.addPlayer();
             recentlyChanged.put(key, System.currentTimeMillis());
+            player.sendMessage(main.getMessages().getComponent("status.skipping-queue-server"));
             return ideal;
         }
 
