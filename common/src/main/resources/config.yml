@@ -93,7 +93,9 @@ auto-add-excluded-servers: []
 # If a player is in a server, you can have the plugin make them automatically join a queue for another server
 # Example with the default values: Player joins the limbo server, they will auto-join the queue for the lobbys group
 # Note that you don't have to use groups. Just put the name of a server to use a single server instead.
-# You do NOT have to set a queue server to use queues.
+# Each entry here MUST have a queue server and a target server/queue seperated by a colon.
+#  ajQueue cannot guess which server you want!
+# You do NOT have to set a queue server to use queue commands.
 queue-servers:
   - 'limbo:lobbys'
 
@@ -425,7 +427,7 @@ debug: false
 
 
 # Don't touch this number please
-config-version: 51
+config-version: 52
 
 
 # This is ONLY here so that they can be moved to messages.yml. Please edit these in messages.yml!
