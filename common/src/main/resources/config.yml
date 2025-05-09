@@ -101,7 +101,7 @@ queue-servers:
 
 # How much should we delay queueing players in queue servers?
 # You should only use this if you have issues with the instant sending.
-# Set to 0 or any negative number to disable
+# Set to 0 or any negative number to have no delay
 # In milliseconds. Maximum value is 3000 (3 seconds)
 # You will need to disable skip-queue-server-if-possible to use this option.
 #  Default: 0
@@ -264,7 +264,7 @@ wait-to-load-servers-delay: 500
 
 # How often (in seconds) we should check for new servers to add queues for.
 # If you dynamically add servers, set this to something other than 0.
-# To disable, set to 0
+# To disable automatic reloading of servers, set to 0
 #  Default: 0
 reload-servers-interval: 0
 
@@ -323,7 +323,7 @@ send-instantly:
 require-queueserver-permission: false
 
 # After how many (unsuccessful) attempts of sending the player should we remove them from the queue?
-# Set to -1 to disable
+# Set to -1 to make it unlimited (not recommended)
 #  Default: 10
 max-tries: 10
 
@@ -389,7 +389,7 @@ enable-updater: true
 force-queue-server-target: true
 
 # How long should the cooldown for queue commands be? (in seconds)
-# Set to -1 to disable
+# Set to -1 or 0 to have no cooldown
 # Default: 3
 queue-command-cooldown: 3
 
