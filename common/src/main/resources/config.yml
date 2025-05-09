@@ -375,6 +375,8 @@ priority-queue-debug: false
 #  This example will only allow 1.17 and 1.17.1 on the server called 1.17
 # Example: lobby-1,lobby-2,lobby-3:754,755,756
 #  This example will only allow 1.16.5, 1.17, and 1.17.1 on the 3 lobby servers
+# Note that this will only restrict queues.
+#  If you go around the queue (e.g., using the default /server command), then this will not apply
 supported-protocols:
   - "1.17:755,756"
 
@@ -427,7 +429,7 @@ debug: false
 
 
 # Don't touch this number please
-config-version: 52
+config-version: 53
 
 
 # This is ONLY here so that they can be moved to messages.yml. Please edit these in messages.yml!
