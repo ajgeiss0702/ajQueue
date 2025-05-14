@@ -47,8 +47,9 @@ require-permission: false
 act-like-no-permission-servers-dont-exist: false
 
 # Require a permission for players to be able to join a queue from a server.
-# If enabled, players will need the permission ajqueue.joinfrom.<server> to join queues.
-# Replace <server> with the name of the server
+# If enabled, players will need the permission ajqueue.joinfrom.<server> to join queues from <server>.
+# Replace <server> with the name of the server you want players to join queues from.
+# For example, if the player is in the lobby, they will need the ajqueue.joinfrom.lobby permission to be able to join any queues.
 #  Default: false
 joinfrom-server-permission: false
 
