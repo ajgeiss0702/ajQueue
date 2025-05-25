@@ -84,7 +84,7 @@ ${changes.length > 1 ? `<br><a href="${github.event.compare}">View combined chan
 `,
         "file_parts": ["file"],
         "version_type": "beta",
-        "loaders": ["bungeecord","velocity"],
+        "loaders": ["bungeecord","velocity","paper"],
         "featured": false,
         "game_versions": versions,
         "dependencies": [],
