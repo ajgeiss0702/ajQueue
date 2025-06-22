@@ -381,6 +381,11 @@ public class QueueMain extends AjQueueAPI {
         d.put("updater.errors.missing-update-token", "&cMissing update token! &7See the&f updater-config.yml&f file for more info.");
         d.put("updater.errors.invalid-update-token", "&cInvalid update token! &7See the&f updater-config.yml&f file for more info. If you are lost, please contact support.");
         d.put("updater.errors.uncaught", "&cAn error occurred while executing this command. &7See the console.");
+        d.put("velocity-built-in-kick-messages.already-connecting", "Already connecting");
+        d.put("velocity-built-in-kick-messages.already-connected", "Already connected");
+        d.put("velocity-built-in-kick-messages.success", "Success");
+        d.put("velocity-built-in-kick-messages.cancelled", "Connection canceled");
+        d.put("velocity-built-in-kick-messages.disconnected", "Connection failed with unknown reason");
 
         List<String> oldProtocolNames = config.getStringList("protocol-names");
         for (String oldProtocolName : oldProtocolNames) {

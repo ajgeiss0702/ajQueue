@@ -79,9 +79,12 @@ public class VelocityPlayer implements AdaptedPlayer, Audience {
 
     private static Boolean viaAvailable = null;
 
+    private final QueueMain main;
+
     public VelocityPlayer(Player player) {
         handle = player;
         if(viaAvailable == null) viaAvailable = isClassAvailable("com.viaversion.viaversion.api.Via");
+        main = QueueMain.getInstance();
     }
 
     @Override
@@ -141,19 +144,19 @@ public class VelocityPlayer implements AdaptedPlayer, Audience {
                         if(reason == null) {
                             switch (result.getStatus()) {
                                 case SUCCESS:
-                                    reason = Component.text("Success");
+                                    reason = main.getMessages().getComponent("velocity-built-in-kick-messages.success");
                                     break;
                                 case ALREADY_CONNECTED:
-                                    reason = Component.text("Already connected");
+                                    reason = main.getMessages().getComponent("velocity-built-in-kick-messages.already-connected");
                                     break;
                                 case CONNECTION_IN_PROGRESS:
-                                    reason = Component.text("Already connecting");
+                                    reason = main.getMessages().getComponent("velocity-built-in-kick-messages.already-connecting");
                                     break;
                                 case CONNECTION_CANCELLED:
-                                    reason = Component.text("Connection canceled");
+                                    reason = main.getMessages().getComponent("velocity-built-in-kick-messages.cancelled");
                                     break;
                                 case SERVER_DISCONNECTED:
-                                    reason = Component.text("Connection failed with unknown reason");
+                                    reason = main.getMessages().getComponent("velocity-built-in-kick-messages.disconnected");
                                     break;
                             }
                         }
