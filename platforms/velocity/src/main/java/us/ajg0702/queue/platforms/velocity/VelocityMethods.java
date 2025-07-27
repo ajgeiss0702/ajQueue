@@ -39,6 +39,7 @@ public class VelocityMethods implements PlatformMethods {
     @Override
     public void sendPluginMessage(AdaptedPlayer player, String channel, String... data) {
         if(player == null) return;
+        if(plugin.getMain().getConfig().getBoolean("disable-proxy-communication")) return;
         Player velocityPlayer = ((VelocityPlayer) player).getHandle();
         @SuppressWarnings("UnstableApiUsage") ByteArrayDataOutput out = ByteStreams.newDataOutput();
         String playerName = player.getName();

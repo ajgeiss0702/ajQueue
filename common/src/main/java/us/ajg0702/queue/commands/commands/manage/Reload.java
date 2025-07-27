@@ -8,6 +8,7 @@ import us.ajg0702.queue.api.commands.ICommandSender;
 import us.ajg0702.queue.commands.SubCommand;
 import us.ajg0702.queue.common.QueueMain;
 import us.ajg0702.utils.common.Messages;
+import us.ajg0702.utils.common.UpdateManager;
 
 import java.util.Collections;
 import java.util.List;
@@ -45,6 +46,7 @@ public class Reload extends SubCommand {
         main.getMessages().reload();
         try {
             main.getConfig().reload();
+            main.getUpdaterConfig().reload();
         } catch (ConfigurateException e) {
             sender.sendMessage(Component.text("An error occurred while reloading. Check the console").color(NamedTextColor.RED));
             e.printStackTrace();
@@ -56,7 +58,8 @@ public class Reload extends SubCommand {
         main.getMessages().reload();
         main.getSlashServerManager().reload();
 
-        main.getUpdater().setEnabled(main.getConfig().getBoolean("enable-updater"));
+        UpdateManager updateManager = main.getUpdateManager();
+        if(updateManager != null) updateManager.setUpdateToken(main.getUpdaterConfig().getString("updater-token"));
 
         sender.sendMessage(getMessages().getComponent("commands.reload"));
     }

@@ -77,6 +77,22 @@ public class SpigotAPI extends AjQueueSpigotAPI {
     }
 
     @Override
+    public Future<MessagedResponse<String>> getRawQueueName(UUID player) {
+        Player p = Bukkit.getPlayer(player);
+        if(p == null) throw new IllegalArgumentException("Player must be online!");
+
+        CompletableFuture<MessagedResponse<String>> future = new CompletableFuture<>();
+
+        responseManager.awaitResponse(player.toString(), "rawqueuename", response -> {
+            future.complete(new MessagedResponse<>(response.getResponse(), response.getNoneMessage()));
+        });
+
+        main.sendMessage(p, "queuename", "");
+
+        return future;
+    }
+
+    @Override
     public Future<MessagedResponse<Integer>> getPosition(UUID player) {
         Player p = Bukkit.getPlayer(player);
         if(p == null) throw new IllegalArgumentException("Player must be online!");

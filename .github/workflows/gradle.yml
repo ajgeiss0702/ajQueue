@@ -26,7 +26,7 @@ jobs:
         with:
           arguments: :free:shadowJar :premium:shadowJar
       - name: Upload plugin jar artifact
-        uses: actions/upload-artifact@v2.3.1
+        uses: actions/upload-artifact@v4.4.0
         with:
           # Artifact name
           name: plugin jar
@@ -35,7 +35,7 @@ jobs:
           # The desired behavior if no files are found using the provided path.
           if-no-files-found: error
       - name: Upload build files artifact
-        uses: actions/upload-artifact@v2.3.1
+        uses: actions/upload-artifact@v4.4.0
         with:
           # Artifact name
           name: build-files
@@ -65,19 +65,36 @@ jobs:
     environment: upload-to-updater
     if: github.ref == 'refs/heads/master'
     needs: build
+    env:
+      GH_TOKEN: ${{ secrets.GH_TOKEN }}
     steps:
       - uses: actions/checkout@v2
       - uses: actions/download-artifact@v2
         with:
           name: build-files
       - run: |
-          mkdir jars
-          cp free/build/libs/ajQueue*.jar jars/
-          cp premium/build/libs/ajQueue*.jar jars/
-          cd jars
-          files=(*)
-          ls
-          echo ${files[0]}
-          echo ${files[1]}
-          curl -i -F "submit=true" -F "secret=${{ secrets.UPLOAD_TOKEN }}" -F "file=@${files[0]}" https://ajg0702.us/pl/updater/upload.php
-          curl -i -F "submit=true" -F "secret=${{ secrets.UPLOAD_TOKEN }}" -F "file=@${files[1]}" https://ajg0702.us/pl/updater/upload.php
+          VERSION=`cat build.gradle.kts | grep "version " | awk -F'"' '{print $2}'`
+          
+          # Plus
+          cd premium/build/libs/
+          echo -n "{ \"message\": \"Plugin Update: $(echo ajQueuePlus-*.jar) (jar)\", \"content\": \"" > file_upload.json
+          base64 ajQueuePlus-*.jar >> file_upload.json
+          echo -n "\" }" >> file_upload.json
+          curl -X PUT -H "Authorization: Bearer $GH_TOKEN" -H "Content-Type: application/json" -d @file_upload.json "https://api.github.com/repos/ajgeiss0702/plugin-updates/contents/jars/premium/$(echo ajQueuePlus*.jar)"
+          
+          SHA=`curl -H "Authorization: Bearer $GH_TOKEN" -s "https://api.github.com/repos/ajgeiss0702/plugin-updates/contents/plugins/ajQueuePlus.json" | jq -r '.sha'`
+          NEW_JSON="{ \"latest\": \"$VERSION\", \"premium\": true }"
+          
+          curl -X PUT -H "Authorization: Bearer $GH_TOKEN" -H "Content-Type: application/json" -d "{ \"message\": \"Plugin Update: $(echo ajQueuePlus-*.jar) (json)\", \"content\": \"$(echo $NEW_JSON | base64)\", \"sha\": \"$SHA\" }" "https://api.github.com/repos/ajgeiss0702/plugin-updates/contents/plugins/ajQueuePlus.json"
+          
+          # Free
+          cd ../../../free/build/libs/
+          echo -n "{ \"message\": \"Plugin Update: $(echo ajQueue-*.jar) (jar)\", \"content\": \"" > file_upload.json
+          base64 ajQueue-*.jar >> file_upload.json
+          echo -n "\" }" >> file_upload.json
+          curl -X PUT -H "Authorization: Bearer $GH_TOKEN" -H "Content-Type: application/json" -d @file_upload.json "https://api.github.com/repos/ajgeiss0702/plugin-updates/contents/jars/free/$(echo ajQueue*.jar)"
+          
+          SHA=`curl -H "Authorization: Bearer $GH_TOKEN" -s "https://api.github.com/repos/ajgeiss0702/plugin-updates/contents/plugins/ajQueue.json" | jq -r '.sha'`
+          NEW_JSON="{ \"latest\": \"$VERSION\", \"premium\": false }"
+          
+          curl -X PUT -H "Authorization: Bearer $GH_TOKEN" -H "Content-Type: application/json" -d "{ \"message\": \"Plugin Update: $(echo ajQueue-*.jar) (json)\", \"content\": \"$(echo $NEW_JSON | base64)\", \"sha\": \"$SHA\" }" "https://api.github.com/repos/ajgeiss0702/plugin-updates/contents/plugins/ajQueue.json"

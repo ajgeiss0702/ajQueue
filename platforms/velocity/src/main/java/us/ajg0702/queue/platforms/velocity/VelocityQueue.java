@@ -160,6 +160,7 @@ public class VelocityQueue implements Implementation {
                         KickedFromServerEvent.RedirectPlayer
                                 .create(changedTargetPlayers.get(e.getPlayer()))
                 );
+                changedTargetPlayers.remove(e.getPlayer());
             } else {
                 return; // if the player is kicked on initial join, we don't care
             }

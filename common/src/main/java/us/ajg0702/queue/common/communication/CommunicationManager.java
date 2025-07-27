@@ -26,6 +26,7 @@ public class CommunicationManager {
                 "leavequeue", new LeaveQueueHandler(main),
 
                 "queuename", new QueueNameHandler(main),
+                "rawqueuename", new RawQueueNameHandler(main),
                 "position", new PositionHandler(main),
                 "positionof", new PositionOfHandler(main),
                 "estimated_time", new EstimatedTimeHandler(main),

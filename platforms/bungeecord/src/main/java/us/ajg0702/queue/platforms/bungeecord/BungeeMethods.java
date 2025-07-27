@@ -37,6 +37,7 @@ public class BungeeMethods implements PlatformMethods {
         if (networkPlayers != null && !networkPlayers.isEmpty()) {
             String playerName = player.getName();
             if(playerName == null) return;
+            if(plugin.getMain().getConfig().getBoolean("disable-proxy-communication")) return;
             ByteArrayDataOutput out = ByteStreams.newDataOutput();
             out.writeUTF(channel);
 

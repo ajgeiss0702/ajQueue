@@ -57,7 +57,7 @@ public class ListCommand extends BaseCommand {
         }
 
 
-        Component m = main.getMessages().getComponent("commands.listqueues.header");
+        sender.sendMessage(main.getMessages().getComponent("commands.listqueues.header"));
         for(QueueServer s : main.getQueueManager().getServers()) {
             String color = "&a";
             if(!s.isOnline()) {
@@ -66,15 +66,13 @@ public class ListCommand extends BaseCommand {
                 color = "&e";
             }
 
-            m = m.append(Component.text("\n"));
-            m = m.append(main.getMessages().getComponent("commands.listqueues.format",
+            sender.sendMessage(main.getMessages().getComponent("commands.listqueues.format",
                     "COLOR:" + Messages.color(color),
                     "NAME:" + s.getAlias(),
                     "COUNT:" + s.getQueue().size(),
                     "STATUS:" + Messages.color(main.getMessages().getRawString("placeholders.status."+s.getStatus(spp)))
             ));
         }
-        sender.sendMessage(m);
     }
 
     @Override

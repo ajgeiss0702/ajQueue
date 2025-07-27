@@ -25,10 +25,10 @@ dependencies {
 
     compileOnly("org.spongepowered:configurate-yaml:4.1.2")
 
-    compileOnly("us.ajg0702:ajUtils:1.2.25")
+    compileOnly("us.ajg0702:ajUtils:1.2.28")
 
     compileOnly(group = "org.spigotmc", name = "spigot", version = "1.16.5-R0.1-SNAPSHOT")
-    compileOnly("me.clip:placeholderapi:2.10.4")
+    compileOnly("me.clip:placeholderapi:2.11.6")
 }
 
 tasks.withType<ProcessResources> {

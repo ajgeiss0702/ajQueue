@@ -47,8 +47,9 @@ require-permission: false
 act-like-no-permission-servers-dont-exist: false
 
 # Require a permission for players to be able to join a queue from a server.
-# If enabled, players will need the permission ajqueue.joinfrom.<server> to join queues.
-# Replace <server> with the name of the server
+# If enabled, players will need the permission ajqueue.joinfrom.<server> to join queues from <server>.
+# Replace <server> with the name of the server you want players to join queues from.
+# For example, if the player is in the lobby, they will need the ajqueue.joinfrom.lobby permission to be able to join any queues.
 #  Default: false
 joinfrom-server-permission: false
 
@@ -84,18 +85,26 @@ auto-add-kick-reasons:
   - "restarting"
   - "closed"
 
+# Server names in this list will be excluded from auto-add-to-queue-on-kick
+# For example, if "survival" is in this list, if a player is kicked from the "survival" server they will not
+#  be auto-added to queue
+auto-add-excluded-servers: []
+
 
 # If a player is in a server, you can have the plugin make them automatically join a queue for another server
 # Example with the default values: Player joins the limbo server, they will auto-join the queue for the lobbys group
 # Note that you don't have to use groups. Just put the name of a server to use a single server instead.
-# You do NOT have to set a queue server to use queues.
+# Each entry here MUST have a queue server and a target server/queue seperated by a colon.
+#  ajQueue cannot guess which server you want!
+# You do NOT have to set a queue server to use queue commands.
 queue-servers:
   - 'limbo:lobbys'
 
 # How much should we delay queueing players in queue servers?
 # You should only use this if you have issues with the instant sending.
-# Set to 0 or any negative number to disable
+# Set to 0 or any negative number to have no delay
 # In milliseconds. Maximum value is 3000 (3 seconds)
+# You will need to disable skip-queue-server-if-possible to use this option.
 #  Default: 0
 queue-server-delay: 0
 
@@ -256,7 +265,7 @@ wait-to-load-servers-delay: 500
 
 # How often (in seconds) we should check for new servers to add queues for.
 # If you dynamically add servers, set this to something other than 0.
-# To disable, set to 0
+# To disable automatic reloading of servers, set to 0
 #  Default: 0
 reload-servers-interval: 0
 
@@ -315,7 +324,7 @@ send-instantly:
 require-queueserver-permission: false
 
 # After how many (unsuccessful) attempts of sending the player should we remove them from the queue?
-# Set to -1 to disable
+# Set to -1 to make it unlimited (not recommended)
 #  Default: 10
 max-tries: 10
 
@@ -361,12 +370,14 @@ check-last-player-sent-time: true
 priority-queue-debug: false
 
 # What protocols do servers support?
-# The protocol version number list can be found here: https://wiki.vg/Protocol_version_numbers
+# The protocol version number list can be found here: https://minecraft.wiki/w/Minecraft_Wiki:Projects/wiki.vg_merge/Protocol_version_numbers
 # Format: server(s):protocol(s)
 # Example: 1.17:755,756
 #  This example will only allow 1.17 and 1.17.1 on the server called 1.17
 # Example: lobby-1,lobby-2,lobby-3:754,755,756
 #  This example will only allow 1.16.5, 1.17, and 1.17.1 on the 3 lobby servers
+# Note that this will only restrict queues.
+#  If you go around the queue (e.g., using the default /server command), then this will not apply
 supported-protocols:
   - "1.17:755,756"
 
@@ -379,7 +390,7 @@ enable-updater: true
 force-queue-server-target: true
 
 # How long should the cooldown for queue commands be? (in seconds)
-# Set to -1 to disable
+# Set to -1 or 0 to have no cooldown
 # Default: 3
 queue-command-cooldown: 3
 
@@ -396,6 +407,14 @@ minimum-ping-time: 1.0
 # Does nothing if you are not on ajQueuePlus, or if you have a supported permission plugin
 plus-level-fallback: false
 
+
+# Enabling this option will prevent ajQueue from communicating with ajQueue on the backend using Plugin Messaging.
+# Generally you should leave this on the default of false, to allow ajQueue to communicate.
+# Enabling this will cause all features of ajQueue on the backend to not work!
+# ** If you do not fully understand this option, please leave it disabled! **
+#  Default: false
+disable-proxy-communication: false
+
 # Should we print some extra stuff to the console that might help aj diagnose some issues?
 debug: false
 
@@ -411,7 +430,7 @@ debug: false
 
 
 # Don't touch this number please
-config-version: 47
+config-version: 53
 
 
 # This is ONLY here so that they can be moved to messages.yml. Please edit these in messages.yml!

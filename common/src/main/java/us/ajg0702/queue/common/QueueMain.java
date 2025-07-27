@@ -12,7 +12,8 @@ import us.ajg0702.queue.common.utils.LogConverter;
 import us.ajg0702.queue.logic.LogicGetterImpl;
 import us.ajg0702.utils.common.Config;
 import us.ajg0702.utils.common.Messages;
-import us.ajg0702.utils.common.Updater;
+import us.ajg0702.utils.common.SimpleConfig;
+import us.ajg0702.utils.common.UpdateManager;
 
 import java.io.File;
 import java.util.*;
@@ -134,9 +135,14 @@ public class QueueMain extends AjQueueAPI {
         return r;
     }
 
-    private Updater updater;
-    public Updater getUpdater() {
-        return updater;
+    private UpdateManager updateManager;
+    public UpdateManager getUpdateManager() {
+        return updateManager;
+    }
+
+    private SimpleConfig updaterConfig;
+    public SimpleConfig getUpdaterConfig() {
+        return updaterConfig;
     }
 
     private final Implementation implementation;
@@ -152,7 +158,6 @@ public class QueueMain extends AjQueueAPI {
     @Override
     public void shutdown() {
         taskManager.shutdown();
-        updater.shutdown();
     }
 
 
@@ -218,6 +223,15 @@ public class QueueMain extends AjQueueAPI {
             return;
         }
 
+
+        try {
+            updaterConfig = new SimpleConfig(dataFolder, "updater-config.yml", new LogConverter(logger));
+        } catch (ConfigurateException e) {
+            logger.warning("Unable to load config:");
+            e.printStackTrace();
+            return;
+        }
+
         constructMessages();
 
         getQueueHolderRegistry().register("default", DefaultQueueHolder.class);
@@ -239,8 +253,8 @@ public class QueueMain extends AjQueueAPI {
 
         taskManager.rescheduleTasks();
 
-        updater = new Updater(logger, platformMethods.getPluginVersion(), isPremium() ? "ajQueuePlus" : "ajQueue", config.getBoolean("enable-updater"), isPremium() ? 79123 : 78266, dataFolder.getParentFile(), "ajQueue update");
-
+        String plugin = isPremium() ? "ajQueuePlus" : "ajQueue";
+        updateManager = new UpdateManager(logger, platformMethods.getPluginVersion(), plugin, plugin, isPremium() ? updaterConfig.getString("updater-token") : null, dataFolder.getParentFile(), "ajQueue update");
     }
 
     private void constructMessages() {
@@ -262,6 +276,7 @@ public class QueueMain extends AjQueueAPI {
         d.put("status.sending-now", "&aSending you to &f{SERVER} &anow..");
         d.put("status.making-room", "<gold>Making room for you..");
         d.put("status.priority-increased", "<gold>You now have higher priority! <green>Moving you up in the queue..");
+        d.put("status.skipping-queue-server", "");
 
         d.put("errors.server-not-exist", "&cThe server {SERVER} does not exist!");
         d.put("errors.already-queued", "&cYou are already queued for that server!");
@@ -355,8 +370,22 @@ public class QueueMain extends AjQueueAPI {
         );
         d.put("updater.no-update", "<red>There is not an update available");
         d.put("updater.success", "<green>The update has been downloaded! Now just restart the server");
-        d.put("updater.fail", "<red>An error occurred while downloading the update. Check the console for more info.");
-        d.put("updater.already-downloaded", "<red>The update has already been downloaded.");
+        d.put("updater.already-downloaded", "&aYou have already downloaded an update! &7Restart the server to apply it");
+        d.put("updater.slow-feedback", "&7Checking for update and downloading...");
+        d.put("updater.disabled", "&cThe updater is disabled! &7Please enable it in the config to download updates.");
+        d.put("updater.warnings.could-not-delete-old-jar", "&aUpdate downloaded&e but the old jar could not be deleted. &7Please delete the old jar before restarting the server.");
+        d.put("updater.errors.while-checking", "&eAn error occurred while checking for an update. &7See the console for more info.");
+        d.put("updater.errors.unknown", "&eAn unknown error occurred: {ERROR}");
+        d.put("updater.errors.could-not-find-jar", "&cCould not find the old jar!&7 Make sure it is named similar to ajQueue-x.x.x.jar");
+        d.put("updater.errors.while-downloading", "&eAn error occurred while downloading an update. &7See the console for more info.");
+        d.put("updater.errors.missing-update-token", "&cMissing update token! &7See the&f updater-config.yml&f file for more info.");
+        d.put("updater.errors.invalid-update-token", "&cInvalid update token! &7See the&f updater-config.yml&f file for more info. If you are lost, please contact support.");
+        d.put("updater.errors.uncaught", "&cAn error occurred while executing this command. &7See the console.");
+        d.put("velocity-built-in-kick-messages.already-connecting", "Already connecting");
+        d.put("velocity-built-in-kick-messages.already-connected", "Already connected");
+        d.put("velocity-built-in-kick-messages.success", "Success");
+        d.put("velocity-built-in-kick-messages.cancelled", "Connection canceled");
+        d.put("velocity-built-in-kick-messages.disconnected", "Connection failed with unknown reason");
 
         List<String> oldProtocolNames = config.getStringList("protocol-names");
         for (String oldProtocolName : oldProtocolNames) {
@@ -410,6 +439,14 @@ public class QueueMain extends AjQueueAPI {
         d.putIfAbsent("protocol-names.762", "1.19.4");
         d.putIfAbsent("protocol-names.763", "1.20.1");
         d.putIfAbsent("protocol-names.764", "1.20.2");
+        d.putIfAbsent("protocol-names.765", "1.20.4");
+        d.putIfAbsent("protocol-names.766", "1.20.6");
+        d.putIfAbsent("protocol-names.767", "1.21.1");
+        d.putIfAbsent("protocol-names.768", "1.21.3");
+        d.putIfAbsent("protocol-names.769", "1.21.4");
+        d.putIfAbsent("protocol-names.770", "1.21.5");
+        d.putIfAbsent("protocol-names.771", "1.21.6");
+        d.putIfAbsent("protocol-names.772", "1.21.8");
 
         messages = new Messages(dataFolder, new LogConverter(logger), d);
     }

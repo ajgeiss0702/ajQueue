@@ -31,6 +31,7 @@ public class PlaceholderExpansion extends me.clip.placeholderapi.expansion.Place
         placeholders.add(new QueuedFor(plugin));
         placeholders.add(new StatusPlayer(plugin));
         placeholders.add(new Status(plugin));
+        placeholders.add(new QueuedStatus(plugin));
 
     }
 
@@ -85,5 +86,9 @@ public class PlaceholderExpansion extends me.clip.placeholderapi.expansion.Place
 
     public void cleanCache(Player player) {
         placeholders.forEach(p -> p.cleanCache(player));
+    }
+
+    public List<Placeholder> getPlaceholderImplementations() {
+        return placeholders;
     }
 }

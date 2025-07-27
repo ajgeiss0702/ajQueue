@@ -14,6 +14,8 @@ import us.ajg0702.queue.common.players.QueuePlayerImpl;
 import us.ajg0702.queue.api.premium.PermissionGetter;
 import us.ajg0702.queue.logic.permissions.PermissionGetterImpl;
 
+import java.util.List;
+
 public class PremiumLogic implements Logic {
 
     public PermissionGetter getPermissionGetter() {
@@ -90,7 +92,7 @@ public class PremiumLogic implements Logic {
             return queuePlayer;
         }
 
-        ImmutableList<QueuePlayer> list = queueServer.getQueue();
+        List<QueuePlayer> list = queueServer.getQueueHolder().getAllPlayers();
 
         for(int i = 0; i < list.size(); i++) {
             QueuePlayer pl = list.get(i);

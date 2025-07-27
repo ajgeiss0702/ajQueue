@@ -1,0 +1,13 @@
+# This is the config for the updater. It was created so that the updater secret would be in a separate file from the config
+
+# The Updater Token is used for updating my premium plugins.
+# If you have ajQueuePlus, generate one here: https://verify.ajg0702.us/updaterToken
+# If you have ajQueue, this is not needed.
+updater-token: ""
+
+
+# If you want to disable the updater, you can do that in the normal config.yml
+
+
+# Don't touch this
+config-version: 1

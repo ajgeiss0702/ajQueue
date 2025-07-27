@@ -95,9 +95,16 @@ public class PermissionGetterImpl implements PermissionGetter {
                 highestPerm = perm;
                 continue;
             }
-            int level = Integer.parseInt(perm.substring(prefix.length()));
-            int highestlevel = Integer.parseInt(highestPerm.substring(prefix.length()));
-            if(level > highestlevel) {
+            String rawLevel = perm.substring(prefix.length());
+            int level;
+            try {
+                level = Integer.parseInt(rawLevel);
+            } catch(NumberFormatException e) {
+                main.getLogger().warn("Invalid permission '" + perm + "'! '" + rawLevel + "' is not a valid number.");
+                continue;
+            }
+            int highestLevel = Integer.parseInt(highestPerm.substring(prefix.length()));
+            if(level > highestLevel) {
                 highestPerm = perm;
             }
         }
