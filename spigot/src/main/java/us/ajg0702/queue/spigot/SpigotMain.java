@@ -5,6 +5,8 @@ import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.command.CommandMap;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
@@ -19,6 +21,8 @@ import us.ajg0702.queue.api.AjQueueAPI;
 import us.ajg0702.queue.api.communication.ComResponse;
 import us.ajg0702.queue.api.spigot.AjQueueSpigotAPI;
 import us.ajg0702.queue.spigot.api.SpigotAPI;
+import us.ajg0702.queue.spigot.commands.SpigotLeaveQueueCommand;
+import us.ajg0702.queue.spigot.commands.SpigotQueueCommand;
 import us.ajg0702.queue.spigot.communication.ResponseManager;
 import us.ajg0702.queue.spigot.placeholders.Placeholder;
 import us.ajg0702.queue.spigot.placeholders.PlaceholderExpansion;
@@ -27,9 +31,11 @@ import us.ajg0702.utils.common.ConfigFile;
 import us.ajg0702.utils.foliacompat.CompatScheduler;
 
 import java.io.File;
+import java.lang.reflect.Field;
 import java.util.HashMap;
-import java.util.UUID;
 import java.util.logging.Level;
+
+import static us.ajg0702.utils.common.Messages.color;
 
 @SuppressWarnings("UnstableApiUsage")
 public class SpigotMain extends JavaPlugin implements PluginMessageListener,Listener {
@@ -44,17 +50,45 @@ public class SpigotMain extends JavaPlugin implements PluginMessageListener,List
 	private ConfigFile config;
 
 	private boolean hasProxy = false;
-	
+
+	@Override
+	public void onLoad() {
+		File oldConfig = new File(getDataFolder(), "config.yml");
+		if(oldConfig.exists()) {
+			//noinspection ResultOfMethodCallIgnored
+			oldConfig.renameTo(new File(getDataFolder(), "spigot-config.yml"));
+		}
+
+		try {
+			config = new ConfigFile(getDataFolder(), getLogger(), "spigot-config.yml");
+		} catch (Exception e) {
+			getLogger().log(Level.SEVERE, "Unable to read config:", e);
+		}
+
+		if(config.getBoolean("enable-commands")) {
+			try {
+				final Field bukkitCommandMap = Bukkit.getServer().getClass().getDeclaredField("commandMap");
+				bukkitCommandMap.setAccessible(true);
+				CommandMap commandMap = (CommandMap) bukkitCommandMap.get(Bukkit.getServer());
+				commandMap.register("queue", new SpigotQueueCommand(this, config.getBoolean("enable-server-alias"), config.getBoolean("enable-spigotqueue-alias")));
+				commandMap.register("leavequeue", new SpigotLeaveQueueCommand(this));
+				getLogger().info("Registered backend commands");
+			} catch (NoSuchFieldException | IllegalAccessException e) {
+				getLogger().log(Level.SEVERE, "Unable to register backend commands:", e);
+			}
+		} else {
+			getLogger().info("Not registering backend commands because they are disabled in spigot-config.yml");
+		}
+	}
+
 	@SuppressWarnings("ConstantConditions")
 	public void onEnable() {
+
 		getServer().getMessenger().registerIncomingPluginChannel(this, "ajqueue:tospigot", this);
 		getServer().getMessenger().registerOutgoingPluginChannel(this, "ajqueue:toproxy");
 
 		AjQueueAPI.SPIGOT_INSTANCE = new SpigotAPI(responseManager, this);
 		AjQueueSpigotAPI.INSTANCE = AjQueueAPI.SPIGOT_INSTANCE;
-		
-		this.getCommand("move").setExecutor(new Commands(this));
-		this.getCommand("leavequeue").setExecutor(new Commands(this));
 		
 		Bukkit.getPluginManager().registerEvents(this, this);
 		
@@ -79,19 +113,6 @@ public class SpigotMain extends JavaPlugin implements PluginMessageListener,List
 			queuebatch.clear();
 			sendMessage("massqueue", msg.toString());
 		}, 2*20, 20);
-
-		File oldConfig = new File(getDataFolder(), "config.yml");
-		if(oldConfig.exists()) {
-			//noinspection ResultOfMethodCallIgnored
-			oldConfig.renameTo(new File(getDataFolder(), "spigot-config.yml"));
-		}
-
-		try {
-			config = new ConfigFile(getDataFolder(), getLogger(), "spigot-config.yml");
-		} catch (Exception e) {
-			getLogger().severe("Unable to read config:");
-			e.printStackTrace();
-		}
 
 		getLogger().info("Spigot side enabled! v"+getDescription().getVersion());
 	}
@@ -190,11 +211,30 @@ public class SpigotMain extends JavaPlugin implements PluginMessageListener,List
 		e.setMotd("ajQueue;whitelisted="+whitelist);
 	}
 
+	public boolean checkProxyResponse(CommandSender sender) {
+		if(!hasProxy() && config.getBoolean("check-proxy-response")) {
+			if(sender instanceof Player) sendMessage((Player) sender, "ack", "");
+			sender.sendMessage(
+					color(
+							"&c" +
+									(sender.hasPermission("ajqueue.manage") ? "ajQueue" : "The queue plugin") +
+									" must also be installed on the proxy!&7 If it has been installed on the proxy, make sure it loaded correctly and try again."
+					)
+			);
+			return true;
+		}
+		return false;
+	}
+
 	public CompatScheduler getScheduler() {
 		return compatScheduler;
 	}
 
 	public ConfigFile getAConfig() {
 		return config;
+	}
+
+	public HashMap<Player, String> getQueueBatch() {
+		return queuebatch;
 	}
 }

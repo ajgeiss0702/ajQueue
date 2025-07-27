@@ -5,10 +5,3 @@ author: ajgeiss0702
 name: ajQueue
 folia-supported: true
 softdepend: [PlaceholderAPI]
-commands:
-   queue:
-      aliases: [server, move, joinq, joinqueue]
-      description: Queue for a server
-   leavequeue:
-      aliases: [leaveq]
-      description: Leaves a queue

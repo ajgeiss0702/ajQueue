@@ -17,6 +17,23 @@ take-over-motd-for-whitelist: true
 check-proxy-response: true
 
 
+# Should we register /queue (and its aliases) and /leavequeue on the backend?
+# That way if those commands are run on a gui, npc, etc, we can automatically forward them to the proxy
+#  Default: true
+enable-commands: true
+
+# Should we register /server as an alias for /queue?
+# Note this only applies to the backend server (e.g. if /server is run on npcs/guis/etc.)
+# If you want to replace the /server command on the proxy, follow this guide: https://wiki.ajg0702.us/ajQueue/setup/replacing-server-command
+#  Default: true
+enable-server-alias: true
+
+# Should we enable /spigotqueue alias for /queue?
+# This is mainly for debugging, which is why its disabled by default
+#  Default: false
+enable-spigotqueue-alias: false
+
+
 
 # Dont touch this
-config-version: 3
+config-version: 4
