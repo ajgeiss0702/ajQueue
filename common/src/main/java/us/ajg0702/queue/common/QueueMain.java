@@ -444,6 +444,9 @@ public class QueueMain extends AjQueueAPI {
         d.putIfAbsent("protocol-names.767", "1.21.1");
         d.putIfAbsent("protocol-names.768", "1.21.3");
         d.putIfAbsent("protocol-names.769", "1.21.4");
+        d.putIfAbsent("protocol-names.770", "1.21.5");
+        d.putIfAbsent("protocol-names.771", "1.21.6");
+        d.putIfAbsent("protocol-names.772", "1.21.8");
 
         messages = new Messages(dataFolder, new LogConverter(logger), d);
     }
