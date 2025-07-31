@@ -9,6 +9,9 @@ import us.ajg0702.queue.common.QueueMain;
 import us.ajg0702.utils.common.GenUtils;
 
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.function.Predicate;
 
 public class DefaultBalancer implements Balancer {
 
@@ -27,6 +30,7 @@ public class DefaultBalancer implements Balancer {
         } else {
             alreadyConnected = player.getCurrentServer();
         }
+        Integer protocol = player == null ? null : player.getProtocolVersion();
         List<AdaptedServer> servers = server.getServers();
         AdaptedServer selected = null;
         int selectednum = 0;
@@ -43,6 +47,23 @@ public class DefaultBalancer implements Balancer {
                     continue;
                 }
                 if(!selected.isJoinable(player) && sv.isJoinable(player)) {
+                    if(protocol != null) {
+                        List<QueueServer> queues = main.getQueueManager().getServers();
+                        AdaptedServer finalSelected = selected;
+                        Optional<QueueServer> selectedQueueServer = queues.stream()
+                                .filter(s -> Objects.equals(s.getName(), finalSelected.getName()))
+                                .findAny();
+                        Optional<QueueServer> svQueueServer = queues.stream()
+                                .filter(s -> Objects.equals(s.getName(), sv.getName()))
+                                .findAny();
+                        if(selectedQueueServer.isPresent() && svQueueServer.isPresent()) {
+                            QueueServer selectedQueue = selectedQueueServer.get();
+                            QueueServer svQueue = svQueueServer.get();
+                            if(selectedQueue.isSupportedProtocol(protocol) && !svQueue.isSupportedProtocol(protocol)) {
+                                continue;
+                            }
+                        }
+                    }
                     selected = sv;
                     selectednum = online;
                     continue;

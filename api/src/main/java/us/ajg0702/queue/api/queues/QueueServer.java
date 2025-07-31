@@ -216,6 +216,11 @@ public interface QueueServer {
      */
     void setSupportedProtocols(List<Integer> list);
 
+    default boolean isSupportedProtocol(int protocol) {
+        if(getSupportedProtocols().isEmpty()) return true;
+        return getSupportedProtocols().contains(protocol);
+    }
+
     /**
      * Gets the balancer this server is using
      * @return The balancer this server is using
