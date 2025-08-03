@@ -363,6 +363,11 @@ re-check-priority: false
 #  Default: true
 check-last-player-sent-time: true
 
+# Should we treat servers with a max player count of -1 as an infinite player count?
+# Limbo servers do this, which is why its enabled by default
+#  Default: true
+treat-negative-one-max-player-as-infinite: true
+
 # Should we send debug info to the console when priority queue is used?
 # This will print several lines to the console when a player joins a queue,
 # so you should probably only use this for debugging purposes
@@ -430,7 +435,7 @@ debug: false
 
 
 # Don't touch this number please
-config-version: 53
+config-version: 54
 
 
 # This is ONLY here so that they can be moved to messages.yml. Please edit these in messages.yml!

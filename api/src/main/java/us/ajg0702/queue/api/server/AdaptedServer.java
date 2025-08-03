@@ -85,7 +85,11 @@ public interface AdaptedServer extends Handle {
 
     default boolean isFull() {
         if(!getLastPing().isPresent()) return false;
-        return getLastPing().get().getPlayerCount() >= getLastPing().get().getMaxPlayers();
+        int max = getLastPing().get().getMaxPlayers();
+        if(max == -1 && AjQueueAPI.getInstance().getConfig().getBoolean("treat-negative-one-max-player-as-infinite")) {
+            return false;
+        }
+        return getLastPing().get().getPlayerCount() >= max;
     }
 
     /**
