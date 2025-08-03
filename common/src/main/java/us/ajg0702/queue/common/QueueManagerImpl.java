@@ -304,7 +304,7 @@ public class QueueManagerImpl implements QueueManager {
             );
             if(main.getConfig().getBoolean("enable-priority-messages")) {
                 for(String rawPriorityMessage : main.getConfig().getStringList("priority-messages")) {
-                    List<String> parts = Arrays.asList(rawPriorityMessage.split(":"));
+                    List<String> parts = new ArrayList<>(Arrays.asList(rawPriorityMessage.split(":")));
                     if(parts.size() == 1) continue;
                     String level = parts.remove(0);
                     String messageRaw = String.join(":", parts);
