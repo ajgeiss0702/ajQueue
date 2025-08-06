@@ -142,7 +142,7 @@ public class SpigotMain extends JavaPlugin implements PluginMessageListener,List
 			return;
 	    }
 
-		if(subchannel.equals("player-joined-queue")) {
+		if(subchannel.equals("player-joined-queue") && papi) {
 			for (Placeholder placeholderImplementation : placeholders.getPlaceholderImplementations()) {
 				if(!(placeholderImplementation instanceof RefetchablePlaceholder)) continue;
 				RefetchablePlaceholder placeholder = (RefetchablePlaceholder) placeholderImplementation;
@@ -182,8 +182,7 @@ public class SpigotMain extends JavaPlugin implements PluginMessageListener,List
 	
 	@EventHandler
 	public void onLeave(PlayerQuitEvent e) {
-		if(!papi) return;
-		placeholders.cleanCache(e.getPlayer());
+		if(papi) placeholders.cleanCache(e.getPlayer());
 	}
 
 	@EventHandler
