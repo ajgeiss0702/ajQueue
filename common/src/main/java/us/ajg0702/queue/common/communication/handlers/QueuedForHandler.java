@@ -24,6 +24,6 @@ public class QueuedForHandler extends MessageHandler {
         return ComResponse
                 .from("queuedfor")
                 .id(data)
-                .with(server.getQueue().size());
+                .with(server.getQueueHolder().getExpressQueueSize()+server.getQueueHolder().getStandardQueueSize());
     }
 }

@@ -4,6 +4,7 @@ import us.ajg0702.queue.api.players.AdaptedPlayer;
 import us.ajg0702.queue.api.players.QueuePlayer;
 import us.ajg0702.queue.api.queues.QueueServer;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -71,16 +72,45 @@ public abstract class QueueHolder {
     }
 
     /**
-     * Returns the size of the queue
-     * @return The number of players in the queue
+     * Returns the size of the standard queue
+     * @return The number of players in the standard queue
      */
-    public abstract int getQueueSize();
+    public abstract int getStandardQueueSize();
+
+    /**
+     * Returns the size of the express queue
+     * @return The number of players in the express queue
+     */
+    public abstract int getExpressQueueSize();
+
+    /**
+     * Gets the size of both the express and standard queues combines
+     * @return the number of players in both queues
+     */
+    public abstract int getTotalQueueSize();
 
     public abstract int getPosition(QueuePlayer player);
 
     /**
-     * Get all players that are in the queue
-     * @return a list of players in the queue
+     * Get all players that are in the standard queue
+     * @return a list of players in the standard queue
      */
-    public abstract List<QueuePlayer> getAllPlayers();
+    public abstract List<QueuePlayer> getAllStandardPlayers();
+
+    /**
+     * Get all players that are in the express queue
+     * @return a list of players in the express queue
+     */
+    public abstract List<QueuePlayer> getAllExpressPlayers();
+
+    /**
+     * Gets all players that are in all queues for this server
+     * @return a list of all players. Express queue players are first in the list, then standard queue players.
+     */
+    public List<QueuePlayer> getAllPlayers() {
+        List<QueuePlayer> players = new ArrayList<>();
+        players.addAll(getAllExpressPlayers());
+        players.addAll(getAllStandardPlayers());
+        return players;
+    }
 }

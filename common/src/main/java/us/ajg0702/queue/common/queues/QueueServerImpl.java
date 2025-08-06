@@ -8,6 +8,7 @@ import us.ajg0702.queue.api.players.QueuePlayer;
 import us.ajg0702.queue.api.queueholders.QueueHolder;
 import us.ajg0702.queue.api.queues.Balancer;
 import us.ajg0702.queue.api.queues.QueueServer;
+import us.ajg0702.queue.api.queues.QueueType;
 import us.ajg0702.queue.api.server.AdaptedServer;
 import us.ajg0702.queue.api.server.AdaptedServerPing;
 import us.ajg0702.queue.common.QueueMain;
@@ -40,12 +41,14 @@ public class QueueServerImpl implements QueueServer {
 
     private int manualMaxPlayers = Integer.MAX_VALUE;
 
+    private QueueType lastQueueSend = QueueType.STANDARD;
 
-    public QueueServerImpl(String name, QueueMain main, AdaptedServer server, List<QueuePlayer> previousPlayers) {
-        this(name, main, Collections.singletonList(server), previousPlayers);
+
+    public QueueServerImpl(String name, QueueMain main, AdaptedServer server, List<QueuePlayer> previousStandardPlayers, List<QueuePlayer> previousExpressPlayers) {
+        this(name, main, Collections.singletonList(server), previousStandardPlayers, previousExpressPlayers);
     }
 
-    public QueueServerImpl(String name, QueueMain main, List<AdaptedServer> servers, List<QueuePlayer> previousPlayers) {
+    public QueueServerImpl(String name, QueueMain main, List<AdaptedServer> servers, List<QueuePlayer> previousStandardPlayers, List<QueuePlayer> previousExpressPlayers) {
         this.name = name;
         this.servers = servers;
         this.main = main;
@@ -98,6 +101,10 @@ public class QueueServerImpl implements QueueServer {
             break;
         }
 
+        List<QueuePlayer> previousPlayers = new ArrayList<>();
+        previousPlayers.addAll(previousExpressPlayers);
+        previousPlayers.addAll(previousStandardPlayers);
+
         for(QueuePlayer queuePlayer : previousPlayers) {
             if(queuePlayer.getPlayer() == null) {
                 addPlayer(
@@ -106,7 +113,8 @@ public class QueueServerImpl implements QueueServer {
                                 queuePlayer.getName(),
                                 this,
                                 queuePlayer.getPriority(),
-                                queuePlayer.getMaxOfflineTime()
+                                queuePlayer.getMaxOfflineTime(),
+                                queuePlayer.getQueueType()
                         )
                 );
             } else {
@@ -115,16 +123,12 @@ public class QueueServerImpl implements QueueServer {
                                 queuePlayer.getPlayer(),
                                 this,
                                 queuePlayer.getPriority(),
-                                queuePlayer.getMaxOfflineTime()
+                                queuePlayer.getMaxOfflineTime(),
+                                queuePlayer.getQueueType()
                         )
                 );
             }
         }
-    }
-
-    @Override
-    public ImmutableList<QueuePlayer> getQueue() {
-        return ImmutableList.copyOf(queueHolder.getAllPlayers());
     }
 
     @Override
@@ -363,6 +367,15 @@ public class QueueServerImpl implements QueueServer {
     @Override
     public QueueHolder getQueueHolder() {
         return queueHolder;
+    }
+
+    @Override
+    public QueueType getLastQueueSend() {
+        return lastQueueSend;
+    }
+
+    public void setLastQueueSend(QueueType lastQueueSend) {
+        this.lastQueueSend = lastQueueSend;
     }
 
     private void positionChange() {

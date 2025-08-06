@@ -54,6 +54,8 @@ public interface QueueManager {
      */
     QueueServer getSingleServer(AdaptedPlayer player);
 
+    QueuePlayer getSingleQueuePlayer(AdaptedPlayer player);
+
     /**
      * Get the name of the server the player is queued for.
      * If multiple servers are queued for, it will use the multi-server-queue-pick option in the config

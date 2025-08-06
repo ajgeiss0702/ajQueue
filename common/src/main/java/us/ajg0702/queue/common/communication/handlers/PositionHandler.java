@@ -1,6 +1,7 @@
 package us.ajg0702.queue.common.communication.handlers;
 
 import us.ajg0702.queue.api.players.AdaptedPlayer;
+import us.ajg0702.queue.api.players.QueuePlayer;
 import us.ajg0702.queue.api.queues.QueueServer;
 import us.ajg0702.queue.common.QueueMain;
 import us.ajg0702.queue.api.communication.ComResponse;
@@ -14,11 +15,11 @@ public class PositionHandler extends MessageHandler {
 
     @Override
     public ComResponse handleMessage(AdaptedPlayer player, String data) {
-        QueueServer server = main.getQueueManager().getSingleServer(player);
+        QueuePlayer queuePlayer = main.getQueueManager().getSingleQueuePlayer(player);
         Integer pos = null;
         String noneMessage = null;
-        if(server != null) {
-            pos = server.getQueue().indexOf(server.findPlayer(player)) + 1;
+        if(queuePlayer != null) {
+            pos = queuePlayer.getPosition();
         } else {
             noneMessage = main.getMessages().getString("placeholders.position.none");
         }

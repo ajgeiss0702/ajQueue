@@ -66,10 +66,17 @@ public class ListCommand extends BaseCommand {
                 color = "&e";
             }
 
-            sender.sendMessage(main.getMessages().getComponent("commands.listqueues.format",
+            int standardSize = s.getQueueHolder().getStandardQueueSize();
+            int expressSize = s.getQueueHolder().getExpressQueueSize();
+            int totalSize = standardSize + expressSize;
+
+            sender.sendMessage(main.getMessages().getComponent("commands.listqueues." + (totalSize != standardSize ? "both-format" : "single-format"),
                     "COLOR:" + Messages.color(color),
                     "NAME:" + s.getAlias(),
-                    "COUNT:" + s.getQueue().size(),
+                    "STANDARD_COUNT:" + standardSize,
+                    "EXPRESS_COUNT:" + expressSize,
+                    "TOTAL_COUNT:" + totalSize,
+                    "COUNT:" + totalSize,
                     "STATUS:" + Messages.color(main.getMessages().getRawString("placeholders.status."+s.getStatus(spp)))
             ));
         }

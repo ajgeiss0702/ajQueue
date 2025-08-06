@@ -2,6 +2,7 @@ package us.ajg0702.queue.api.players;
 
 import org.jetbrains.annotations.NotNull;
 import us.ajg0702.queue.api.queues.QueueServer;
+import us.ajg0702.queue.api.queues.QueueType;
 import us.ajg0702.queue.api.server.AdaptedServer;
 
 import javax.annotation.Nullable;
@@ -20,6 +21,12 @@ public interface QueuePlayer {
      * @return The QueueServer this player is queued for
      */
     QueueServer getQueueServer();
+
+    /**
+     * Gets whether this player is in the standard or express queue
+     * @return the queue type (STANDARD or EXPRESS)
+     */
+    QueueType getQueueType();
 
     /**
      * Gets the player's position in the queue
@@ -83,4 +90,12 @@ public interface QueuePlayer {
      * Attempts a connection to the provided AdaptedServer, calling PreConnectEvent before AdaptedPlayer.connect(...)
      */
     void connect(@NotNull AdaptedServer server);
+
+    default boolean isInExpressQueue() {
+        return getQueueType() == QueueType.EXPRESS;
+    }
+
+    default boolean isInStandardQueue() {
+        return getQueueType() == QueueType.STANDARD;
+    }
 }

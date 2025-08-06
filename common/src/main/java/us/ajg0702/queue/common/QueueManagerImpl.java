@@ -3,14 +3,15 @@ package us.ajg0702.queue.common;
 import com.google.common.collect.ImmutableList;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.title.Title;
-import us.ajg0702.queue.api.AjQueueAPI;
 import us.ajg0702.queue.api.QueueManager;
 import us.ajg0702.queue.api.events.BuildServersEvent;
 import us.ajg0702.queue.api.events.PreQueueEvent;
 import us.ajg0702.queue.api.players.AdaptedPlayer;
 import us.ajg0702.queue.api.players.QueuePlayer;
 import us.ajg0702.queue.api.premium.Logic;
+import us.ajg0702.queue.api.queueholders.QueueHolder;
 import us.ajg0702.queue.api.queues.QueueServer;
+import us.ajg0702.queue.api.queues.QueueType;
 import us.ajg0702.queue.api.server.AdaptedServer;
 import us.ajg0702.queue.commands.commands.manage.PauseQueueServer;
 import us.ajg0702.queue.common.players.QueuePlayerImpl;
@@ -22,6 +23,7 @@ import us.ajg0702.utils.common.TimeUtils;
 import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.*;
+import java.util.function.Supplier;
 
 public class QueueManagerImpl implements QueueManager {
 
@@ -47,11 +49,12 @@ public class QueueManagerImpl implements QueueManager {
 
         for(AdaptedServer server : buildServersEvent.getServers()) {
             QueueServer previousServer = findServer(server.getName());
-            List<QueuePlayer> previousPlayers = previousServer == null ? new ArrayList<>() : previousServer.getQueue();
-            if(previousPlayers.size() > 0) {
-                Debug.info("Adding "+previousPlayers.size()+" players back to the queue for "+server.getName());
+            List<QueuePlayer> previousStandardPlayers = previousServer == null ? new ArrayList<>() : previousServer.getQueueHolder().getAllStandardPlayers();
+            List<QueuePlayer> previousExpressPlayers = previousServer == null ? new ArrayList<>() : previousServer.getQueueHolder().getAllExpressPlayers();
+            if(!previousStandardPlayers.isEmpty() || !previousExpressPlayers.isEmpty()) {
+                Debug.info("Adding "+previousStandardPlayers.size()+"+"+previousExpressPlayers.size()+" players back to the queue for "+server.getName());
             }
-            QueueServer queueServer = new QueueServerImpl(server.getName(), main, server, previousPlayers);
+            QueueServer queueServer = new QueueServerImpl(server.getName(), main, server, previousStandardPlayers, previousExpressPlayers);
             if(previousServer != null) {
                 queueServer.setPaused(previousServer.isPaused());
                 queueServer.setLastSentTime(previousServer.getLastSentTime());
@@ -68,17 +71,18 @@ public class QueueManagerImpl implements QueueManager {
             }
 
             List<AdaptedServer> groupServers = groups.getValue();
-            if (groupServers.size() == 0) {
+            if (groupServers.isEmpty()) {
                 main.getLogger().warning("Server group '"+groupName+"' has no servers! Ignoring it.");
                 continue;
             }
 
             QueueServer previousServer = main.getQueueManager().findServer(groupName);
-            List<QueuePlayer> previousPlayers = previousServer == null ? new ArrayList<>() : previousServer.getQueue();
-            if (previousPlayers.size() > 0) {
-                Debug.info("Adding "+previousPlayers.size()+" players back to the queue for "+groupName);
+            List<QueuePlayer> previousStandardPlayers = previousServer == null ? new ArrayList<>() : previousServer.getQueueHolder().getAllStandardPlayers();
+            List<QueuePlayer> previousExpressPlayers = previousServer == null ? new ArrayList<>() : previousServer.getQueueHolder().getAllExpressPlayers();
+            if(!previousStandardPlayers.isEmpty() || !previousExpressPlayers.isEmpty()) {
+                Debug.info("Adding "+previousStandardPlayers.size()+"+"+previousExpressPlayers.size()+" players back to the queue for "+groupName);
             }
-            result.add(new QueueServerImpl(groupName, main, groupServers, previousPlayers));
+            result.add(new QueueServerImpl(groupName, main, groupServers, previousStandardPlayers, previousExpressPlayers));
         }
 
         List<String> groupsRaw = main.getConfig().getStringList("server-groups");
@@ -94,7 +98,7 @@ public class QueueManagerImpl implements QueueManager {
             }
 
             String groupName = groupRaw.split(":")[0];
-            String[] serversraw = groupRaw.split(":")[1].split(",");
+            String[] serversRaw = groupRaw.split(":")[1].split(",");
 
             if(findServer(groupName, result) != null) {
                 main.getLogger().warning("The name of a group ('"+groupName+"') cannot be the same as the name of a server!");
@@ -103,10 +107,10 @@ public class QueueManagerImpl implements QueueManager {
 
             List<AdaptedServer> groupServers = new ArrayList<>();
 
-            for(String serverraw : serversraw) {
-                QueueServer found = findServer(serverraw, result);
+            for(String serverRaw : serversRaw) {
+                QueueServer found = findServer(serverRaw, result);
                 if(found == null) {
-                    main.getLogger().warning("Could not find server named '"+serverraw+"' in servergroup '"+groupName+"'!");
+                    main.getLogger().warning("Could not find server named '"+serverRaw+"' in servergroup '"+groupName+"'!");
                     continue;
                 }
                 if(found.isGroup()) continue;
@@ -114,18 +118,19 @@ public class QueueManagerImpl implements QueueManager {
                 groupServers.add(found.getServers().get(0));
             }
 
-            if(groupServers.size() == 0) {
+            if(groupServers.isEmpty()) {
                 main.getLogger().warning("Server group '"+groupName+"' has no servers! Ignoring it.");
                 continue;
             }
 
             QueueServer previousServer = main.getQueueManager().findServer(groupName);
-            List<QueuePlayer> previousPlayers = previousServer == null ? new ArrayList<>() : previousServer.getQueue();
-            if(previousPlayers.size() > 0) {
-                Debug.info("Adding "+previousPlayers.size()+" players back to the queue for "+groupName);
+            List<QueuePlayer> previousStandardPlayers = previousServer == null ? new ArrayList<>() : previousServer.getQueueHolder().getAllStandardPlayers();
+            List<QueuePlayer> previousExpressPlayers = previousServer == null ? new ArrayList<>() : previousServer.getQueueHolder().getAllExpressPlayers();
+            if(!previousStandardPlayers.isEmpty() || !previousExpressPlayers.isEmpty()) {
+                Debug.info("Adding "+previousStandardPlayers.size()+"+"+previousExpressPlayers.size()+" players back to the queue for "+groupName);
             }
 
-            result.add(new QueueServerImpl(groupName, main, groupServers, previousPlayers));
+            result.add(new QueueServerImpl(groupName, main, groupServers, previousStandardPlayers, previousExpressPlayers));
         }
 
         List<String> supportedProtocolsRaw = main.getConfig().getStringList("supported-protocols");
@@ -244,7 +249,6 @@ public class QueueManagerImpl implements QueueManager {
 
         // Player should be added!
 
-        List<QueuePlayer> list = server.getQueueHolder().getAllPlayers();
         QueuePlayer queuePlayer;
         AdaptedServer ideal = server.getIdealServer(player);
         if(main.isPremium()) {
@@ -254,10 +258,11 @@ public class QueueManagerImpl implements QueueManager {
                     player.hasPermission("ajqueue.serverpriority."+server.getName()) ? 1 : 0;
             priority = Math.max(priority, Logic.getUnJoinablePriorities(server, ideal, player) > 0 ? 1 : 0);
             int maxOfflineTime = player.hasPermission("ajqueue.stayqueued") ? 60 : 0;
-            queuePlayer = new QueuePlayerImpl(player, server, priority, maxOfflineTime);
+            queuePlayer = new QueuePlayerImpl(player, server, priority, maxOfflineTime, QueueType.STANDARD);
+            List<QueuePlayer> list = server.getQueueHolder().getAllStandardPlayers();
             if(
                     priority == 1 &&
-                    server.getQueue().size() > 0
+                    server.getQueueHolder().getStandardQueueSize() > 0
             ) {
                 int i = 0;
                 for(QueuePlayer ply : list) {
@@ -274,10 +279,11 @@ public class QueueManagerImpl implements QueueManager {
             }
         }
 
-        list = server.getQueueHolder().getAllPlayers();
 
         int pos = queuePlayer.getPosition();
-        int len = list.size();
+        int len = queuePlayer.isInExpressQueue() ?
+                server.getQueueHolder().getExpressQueueSize() :
+                server.getQueueHolder().getStandardQueueSize();
 
         boolean sentInstantly = canSendInstantly(player, server);
         boolean hasBypass = main.getLogic().hasAnyBypass(player, server.getName());
@@ -335,7 +341,12 @@ public class QueueManagerImpl implements QueueManager {
     @Override
     public boolean canSendInstantly(AdaptedPlayer player, QueueServer queueServer) {
         boolean isJoinable = queueServer.isJoinable(player);
-        boolean sizeGood = queueServer.getQueueHolder().getQueueSize() <= 1 && isJoinable;
+        boolean sizeGood = (
+                main.getLogic().isPremium() && player.hasPermission("ajqueue.express."+queueServer.getName()) ?
+                    queueServer.getQueueHolder().getExpressQueueSize() :
+                    queueServer.getQueueHolder().getStandardQueueSize()
+                )
+                <= 1 && isJoinable;
         boolean timeGood = !main.getConfig().getBoolean("check-last-player-sent-time") || queueServer.getLastSentTime() > Math.floor(main.getTimeBetweenPlayers() * 1000);
         boolean alwaysSendInstantly = main.getConfig().getStringList("send-instantly").contains(queueServer.getName());
         boolean hasBypass = main.getLogic().hasAnyBypass(player, queueServer.getName());
@@ -374,6 +385,21 @@ public class QueueManagerImpl implements QueueManager {
     }
 
     @Override
+    public QueuePlayer getSingleQueuePlayer(AdaptedPlayer player) {
+        ImmutableList<QueuePlayer> queued = findPlayerInQueues(player);
+        if(queued.isEmpty()) {
+            return null;
+        }
+        QueuePlayer selected = queued.get(0);
+
+        if(main.getConfig().getString("multi-server-queue-pick").equalsIgnoreCase("last")) {
+            selected = queued.get(queued.size()-1);
+        }
+        return selected;
+    }
+
+
+    @Override
     public String getQueuedName(AdaptedPlayer player) {
         QueueServer server = getSingleServer(player);
         if(server == null) return main.getMessages().getString("placeholders.queued.none");
@@ -394,9 +420,12 @@ public class QueueManagerImpl implements QueueManager {
         if(!main.getConfig().getBoolean("send-actionbar")) return;
 
         for(QueueServer server : servers) {
-            for(QueuePlayer queuePlayer : server.getQueue()) {
+            for(QueuePlayer queuePlayer : server.getQueueHolder().getAllPlayers()) {
 
                 int pos = queuePlayer.getPosition();
+                int len = queuePlayer.getQueueType() == QueueType.STANDARD ?
+                        server.getQueueHolder().getStandardQueueSize() :
+                        server.getQueueHolder().getExpressQueueSize();
                 if(pos == 0) {
                     server.removePlayer(queuePlayer);
                     continue;
@@ -413,7 +442,7 @@ public class QueueManagerImpl implements QueueManager {
                 if(!server.isJoinable(player)) {
                     player.sendActionBar(msgs.getComponent("spigot.actionbar.offline",
                             "POS:"+pos,
-                            "LEN:"+server.getQueue().size(),
+                            "LEN:"+len,
                             "SERVER:"+server.getAlias(),
                             "STATUS:"+status
                     ));
@@ -421,7 +450,7 @@ public class QueueManagerImpl implements QueueManager {
                     int time = (int) Math.round(pos * main.getTimeBetweenPlayers());
                     player.sendActionBar(msgs.getComponent("spigot.actionbar.online",
                             "POS:"+pos,
-                            "LEN:"+server.getQueue().size(),
+                            "LEN:"+len,
                             "SERVER:"+server.getAlias(),
                             "TIME:"+ TimeUtils.timeString(time, msgs.getString("format.time.mins"), msgs.getString("format.time.secs"))
                     ));
@@ -436,13 +465,16 @@ public class QueueManagerImpl implements QueueManager {
         if(!main.getConfig().getBoolean("send-title")) return;
 
         for(QueueServer server : servers) {
-            for(QueuePlayer queuePlayer : server.getQueue()) {
+            for(QueuePlayer queuePlayer : server.getQueueHolder().getAllPlayers()) {
 
                 int pos = queuePlayer.getPosition();
                 if(pos == 0) {
                     server.removePlayer(queuePlayer);
                     continue;
                 }
+                int len = queuePlayer.getQueueType() == QueueType.STANDARD ?
+                        server.getQueueHolder().getStandardQueueSize() :
+                        server.getQueueHolder().getExpressQueueSize();
 
                 AdaptedPlayer player = queuePlayer.getPlayer();
                 if(player == null) continue;
@@ -456,14 +488,14 @@ public class QueueManagerImpl implements QueueManager {
 
                 Component titleMessage = msgs.getComponent("title.title",
                         "POS:"+pos,
-                        "LEN:"+server.getQueue().size(),
+                        "LEN:"+len,
                         "SERVER:"+server.getAlias(),
                         "STATUS:"+status,
                         "TIME:"+ TimeUtils.timeString(time, msgs.getString("format.time.mins"), msgs.getString("format.time.secs"))
                 );
                 Component subTitleMessage = msgs.getComponent("title.subtitle",
                         "POS:"+pos,
-                        "LEN:"+server.getQueue().size(),
+                        "LEN:"+len,
                         "SERVER:"+server.getAlias(),
                         "STATUS:"+status,
                         "TIME:"+ TimeUtils.timeString(time, msgs.getString("format.time.mins"), msgs.getString("format.time.secs"))
@@ -517,7 +549,7 @@ public class QueueManagerImpl implements QueueManager {
             }
         }
         for (QueueServer s : servers) {
-            for (QueuePlayer queuePlayer : s.getQueue()) {
+            for (QueuePlayer queuePlayer : s.getQueueHolder().getAllPlayers()) {
                 AdaptedPlayer player = queuePlayer.getPlayer();
                 if (player == null || !player.isConnected()) continue;
                 if(player.getServerName() == null) continue;
@@ -529,7 +561,7 @@ public class QueueManagerImpl implements QueueManager {
                 skipPriorityCheck = false;
             } else {
                 for (QueueServer server : servers) {
-                    for (QueuePlayer queuePlayer : server.getQueue()) {
+                    for (QueuePlayer queuePlayer : server.getQueueHolder().getAllPlayers()) {
                         if(queuePlayer.getPlayer() == null) continue;
                         AdaptedPlayer player = queuePlayer.getPlayer();
                         AdaptedServer ideal = server.getIdealServer(player);
@@ -551,7 +583,7 @@ public class QueueManagerImpl implements QueueManager {
     public void sendMessages() {
         try {
             for(QueueServer server : servers) {
-                for(QueuePlayer queuePlayer : server.getQueue()) {
+                for(QueuePlayer queuePlayer : server.getQueueHolder().getAllPlayers()) {
                     sendMessage(queuePlayer);
                 }
             }
@@ -568,7 +600,9 @@ public class QueueManagerImpl implements QueueManager {
         QueueServer server = queuePlayer.getQueueServer();
 
         int pos = queuePlayer.getPosition();
-        int len = server.getQueueHolder().getQueueSize();
+        int len = queuePlayer.getQueueType() == QueueType.STANDARD ?
+                server.getQueueHolder().getStandardQueueSize() :
+                server.getQueueHolder().getExpressQueueSize();
 
         if(!server.isJoinable(player)) {
             String status = server.getStatusString(player);
@@ -650,7 +684,8 @@ public class QueueManagerImpl implements QueueManager {
         }
 
         for(QueueServer server : sendingServers) {
-            for(QueuePlayer queuePlayer : server.getQueue()) {
+            QueueHolder queueHolder = server.getQueueHolder();
+            for(QueuePlayer queuePlayer : queueHolder.getAllPlayers()) {
                 if(queuePlayer.getPlayer() != null) continue;
                 if(main.getLogic().playerDisconnectedTooLong(queuePlayer)) {
                     Debug.info("Removing " + queuePlayer.getName() + " due to them being disconnected too long");
@@ -659,11 +694,33 @@ public class QueueManagerImpl implements QueueManager {
             }
 
             if(!server.isOnline()) continue;
-            if(server.getQueue().size() == 0) continue;
+
+            QueueType lastSend = server.getLastQueueSend();
+
+            boolean express;
+            if(lastSend == QueueType.EXPRESS) {
+                express = queueHolder.getStandardQueueSize() <= 0;
+            } else {
+                express = queueHolder.getExpressQueueSize() >= 0;
+            }
+
+            ((QueueServerImpl) server).setLastQueueSend(express ? QueueType.EXPRESS : QueueType.STANDARD);
 
             Debug.info("should send when back online: " + !server.isGroup() + " && " + main.getConfig().getBoolean("send-all-when-back-online") + " && " + server.getServers().get(0).justWentOnline());
             if(!server.isGroup() && main.getConfig().getBoolean("send-all-when-back-online") && server.getServers().get(0).justWentOnline()) {
-                for(QueuePlayer p : server.getQueue()) {
+                List<QueuePlayer> expressPlayers = server.getQueueHolder().getAllExpressPlayers();
+                List<QueuePlayer> standardPlayers = server.getQueueHolder().getAllStandardPlayers();
+                List<QueuePlayer> players = new ArrayList<>();
+                // alternate between standard and express players, even in send-all-when-back-online
+                for (int i = 0; i < Math.max(expressPlayers.size(), standardPlayers.size()); i++) {
+                    if(i < expressPlayers.size()) {
+                        players.add(expressPlayers.get(i));
+                    }
+                    if(i < standardPlayers.size()) {
+                        players.add(standardPlayers.get(i));
+                    }
+                }
+                for(QueuePlayer p : players) {
 
                     AdaptedPlayer player = p.getPlayer();
                     if(player == null) continue;
@@ -688,19 +745,30 @@ public class QueueManagerImpl implements QueueManager {
                 continue;
             }
 
-            QueuePlayer nextQueuePlayer = server.getQueue().get(0);
+            if((express ? queueHolder.getExpressQueueSize() : queueHolder.getStandardQueueSize()) <= 0) continue;
+
+            QueuePlayer nextQueuePlayer = express ?
+                    queueHolder.getAllExpressPlayers().get(0) :
+                    queueHolder.getAllStandardPlayers().get(0);
             AdaptedPlayer nextPlayer = nextQueuePlayer.getPlayer();
+
+            Supplier<Integer> queueSize = () -> express ?
+                    queueHolder.getExpressQueueSize() :
+                    queueHolder.getStandardQueueSize();
+
 
 
             // If the first person int the queue is offline or already in the server, find the next online player in the queue
             int i = 0;
             List<String> excludableServers = new ArrayList<>(server.getServerNames());
             if(nextQueuePlayer.getInitialServer() != null) excludableServers.remove(nextQueuePlayer.getInitialServer().getName());
-            while((nextPlayer == null || excludableServers.contains(nextPlayer.getServerName())) && i < server.getQueue().size()) {
+            while((nextPlayer == null || excludableServers.contains(nextPlayer.getServerName())) && i < queueSize.get()) {
                 if(nextPlayer != null) { // Remove them if they are already in the server
                     server.removePlayer(nextQueuePlayer);
-                    if(server.getQueue().size() > i) {
-                        nextQueuePlayer = server.getQueue().get(i);
+                    if(queueSize.get() > i) {
+                        nextQueuePlayer = express ?
+                                queueHolder.getAllExpressPlayers().get(i) :
+                                queueHolder.getAllStandardPlayers().get(i);
                         nextPlayer = nextQueuePlayer.getPlayer();
                     } else {
                         nextPlayer = null;
@@ -708,10 +776,12 @@ public class QueueManagerImpl implements QueueManager {
                     }
                 } else {
                     i++;
-                    if(i > server.getQueue().size()-1) {
+                    if(i > queueSize.get()-1) {
                         break;
                     }
-                    nextQueuePlayer = server.getQueue().get(i);
+                    nextQueuePlayer = express ?
+                            queueHolder.getAllExpressPlayers().get(i) :
+                            queueHolder.getAllStandardPlayers().get(i);
                     nextPlayer = nextQueuePlayer.getPlayer();
                 }
             }

@@ -49,7 +49,7 @@ public class KickAll extends SubCommand {
         }
 
         QueueServer server = main.getQueueManager().findServer(args[0]);
-        List<QueuePlayer> kickPlayers = new ArrayList<>(server.getQueue());
+        List<QueuePlayer> kickPlayers = new ArrayList<>(server.getQueueHolder().getAllPlayers());
 
         for(QueuePlayer player : kickPlayers) {
             player.getQueueServer().removePlayer(player);

@@ -1,17 +1,17 @@
 package us.ajg0702.queue.logic;
 
-import com.google.common.collect.ImmutableList;
-import us.ajg0702.queue.api.AjQueueAPI;
 import us.ajg0702.queue.api.events.PriorityCalculationEvent;
 import us.ajg0702.queue.api.premium.Logic;
 import us.ajg0702.queue.api.players.AdaptedPlayer;
 import us.ajg0702.queue.api.players.QueuePlayer;
 import us.ajg0702.queue.api.queues.QueueServer;
+import us.ajg0702.queue.api.queues.QueueType;
 import us.ajg0702.queue.api.server.AdaptedServer;
 import us.ajg0702.queue.api.util.QueueLogger;
 import us.ajg0702.queue.common.QueueMain;
 import us.ajg0702.queue.common.players.QueuePlayerImpl;
 import us.ajg0702.queue.api.premium.PermissionGetter;
+import us.ajg0702.queue.common.queues.QueueServerImpl;
 import us.ajg0702.queue.logic.permissions.PermissionGetterImpl;
 
 import java.util.List;
@@ -56,12 +56,19 @@ public class PremiumLogic implements Logic {
         QueueLogger logger = main.getLogger();
         boolean debug = main.getConfig().getBoolean("priority-queue-debug");
 
+        boolean express = player.hasPermission("ajqueue.express." + queueServer.getName());
+        QueueType queueType = express ? QueueType.EXPRESS : QueueType.STANDARD;
+
+        if(debug) logger.info("[priority] "+player.getName()+" queue type: "+queueType);
+
         if(hasAnyBypass(player, queueServer.getName())) {
             if(debug) {
                 logger.info("[priority] "+player.getName()+" bypass");
             }
-            QueuePlayer queuePlayer = new QueuePlayerImpl(player, queueServer, Integer.MAX_VALUE, maxOfflineTime);
+            QueuePlayer queuePlayer = new QueuePlayerImpl(player, queueServer, Integer.MAX_VALUE, maxOfflineTime, queueType);
             queueServer.addPlayer(queuePlayer, 0);
+            // set to the opposite so that it will switch to the player's
+            ((QueueServerImpl) queueServer).setLastQueueSend(express ? QueueType.STANDARD : QueueType.EXPRESS);
             main.getQueueManager().sendPlayers(queueServer);
             return queuePlayer;
         }
@@ -76,7 +83,7 @@ public class PremiumLogic implements Logic {
         int highestPriority = Math.max(priority, serverPriority);
         highestPriority = Math.max(highestPriority, Logic.getUnJoinablePriorities(queueServer, server, player));
 
-        QueuePlayer queuePlayer = new QueuePlayerImpl(player, queueServer, highestPriority, maxOfflineTime);
+        QueuePlayer queuePlayer = new QueuePlayerImpl(player, queueServer, highestPriority, maxOfflineTime, queueType);
 
         if(debug) {
             logger.info("[priority] "+player.getName()+" highestPriority: "+highestPriority);
@@ -92,7 +99,9 @@ public class PremiumLogic implements Logic {
             return queuePlayer;
         }
 
-        List<QueuePlayer> list = queueServer.getQueueHolder().getAllPlayers();
+        List<QueuePlayer> list = express ?
+                queueServer.getQueueHolder().getAllExpressPlayers() :
+                queueServer.getQueueHolder().getAllStandardPlayers();
 
         for(int i = 0; i < list.size(); i++) {
             QueuePlayer pl = list.get(i);

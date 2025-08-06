@@ -16,14 +16,6 @@ import java.util.UUID;
 public interface QueueServer {
 
     /**
-     * Get the players who are queued.
-     * @return The players who are queued
-     * @deprecated It is recommended to not use this method unless you absolutely have to. If you have to, use getQueueHolder().getAllPlayers()
-     */
-    @Deprecated
-    ImmutableList<QueuePlayer> getQueue();
-
-    /**
      * Get the status of the server as a string
      * @param p The player that you are checking for. Used for checking restricted servers
      * @return The status of the server as a string
@@ -236,6 +228,12 @@ public interface QueueServer {
     default int getPosition(QueuePlayer player) {
         return getQueueHolder().getPosition(player);
     }
+
+    /**
+     * Gets the last queue type that was sent
+     * @return the last queue type that was sent
+     */
+    QueueType getLastQueueSend();
 
 
     /**

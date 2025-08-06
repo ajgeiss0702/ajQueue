@@ -50,14 +50,22 @@ public class QueueList extends SubCommand {
         int total = 0;
         for(QueueServer server : main.getQueueManager().getServers()) {
 
+            int standardSize = server.getQueueHolder().getStandardQueueSize();
+            int expressSize = server.getQueueHolder().getExpressQueueSize();
+            int totalSize = standardSize + expressSize;
             String msg = getMessages().getRawString("list.format",
-                    "SERVER:"+server.getName()
+                    "SERVER:"+server.getName(),
+                    "STANDARD_COUNT:" + standardSize,
+                    "EXPRESS_COUNT:" + expressSize,
+                    "TOTAL_COUNT:" + totalSize,
+                    "COUNT:" + totalSize
             );
             StringBuilder playerList = new StringBuilder();
-            List<QueuePlayer> players = server.getQueue();
+            List<QueuePlayer> players = server.getQueueHolder().getAllPlayers();
             boolean none = true;
             for(QueuePlayer p : players) {
-                playerList.append(getMessages().getRawString("list.playerlist",
+                playerList.append(getMessages().getRawString("list.playerlist-format",
+                        "EXPRESS_COLOR:" + (p.isInExpressQueue() ? "&6" : ""),
                         "NAME:" + p.getName()
                 ));
                 none = false;
@@ -73,7 +81,6 @@ public class QueueList extends SubCommand {
                     .map(c -> c.endsWith(",") ? c.substring(0, c.length() - 1) : c) // removes comma from the end of the line
                     .collect(Collectors.joining("\n"));
             total += players.size();
-            msg = msg.replaceAll("\\{COUNT}", players.size()+"");
             sender.sendMessage(main.getMessages().toComponent(msg));
         }
         sender.sendMessage(getMessages().getComponent("list.total", "TOTAL:"+total));

@@ -6,6 +6,7 @@ import us.ajg0702.queue.api.events.PreConnectEvent;
 import us.ajg0702.queue.api.players.AdaptedPlayer;
 import us.ajg0702.queue.api.players.QueuePlayer;
 import us.ajg0702.queue.api.queues.QueueServer;
+import us.ajg0702.queue.api.queues.QueueType;
 import us.ajg0702.queue.api.server.AdaptedServer;
 import us.ajg0702.queue.common.QueueMain;
 import us.ajg0702.utils.common.Messages;
@@ -17,6 +18,7 @@ public class QueuePlayerImpl implements QueuePlayer {
 
     private AdaptedPlayer player;
     private final QueueServer server;
+    private final QueueType queueType;
 
     private final int highestPriority;
 
@@ -29,17 +31,18 @@ public class QueuePlayerImpl implements QueuePlayer {
 
     public int lastPosition;
 
-    public QueuePlayerImpl(UUID uuid, String name, QueueServer server, int highestPriority, int maxOfflineTime) {
-        this(null, name, uuid, server, highestPriority, maxOfflineTime);
+    public QueuePlayerImpl(UUID uuid, String name, QueueServer server, int highestPriority, int maxOfflineTime, QueueType queueType) {
+        this(null, name, uuid, server, highestPriority, maxOfflineTime, queueType);
     }
 
-    public QueuePlayerImpl(AdaptedPlayer player, QueueServer server, int highestPriority, int maxOfflineTime) {
-        this(player, player.getName(), player.getUniqueId(), server, highestPriority, maxOfflineTime);
+    public QueuePlayerImpl(AdaptedPlayer player, QueueServer server, int highestPriority, int maxOfflineTime, QueueType queueType) {
+        this(player, player.getName(), player.getUniqueId(), server, highestPriority, maxOfflineTime, queueType);
     }
 
-    private QueuePlayerImpl(@Nullable AdaptedPlayer player, String name, @NotNull UUID uuid, QueueServer server, int highestPriority, int maxOfflineTime) {
+    private QueuePlayerImpl(@Nullable AdaptedPlayer player, String name, @NotNull UUID uuid, QueueServer server, int highestPriority, int maxOfflineTime, QueueType queueType) {
         this.player = player;
         this.server = server;
+        this.queueType = queueType;
 
         this.highestPriority = highestPriority;
 
@@ -62,6 +65,11 @@ public class QueuePlayerImpl implements QueuePlayer {
     @Override
     public QueueServer getQueueServer() {
         return server;
+    }
+
+    @Override
+    public QueueType getQueueType() {
+        return queueType;
     }
 
     @Nullable
