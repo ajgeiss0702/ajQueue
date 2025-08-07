@@ -69,6 +69,11 @@ public class DefaultQueueHolder extends QueueHolder {
                 return queuePlayer;
             }
         }
+        for(QueuePlayer queuePlayer : expressQueue) {
+            if(queuePlayer.getName().equalsIgnoreCase(name)) {
+                return queuePlayer;
+            }
+        }
         return null;
     }
 
