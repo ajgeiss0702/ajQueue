@@ -54,6 +54,11 @@ public class DefaultQueueHolder extends QueueHolder {
                 return queuePlayer;
             }
         }
+        for(QueuePlayer queuePlayer : expressQueue) {
+            if(queuePlayer.getUniqueId().toString().equals(uuid.toString())) {
+                return queuePlayer;
+            }
+        }
         return null;
     }
 
