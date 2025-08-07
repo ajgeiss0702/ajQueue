@@ -70,7 +70,7 @@ public class ListCommand extends BaseCommand {
             int expressSize = s.getQueueHolder().getExpressQueueSize();
             int totalSize = standardSize + expressSize;
 
-            sender.sendMessage(main.getMessages().getComponent("commands.listqueues." + (totalSize != standardSize ? "both-format" : "single-format"),
+            sender.sendMessage(main.getMessages().getComponent("commands.listqueues." + (totalSize != Math.max(standardSize, expressSize) ? "both-format" : "single-format"),
                     "COLOR:" + Messages.color(color),
                     "NAME:" + s.getAlias(),
                     "STANDARD_COUNT:" + standardSize,

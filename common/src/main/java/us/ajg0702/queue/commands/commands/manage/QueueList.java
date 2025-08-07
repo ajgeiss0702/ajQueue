@@ -53,7 +53,7 @@ public class QueueList extends SubCommand {
             int standardSize = server.getQueueHolder().getStandardQueueSize();
             int expressSize = server.getQueueHolder().getExpressQueueSize();
             int totalSize = standardSize + expressSize;
-            String msg = getMessages().getRawString("list.format",
+            String msg = getMessages().getRawString("list." + (totalSize != Math.max(standardSize, expressSize) ? "both-format" : "single-format"),
                     "SERVER:"+server.getName(),
                     "STANDARD_COUNT:" + standardSize,
                     "EXPRESS_COUNT:" + expressSize,

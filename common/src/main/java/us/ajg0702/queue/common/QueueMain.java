@@ -315,7 +315,7 @@ public class QueueMain extends AjQueueAPI {
         d.put("format.time.secs", "{s} seconds");
 
         d.put("list.single-format", "&b{SERVER} &7({COUNT}): {LIST}");
-        d.put("list.both-format", "&b{SERVER} &7({STANDARD_COUNT}+{EXPRESS_COUNT}): {LIST}");
+        d.put("list.both-format", "&b{SERVER} &7({STANDARD_COUNT}+&6{EXPRESS_COUNT}&7): {LIST}");
         d.put("list.playerlist-format", "&9{EXPRESS_COLOR}{NAME}&7, ");
         d.put("list.total", "&7Total players in queues: &f{TOTAL}");
         d.put("list.none", "&7None");
@@ -362,7 +362,7 @@ public class QueueMain extends AjQueueAPI {
 
         d.put("commands.listqueues.header", "&9Queues:");
         d.put("commands.listqueues.single-format", "<hover:show_text:'&7Status: {STATUS}'>{COLOR}{NAME}&7: {COUNT} queued</hover>");
-        d.put("commands.listqueues.both-format", "<hover:show_text:'&7Status: {STATUS}'>{COLOR}{NAME}&7: {STANDARD_COUNT}+{EXPRESS_COUNT} queued</hover>");
+        d.put("commands.listqueues.both-format", "<hover:show_text:'&7Status: {STATUS}'>{COLOR}{NAME}&7: {STANDARD_COUNT}+&6{EXPRESS_COUNT} &7queued</hover>");
 
         d.put("max-tries-reached", "&cUnable to connect to {SERVER}. Max retries reached.");
         d.put("auto-queued", "&aYou've been auto-queued for {SERVER} because you were kicked.");

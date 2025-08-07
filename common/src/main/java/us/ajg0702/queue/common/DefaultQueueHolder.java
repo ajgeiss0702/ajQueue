@@ -26,7 +26,11 @@ public class DefaultQueueHolder extends QueueHolder {
 
     @Override
     public void addPlayer(QueuePlayer player) {
-        queue.add(player);
+        if(player.isInStandardQueue()) {
+            queue.add(player);
+        } else {
+            expressQueue.add(player);
+        }
     }
 
     @Override
