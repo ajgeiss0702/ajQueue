@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -222,7 +223,7 @@ public class EventHandlerImpl implements EventHandler {
         }
     }
 
-    private final Map<String, Long> recentlyChanged = new HashMap<>();
+    private final Map<String, Long> recentlyChanged = new ConcurrentHashMap<>();
 
     @Override
     public @Nullable AdaptedServer changeTargetServer(AdaptedPlayer player, AdaptedServer initialChoice) {
