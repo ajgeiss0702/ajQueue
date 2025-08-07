@@ -288,6 +288,9 @@ public class QueueManagerImpl implements QueueManager {
         boolean sentInstantly = canSendInstantly(player, server);
         boolean hasBypass = main.getLogic().hasAnyBypass(player, server.getName());
 
+        String express = queuePlayer.isInExpressQueue() ?
+                main.getMessages().getString("actionbar.express") :
+                main.getMessages().getString("actionbar.non-express");
 
         if(sentInstantly) {
             if(!hasBypass) {
@@ -297,15 +300,18 @@ public class QueueManagerImpl implements QueueManager {
                 player.sendMessage(msgs.getComponent("status.now-in-empty-queue",
                         "POS:"+pos,
                         "LEN:"+len,
-                        "SERVER:"+server.getAlias()));
+                        "SERVER:"+server.getAlias(),
+                        "EXPRESS:"+express
+                ));
             }
         } else {
             player.sendMessage(
                     msgs.getComponent("status.now-in-queue",
-                      "POS:"+pos,
-                       "LEN:"+len,
-                        "SERVER:"+server.getAlias(),
-                       "SERVERNAME:"+server.getName()
+                            "POS:"+pos,
+                            "LEN:"+len,
+                            "SERVER:"+server.getAlias(),
+                            "SERVERNAME:"+server.getName(),
+                            "EXPRESS:"+express
                     )
             );
             if(main.getConfig().getBoolean("enable-priority-messages")) {
@@ -439,20 +445,26 @@ public class QueueManagerImpl implements QueueManager {
                 QueueServer singleServer = getSingleServer(player);
                 if(singleServer == null || !singleServer.equals(server)) continue;
 
+                String express = queuePlayer.isInExpressQueue() ?
+                        main.getMessages().getString("actionbar.express") :
+                        main.getMessages().getString("actionbar.non-express");
+
                 if(!server.isJoinable(player)) {
-                    player.sendActionBar(msgs.getComponent("spigot.actionbar.offline",
+                    player.sendActionBar(msgs.getComponent("actionbar.offline",
                             "POS:"+pos,
                             "LEN:"+len,
                             "SERVER:"+server.getAlias(),
-                            "STATUS:"+status
+                            "STATUS:"+status,
+                            "EXPRESS:"+express
                     ));
                 } else {
                     int time = (int) Math.round(pos * main.getTimeBetweenPlayers());
-                    player.sendActionBar(msgs.getComponent("spigot.actionbar.online",
+                    player.sendActionBar(msgs.getComponent("actionbar.online",
                             "POS:"+pos,
                             "LEN:"+len,
                             "SERVER:"+server.getAlias(),
-                            "TIME:"+ TimeUtils.timeString(time, msgs.getString("format.time.mins"), msgs.getString("format.time.secs"))
+                            "TIME:"+ TimeUtils.timeString(time, msgs.getString("format.time.mins"), msgs.getString("format.time.secs")),
+                            "EXPRESS:"+express
                     ));
                 }
 

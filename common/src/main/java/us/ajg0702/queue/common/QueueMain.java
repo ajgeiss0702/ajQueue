@@ -271,8 +271,11 @@ public class QueueMain extends AjQueueAPI {
 
         d.put("status.online.base", "&7You are in position &f{POS}&7 of &f{LEN}&7. Estimated time: {TIME}");
         d.put("status.left-last-queue", "&aYou left the last queue you were in.");
-        d.put("status.now-in-queue", "&aYou are now queued for {SERVER}! &7You are in position &f{POS}&7 of &f{LEN}&7.\n&7Type &f/leavequeue&7 or &f<click:run_command:/leavequeue {SERVERNAME}>click here</click>&7 to leave the queue!");
+        d.put("status.now-in-queue", "&aYou are now{EXPRESS}&aqueued for {SERVER}! &7You are in position &f{POS}&7 of &f{LEN}&7.\n&7Type &f/leavequeue&7 or &f<click:run_command:/leavequeue {SERVERNAME}>click here</click>&7 to leave the queue!");
         d.put("status.now-in-empty-queue", "");
+        d.put("status.express", " &6express ");
+        d.put("status.non-express", " ");
+
         d.put("status.sending-now", "&aSending you to &f{SERVER} &anow..");
         d.put("status.making-room", "<gold>Making room for you..");
         d.put("status.priority-increased", "<gold>You now have higher priority! <green>Moving you up in the queue..");
@@ -317,8 +320,11 @@ public class QueueMain extends AjQueueAPI {
         d.put("list.total", "&7Total players in queues: &f{TOTAL}");
         d.put("list.none", "&7None");
 
-        d.put("spigot.actionbar.online", "&7You are queued for &f{SERVER}&7. You are in position &f{POS}&7 of &f{LEN}&7. Estimated time: {TIME}");
-        d.put("spigot.actionbar.offline", "&7You are queued for &f{SERVER}&7. &7You are in position &f{POS}&7 of &f{LEN}&7.");
+        d.put("actionbar.online", "&7You are{EXPRESS}&7queued for &f{SERVER}&7. You are in position &f{POS}&7 of &f{LEN}&7. Estimated time: {TIME}");
+        d.put("actionbar.offline", "&7You are{EXPRESS}&7queued for &f{SERVER}&7. &7You are in position &f{POS}&7 of &f{LEN}&7.");
+        d.put("actionbar.express", " &6express ");
+        d.put("actionbar.non-express", " ");
+
 
         d.put("send", "&aAdded &f{PLAYER}&a to the queue for &f{SERVER}");
         d.put("remove", "&aRemoved &f{PLAYER} from all queues they were in.");
