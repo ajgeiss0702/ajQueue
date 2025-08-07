@@ -63,7 +63,14 @@ public class QueueList extends SubCommand {
             StringBuilder playerList = new StringBuilder();
             List<QueuePlayer> players = server.getQueueHolder().getAllPlayers();
             boolean none = true;
+            int i = 0;
             for(QueuePlayer p : players) {
+                if(i++ >= 50) {
+                    playerList.append(getMessages().getRawString("list.playerlist-and-more",
+                            "MORE:" + (players.size() - i + 1)
+                    ));
+                    break;
+                }
                 playerList.append(getMessages().getRawString("list.playerlist-format",
                         "EXPRESS_COLOR:" + (p.isInExpressQueue() ? "&6" : ""),
                         "NAME:" + p.getName()

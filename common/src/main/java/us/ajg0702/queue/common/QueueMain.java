@@ -317,6 +317,7 @@ public class QueueMain extends AjQueueAPI {
         d.put("list.single-format", "&b{SERVER} &7({COUNT}): {LIST}");
         d.put("list.both-format", "&b{SERVER} &7({STANDARD_COUNT}+&6{EXPRESS_COUNT}&7): {LIST}");
         d.put("list.playerlist-format", "&9{EXPRESS_COLOR}{NAME}&7, ");
+        d.put("list.playerlist-and-more", "&7and &f{MORE} &7more");
         d.put("list.total", "&7Total players in queues: &f{TOTAL}");
         d.put("list.none", "&7None");
 
