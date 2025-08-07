@@ -77,10 +77,7 @@ public class EventHandlerImpl implements EventHandler {
         QueueCommand.cooldowns.remove(player);
         main.serverTimeManager.removePlayer(player);
 
-        List<String> changedKeys = recentlyChanged.keySet().stream()
-                .filter(k -> k.startsWith(player.getUniqueId().toString()))
-                .collect(Collectors.toList());
-        changedKeys.forEach(recentlyChanged::remove);
+        recentlyChanged.keySet().removeIf(k -> k.startsWith(player.getUniqueId().toString()));
     }
 
     @Override
