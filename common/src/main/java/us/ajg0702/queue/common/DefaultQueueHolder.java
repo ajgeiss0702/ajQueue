@@ -54,12 +54,12 @@ public class DefaultQueueHolder extends QueueHolder {
     @Override
     public QueuePlayer findPlayer(UUID uuid) {
         for(QueuePlayer queuePlayer : queue) {
-            if(queuePlayer.getUniqueId().toString().equals(uuid.toString())) {
+            if(queuePlayer.getUniqueId().equals(uuid)) {
                 return queuePlayer;
             }
         }
         for(QueuePlayer queuePlayer : expressQueue) {
-            if(queuePlayer.getUniqueId().toString().equals(uuid.toString())) {
+            if(queuePlayer.getUniqueId().equals(uuid)) {
                 return queuePlayer;
             }
         }
