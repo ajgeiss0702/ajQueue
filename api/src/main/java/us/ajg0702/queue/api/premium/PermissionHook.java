@@ -8,4 +8,7 @@ public interface PermissionHook {
     String getName();
     boolean canUse();
     List<String> getPermissions(AdaptedPlayer player);
+    default boolean hasPermissionInAnyContext(AdaptedPlayer player, String permission) {
+        return player.hasPermission(permission);
+    }
 }

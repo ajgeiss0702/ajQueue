@@ -33,6 +33,7 @@ public interface QueueManager {
      * @return if the player would be sent instantly if they join the queue now
      */
     boolean canSendInstantly(AdaptedPlayer player, QueueServer queueServer);
+    boolean canSendInstantly(AdaptedPlayer player, QueueServer queueServer, boolean hasBypass);
 
 
     /**

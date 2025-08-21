@@ -87,4 +87,22 @@ public class LuckPermsHook implements PermissionHook {
 
         return perms;
     }
+
+    @Override
+    public boolean hasPermissionInAnyContext(AdaptedPlayer player, String permission) {
+        LuckPerms api = LuckPermsProvider.get();
+
+        User user = api.getUserManager().getUser(player.getUniqueId());
+
+        if(user == null) {
+            main.getLogger().warn("LuckPerms doesnt seem to have data loaded for "+player.getName()+"! " +
+                    "Because of this I can't load priority permissions. Acting like "+player.getName()+" doesnt have any.");
+            return false;
+        }
+
+        return user.getCachedData()
+                .getPermissionData(QueryOptions.nonContextual())
+                .checkPermission(permission)
+                .asBoolean();
+    }
 }

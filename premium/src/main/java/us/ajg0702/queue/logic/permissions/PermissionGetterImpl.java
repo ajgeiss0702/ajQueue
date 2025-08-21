@@ -65,20 +65,18 @@ public class PermissionGetterImpl implements PermissionGetter {
         if(getSelected() == null) {
             return false;
         }
+
+        // don't do the more expensive check below if the player doesn't have the contextbypass permission at all
+        if(!getSelected().hasPermissionInAnyContext(player, "ajqueue.contextbypass")) return false;
+
+        // we do special logic for this in the luckperms hook
         List<String> perms = getSelected().getPermissions(player);
         return perms.contains("ajqueue.serverbypass."+server);
     }
 
     @Override
     public boolean hasUniqueFullBypass(AdaptedPlayer player, String server) {
-        if(player.hasPermission("ajqueue.joinfullandbypassserver."+server)) return true;
-
-        if(getSelected() == null) {
-            return false;
-        }
-        List<String> perms = getSelected().getPermissions(player);
-        perms.removeIf(s -> !s.startsWith("ajqueue.joinfullandbypassserver."+server));
-        return perms.size() > 0;
+        return player.hasPermission("ajqueue.joinfullandbypassserver."+server);
     }
 
     private int getHighestPermission(AdaptedPlayer player, String prefix) {

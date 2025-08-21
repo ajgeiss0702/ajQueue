@@ -285,8 +285,8 @@ public class QueueManagerImpl implements QueueManager {
                 server.getQueueHolder().getExpressQueueSize() :
                 server.getQueueHolder().getStandardQueueSize();
 
-        boolean sentInstantly = canSendInstantly(player, server);
         boolean hasBypass = main.getLogic().hasAnyBypass(player, server.getName());
+        boolean sentInstantly = canSendInstantly(player, server, hasBypass);
 
         String express = queuePlayer.isInExpressQueue() ?
                 main.getMessages().getString("actionbar.express") :
@@ -346,11 +346,15 @@ public class QueueManagerImpl implements QueueManager {
 
     @Override
     public boolean canSendInstantly(AdaptedPlayer player, QueueServer queueServer) {
+        return canSendInstantly(player, queueServer, main.getLogic().hasAnyBypass(player, queueServer.getName()));
+    }
+
+    @Override
+    public boolean canSendInstantly(AdaptedPlayer player, QueueServer queueServer, boolean hasBypass) {
         boolean isJoinable = queueServer.isJoinable(player);
         boolean sizeGood = queueServer.getQueueHolder().getTotalQueueSize() <= 1 && isJoinable;
         boolean timeGood = !main.getConfig().getBoolean("check-last-player-sent-time") || queueServer.getLastSentTime() > Math.floor(main.getTimeBetweenPlayers() * 1000);
         boolean alwaysSendInstantly = main.getConfig().getStringList("send-instantly").contains(queueServer.getName());
-        boolean hasBypass = main.getLogic().hasAnyBypass(player, queueServer.getName());
 
         boolean sentInstantly = isJoinable && (sizeGood || hasBypass) && (alwaysSendInstantly || timeGood || hasBypass);
         Debug.info("should send instantly (" + sentInstantly + "): " + isJoinable + " && (" + sizeGood + " || " + hasBypass + ") && (" + alwaysSendInstantly + " || " + timeGood + " || " + hasBypass + ")");
