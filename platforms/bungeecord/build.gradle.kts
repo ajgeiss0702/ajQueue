@@ -10,6 +10,7 @@ repositories {
     maven { url = uri("https://repo.ajg0702.us/releases/") }
     maven { url = uri("https://nexus.velocitypowered.com/repository/maven-public/") }
     maven { url = uri("https://repo.viaversion.com/") }
+    maven { url = uri("https://oss.sonatype.org/content/repositories/snapshots") }
     mavenCentral()
 }
 
@@ -18,7 +19,7 @@ dependencies {
     compileOnly("com.google.guava:guava:30.1.1-jre")
     compileOnly("us.ajg0702:ajUtils:1.2.30")
 
-    compileOnly("net.md-5:bungeecord-api:1.16-R0.4")
+    compileOnly("net.md-5:bungeecord-api:1.21-R0.3")
 
     implementation("net.kyori:adventure-text-minimessage:4.15.0")
 
