@@ -160,7 +160,8 @@ public class BungeeQueue extends Plugin implements Listener, Implementation {
         });
     }
 
-    @EventHandler
+    @EventHandler(priority = 33) // nLogin uses 32, so we need to use 33 to run after it
+    // If we don't run after nLogin, their auto-forwarding of premium players to a queue server won't be detected
     public void onServerConnect(ServerConnectEvent e) {
         AdaptedServer newServer = main.getEventHandler().changeTargetServer(new BungeePlayer(e.getPlayer()), new BungeeServer(e.getTarget()));
 
