@@ -112,7 +112,8 @@ ${changes.length > 1 ? `<br><a href="${github.event.compare}">View combined chan
 
 
 
-    console.log("Uploading ajQueuePlus to Polymart...");
+    console.log("Not uploading to polymart because their api is broken")
+    /*console.log("Uploading ajQueuePlus to Polymart...");
 
     const polymartPlusResponse = await uploadToPolymart(github.event, "2714", version, changes, plusFile);
 
@@ -130,7 +131,7 @@ ${changes.length > 1 ? `<br><a href="${github.event.compare}">View combined chan
         console.warn("Polymart plus response failed.", await polymartFreeResponse.firstResponse.text(), await polymartFreeResponse.uploadResponse?.text());
     } else {
         console.warn("Polymart plus succeeded.", await polymartFreeResponse.firstResponse.text(), await polymartFreeResponse.uploadResponse?.text());
-    }
+    }*/
 
 })();
 
