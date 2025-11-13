@@ -18,7 +18,7 @@ dependencies {
     compileOnly("net.kyori:adventure-text-serializer-plain:4.15.0")
 
     compileOnly("com.google.guava:guava:30.1.1-jre")
-    compileOnly("us.ajg0702:ajUtils:1.2.32")
+    compileOnly("us.ajg0702:ajUtils:1.2.37")
 
     compileOnly("org.slf4j:slf4j-log4j12:1.7.29")
 
