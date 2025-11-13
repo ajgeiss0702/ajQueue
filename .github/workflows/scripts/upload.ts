@@ -156,7 +156,7 @@ ${changes.length > 1 ? "\n" + `[url=${event.compare}]View combined changes[/url]
 `);
     polymartData.set("file", file);
 
-    return await fetch("https://api.polymart.org/v1/postUpdate", {
+    return await fetch("https://api.polymart.org/v1/doPostUpdate", {
         method: "POST",
         headers: {
             "User-Agent": "ajUpdater/2.0",
