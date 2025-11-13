@@ -116,20 +116,20 @@ ${changes.length > 1 ? `<br><a href="${github.event.compare}">View combined chan
 
     const polymartPlusResponse = await uploadToPolymart(github.event, "2714", version, changes, plusFile);
 
-    if(!polymartPlusResponse.ok) {
-        console.warn("Polymart plus response failed.", await polymartPlusResponse.text());
+    if(!polymartPlusResponse.bothOk) {
+        console.warn("Polymart plus response failed.", await polymartPlusResponse.firstResponse.text(), await polymartPlusResponse.uploadResponse?.text());
     } else {
-        console.warn("Polymart plus succeeded.", await polymartPlusResponse.text());
+        console.warn("Polymart plus succeeded.", await polymartPlusResponse.firstResponse.text(), await polymartPlusResponse.uploadResponse?.text());
     }
 
     console.log("Uploading ajQueue to Polymart...");
 
     const polymartFreeResponse = await uploadToPolymart(github.event, "2535", version, changes, file);
 
-    if(!polymartFreeResponse.ok) {
-        console.warn("Polymart free response failed.", await polymartFreeResponse.text());
+    if(!polymartFreeResponse.bothOk) {
+        console.warn("Polymart plus response failed.", await polymartFreeResponse.firstResponse.text(), await polymartFreeResponse.uploadResponse?.text());
     } else {
-        console.warn("Polymart free succeeded.", await polymartFreeResponse.text());
+        console.warn("Polymart plus succeeded.", await polymartFreeResponse.firstResponse.text(), await polymartFreeResponse.uploadResponse?.text());
     }
 
 })();
@@ -141,11 +141,11 @@ async function uploadToPolymart(event: GithubPushEvent, resource_id: string, ver
     }
     const polymartData = new FormData();
     polymartData.set("api_key", POLYMART_TOKEN);
-    polymartData.set("resource_id", resource_id);
+    polymartData.set("product", resource_id);
     polymartData.set("version", version);
-    polymartData.set("title", `Pre-release v${version}`);
+    polymartData.set("update_title", `Pre-release v${version}`);
     polymartData.set("beta", "1");
-    polymartData.set("message",
+    polymartData.set("update_description",
         `Note: This is a potentially unstable (and possibly untested) build. It is not guaranteed to work, and may have issues.
 If you do decide to run this, make sure to report any issues to support.
 
@@ -154,15 +154,42 @@ ${changes.map(c => `[url=${c.url}]${c.message}[/url]` + "\n").join()}
 
 ${changes.length > 1 ? "\n" + `[url=${event.compare}]View combined changes[/url]` : ``}
 `);
-    polymartData.set("file", file);
+    polymartData.set("file_name", file.name);
 
-    return await fetch("https://api.polymart.org/v1/doPostUpdate", {
+    const firstResponse = await fetch("https://api.polymart.org/v1/doPostUpdate", {
         method: "POST",
         headers: {
             "User-Agent": "ajUpdater/2.0",
         },
         body: polymartData
     });
+
+    let uploadResponse: Response | undefined = undefined;
+
+    if(firstResponse.ok) {
+        const polymartResponseData = (await firstResponse.clone().json()).response;
+
+        const uploadData = new FormData();
+        for (let [k, v] of Object.entries(polymartResponseData.upload.fields)) {
+            uploadData.append(k, v as any);
+        }
+        uploadData.append("file", file);
+
+        uploadResponse = await fetch(polymartResponseData.upload.url, {
+            method: "POST",
+            headers: {
+                "User-Agent": "ajUpdater/2.0",
+                "enctype": "multipart/form-data"
+            },
+            body: uploadData
+        })
+    }
+
+    return {
+        bothOk: firstResponse.ok && uploadResponse?.ok,
+        firstResponse,
+        uploadResponse
+    }
 }
 
 
