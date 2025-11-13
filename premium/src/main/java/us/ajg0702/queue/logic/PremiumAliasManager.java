@@ -3,6 +3,8 @@ package us.ajg0702.queue.logic;
 import us.ajg0702.queue.api.AliasManager;
 import us.ajg0702.utils.common.Config;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class PremiumAliasManager implements AliasManager {
@@ -15,22 +17,25 @@ public class PremiumAliasManager implements AliasManager {
 
     @Override
     public String getAlias(String server) {
-        List<String> aliasesraw = config.getStringList("server-aliases");
-        for(String aliasraw : aliasesraw) {
-            String realname = aliasraw.split(":")[0];
-            if(!realname.equalsIgnoreCase(server)) continue;
-            return aliasraw.split(":")[1];
+        List<String> aliasesRaw = config.getStringList("server-aliases");
+        for(String aliasRaw : aliasesRaw) {
+            List<String> parts = new ArrayList<>(Arrays.asList(aliasRaw.split(":")));
+            String realName = parts.remove(0);
+            if(!realName.equalsIgnoreCase(server)) continue;
+            return String.join(":", parts);
         }
         return server;
     }
 
     @Override
     public String getServer(String alias) {
-        List<String> aliasesraw = config.getStringList("server-aliases");
-        for(String aliasraw : aliasesraw) {
-            String salias = aliasraw.split(":")[1];
-            if(!alias.equalsIgnoreCase(salias)) continue;
-            return aliasraw.split(":")[0];
+        List<String> aliasesRaw = config.getStringList("server-aliases");
+        for(String aliasRaw : aliasesRaw) {
+            List<String> parts = new ArrayList<>(Arrays.asList(aliasRaw.split(":")));
+            String realName = parts.remove(0);
+            String tAlias = String.join(":", parts);
+            if(!tAlias.equalsIgnoreCase(alias)) continue;
+            return realName;
         }
         return alias;
     }
