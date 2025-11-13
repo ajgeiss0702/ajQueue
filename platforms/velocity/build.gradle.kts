@@ -16,7 +16,7 @@ repositories {
 dependencies {
     compileOnly("net.kyori:adventure-api:4.15.0")
     compileOnly("com.google.guava:guava:30.1.1-jre")
-    compileOnly("us.ajg0702:ajUtils:1.2.30")
+    compileOnly("us.ajg0702:ajUtils:1.2.32")
 
     compileOnly("com.velocitypowered:velocity-api:3.1.1")
     annotationProcessor("com.velocitypowered:velocity-api:3.1.1")
