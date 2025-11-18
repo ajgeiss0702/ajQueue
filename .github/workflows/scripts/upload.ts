@@ -112,8 +112,7 @@ ${changes.length > 1 ? `<br><a href="${github.event.compare}">View combined chan
 
 
 
-    console.log("Not uploading to polymart because their api is broken")
-    /*console.log("Uploading ajQueuePlus to Polymart...");
+    console.log("Uploading ajQueuePlus to Polymart...");
 
     const polymartPlusResponse = await uploadToPolymart(github.event, "2714", version, changes, plusFile);
 
@@ -131,7 +130,7 @@ ${changes.length > 1 ? `<br><a href="${github.event.compare}">View combined chan
         console.warn("Polymart plus response failed.", await polymartFreeResponse.firstResponse.text(), await polymartFreeResponse.uploadResponse?.text());
     } else {
         console.warn("Polymart plus succeeded.", await polymartFreeResponse.firstResponse.text(), await polymartFreeResponse.uploadResponse?.text());
-    }*/
+    }
 
 })();
 
@@ -145,7 +144,7 @@ async function uploadToPolymart(event: GithubPushEvent, resource_id: string, ver
     polymartData.set("product", resource_id);
     polymartData.set("version", version);
     polymartData.set("update_title", `Pre-release v${version}`);
-    polymartData.set("beta", "1");
+    polymartData.set("tag", "beta");
     polymartData.set("update_description",
         `Note: This is a potentially unstable (and possibly untested) build. It is not guaranteed to work, and may have issues.
 If you do decide to run this, make sure to report any issues to support.
