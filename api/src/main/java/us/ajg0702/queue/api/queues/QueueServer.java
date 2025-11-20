@@ -235,6 +235,22 @@ public interface QueueServer {
      */
     QueueType getLastQueueSend();
 
+    /**
+     *
+     * @return the number of players that have been sent since getLastQueueSend was changed
+     */
+    int getSendCount();
+
+    /**
+     * Increments sendCount by 1
+     */
+    void incrementSendCount();
+
+    /**
+     * Resets sendCount to 0
+     */
+    void resetSendCount();
+
 
     /**
      * elliot is bad

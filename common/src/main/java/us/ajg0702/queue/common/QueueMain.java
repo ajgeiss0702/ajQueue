@@ -7,6 +7,7 @@ import us.ajg0702.queue.api.events.utils.EventReceiver;
 import us.ajg0702.queue.api.premium.Logic;
 import us.ajg0702.queue.api.premium.LogicGetter;
 import us.ajg0702.queue.api.queues.QueueServer;
+import us.ajg0702.queue.api.util.ExpressRatio;
 import us.ajg0702.queue.api.util.QueueLogger;
 import us.ajg0702.queue.common.utils.LogConverter;
 import us.ajg0702.queue.logic.LogicGetterImpl;
@@ -133,6 +134,29 @@ public class QueueMain extends AjQueueAPI {
             r.put(fromName, existing);
         }
         return r;
+    }
+
+    public ExpressRatio getExpressRatio() {
+        String raw = getConfig().getString("express-ratio");
+        if(!raw.contains(":")) {
+            getLogger().warn("The express-ratio option in the config is not formatted correctly! It requires a colon (:) separating the two numbers. Defaulting to 1:1 until this is fixed.");
+            return ExpressRatio.oneToOne();
+        }
+
+        String[] parts = raw.split(":");
+        String expressRaw = parts[0];
+        String standardRaw = parts[1];
+
+        int express;
+        int standard;
+        try {
+            express = Integer.parseInt(expressRaw);
+            standard = Integer.parseInt(standardRaw);
+        } catch(NumberFormatException e) {
+            getLogger().warn("The express-ratio option in the config is not formatted correctly! Defaulting to 1:1 until this is fixed. One or both of the numbers could not be parsed: " + e.getMessage());
+            return ExpressRatio.oneToOne();
+        }
+        return new ExpressRatio(express, standard);
     }
 
     private UpdateManager updateManager;

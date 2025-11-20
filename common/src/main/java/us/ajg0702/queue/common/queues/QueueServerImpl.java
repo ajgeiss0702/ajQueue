@@ -42,6 +42,7 @@ public class QueueServerImpl implements QueueServer {
     private int manualMaxPlayers = Integer.MAX_VALUE;
 
     private QueueType lastQueueSend = QueueType.STANDARD;
+    private int sendCount = 0;
 
 
     public QueueServerImpl(String name, QueueMain main, AdaptedServer server, List<QueuePlayer> previousStandardPlayers, List<QueuePlayer> previousExpressPlayers) {
@@ -372,6 +373,21 @@ public class QueueServerImpl implements QueueServer {
     @Override
     public QueueType getLastQueueSend() {
         return lastQueueSend;
+    }
+
+    @Override
+    public int getSendCount() {
+        return sendCount;
+    }
+
+    @Override
+    public void incrementSendCount() {
+        sendCount++;
+    }
+
+    @Override
+    public void resetSendCount() {
+        sendCount = 0;
     }
 
     public void setLastQueueSend(QueueType lastQueueSend) {

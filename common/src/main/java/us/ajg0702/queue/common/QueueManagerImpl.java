@@ -13,6 +13,7 @@ import us.ajg0702.queue.api.queueholders.QueueHolder;
 import us.ajg0702.queue.api.queues.QueueServer;
 import us.ajg0702.queue.api.queues.QueueType;
 import us.ajg0702.queue.api.server.AdaptedServer;
+import us.ajg0702.queue.api.util.ExpressRatio;
 import us.ajg0702.queue.commands.commands.manage.PauseQueueServer;
 import us.ajg0702.queue.common.players.QueuePlayerImpl;
 import us.ajg0702.queue.common.queues.QueueServerImpl;
@@ -707,29 +708,44 @@ public class QueueManagerImpl implements QueueManager {
             if(!server.isOnline()) continue;
 
             QueueType lastSend = server.getLastQueueSend();
+            ExpressRatio expressRatio = main.getExpressRatio();
 
-            boolean express;
-            if(lastSend == QueueType.EXPRESS) {
-                express = queueHolder.getStandardQueueSize() <= 0;
-            } else {
-                express = queueHolder.getExpressQueueSize() >= 0;
+            boolean express = lastSend == QueueType.EXPRESS;
+            if(lastSend == QueueType.EXPRESS && server.getSendCount() >= expressRatio.getExpressCount() && queueHolder.getStandardQueueSize() > 0) {
+                express = false;
+                server.resetSendCount();
+            }
+            if(lastSend == QueueType.STANDARD && server.getSendCount() >= expressRatio.getStandardCount() && queueHolder.getExpressQueueSize() > 0) {
+                express = true;
+                server.resetSendCount();
             }
 
             ((QueueServerImpl) server).setLastQueueSend(express ? QueueType.EXPRESS : QueueType.STANDARD);
 
             Debug.info("should send when back online: " + !server.isGroup() + " && " + main.getConfig().getBoolean("send-all-when-back-online") + " && " + server.getServers().get(0).justWentOnline());
             if(!server.isGroup() && main.getConfig().getBoolean("send-all-when-back-online") && server.getServers().get(0).justWentOnline()) {
-                List<QueuePlayer> expressPlayers = server.getQueueHolder().getAllExpressPlayers();
-                List<QueuePlayer> standardPlayers = server.getQueueHolder().getAllStandardPlayers();
+                List<QueuePlayer> expressPlayers = new ArrayList<>(server.getQueueHolder().getAllExpressPlayers());
+                List<QueuePlayer> standardPlayers = new ArrayList<>(server.getQueueHolder().getAllStandardPlayers());
                 List<QueuePlayer> players = new ArrayList<>();
                 // alternate between standard and express players, even in send-all-when-back-online
-                for (int i = 0; i < Math.max(expressPlayers.size(), standardPlayers.size()); i++) {
-                    if(i < expressPlayers.size()) {
-                        players.add(expressPlayers.get(i));
+                QueueType lastAdd = express ? QueueType.EXPRESS : QueueType.STANDARD;
+                int addCount = server.getSendCount();
+                while(!expressPlayers.isEmpty() || !standardPlayers.isEmpty()) {
+                    if(lastAdd == QueueType.EXPRESS && addCount >= expressRatio.getExpressCount() && !standardPlayers.isEmpty()) {
+                        express = false;
+                        addCount = 0;
                     }
-                    if(i < standardPlayers.size()) {
-                        players.add(standardPlayers.get(i));
+                    if(lastAdd == QueueType.STANDARD && addCount >= expressRatio.getStandardCount() && !expressPlayers.isEmpty()) {
+                        express = true;
+                        addCount = 0;
                     }
+                    lastAdd = express ? QueueType.EXPRESS : QueueType.STANDARD;
+                    if(express) {
+                        players.add(expressPlayers.remove(0));
+                    } else {
+                        players.add(standardPlayers.remove(0));
+                    }
+                    addCount++;
                 }
                 for(QueuePlayer p : players) {
 
@@ -763,7 +779,8 @@ public class QueueManagerImpl implements QueueManager {
                     queueHolder.getAllStandardPlayers().get(0);
             AdaptedPlayer nextPlayer = nextQueuePlayer.getPlayer();
 
-            Supplier<Integer> queueSize = () -> express ?
+            boolean finalExpress = express;
+            Supplier<Integer> queueSize = () -> finalExpress ?
                     queueHolder.getExpressQueueSize() :
                     queueHolder.getStandardQueueSize();
 
@@ -951,6 +968,7 @@ public class QueueManagerImpl implements QueueManager {
             Debug.info("calling nextQueuePlayer.connect on " + nextPlayer.getName());
             // Use QueuePlayer.connect which will fire the PreConnectEvent then call player.connect
             nextQueuePlayer.connect(selected);
+            server.incrementSendCount();
             selected.addPlayer();
             Debug.info(selected.getName()+" player count is now set to "+ selected.getPlayerCount());
         }

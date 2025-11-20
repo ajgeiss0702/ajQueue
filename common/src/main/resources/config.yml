@@ -328,6 +328,17 @@ require-queueserver-permission: false
 #  Default: 10
 max-tries: 10
 
+# What ratio of express to standard players should we send? (express:standard)
+# The default of 1:1 will send one express player, then one standard player.
+# If you set this to 2:1, ajQueue will attempt to send 2 players from the express queue for every standard queue attempt.
+# You can also set this to 1:2, so ajQueue will send 2 standard players for every express player.
+# Note that I specify "send attempts." This does not track players actually sent, but attempts.
+#  So if ajQueue attempts to send a player, but they are not actually sent (due to a kick or long join),
+#  then that would still count.
+# The format of this is "express:standard"
+#  Default: 1:1
+express-ratio: "1:1"
+
 # What QueueHolder should we use?
 # By default, the only QueueHolder available is 'default'
 # But more may be available via addons (registered via the API)
@@ -435,7 +446,7 @@ debug: false
 
 
 # Don't touch this number please
-config-version: 54
+config-version: 55
 
 
 # This is ONLY here so that they can be moved to messages.yml. Please edit these in messages.yml!

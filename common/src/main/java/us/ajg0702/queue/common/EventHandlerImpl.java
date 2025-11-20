@@ -235,24 +235,34 @@ public class EventHandlerImpl implements EventHandler {
 
         List<String> toNames = queueServers.get(initialChoice.getName());
 
-        // don't change if initial target server isn't a queue-server
+        Debug.info("Checking queue-servers for "+player.getName()+" (skip-queue-server-if-possible) (" + initialChoice.getName() + ") (" + toNames + ") " + queueServers + " " + queueServers.size());
+
+        // don't change if the initial target server isn't a queue-server
         if(toNames == null || toNames.isEmpty()) return null;
+
+        Debug.info("Found "+toNames.size()+" queue-servers for "+player.getName()+" (skip-queue-server-if-possible)");
 
         for (String toName : toNames) {
             QueueServer to = main.getQueueManager().findServer(toName);
 
             if(!main.getQueueManager().canSendInstantly(player, to)) continue;
 
+            Debug.info(player.getName()+" can be sent to "+to.getName()+" (skip-queue-server-if-possible)");
+
             AdaptedServer ideal = to.getIdealServer(player);
 
             if(ideal == null) continue;
+            Debug.info("Got ideal");
             if(!to.isJoinable(player)) continue;
+            Debug.info("to is joinable");
             if(!ideal.isJoinable(player)) continue;
+            Debug.info("ideal is joinable");
             if(!(!main.getConfig().getBoolean("require-queueserver-permission") || player.hasPermission("ajqueue.queueserver." + to.getName()))) continue;
 
             String key = player.getUniqueId() + ":" + toName;
             // don't redirect player if we've already redirected them recently
             if(System.currentTimeMillis() - recentlyChanged.getOrDefault(key, 0L) <= main.getConfig().getDouble("wait-time") * 1000L) {
+                Debug.info("Not skipping queue-server because skip was attempted recently");
                 continue;
             }
 
