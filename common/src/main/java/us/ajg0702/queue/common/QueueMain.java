@@ -350,6 +350,8 @@ public class QueueMain extends AjQueueAPI {
         d.put("actionbar.express", " &6express ");
         d.put("actionbar.non-express", " ");
 
+        d.put("spigot.actionbar.warning", "\"spigot.actionbar\" messages are no longer used! They are now under \"actionbar\" (without the spigot at the beginning)");
+
 
         d.put("send", "&aAdded &f{PLAYER}&a to the queue for &f{SERVER}");
         d.put("remove", "&aRemoved &f{PLAYER} from all queues they were in.");
