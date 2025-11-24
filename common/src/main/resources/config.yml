@@ -347,7 +347,7 @@ queue-holder: default
 
 # Should we enable the ajqueue.make-room permission?
 # The make-room permission will force there to be room in a server.
-#  So, if a player with this permission queues for a server and has this permission,
+#  So, if a player with this permission queues for a server that is full,
 #   someone from the server will be moved to the lobby to make room
 # This can be further configured using the next few options
 #  Default: false
@@ -446,7 +446,7 @@ debug: false
 
 
 # Don't touch this number please
-config-version: 55
+config-version: 56
 
 
 # This is ONLY here so that they can be moved to messages.yml. Please edit these in messages.yml!
