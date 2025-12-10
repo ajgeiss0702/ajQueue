@@ -56,11 +56,18 @@ public interface QueueServer {
     void setLastSentTime(long lastSentTime);
 
     /**
+     * Gets the average time it takes to send a player to this server
+     * @return the average time it takes to send a player to this server
+     */
+    double getAverageSendTime();
+
+    /**
      * Checks if the server is joinable by a player
      * @param p The player to see if they can join
      * @return If the server is joinable
      */
     boolean isJoinable(AdaptedPlayer p);
+    boolean isJoinable(AdaptedPlayer p, boolean ignoreFull);
 
     /**
      * Gets the manually-set max player count for this server/group

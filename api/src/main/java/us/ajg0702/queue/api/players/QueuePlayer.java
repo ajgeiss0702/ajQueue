@@ -87,6 +87,12 @@ public interface QueuePlayer {
     AdaptedServer getInitialServer();
 
     /**
+     * Gets an estimate until the player is sent to the server.
+     * @return ETA until the player is sent to the server, in seconds.
+     */
+    int getETA();
+
+    /**
      * Attempts a connection to the provided AdaptedServer, calling PreConnectEvent before AdaptedPlayer.connect(...)
      */
     void connect(@NotNull AdaptedServer server);

@@ -38,11 +38,14 @@ public class QueueServerImpl implements QueueServer {
     private boolean paused;
 
     private long lastSentTime = 0;
+    private int lastSendQueueSize = 0;
 
     private int manualMaxPlayers = Integer.MAX_VALUE;
 
     private QueueType lastQueueSend = QueueType.STANDARD;
     private int sendCount = 0;
+
+    private List<Float> sendTimes = new ArrayList<>();
 
 
     public QueueServerImpl(String name, QueueMain main, AdaptedServer server, List<QueuePlayer> previousStandardPlayers, List<QueuePlayer> previousExpressPlayers) {
@@ -211,15 +214,53 @@ public class QueueServerImpl implements QueueServer {
     }
     @Override
     public void setLastSentTime(long lastSentTime) {
+        long previousSendTime = this.lastSentTime;
+        int previousQueueSize = this.lastSendQueueSize;
+
+        // We don't add a queue time if the previous send resulted an in an empty queue.
+        // This is so we don't count the time that the queue was sitting idle with 0 players in it.
+        // The setLastSentTime method is called after removing the player from the queue,
+        //  so if the last size is 0, then the last send resulted in an empty queue.
+        if(previousQueueSize != 0) {
+            sendTimes.add((float) (lastSentTime - previousSendTime) / 1000);
+            if(sendTimes.size() > main.getConfig().getInt("send-times-to-keep")) {
+                sendTimes.remove(0);
+            }
+        }
+
+        this.lastSendQueueSize = queueHolder.getTotalQueueSize();
         this.lastSentTime = lastSentTime;
     }
 
     @Override
+    public double getAverageSendTime() {
+        // don't allow the average send time to be lower than the wait-time set in the config
+        return Math.max(
+                main.getTimeBetweenPlayers(),
+                sendTimes.isEmpty() ?
+                        0 :
+                        (
+                                sendTimes
+                                    .stream()
+                                    .mapToDouble(Float::doubleValue)
+                                    .average()
+                                    .orElse(0)
+                                        / 1e3
+                        )
+        );
+    }
+
+    @Override
     public boolean isJoinable(AdaptedPlayer p) {
+        return isJoinable(p, false);
+    }
+
+    @Override
+    public boolean isJoinable(AdaptedPlayer p, boolean ignoreFull) {
         if(isManuallyFull() && !AdaptedServer.canJoinFull(p, getName())) return false;
         AdaptedServer server = getIdealServer(p);
         if(server == null) return false;
-        return server.isJoinable(p) && !isPaused();
+        return server.isJoinable(p, ignoreFull) && !isPaused();
     }
 
     @Override

@@ -122,6 +122,11 @@ public class QueuePlayerImpl implements QueuePlayer {
         return initialServer;
     }
 
+    @Override
+    public int getETA() {
+        return Math.round((float) (server.getAverageSendTime() * getPosition()));
+    }
+
 
     private long leaveTime = 0;
     public void setLeaveTime(long leaveTime) {

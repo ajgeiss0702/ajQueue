@@ -88,15 +88,15 @@ public class EventHandlerImpl implements EventHandler {
             QueueServer server = queuePlayer.getQueueServer();
             int pos = queuePlayer.getPosition();
             if((pos <= 1 && server.getServerNames().contains(player.getServerName())) || main.getConfig().getBoolean("remove-player-on-server-switch")) {
+                server.removePlayer(player);
+                main.getQueueManager().getSendingAttempts().remove(queuePlayer);
                 if((pos <= 1 && server.getServerNames().contains(player.getServerName()))) {
-                    // Player was successfully sent.
+                    // Player was successfully sent. Log it for ETAs
                     server.setLastSentTime(System.currentTimeMillis());
                     main.getTaskManager().runNow(() -> {
                         main.call(new SuccessfulSendEvent(queuePlayer, player.getCurrentServer()));
                     });
                 }
-                server.removePlayer(player);
-                main.getQueueManager().getSendingAttempts().remove(queuePlayer);
             }
         }
 

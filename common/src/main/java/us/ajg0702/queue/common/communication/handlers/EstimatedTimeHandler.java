@@ -22,7 +22,7 @@ public class EstimatedTimeHandler extends MessageHandler {
         String timeString;
         if(server != null) {
             QueuePlayer queuePlayer = server.findPlayer(player);
-            time = (int) Math.round(queuePlayer.getPosition() * main.getTimeBetweenPlayers());
+            time = queuePlayer.getETA();
             timeString = TimeUtils.timeString(
                     time,
                     main.getMessages().getString("format.time.mins"),

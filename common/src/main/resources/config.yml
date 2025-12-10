@@ -423,6 +423,15 @@ minimum-ping-time: 1.0
 # Does nothing if you are not on ajQueuePlus, or if you have a supported permission plugin
 plus-level-fallback: false
 
+# How many send times should we keep track of for calculating ETAs?
+# The time between players being sent to the server is averaged to get the ETA.
+# This amount of "time between sends" will be used in that average.
+# Increasing this will result in a more stable ETA, but will take longer to update for big changes in send times.
+# Lowering this will result in the ETA updating faster to big changes,
+#  but may result in inaccurate ETAs for infrequent sends (like for full servers)
+#  Default: 10
+send-times-to-keep: 10
+
 
 # Enabling this option will prevent ajQueue from communicating with ajQueue on the backend using Plugin Messaging.
 # Generally you should leave this on the default of false, to allow ajQueue to communicate.

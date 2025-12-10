@@ -71,11 +71,14 @@ public interface AdaptedServer extends Handle {
     boolean justWentOnline();
 
     default boolean isJoinable(AdaptedPlayer player) {
+        return isJoinable(player, false);
+    }
+    default boolean isJoinable(AdaptedPlayer player, boolean ignoreFull) {
         if(player != null) {
             if (isWhitelisted() && !getWhitelistedPlayers().contains(player.getUniqueId())) {
                 return false;
             }
-            if (isFull() && !canJoinFull(player)) {
+            if (!ignoreFull && isFull() && !canJoinFull(player)) {
                 return false;
             }
         }

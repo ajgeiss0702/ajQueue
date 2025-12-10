@@ -285,10 +285,10 @@ public class QueueMain extends AjQueueAPI {
         LinkedHashMap<String, Object> d = new LinkedHashMap<>();
 
         d.put("status.offline.base", "&c{SERVER} is {STATUS}. &7You are in position &f{POS}&7 of &f{LEN}&7.");
+        d.put("status.full.base", "&c{SERVER} is full. &7You are in position &f{POS}&7 of &f{LEN}&7. Estimated time: {TIME}");
 
         d.put("status.offline.offline", "offline");
         d.put("status.offline.restarting", "restarting");
-        d.put("status.offline.full", "full");
         d.put("status.offline.restricted", "restricted");
         d.put("status.offline.paused", "paused");
         d.put("status.offline.whitelisted", "whitelisted");
@@ -346,6 +346,7 @@ public class QueueMain extends AjQueueAPI {
         d.put("list.none", "&7None");
 
         d.put("actionbar.online", "&7You are{EXPRESS}&7queued for &f{SERVER}&7. You are in position &f{POS}&7 of &f{LEN}&7. Estimated time: {TIME}");
+        d.put("actionbar.full", "&7You are{EXPRESS}&7queued for &f{SERVER}&7. You are in position &f{POS}&7 of &f{LEN}&7. Estimated time: {TIME}");
         d.put("actionbar.offline", "&7You are{EXPRESS}&7queued for &f{SERVER}&7. &7You are in position &f{POS}&7 of &f{LEN}&7.");
         d.put("actionbar.express", " &6express ");
         d.put("actionbar.non-express", " ");

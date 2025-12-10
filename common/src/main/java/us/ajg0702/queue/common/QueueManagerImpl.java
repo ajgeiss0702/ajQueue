@@ -450,15 +450,26 @@ public class QueueManagerImpl implements QueueManager {
                         main.getMessages().getString("actionbar.non-express");
 
                 if(!server.isJoinable(player)) {
-                    player.sendActionBar(msgs.getComponent("actionbar.offline",
-                            "POS:"+pos,
-                            "LEN:"+len,
-                            "SERVER:"+server.getAlias(),
-                            "STATUS:"+status,
-                            "EXPRESS:"+express
-                    ));
+                    if(server.isJoinable(player, true)) {
+                        int time = queuePlayer.getETA();
+                        player.sendActionBar(msgs.getComponent("actionbar.full",
+                                "POS:"+pos,
+                                "LEN:"+len,
+                                "SERVER:"+server.getAlias(),
+                                "TIME:"+ TimeUtils.timeString(time, msgs.getString("format.time.mins"), msgs.getString("format.time.secs")),
+                                "EXPRESS:"+express
+                        ));
+                    } else {
+                        player.sendActionBar(msgs.getComponent("actionbar.offline",
+                                "POS:"+pos,
+                                "LEN:"+len,
+                                "SERVER:"+server.getAlias(),
+                                "STATUS:"+status,
+                                "EXPRESS:"+express
+                        ));
+                    }
                 } else {
-                    int time = (int) Math.round(pos * main.getTimeBetweenPlayers());
+                    int time = queuePlayer.getETA();
                     player.sendActionBar(msgs.getComponent("actionbar.online",
                             "POS:"+pos,
                             "LEN:"+len,
@@ -496,7 +507,7 @@ public class QueueManagerImpl implements QueueManager {
 
                 String status = Messages.color(main.getMessages().getRawString("placeholders.status."+server.getStatus(player)));
 
-                int time = (int) Math.round(pos * main.getTimeBetweenPlayers());
+                int time = queuePlayer.getETA();
 
                 Component titleMessage = msgs.getComponent("title.title",
                         "POS:"+pos,
@@ -618,18 +629,24 @@ public class QueueManagerImpl implements QueueManager {
 
         if(!server.isJoinable(player)) {
             String status = server.getStatusString(player);
-
-            if(msgs.getString("status.offline.base").isEmpty()) return;
-
-            player.sendMessage(msgs.getComponent("status.offline.base",
-                    "STATUS:"+status,
-                    "POS:"+pos,
-                    "LEN:"+len,
-                    "SERVER:"+server.getAlias()
-                    ));
+            if(server.isJoinable(player, true)) {
+                int time = queuePlayer.getETA();
+                player.sendMessage(msgs.getComponent("status.full.base",
+                        "TIME:" + TimeUtils.timeString(time, msgs.getString("format.time.mins"), msgs.getString("format.time.secs")),
+                        "POS:"+pos,
+                        "LEN:"+len,
+                        "SERVER:"+server.getAlias()
+                ));
+            } else {
+                player.sendMessage(msgs.getComponent("status.offline.base",
+                        "STATUS:"+status,
+                        "POS:"+pos,
+                        "LEN:"+len,
+                        "SERVER:"+server.getAlias()
+                ));
+            }
         } else {
-            if(msgs.getString("status.online.base").isEmpty()) return;
-            int time = (int) Math.round(pos * main.getTimeBetweenPlayers());
+            int time = queuePlayer.getETA();
             player.sendMessage(msgs.getComponent("status.online.base",
                     "TIME:" + TimeUtils.timeString(time, msgs.getString("format.time.mins"), msgs.getString("format.time.secs")),
                     "POS:"+pos,
