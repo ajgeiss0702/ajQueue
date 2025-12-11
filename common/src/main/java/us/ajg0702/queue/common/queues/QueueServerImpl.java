@@ -15,6 +15,7 @@ import us.ajg0702.queue.common.QueueMain;
 import us.ajg0702.queue.common.players.QueuePlayerImpl;
 import us.ajg0702.queue.common.queues.balancers.DefaultBalancer;
 import us.ajg0702.queue.common.queues.balancers.FirstBalancer;
+import us.ajg0702.queue.common.queues.balancers.FirstStrictBalancer;
 import us.ajg0702.queue.common.queues.balancers.MinigameBalancer;
 import us.ajg0702.queue.common.utils.Debug;
 import us.ajg0702.utils.common.Messages;
@@ -71,6 +72,9 @@ public class QueueServerImpl implements QueueServer {
                         break;
                     case "first":
                         balancer = new FirstBalancer(this, main);
+                        break;
+                    case "first-strict":
+                        balancer = new FirstStrictBalancer(this);
                         break;
                     default:
                         balancerType = "default";

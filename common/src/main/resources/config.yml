@@ -146,6 +146,8 @@ server-groups:
 #  default - Will send the player to the server in the group with the least number of players
 #  minigame - Will send the player to the server with the most players, until that server is full, which it will then send to the next server
 #  first - Will send the player to the first available server in the group (as long as it is joinable)
+#  first-strict - Will always send the player to the first server in the group, whether it's available or not.
+#    With first-strict, if the first server is offline, the group will show as offline and won't send players.
 balancer-types:
   - "bedwars:minigame"
 
@@ -455,7 +457,7 @@ debug: false
 
 
 # Don't touch this number please
-config-version: 57
+config-version: 58
 
 
 # This is ONLY here so that they can be moved to messages.yml. Please edit these in messages.yml!
