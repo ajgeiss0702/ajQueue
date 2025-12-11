@@ -180,7 +180,10 @@ public class EventHandlerImpl implements EventHandler {
                             String toName = event.getTargetServer();
 
                             player.sendMessage(main.getMessages().getComponent("auto-queued", "SERVER:"+main.getAliasManager().getAlias(toName)));
-                            main.getQueueManager().addToQueue(player, toName);
+                            boolean success = main.getQueueManager().addToQueue(player, toName);
+                            if(!success) {
+                                main.getLogger().warn("Failed to add " + player.getName() + " to queue on kick! If you see another warning saying they weren't connected, try increasing auto-add-to-queue-on-kick-delay in the config.");
+                            }
                         }
                     }, (long) (main.getConfig().getDouble("auto-add-to-queue-on-kick-delay")*1000), TimeUnit.MILLISECONDS);
                     return;
