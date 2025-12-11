@@ -37,6 +37,13 @@ public interface QueuePlayer {
     }
 
     /**
+     * Gets the player's absolute position. Absolute because it takes into account express queue and the express queue sending ratio.
+     * Basically, this is the real number of people that will be sent to the server before this player (+1).
+     * @return The player's absolute position. 1 being 1st, 2 being 2nd, etc.
+     */
+    int getAbsolutePosition();
+
+    /**
      * Get the player this represents.
      * Can be null because the player could not be online
      * @return The player if they are online, null otherwise
