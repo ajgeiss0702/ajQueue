@@ -455,7 +455,7 @@ debug: false
 
 
 # Don't touch this number please
-config-version: 56
+config-version: 57
 
 
 # This is ONLY here so that they can be moved to messages.yml. Please edit these in messages.yml!
