@@ -450,7 +450,7 @@ public class QueueManagerImpl implements QueueManager {
                         main.getMessages().getString("actionbar.non-express");
 
                 if(!server.isJoinable(player)) {
-                    if(server.isJoinable(player, true)) {
+                    if(server.isJoinable(player, true) && main.getConfig().getInt("send-times-to-keep") > 0) {
                         int time = queuePlayer.getETA();
                         player.sendActionBar(msgs.getComponent("actionbar.full",
                                 "POS:"+pos,
@@ -629,7 +629,7 @@ public class QueueManagerImpl implements QueueManager {
 
         if(!server.isJoinable(player)) {
             String status = server.getStatusString(player);
-            if(server.isJoinable(player, true)) {
+            if(server.isJoinable(player, true) && main.getConfig().getInt("send-times-to-keep") > 0) {
                 int time = queuePlayer.getETA();
                 player.sendMessage(msgs.getComponent("status.full.base",
                         "TIME:" + TimeUtils.timeString(time, msgs.getString("format.time.mins"), msgs.getString("format.time.secs")),

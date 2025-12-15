@@ -218,19 +218,24 @@ public class QueueServerImpl implements QueueServer {
     }
     @Override
     public void setLastSentTime(long lastSentTime) {
-        long previousSendTime = this.lastSentTime;
-        int previousQueueSize = this.lastSendQueueSize;
+        int sendTimesToKeep = main.getConfig().getInt("send-times-to-keep");
 
-        // We don't add a queue time if the previous send resulted an in an empty queue.
-        // This is so we don't count the time that the queue was sitting idle with 0 players in it.
-        // The setLastSentTime method is called after removing the player from the queue,
-        //  so if the last size is 0, then the last send resulted in an empty queue.
-        if(previousQueueSize != 0) {
-            sendTimes.add((float) (lastSentTime - previousSendTime) / 1000);
-            if(sendTimes.size() > main.getConfig().getInt("send-times-to-keep")) {
-                sendTimes.remove(0);
+        if(sendTimesToKeep > 0) {
+            long previousSendTime = this.lastSentTime;
+            int previousQueueSize = this.lastSendQueueSize;
+
+            // We don't add a queue time if the previous send resulted an in an empty queue.
+            // This is so we don't count the time that the queue was sitting idle with 0 players in it.
+            // The setLastSentTime method is called after removing the player from the queue,
+            //  so if the last size is 0, then the last send resulted in an empty queue.
+            if(previousQueueSize != 0) {
+                sendTimes.add((float) (lastSentTime - previousSendTime) / 1000);
+                if(sendTimes.size() > sendTimesToKeep) {
+                    sendTimes.remove(0);
+                }
             }
         }
+
 
         this.lastSendQueueSize = queueHolder.getTotalQueueSize();
         this.lastSentTime = lastSentTime;
@@ -238,6 +243,7 @@ public class QueueServerImpl implements QueueServer {
 
     @Override
     public double getAverageSendTime() {
+        if(main.getConfig().getInt("send-times-to-keep") <= 0) return main.getTimeBetweenPlayers();
         // don't allow the average send time to be lower than the wait-time set in the config
         return Math.max(
                 main.getTimeBetweenPlayers(),

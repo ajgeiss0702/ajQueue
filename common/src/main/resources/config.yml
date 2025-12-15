@@ -431,6 +431,7 @@ plus-level-fallback: false
 # Increasing this will result in a more stable ETA, but will take longer to update for big changes in send times.
 # Lowering this will result in the ETA updating faster to big changes,
 #  but may result in inaccurate ETAs for infrequent sends (like for full servers)
+# Set to 0 or negative to go back to the old ETA system (queue position * wait-time)
 #  Default: 10
 send-times-to-keep: 10
 
@@ -457,7 +458,7 @@ debug: false
 
 
 # Don't touch this number please
-config-version: 59
+config-version: 60
 
 
 # This is ONLY here so that they can be moved to messages.yml. Please edit these in messages.yml!
