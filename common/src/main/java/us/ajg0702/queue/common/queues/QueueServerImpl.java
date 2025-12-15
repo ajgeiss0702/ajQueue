@@ -40,6 +40,7 @@ public class QueueServerImpl implements QueueServer {
 
     private long lastSentTime = 0;
     private int lastSendQueueSize = 0;
+    private double averageSendTime = 0;
 
     private int manualMaxPlayers = Integer.MAX_VALUE;
 
@@ -137,6 +138,9 @@ public class QueueServerImpl implements QueueServer {
                 );
             }
         }
+
+        // Start off average send time as the time between players, so its not 0
+        averageSendTime = main.getTimeBetweenPlayers();
     }
 
     @Override
@@ -234,6 +238,21 @@ public class QueueServerImpl implements QueueServer {
                     sendTimes.remove(0);
                 }
             }
+
+            // don't allow the average send time to be lower than the wait-time set in the config
+            averageSendTime = Math.max(
+                    main.getTimeBetweenPlayers(),
+                    sendTimes.isEmpty() ?
+                            0 :
+                            (
+                                    sendTimes
+                                            .stream()
+                                            .mapToDouble(Float::doubleValue)
+                                            .average()
+                                            .orElse(0)
+                                            / 1e3
+                            )
+            );
         }
 
 
@@ -244,20 +263,7 @@ public class QueueServerImpl implements QueueServer {
     @Override
     public double getAverageSendTime() {
         if(main.getConfig().getInt("send-times-to-keep") <= 0) return main.getTimeBetweenPlayers();
-        // don't allow the average send time to be lower than the wait-time set in the config
-        return Math.max(
-                main.getTimeBetweenPlayers(),
-                sendTimes.isEmpty() ?
-                        0 :
-                        (
-                                sendTimes
-                                    .stream()
-                                    .mapToDouble(Float::doubleValue)
-                                    .average()
-                                    .orElse(0)
-                                        / 1e3
-                        )
-        );
+        return averageSendTime;
     }
 
     @Override
