@@ -443,6 +443,13 @@ send-times-to-keep: 10
 #  Default: false
 disable-proxy-communication: false
 
+# How long should we wait before giving up pinging a server (for checking if its online and player count)
+# This only applies if you are running Velocity.
+# If left at the default value of 0 (or changed to a negative value), it will use `read-timeout` in velocity.toml
+# This is in seconds. Decimals are supported.
+#  Default: 0 (uses read-timeout from the velocity config)
+ping-timeout: 0
+
 # Should we print some extra stuff to the console that might help aj diagnose some issues?
 debug: false
 
@@ -458,7 +465,7 @@ debug: false
 
 
 # Don't touch this number please
-config-version: 60
+config-version: 61
 
 
 # This is ONLY here so that they can be moved to messages.yml. Please edit these in messages.yml!

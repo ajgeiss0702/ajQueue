@@ -1,6 +1,7 @@
 package us.ajg0702.queue.platforms.velocity.server;
 
 import com.velocitypowered.api.proxy.Player;
+import com.velocitypowered.api.proxy.server.PingOptions;
 import com.velocitypowered.api.proxy.server.RegisteredServer;
 import com.velocitypowered.api.proxy.server.ServerPing;
 import us.ajg0702.queue.api.AjQueueAPI;
@@ -16,6 +17,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 
 public class VelocityServer implements AdaptedServer {
 
@@ -27,8 +29,17 @@ public class VelocityServer implements AdaptedServer {
 
     private int offlineTime = 0;
 
+    private final PingOptions pingOptions;
+
     public VelocityServer(RegisteredServer handle) {
         this.handle = handle;
+
+        double pingTimeout = AjQueueAPI.getInstance().getConfig().getDouble("ping-timeout");
+        pingOptions = pingTimeout > 0 ?
+                PingOptions.builder()
+                    .timeout((long) (pingTimeout * 1e3), TimeUnit.MILLISECONDS)
+                    .build()
+                : null;
     }
 
     @Override
@@ -47,7 +58,7 @@ public class VelocityServer implements AdaptedServer {
 
         long sent = System.currentTimeMillis();
 
-        CompletableFuture<ServerPing> serverPing = handle.ping();
+        CompletableFuture<ServerPing> serverPing = pingOptions == null ? handle.ping() : handle.ping(pingOptions);
 
         if(debug) logger.info("[pinger] [" + getName() + "] sending ping");
 

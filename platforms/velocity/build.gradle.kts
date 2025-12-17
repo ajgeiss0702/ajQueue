@@ -18,8 +18,8 @@ dependencies {
     compileOnly("com.google.guava:guava:30.1.1-jre")
     compileOnly("us.ajg0702:ajUtils:1.2.37")
 
-    compileOnly("com.velocitypowered:velocity-api:3.1.1")
-    annotationProcessor("com.velocitypowered:velocity-api:3.1.1")
+    compileOnly("com.velocitypowered:velocity-api:3.4.0-SNAPSHOT")
+    annotationProcessor("com.velocitypowered:velocity-api:3.4.0-SNAPSHOT")
     implementation("net.kyori:adventure-text-minimessage:4.15.0")
 
     compileOnly("com.viaversion:viaversion-api:4.3.1")
@@ -46,6 +46,11 @@ tasks.jar {
 
 tasks.compileJava {
     source = tasks.getByName("processResources").outputs.files.asFileTree
+}
+
+java {
+    // fixes velocity requiring java 17 for build
+    disableAutoTargetJvm()
 }
 
 
