@@ -1,6 +1,6 @@
 plugins {
     `java-library`
-    id("com.github.johnrengelman.shadow")
+    id("com.gradleup.shadow")
     `maven-publish`
 }
 

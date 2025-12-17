@@ -41,7 +41,7 @@ tasks.withType<ProcessResources> {
         "tokens" to mapOf(
             "VERSION" to project.version.toString()
         )
-    ).into("$buildDir/src")
+    ).into("${layout.buildDirectory.asFile.get()}/src")
 }
 
 tasks.jar {
