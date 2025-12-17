@@ -89,6 +89,12 @@ public abstract class QueueHolder {
      */
     public abstract int getTotalQueueSize();
 
+    /**
+     * Gets the number of players in both express and standard queues combined, but only ones that are online
+     * @return The number of online players in both queues.
+     */
+    public abstract int getTotalOnlineQueueSize();
+
     public abstract int getPosition(QueuePlayer player);
 
     /**

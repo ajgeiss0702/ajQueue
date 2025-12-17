@@ -9,6 +9,7 @@ import us.ajg0702.queue.api.queues.QueueType;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.function.Predicate;
 
 public class DefaultQueueHolder extends QueueHolder {
 
@@ -94,6 +95,21 @@ public class DefaultQueueHolder extends QueueHolder {
     @Override
     public int getTotalQueueSize() {
         return queue.size() + expressQueue.size();
+    }
+
+    @Override
+    public int getTotalOnlineQueueSize() {
+        Predicate<QueuePlayer> online = p -> p.getPlayer() != null && p.getPlayer().isConnected();
+        return Math.toIntExact(
+                queue
+                        .stream()
+                        .filter(online)
+                        .count() +
+                expressQueue
+                        .stream()
+                        .filter(online)
+                        .count()
+        );
     }
 
     @Override

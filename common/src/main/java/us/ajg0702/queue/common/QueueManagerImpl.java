@@ -353,7 +353,7 @@ public class QueueManagerImpl implements QueueManager {
     @Override
     public boolean canSendInstantly(AdaptedPlayer player, QueueServer queueServer, boolean hasBypass) {
         boolean isJoinable = queueServer.isJoinable(player);
-        boolean sizeGood = queueServer.getQueueHolder().getTotalQueueSize() <= 1 && isJoinable;
+        boolean sizeGood = queueServer.getQueueHolder().getTotalOnlineQueueSize() <= 1 && isJoinable;
         boolean timeGood = !main.getConfig().getBoolean("check-last-player-sent-time") || queueServer.getLastSentTime() > Math.floor(main.getTimeBetweenPlayers() * 1000);
         boolean alwaysSendInstantly = main.getConfig().getStringList("send-instantly").contains(queueServer.getName());
 
