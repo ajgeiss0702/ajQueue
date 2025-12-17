@@ -250,7 +250,9 @@ server-aliases:
 offline-time: 120
 
 # On velocity, should we send a player a message when they are kicked while trying to connect to a server with the queue?
-# This has no effect on bungee, because the message is sent from bungee and there's no way to change that in ajQueue
+# Note this does NOT apply if the server is offline/full. ajQueue does not attempt to send players to offline/full servers.
+# This would only apply to things like bans or temporary join errors.
+# This has no effect on bungee, because the message is sent from bungee and there's no way to change that in ajQueue.
 #  Default: false
 velocity-kick-message: false
 
@@ -465,7 +467,7 @@ debug: false
 
 
 # Don't touch this number please
-config-version: 61
+config-version: 62
 
 
 # This is ONLY here so that they can be moved to messages.yml. Please edit these in messages.yml!
