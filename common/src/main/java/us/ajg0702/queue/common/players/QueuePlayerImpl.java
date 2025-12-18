@@ -28,7 +28,7 @@ public class QueuePlayerImpl implements QueuePlayer {
     private final UUID uuid;
     private final String name;
 
-    private final int maxOfflineTime;
+    private int maxOfflineTime;
 
     private final AdaptedServer initialServer;
 
@@ -174,6 +174,13 @@ public class QueuePlayerImpl implements QueuePlayer {
 
     private long leaveTime = 0;
     public void setLeaveTime(long leaveTime) {
+        // Update the offline time when they leave to be sure we have the most up-to-date allowed offline time
+        if(AjQueueAPI.getInstance().isPremium()) {
+            maxOfflineTime = AjQueueAPI.getInstance().getLogic().getPermissionGetter().getMaxOfflineTime(player);
+        } else {
+            maxOfflineTime = player.hasPermission("ajqueue.stayqueued") ? 60 : 0;
+        }
+
         this.leaveTime = leaveTime;
     }
 
