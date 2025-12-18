@@ -752,11 +752,11 @@ public class QueueManagerImpl implements QueueManager {
                 QueueType lastAdd = express ? QueueType.EXPRESS : QueueType.STANDARD;
                 int addCount = server.getSendCount();
                 while(!expressPlayers.isEmpty() || !standardPlayers.isEmpty()) {
-                    if(lastAdd == QueueType.EXPRESS && addCount >= expressRatio.getExpressCount() && !standardPlayers.isEmpty()) {
+                    if(lastAdd == QueueType.EXPRESS && (addCount >= expressRatio.getExpressCount() || expressPlayers.isEmpty()) && !standardPlayers.isEmpty()) {
                         express = false;
                         addCount = 0;
                     }
-                    if(lastAdd == QueueType.STANDARD && addCount >= expressRatio.getStandardCount() && !expressPlayers.isEmpty()) {
+                    if(lastAdd == QueueType.STANDARD && (addCount >= expressRatio.getStandardCount() || expressPlayers.isEmpty()) && !expressPlayers.isEmpty()) {
                         express = true;
                         addCount = 0;
                     }
