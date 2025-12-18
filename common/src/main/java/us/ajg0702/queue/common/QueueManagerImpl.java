@@ -727,19 +727,21 @@ public class QueueManagerImpl implements QueueManager {
             QueueType lastSend = server.getLastQueueSend();
             ExpressRatio expressRatio = main.getExpressRatio();
 
-            boolean express = lastSend == QueueType.EXPRESS;
-            if(lastSend == QueueType.EXPRESS && (server.getSendCount() >= expressRatio.getExpressCount() || queueHolder.getExpressQueueSize() == 0) && queueHolder.getStandardQueueSize() > 0) {
-                express = false;
-                server.resetSendCount();
-            }
-            if(lastSend == QueueType.STANDARD && (server.getSendCount() >= expressRatio.getStandardCount() || queueHolder.getStandardQueueSize() == 0) && queueHolder.getExpressQueueSize() > 0) {
-                express = true;
-                server.resetSendCount();
-            }
+            boolean express = main.isPremium() && lastSend == QueueType.EXPRESS;
+            if(main.isPremium()) {
+                if(lastSend == QueueType.EXPRESS && (server.getSendCount() >= expressRatio.getExpressCount() || queueHolder.getExpressQueueSize() == 0) && queueHolder.getStandardQueueSize() > 0) {
+                    express = false;
+                    server.resetSendCount();
+                }
+                if(lastSend == QueueType.STANDARD && (server.getSendCount() >= expressRatio.getStandardCount() || queueHolder.getStandardQueueSize() == 0) && queueHolder.getExpressQueueSize() > 0) {
+                    express = true;
+                    server.resetSendCount();
+                }
 
-            ((QueueServerImpl) server).setLastQueueSend(express ? QueueType.EXPRESS : QueueType.STANDARD);
+                ((QueueServerImpl) server).setLastQueueSend(express ? QueueType.EXPRESS : QueueType.STANDARD);
 
-            Debug.info(server.getName() + " currently on express " + express + " with " + server.getSendCount() + " and lastSend " + lastSend);
+                Debug.info(server.getName() + " currently on express " + express + " with " + server.getSendCount() + " and lastSend " + lastSend);
+            }
 
 //            Debug.info("should send when back online: " + !server.isGroup() + " && " + main.getConfig().getBoolean("send-all-when-back-online") + " && " + server.getServers().get(0).justWentOnline());
             if(!server.isGroup() && main.getConfig().getBoolean("send-all-when-back-online") && server.getServers().get(0).justWentOnline()) {
