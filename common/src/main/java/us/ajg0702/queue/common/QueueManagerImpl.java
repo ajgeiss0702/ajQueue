@@ -728,18 +728,20 @@ public class QueueManagerImpl implements QueueManager {
             ExpressRatio expressRatio = main.getExpressRatio();
 
             boolean express = lastSend == QueueType.EXPRESS;
-            if(lastSend == QueueType.EXPRESS && server.getSendCount() >= expressRatio.getExpressCount() && queueHolder.getStandardQueueSize() > 0) {
+            if(lastSend == QueueType.EXPRESS && (server.getSendCount() >= expressRatio.getExpressCount() || queueHolder.getExpressQueueSize() == 0) && queueHolder.getStandardQueueSize() > 0) {
                 express = false;
                 server.resetSendCount();
             }
-            if(lastSend == QueueType.STANDARD && server.getSendCount() >= expressRatio.getStandardCount() && queueHolder.getExpressQueueSize() > 0) {
+            if(lastSend == QueueType.STANDARD && (server.getSendCount() >= expressRatio.getStandardCount() || queueHolder.getStandardQueueSize() == 0) && queueHolder.getExpressQueueSize() > 0) {
                 express = true;
                 server.resetSendCount();
             }
 
             ((QueueServerImpl) server).setLastQueueSend(express ? QueueType.EXPRESS : QueueType.STANDARD);
 
-            Debug.info("should send when back online: " + !server.isGroup() + " && " + main.getConfig().getBoolean("send-all-when-back-online") + " && " + server.getServers().get(0).justWentOnline());
+            Debug.info(server.getName() + " currently on express " + express + " with " + server.getSendCount() + " and lastSend " + lastSend);
+
+//            Debug.info("should send when back online: " + !server.isGroup() + " && " + main.getConfig().getBoolean("send-all-when-back-online") + " && " + server.getServers().get(0).justWentOnline());
             if(!server.isGroup() && main.getConfig().getBoolean("send-all-when-back-online") && server.getServers().get(0).justWentOnline()) {
                 List<QueuePlayer> expressPlayers = new ArrayList<>(server.getQueueHolder().getAllExpressPlayers());
                 List<QueuePlayer> standardPlayers = new ArrayList<>(server.getQueueHolder().getAllStandardPlayers());
