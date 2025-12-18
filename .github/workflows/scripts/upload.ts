@@ -48,7 +48,8 @@ if(!github?.event) {
     const versions = await fetch("https://ajg0702.us/pl/updater/mc-versions.php")
         .then(res => res.json());
 
-    const changes = github.event.commits;
+    const event = github.event
+    const changes = event.commits;
 
     const version = await fs.readFile("build.gradle.kts", "utf8")
         .then(f => f.split("version = \"")[1].split('"')[0]);
@@ -73,15 +74,20 @@ if(!github?.event) {
         "project_id": "dzacATni",
         "version_number": `${version}`,
         "name": `Pre-release v${version}`,
-        "changelog":
-`Note: This is a potentially unstable (and possibly untested) build. It is not guaranteed to work, and may have issues.<br>
-If you do decide to run this, make sure to report any issues to support.<br>
-<br>
-Changes in this build:<br>
-${changes.map(c => `<a href="${c.url}">${c.message}</a><br>`).join("")}
+        "changelog": `
+<p>
+    Note: This is a potentially unstable (and possibly untested) build. It is not guaranteed to work, and may have issues.<br/>
+    If you do decide to run this, make sure to report any issues to support.
+</p>
 
-${changes.length > 1 ? `<br><a href="${github.event.compare}">View combined changes</a>` : ``}
-`,
+<p>
+    Changes in this build:
+    <ul>
+        ${changes.map(c => `<li><a href="${c.url}">${c.message}</a></li>`).join("\n")}
+    </ul>
+    ${changes.length > 1 ? `<a href="${event.compare}">View combined changes</a>` : ``}
+</p>
+`.trim(),
         "file_parts": ["file"],
         "version_type": "beta",
         "loaders": ["bungeecord","velocity","paper"],
@@ -145,15 +151,20 @@ async function uploadToPolymart(event: GithubPushEvent, resource_id: string, ver
     polymartData.set("version", version);
     polymartData.set("update_title", `Pre-release v${version}`);
     polymartData.set("tag", "beta");
-    polymartData.set("update_description",
-        `Note: This is a potentially unstable (and possibly untested) build. It is not guaranteed to work, and may have issues.
-If you do decide to run this, make sure to report any issues to support.
+    polymartData.set("update_description", `
+<p>
+    Note: This is a potentially unstable (and possibly untested) build. It is not guaranteed to work, and may have issues.<br/>
+    If you do decide to run this, make sure to report any issues to support.
+</p>
 
-Changes in this build:
-${changes.map(c => `[url=${c.url}]${c.message}[/url]` + "\n").join()}
-
-${changes.length > 1 ? "\n" + `[url=${event.compare}]View combined changes[/url]` : ``}
-`);
+<p>
+    Changes in this build:
+    <ul>
+        ${changes.map(c => `<li><a href="${c.url}">${c.message}</a></li>`).join("\n")}
+    </ul>
+    ${changes.length > 1 ? `<a href="${event.compare}">View combined changes</a>` : ``}
+</p>
+`.trim());
     polymartData.set("file_name", file.name);
 
     const firstResponse = await fetch("https://api.polymart.org/v1/doPostUpdate", {
