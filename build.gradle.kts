@@ -12,7 +12,7 @@ repositories {
 }
 
 allprojects {
-    version = "2.9.0"
+    version = "2.9.1"
     group = "us.ajg0702"
 
     plugins.apply("java")
