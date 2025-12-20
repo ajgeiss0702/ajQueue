@@ -437,6 +437,19 @@ plus-level-fallback: false
 #  Default: 10
 send-times-to-keep: 10
 
+# Should we display the total number of player in both queues (standard and express) when showing the queue length to players?
+# With the default of false, the players will only see the number of players in the queue they are in (standard or express)
+#  Default: false
+combine-queue-length: false
+
+# Should we show the player their absolute/effective position in the queue
+#  (taking into account express/standard and the ratio) instead of the position in the queue they are in?
+# This will mean instead of showing their position in the queue they are in,
+#  it will show how many players are ahead of them in the queue (+1 for the player themselves).
+# If you enable this, you should probably also enable combine-queue-length.
+#  Default: false
+use-absolute-position: false
+
 
 # Enabling this option will prevent ajQueue from communicating with ajQueue on the backend using Plugin Messaging.
 # Generally you should leave this on the default of false, to allow ajQueue to communicate.

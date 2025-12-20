@@ -281,10 +281,12 @@ public class QueueManagerImpl implements QueueManager {
         }
 
 
-        int pos = queuePlayer.getPosition();
-        int len = queuePlayer.isInExpressQueue() ?
-                server.getQueueHolder().getExpressQueueSize() :
-                server.getQueueHolder().getStandardQueueSize();
+        int pos = main.getConfig().getBoolean("use-absolute-position") ? queuePlayer.getAbsolutePosition() : queuePlayer.getPosition();
+        int len = main.getConfig().getBoolean("combine-queue-length") ? queuePlayer.getQueueServer().getQueueHolder().getTotalQueueSize() : (
+                queuePlayer.isInExpressQueue() ?
+                    server.getQueueHolder().getExpressQueueSize() :
+                    server.getQueueHolder().getStandardQueueSize()
+        );
 
         boolean hasBypass = main.getLogic().hasAnyBypass(player, server.getName());
         boolean sentInstantly = canSendInstantly(player, server, hasBypass);
@@ -428,10 +430,12 @@ public class QueueManagerImpl implements QueueManager {
         for(QueueServer server : servers) {
             for(QueuePlayer queuePlayer : server.getQueueHolder().getAllPlayers()) {
 
-                int pos = queuePlayer.getPosition();
-                int len = queuePlayer.getQueueType() == QueueType.STANDARD ?
-                        server.getQueueHolder().getStandardQueueSize() :
-                        server.getQueueHolder().getExpressQueueSize();
+                int pos = main.getConfig().getBoolean("use-absolute-position") ? queuePlayer.getAbsolutePosition() : queuePlayer.getPosition();
+                int len = main.getConfig().getBoolean("combine-queue-length") ? queuePlayer.getQueueServer().getQueueHolder().getTotalQueueSize() : (
+                        queuePlayer.isInExpressQueue() ?
+                                server.getQueueHolder().getExpressQueueSize() :
+                                server.getQueueHolder().getStandardQueueSize()
+                );
                 if(pos == 0) {
                     server.removePlayer(queuePlayer);
                     continue;
@@ -490,14 +494,16 @@ public class QueueManagerImpl implements QueueManager {
         for(QueueServer server : servers) {
             for(QueuePlayer queuePlayer : server.getQueueHolder().getAllPlayers()) {
 
-                int pos = queuePlayer.getPosition();
+                int pos = main.getConfig().getBoolean("use-absolute-position") ? queuePlayer.getAbsolutePosition() : queuePlayer.getPosition();
                 if(pos == 0) {
                     server.removePlayer(queuePlayer);
                     continue;
                 }
-                int len = queuePlayer.getQueueType() == QueueType.STANDARD ?
-                        server.getQueueHolder().getStandardQueueSize() :
-                        server.getQueueHolder().getExpressQueueSize();
+                int len = main.getConfig().getBoolean("combine-queue-length") ? queuePlayer.getQueueServer().getQueueHolder().getTotalQueueSize() : (
+                        queuePlayer.isInExpressQueue() ?
+                                server.getQueueHolder().getExpressQueueSize() :
+                                server.getQueueHolder().getStandardQueueSize()
+                );
 
                 AdaptedPlayer player = queuePlayer.getPlayer();
                 if(player == null) continue;
@@ -622,10 +628,12 @@ public class QueueManagerImpl implements QueueManager {
 
         QueueServer server = queuePlayer.getQueueServer();
 
-        int pos = queuePlayer.getPosition();
-        int len = queuePlayer.getQueueType() == QueueType.STANDARD ?
-                server.getQueueHolder().getStandardQueueSize() :
-                server.getQueueHolder().getExpressQueueSize();
+        int pos = main.getConfig().getBoolean("use-absolute-position") ? queuePlayer.getAbsolutePosition() : queuePlayer.getPosition();
+        int len = main.getConfig().getBoolean("combine-queue-length") ? queuePlayer.getQueueServer().getQueueHolder().getTotalQueueSize() : (
+                queuePlayer.isInExpressQueue() ?
+                        server.getQueueHolder().getExpressQueueSize() :
+                        server.getQueueHolder().getStandardQueueSize()
+        );
 
         if(!server.isJoinable(player)) {
             String status = server.getStatusString(player);
