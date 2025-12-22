@@ -801,6 +801,8 @@ public class QueueManagerImpl implements QueueManager {
                 continue;
             }
 
+            server.incrementSendCount();
+
             if((express ? queueHolder.getExpressQueueSize() : queueHolder.getStandardQueueSize()) <= 0) continue;
 
             QueuePlayer nextQueuePlayer = express ?
@@ -997,7 +999,6 @@ public class QueueManagerImpl implements QueueManager {
             Debug.info("calling nextQueuePlayer.connect on " + nextPlayer.getName());
             // Use QueuePlayer.connect which will fire the PreConnectEvent then call player.connect
             nextQueuePlayer.connect(selected);
-            server.incrementSendCount();
             selected.addPlayer();
             Debug.info(selected.getName()+" player count is now set to "+ selected.getPlayerCount());
         }
