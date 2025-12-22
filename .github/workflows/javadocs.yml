@@ -25,10 +25,10 @@ jobs:
         with:
           java-version: '17'
           distribution: 'temurin'
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v5
       - name: Build with Gradle
-        uses: gradle/gradle-build-action@937999e9cc2425eddc7fd62d1053baf041147db7
-        with:
-          arguments: :api:javadoc
+        run: ./gradlew :api:javadoc
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3.0.1
         with:

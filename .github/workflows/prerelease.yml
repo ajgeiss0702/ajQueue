@@ -28,10 +28,10 @@ jobs:
           mv temp.txt build.gradle.kts
           echo Version number is now $(cat build.gradle.kts | grep "version " | awk -F'"' '{print $2}') - $NEW_VERSION
           cat build.gradle.kts
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v5
       - name: Build with Gradle
-        uses: gradle/gradle-build-action@937999e9cc2425eddc7fd62d1053baf041147db7
-        with:
-          arguments: :free:shadowJar :premium:shadowJar
+        run: ./gradlew :free:shadowJar :premium:shadowJar
       - name: Upload build files artifact
         uses: actions/upload-artifact@v4.4.0
         with:
