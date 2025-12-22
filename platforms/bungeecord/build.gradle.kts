@@ -8,9 +8,9 @@ group = "us.ajg0702.queue.platforms.bungeecord"
 repositories {
     //mavenLocal()
     maven { url = uri("https://repo.ajg0702.us/releases/") }
-    maven { url = uri("https://nexus.velocitypowered.com/repository/maven-public/") }
     maven { url = uri("https://repo.viaversion.com/") }
     maven { url = uri("https://oss.sonatype.org/content/repositories/snapshots") }
+    maven { url = uri("https://repo.papermc.io/repository/maven-public/") }
     mavenCentral()
 }
 
