@@ -273,7 +273,7 @@ public class QueueServerImpl implements QueueServer {
 
     @Override
     public boolean isJoinable(AdaptedPlayer p, boolean ignoreFull) {
-        if(isManuallyFull() && !AdaptedServer.canJoinFull(p, getName())) return false;
+        if(!ignoreFull && isManuallyFull() && !AdaptedServer.canJoinFull(p, getName())) return false;
         AdaptedServer server = getIdealServer(p);
         if(server == null) return false;
         return server.isJoinable(p, ignoreFull) && !isPaused();
