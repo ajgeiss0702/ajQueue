@@ -23,7 +23,7 @@ public class RawQueueNameHandler extends MessageHandler {
             none = main.getMessages().getString("placeholders.position.none");
         }
         return ComResponse
-                .from("queuename")
+                .from("rawqueuename")
                 .id(player.getUniqueId())
                 .with(name)
                 .noneMessage(none);

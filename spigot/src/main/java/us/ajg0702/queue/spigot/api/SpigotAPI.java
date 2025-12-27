@@ -87,7 +87,7 @@ public class SpigotAPI extends AjQueueSpigotAPI {
             future.complete(new MessagedResponse<>(response.getResponse(), response.getNoneMessage()));
         });
 
-        main.sendMessage(p, "queuename", "");
+        main.sendMessage(p, "rawqueuename", "");
 
         return future;
     }
