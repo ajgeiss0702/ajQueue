@@ -357,7 +357,7 @@ max-tries: 10
 express-ratio: "1:1"
 
 # What QueueHolder should we use?
-# By default, the only QueueHolder available is 'default'
+# By default, the only QueueHolder available is 'default' and 'redis'
 # But more may be available via addons (registered via the API)
 # Use 'redis' to enable cross-proxy queue syncing via Redis
 queue-holder: default
