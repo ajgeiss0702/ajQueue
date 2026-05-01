@@ -1,8 +1,12 @@
 package us.ajg0702.queue.common;
 import com.google.common.collect.ImmutableList;
-import redis.clients.jedis.Jedis;
-import redis.clients.jedis.JedisPool;
-import redis.clients.jedis.JedisPoolConfig;
+import io.lettuce.core.RedisClient;
+import io.lettuce.core.RedisURI;
+import io.lettuce.core.api.StatefulRedisConnection;
+import io.lettuce.core.api.sync.RedisCommands;
+import io.lettuce.core.support.ConnectionPoolSupport;
+import org.apache.commons.pool2.impl.GenericObjectPool;
+import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
 import us.ajg0702.queue.api.AjQueueAPI;
 import us.ajg0702.queue.api.players.AdaptedPlayer;
 import us.ajg0702.queue.api.players.QueuePlayer;
@@ -11,12 +15,13 @@ import us.ajg0702.queue.api.queues.QueueServer;
 import us.ajg0702.queue.api.queues.QueueType;
 import us.ajg0702.queue.common.players.QueuePlayerImpl;
 import us.ajg0702.utils.common.Config;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.Predicate;
 /**
- * A QueueHolder that stores queued players in Redis, enabling cross-proxy queue syncing.
+ * A QueueHolder that stores queued players in Redis using Lettuce, enabling cross-proxy queue syncing.
  *
  * Configure via config.yml:
  *   queue-holder: redis
@@ -27,7 +32,8 @@ import java.util.function.Predicate;
  *     database: 0
  */
 public class RedisQueueHolder extends QueueHolder {
-    private static JedisPool pool;
+    private static RedisClient redisClient;
+    private static GenericObjectPool<StatefulRedisConnection<String, String>> connectionPool;
     private final String standardKey;
     private final String expressKey;
     private final QueueServer queueServer;
@@ -37,27 +43,49 @@ public class RedisQueueHolder extends QueueHolder {
         String safeName = queueServer.getName().replace(":", "_");
         this.standardKey = "ajqueue:queue:" + safeName + ":standard";
         this.expressKey  = "ajqueue:queue:" + safeName + ":express";
-        ensurePool();
+        ensureClient();
     }
-    private static synchronized void ensurePool() {
-        if (pool != null && !pool.isClosed()) return;
+    private static synchronized void ensureClient() {
+        if (redisClient != null && connectionPool != null) return;
         Config config = AjQueueAPI.getInstance().getConfig();
         String host     = config.getString("redis.host");
         int    port     = config.getInt("redis.port");
         String password = config.getString("redis.password");
         int    database = config.getInt("redis.database");
-        JedisPoolConfig poolCfg = new JedisPoolConfig();
-        poolCfg.setMaxTotal(10);
-        poolCfg.setMaxIdle(5);
-        poolCfg.setMinIdle(1);
-        poolCfg.setTestOnBorrow(true);
-        if (password == null || password.isEmpty()) {
-            pool = new JedisPool(poolCfg, host, port, 2000, null, database);
-        } else {
-            pool = new JedisPool(poolCfg, host, port, 2000, password, database);
+        RedisURI.Builder uriBuilder = RedisURI.builder()
+                .withHost(host)
+                .withPort(port)
+                .withDatabase(database)
+                .withTimeout(Duration.ofSeconds(2));
+        if (password != null && !password.isEmpty()) {
+            uriBuilder.withPassword(password.toCharArray());
+        }
+        redisClient = RedisClient.create(uriBuilder.build());
+        GenericObjectPoolConfig<StatefulRedisConnection<String, String>> poolConfig = new GenericObjectPoolConfig<>();
+        poolConfig.setMaxTotal(10);
+        poolConfig.setMaxIdle(5);
+        poolConfig.setMinIdle(1);
+        poolConfig.setTestOnBorrow(true);
+        connectionPool = ConnectionPoolSupport.createGenericObjectPool(
+                () -> redisClient.connect(),
+                poolConfig
+        );
+    }
+    // Borrow a connection from the pool and run a block of commands
+    @FunctionalInterface
+    private interface RedisAction<T> {
+        T run(RedisCommands<String, String> commands) throws Exception;
+    }
+    private <T> T withRedis(RedisAction<T> action) {
+        try (StatefulRedisConnection<String, String> conn = connectionPool.borrowObject()) {
+            return action.run(conn.sync());
+        } catch (Exception e) {
+            throw new RuntimeException("Redis operation failed", e);
         }
     }
+    // -----------------------------------------------------------------------
     // Serialization: uuid|name|queueType|priority|maxOfflineTime
+    // -----------------------------------------------------------------------
     private static final String SEP = "|";
     private String serialize(QueuePlayer player) {
         return player.getUniqueId().toString()
@@ -85,91 +113,94 @@ public class RedisQueueHolder extends QueueHolder {
         if (online != null) qp.setPlayer(online);
         return qp;
     }
+    // -----------------------------------------------------------------------
+    // QueueHolder implementation
+    // -----------------------------------------------------------------------
     @Override
     public String getIdentifier() { return "redis"; }
     @Override
     public void addPlayer(QueuePlayer player) {
         String key = player.isInStandardQueue() ? standardKey : expressKey;
-        try (Jedis jedis = pool.getResource()) { jedis.rpush(key, serialize(player)); }
+        withRedis(cmd -> cmd.rpush(key, serialize(player)));
     }
     @Override
     public void addPlayer(QueuePlayer player, int position) {
         String key = player.isInStandardQueue() ? standardKey : expressKey;
-        String serialized = serialize(player);
-        try (Jedis jedis = pool.getResource()) {
-            List<String> current = jedis.lrange(key, 0, -1);
+        withRedis(cmd -> {
+            List<String> current = new ArrayList<>(cmd.lrange(key, 0, -1));
             int insertAt = Math.max(0, Math.min(position - 1, current.size()));
-            current.add(insertAt, serialized);
-            rebuildList(jedis, key, current);
-        }
+            current.add(insertAt, serialize(player));
+            rebuildList(cmd, key, current);
+            return null;
+        });
     }
     @Override
     public void removePlayer(QueuePlayer player) {
         String key = player.isInStandardQueue() ? standardKey : expressKey;
-        try (Jedis jedis = pool.getResource()) {
-            // Remove all entries with this UUID from the list
-            removeByUuid(jedis, key, player.getUniqueId());
-        }
+        withRedis(cmd -> { removeByUuid(cmd, key, player.getUniqueId()); return null; });
     }
     @Override
     public QueuePlayer findPlayer(UUID uuid) {
-        try (Jedis jedis = pool.getResource()) {
-            QueuePlayer p = findInList(jedis, standardKey, uuid);
+        return withRedis(cmd -> {
+            QueuePlayer p = findInList(cmd, standardKey, uuid);
             if (p != null) return p;
-            return findInList(jedis, expressKey, uuid);
-        }
+            return findInList(cmd, expressKey, uuid);
+        });
     }
     @Override
     public QueuePlayer findPlayer(String name) {
-        try (Jedis jedis = pool.getResource()) {
-            QueuePlayer p = findInListByName(jedis, standardKey, name);
+        return withRedis(cmd -> {
+            QueuePlayer p = findInListByName(cmd, standardKey, name);
             if (p != null) return p;
-            return findInListByName(jedis, expressKey, name);
-        }
+            return findInListByName(cmd, expressKey, name);
+        });
     }
     @Override
     public int getStandardQueueSize() {
-        try (Jedis jedis = pool.getResource()) { return Math.toIntExact(jedis.llen(standardKey)); }
+        return withRedis(cmd -> Math.toIntExact(cmd.llen(standardKey)));
     }
     @Override
     public int getExpressQueueSize() {
-        try (Jedis jedis = pool.getResource()) { return Math.toIntExact(jedis.llen(expressKey)); }
+        return withRedis(cmd -> Math.toIntExact(cmd.llen(expressKey)));
     }
     @Override
     public int getTotalQueueSize() {
-        try (Jedis jedis = pool.getResource()) { return Math.toIntExact(jedis.llen(standardKey) + jedis.llen(expressKey)); }
+        return withRedis(cmd -> Math.toIntExact(cmd.llen(standardKey) + cmd.llen(expressKey)));
     }
     @Override
     public int getTotalOnlineQueueSize() {
         Predicate<QueuePlayer> online = p -> p.getPlayer() != null && p.getPlayer().isConnected();
-        try (Jedis jedis = pool.getResource()) {
-            long count = jedis.lrange(standardKey, 0, -1).stream()
+        return withRedis(cmd -> {
+            long count = cmd.lrange(standardKey, 0, -1).stream()
                     .map(this::deserialize).filter(p -> p != null && online.test(p)).count();
-            count += jedis.lrange(expressKey, 0, -1).stream()
+            count += cmd.lrange(expressKey, 0, -1).stream()
                     .map(this::deserialize).filter(p -> p != null && online.test(p)).count();
             return Math.toIntExact(count);
-        }
+        });
     }
     @Override
     public int getPosition(QueuePlayer player) {
         String key = player.isInStandardQueue() ? standardKey : expressKey;
-        try (Jedis jedis = pool.getResource()) {
-            List<String> list = jedis.lrange(key, 0, -1);
+        return withRedis(cmd -> {
+            List<String> list = cmd.lrange(key, 0, -1);
             for (int i = 0; i < list.size(); i++) {
                 QueuePlayer p = deserialize(list.get(i));
                 if (p != null && p.getUniqueId().equals(player.getUniqueId())) return i + 1;
             }
             return -1;
-        }
+        });
     }
     @Override
     public List<QueuePlayer> getAllStandardPlayers() {
-        try (Jedis jedis = pool.getResource()) { return deserializeList(jedis.lrange(standardKey, 0, -1)); }
+        return withRedis(cmd -> deserializeList(cmd.lrange(standardKey, 0, -1)));
     }
     @Override
     public List<QueuePlayer> getAllExpressPlayers() {
-        try (Jedis jedis = pool.getResource()) { return deserializeList(jedis.lrange(expressKey, 0, -1)); }
+        return withRedis(cmd -> deserializeList(cmd.lrange(expressKey, 0, -1)));
     }
+    // -----------------------------------------------------------------------
+    // Private helpers
+    // -----------------------------------------------------------------------
     private List<QueuePlayer> deserializeList(List<String> raw) {
         List<QueuePlayer> result = new ArrayList<>(raw.size());
         for (String s : raw) {
@@ -178,34 +209,44 @@ public class RedisQueueHolder extends QueueHolder {
         }
         return ImmutableList.copyOf(result);
     }
-    private QueuePlayer findInList(Jedis jedis, String key, UUID uuid) {
-        for (String raw : jedis.lrange(key, 0, -1)) {
+    private QueuePlayer findInList(RedisCommands<String, String> cmd, String key, UUID uuid) {
+        for (String raw : cmd.lrange(key, 0, -1)) {
             QueuePlayer p = deserialize(raw);
             if (p != null && p.getUniqueId().equals(uuid)) return p;
         }
         return null;
     }
-    private QueuePlayer findInListByName(Jedis jedis, String key, String name) {
-        for (String raw : jedis.lrange(key, 0, -1)) {
+    private QueuePlayer findInListByName(RedisCommands<String, String> cmd, String key, String name) {
+        for (String raw : cmd.lrange(key, 0, -1)) {
             QueuePlayer p = deserialize(raw);
             if (p != null && p.getName().equalsIgnoreCase(name)) return p;
         }
         return null;
     }
-    private void removeByUuid(Jedis jedis, String key, UUID uuid) {
-        List<String> list = jedis.lrange(key, 0, -1);
-        List<String> toRemove = new ArrayList<>();
+    private void removeByUuid(RedisCommands<String, String> cmd, String key, UUID uuid) {
+        List<String> list = cmd.lrange(key, 0, -1);
         for (String raw : list) {
             QueuePlayer p = deserialize(raw);
-            if (p != null && p.getUniqueId().equals(uuid)) toRemove.add(raw);
+            if (p != null && p.getUniqueId().equals(uuid)) {
+                cmd.lrem(key, 0, raw);
+            }
         }
-        for (String raw : toRemove) jedis.lrem(key, 0, raw);
     }
-    private void rebuildList(Jedis jedis, String key, List<String> items) {
-        jedis.del(key);
-        if (!items.isEmpty()) jedis.rpush(key, items.toArray(new String[0]));
+    private void rebuildList(RedisCommands<String, String> cmd, String key, List<String> items) {
+        cmd.del(key);
+        if (!items.isEmpty()) cmd.rpush(key, items.toArray(new String[0]));
     }
-    public static synchronized void closePool() {
-        if (pool != null && !pool.isClosed()) { pool.close(); pool = null; }
+    /**
+     * Closes the Lettuce client and connection pool. Called on plugin shutdown.
+     */
+    public static synchronized void closeClient() {
+        if (connectionPool != null) {
+            connectionPool.close();
+            connectionPool = null;
+        }
+        if (redisClient != null) {
+            redisClient.shutdown();
+            redisClient = null;
+        }
     }
 }

@@ -182,7 +182,7 @@ public class QueueMain extends AjQueueAPI {
     @Override
     public void shutdown() {
         taskManager.shutdown();
-        RedisQueueHolder.closePool();
+        RedisQueueHolder.closeClient();
     }
 
 
