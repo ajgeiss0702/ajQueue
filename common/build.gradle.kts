@@ -25,6 +25,7 @@ dependencies {
     compileOnly("org.spongepowered:configurate-yaml:4.0.0")
 
     implementation(project(":api"))
+    implementation("redis.clients:jedis:7.5.0")
 }
 
 publishing {

@@ -359,7 +359,23 @@ express-ratio: "1:1"
 # What QueueHolder should we use?
 # By default, the only QueueHolder available is 'default'
 # But more may be available via addons (registered via the API)
+# Use 'redis' to enable cross-proxy queue syncing via Redis
 queue-holder: default
+
+# Redis connection settings (only used when queue-holder is set to 'redis')
+redis:
+  # Redis server hostname or IP
+  #  Default: localhost
+  host: localhost
+  # Redis server port
+  #  Default: 6379
+  port: 6379
+  # Redis password (leave empty if no authentication is required)
+  #  Default: ""
+  password: ""
+  # Redis database index
+  #  Default: 0
+  database: 0
 
 
 # Should we enable the ajqueue.make-room permission?

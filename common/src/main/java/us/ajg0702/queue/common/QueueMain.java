@@ -182,6 +182,7 @@ public class QueueMain extends AjQueueAPI {
     @Override
     public void shutdown() {
         taskManager.shutdown();
+        RedisQueueHolder.closePool();
     }
 
 
@@ -259,6 +260,7 @@ public class QueueMain extends AjQueueAPI {
         constructMessages();
 
         getQueueHolderRegistry().register("default", DefaultQueueHolder.class);
+        getQueueHolderRegistry().register("redis", RedisQueueHolder.class);
 
         logic = logicGetter.constructLogic();
         aliasManager = logicGetter.constructAliasManager(config);
