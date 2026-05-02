@@ -143,12 +143,12 @@ public class RedisQueueHolder extends QueueHolder {
     @Override
     public void addPlayer(QueuePlayer player) {
         String key = player.isInStandardQueue() ? standardKey : expressKey;
-        withRedis("addPlayer:" + player.getName(), cmd -> cmd.rpush(key, serialize(player)));
+        withRedis("addPlayer:" + player.getUniqueId(), cmd -> cmd.rpush(key, serialize(player)));
     }
     @Override
     public void addPlayer(QueuePlayer player, int position) {
         String key = player.isInStandardQueue() ? standardKey : expressKey;
-        withRedis("addPlayer[pos=" + position + "]:" + player.getName(), cmd -> {
+        withRedis("addPlayer[pos=" + position + "]:" + player.getUniqueId(), cmd -> {
             List<String> current = new ArrayList<>(cmd.lrange(key, 0, -1));
             int insertAt = Math.max(0, Math.min(position - 1, current.size()));
             current.add(insertAt, serialize(player));
@@ -159,7 +159,7 @@ public class RedisQueueHolder extends QueueHolder {
     @Override
     public void removePlayer(QueuePlayer player) {
         String key = player.isInStandardQueue() ? standardKey : expressKey;
-        withRedis("removePlayer:" + player.getName(),
+        withRedis("removePlayer:" + player.getUniqueId(),
                 cmd -> { removeByUuid(cmd, key, player.getUniqueId()); return null; });
     }
     @Override
@@ -207,11 +207,13 @@ public class RedisQueueHolder extends QueueHolder {
     @Override
     public int getPosition(QueuePlayer player) {
         String key = player.isInStandardQueue() ? standardKey : expressKey;
-        return withRedis("getPosition:" + player.getName(), cmd -> {
+        // Compare UUID prefix in raw string to avoid deserializing every entry (which would
+        // re-enter withRedis and deadlock the connection pool via nested borrow).
+        String uuidPrefix = player.getUniqueId().toString() + SEP;
+        return withRedis("getPosition:" + player.getUniqueId(), cmd -> {
             List<String> list = cmd.lrange(key, 0, -1);
             for (int i = 0; i < list.size(); i++) {
-                QueuePlayer p = deserialize(list.get(i));
-                if (p != null && p.getUniqueId().equals(player.getUniqueId())) return i + 1;
+                if (list.get(i).startsWith(uuidPrefix)) return i + 1;
             }
             return -1;
         });
@@ -277,7 +279,7 @@ public class RedisQueueHolder extends QueueHolder {
         String key = player.isInStandardQueue() ? standardKey : expressKey;
         String uuidPrefix = player.getUniqueId().toString() + SEP;
         String serialized = serialize(player);
-        withRedis("onPlayerOffline:" + player.getName(), cmd -> {
+        withRedis("onPlayerOffline:" + player.getUniqueId(), cmd -> {
             List<String> list = cmd.lrange(key, 0, -1);
             for (int i = 0; i < list.size(); i++) {
                 if (list.get(i).startsWith(uuidPrefix)) {
