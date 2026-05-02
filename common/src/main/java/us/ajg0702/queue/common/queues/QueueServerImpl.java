@@ -30,7 +30,7 @@ public class QueueServerImpl implements QueueServer {
 
     private final List<AdaptedServer> servers;
 
-    private final QueueHolder queueHolder = AjQueueAPI.getQueueHolderRegistry().getQueueHolder(this);
+    private final QueueHolder queueHolder;
 
     private List<Integer> supportedProtocols = new ArrayList<>();
 
@@ -58,6 +58,7 @@ public class QueueServerImpl implements QueueServer {
         this.name = name;
         this.servers = servers;
         this.main = main;
+        this.queueHolder = AjQueueAPI.getQueueHolderRegistry().getQueueHolder(this);
 
         List<String> types = main.getConfig().getStringList("balancer-types");
         for(String type : types) {

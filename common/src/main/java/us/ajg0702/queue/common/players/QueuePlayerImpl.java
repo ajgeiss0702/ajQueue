@@ -57,7 +57,11 @@ public class QueuePlayerImpl implements QueuePlayer {
 
         initialServer = player != null ? player.getCurrentServer() : null;
 
-        lastPosition = getPosition();
+        // lastPosition is initialized to -1; callers (e.g. RedisQueueHolder.deserializeList)
+        // are responsible for setting it to the correct value after construction if needed.
+        // Calling getPosition() here would trigger a nested Redis borrow inside withRedis()
+        // and deadlock the connection pool.
+        lastPosition = -1;
     }
 
     @Override
