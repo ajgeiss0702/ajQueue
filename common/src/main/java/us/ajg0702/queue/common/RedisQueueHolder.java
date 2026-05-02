@@ -33,7 +33,6 @@ import java.util.logging.Logger;
  *     database: 0
  */
 public class RedisQueueHolder extends QueueHolder {
-    private static final Logger log = Logger.getLogger("ajQueue/RedisQueueHolder");
     private static RedisClient redisClient;
     private static GenericObjectPool<StatefulRedisConnection<String, String>> connectionPool;
     private final String standardKey;
@@ -41,28 +40,21 @@ public class RedisQueueHolder extends QueueHolder {
     private final QueueServer queueServer;
     public RedisQueueHolder(QueueServer queueServer) {
         super(queueServer);
-        log.info("[RedisQueueHolder] Constructor called for server: " + queueServer.getName());
         this.queueServer = queueServer;
         String safeName = queueServer.getName().replace(":", "_");
         this.standardKey = "ajqueue:queue:" + safeName + ":standard";
         this.expressKey  = "ajqueue:queue:" + safeName + ":express";
-        log.info("[RedisQueueHolder] Keys set — standard=" + standardKey + " express=" + expressKey);
         ensureClient();
-        log.info("[RedisQueueHolder] Ready for server: " + queueServer.getName());
     }
     private static synchronized void ensureClient() {
-        log.info("[RedisQueueHolder] ensureClient() called");
         if (redisClient != null && connectionPool != null) {
-            log.info("[RedisQueueHolder] Client already initialized, skipping.");
             return;
         }
-        log.info("[RedisQueueHolder] Reading Redis config...");
         Config config = AjQueueAPI.getInstance().getConfig();
         String host     = config.getString("redis.host");
         int    port     = config.getInt("redis.port");
         String password = config.getString("redis.password");
         int    database = config.getInt("redis.database");
-        log.info("[RedisQueueHolder] Connecting to Redis at " + host + ":" + port + " db=" + database);
         RedisURI.Builder uriBuilder = RedisURI.builder()
                 .withHost(host)
                 .withPort(port)
@@ -71,7 +63,6 @@ public class RedisQueueHolder extends QueueHolder {
         if (password != null && !password.isEmpty()) {
             uriBuilder.withPassword(password.toCharArray());
         }
-        log.info("[RedisQueueHolder] Creating RedisClient...");
         redisClient = RedisClient.create(uriBuilder.build());
         GenericObjectPoolConfig<StatefulRedisConnection<String, String>> poolConfig =
                 new GenericObjectPoolConfig<>();
@@ -83,13 +74,11 @@ public class RedisQueueHolder extends QueueHolder {
         poolConfig.setTestOnReturn(false);
         // Fail fast if pool is exhausted rather than blocking forever
         poolConfig.setMaxWait(Duration.ofSeconds(5));
-        log.info("[RedisQueueHolder] Creating connection pool...");
         connectionPool = ConnectionPoolSupport.createGenericObjectPool(
                 () -> redisClient.connect(),
                 poolConfig,
                 true   // wrapConnections=true: close() returns to pool instead of destroying
         );
-        log.info("[RedisQueueHolder] Redis connection pool ready (" + host + ":" + port + ")");
     }
     // -----------------------------------------------------------------------
     // Redis execution — runs on the dedicated redis thread, never the main thread
@@ -99,15 +88,11 @@ public class RedisQueueHolder extends QueueHolder {
         T run(RedisCommands<String, String> commands) throws Exception;
     }
     private <T> T withRedis(String opName, RedisAction<T> action) {
-        log.fine("[RedisQueueHolder] start op: " + opName + " (thread=" + Thread.currentThread().getName() + ")");
         long t0 = System.currentTimeMillis();
         try (StatefulRedisConnection<String, String> conn = connectionPool.borrowObject()) {
-            log.fine("[RedisQueueHolder] connection borrowed for: " + opName);
             T result = action.run(conn.sync());
-            log.fine("[RedisQueueHolder] op done: " + opName + " (" + (System.currentTimeMillis() - t0) + "ms)");
             return result;
         } catch (Exception e) {
-            log.warning("[RedisQueueHolder] op FAILED: " + opName + " (" + (System.currentTimeMillis() - t0) + "ms) — " + e);
             throw new RuntimeException("Redis operation failed [" + opName + "]", e);
         }
     }
@@ -297,12 +282,9 @@ public class RedisQueueHolder extends QueueHolder {
             for (int i = 0; i < list.size(); i++) {
                 if (list.get(i).startsWith(uuidPrefix)) {
                     cmd.lset(key, i, serialized);
-                    log.fine("[RedisQueueHolder] Updated leaveTime for " + player.getName()
-                            + " at index " + i + " in " + key);
                     return null;
                 }
             }
-            log.fine("[RedisQueueHolder] onPlayerOffline: " + player.getName() + " not found in " + key);
             return null;
         });
     }
@@ -310,9 +292,7 @@ public class RedisQueueHolder extends QueueHolder {
      * Closes the Lettuce client and connection pool. Called on plugin shutdown.
      */
     public static synchronized void closeClient() {
-        log.info("[RedisQueueHolder] Shutting down...");
         if (connectionPool != null) { connectionPool.close(); connectionPool = null; }
         if (redisClient != null) { redisClient.shutdown(); redisClient = null; }
-        log.info("[RedisQueueHolder] Shutdown complete.");
     }
 }
