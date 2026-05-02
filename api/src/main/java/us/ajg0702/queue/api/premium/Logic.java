@@ -64,7 +64,7 @@ public interface Logic {
             boolean hasMakeRoom = player.hasPermission("ajqueue.make-room") && AjQueueAPI.getInstance().getConfig().getBoolean("enable-make-room-permission");
             if(
                     (server.isFull() && (server.canJoinFull(player) || hasMakeRoom)) ||
-                            (queueServer.isManuallyFull() && (AdaptedServer.canJoinFull(player, queueServer.getName()) || hasMakeRoom))) {
+                            ((queueServer.isManuallyFull() || queueServer.isDynamicallyFull()) && (AdaptedServer.canJoinFull(player, queueServer.getName()) || hasMakeRoom))) {
                 highest = Math.max(highest, fulljoinPriority);
             }
         }

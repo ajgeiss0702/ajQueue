@@ -165,7 +165,7 @@ public class QueueServerImpl implements QueueServer {
             return msgs.getString("status.offline.whitelisted");
         }
 
-        if((server.isFull() && !server.canJoinFull(p)) || (isManuallyFull() && !AdaptedServer.canJoinFull(p, getName()))) {
+        if((server.isFull() && !server.canJoinFull(p)) || ((isManuallyFull() || isDynamicallyFull()) && !AdaptedServer.canJoinFull(p, getName()))) {
             return msgs.getString("status.offline.full");
         }
 
@@ -201,7 +201,7 @@ public class QueueServerImpl implements QueueServer {
             return "whitelisted";
         }
 
-        if(((server.isFull() && !server.canJoinFull(p)) || (isManuallyFull() && !AdaptedServer.canJoinFull(p, getName())))) {
+        if(((server.isFull() && !server.canJoinFull(p)) || ((isManuallyFull() || isDynamicallyFull()) && !AdaptedServer.canJoinFull(p, getName())))) {
             return "full";
         }
 
