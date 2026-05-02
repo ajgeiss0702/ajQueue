@@ -112,19 +112,23 @@ public class RedisQueueHolder extends QueueHolder {
         }
     }
     // -----------------------------------------------------------------------
-    // Serialization: uuid|name|queueType|priority|maxOfflineTime
+    // Serialization: uuid|name|queueType|priority|maxOfflineTime|leaveTime
     // -----------------------------------------------------------------------
     private static final String SEP = "|";
     private String serialize(QueuePlayer player) {
+        long leaveTime = (player instanceof QueuePlayerImpl)
+                ? ((QueuePlayerImpl) player).getLeaveTime()
+                : 0L;
         return player.getUniqueId().toString()
                 + SEP + player.getName()
                 + SEP + player.getQueueType().name()
                 + SEP + player.getPriority()
-                + SEP + player.getMaxOfflineTime();
+                + SEP + player.getMaxOfflineTime()
+                + SEP + leaveTime;
     }
     private QueuePlayer deserialize(String raw) {
         if (raw == null) return null;
-        String[] parts = raw.split("\\|", 5);
+        String[] parts = raw.split("\\|", 6);
         if (parts.length < 5) return null;
         UUID uuid;
         try { uuid = UUID.fromString(parts[0]); } catch (IllegalArgumentException e) { return null; }
@@ -136,7 +140,13 @@ public class RedisQueueHolder extends QueueHolder {
             priority       = Integer.parseInt(parts[3]);
             maxOfflineTime = Integer.parseInt(parts[4]);
         } catch (NumberFormatException e) { priority = 0; maxOfflineTime = 0; }
+        // Field 6: leaveTime (added in v2 of the format; default 0 for old entries)
+        long leaveTime = 0;
+        if (parts.length >= 6) {
+            try { leaveTime = Long.parseLong(parts[5]); } catch (NumberFormatException ignored) {}
+        }
         QueuePlayerImpl qp = new QueuePlayerImpl(uuid, name, queueServer, priority, maxOfflineTime, queueType);
+        if (leaveTime > 0) qp.restoreLeaveTime(leaveTime);
         AdaptedPlayer online = AjQueueAPI.getInstance().getPlatformMethods().getPlayer(uuid);
         if (online != null) qp.setPlayer(online);
         return qp;
@@ -272,6 +282,29 @@ public class RedisQueueHolder extends QueueHolder {
     private void rebuildList(RedisCommands<String, String> cmd, String key, List<String> items) {
         cmd.del(key);
         if (!items.isEmpty()) cmd.rpush(key, items.toArray(new String[0]));
+    }
+    /**
+     * Persists the updated leaveTime (and maxOfflineTime) back to Redis so every other proxy
+     * sees the player as offline on their next getAllPlayers() call.
+     */
+    @Override
+    public void onPlayerOffline(QueuePlayer player) {
+        String key = player.isInStandardQueue() ? standardKey : expressKey;
+        String uuidPrefix = player.getUniqueId().toString() + SEP;
+        String serialized = serialize(player);
+        withRedis("onPlayerOffline:" + player.getName(), cmd -> {
+            List<String> list = cmd.lrange(key, 0, -1);
+            for (int i = 0; i < list.size(); i++) {
+                if (list.get(i).startsWith(uuidPrefix)) {
+                    cmd.lset(key, i, serialized);
+                    log.fine("[RedisQueueHolder] Updated leaveTime for " + player.getName()
+                            + " at index " + i + " in " + key);
+                    return null;
+                }
+            }
+            log.fine("[RedisQueueHolder] onPlayerOffline: " + player.getName() + " not found in " + key);
+            return null;
+        });
     }
     /**
      * Closes the Lettuce client and connection pool. Called on plugin shutdown.

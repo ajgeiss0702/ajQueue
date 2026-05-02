@@ -119,4 +119,16 @@ public abstract class QueueHolder {
         players.addAll(getAllStandardPlayers());
         return players;
     }
+
+    /**
+     * Called when a player goes offline (i.e. disconnects from the proxy) while in this queue.
+     * The player's leaveTime has already been set via QueuePlayerImpl.setLeaveTime() before this is called.
+     * Default implementation is a no-op; persistent queue holders (e.g. Redis) should override
+     * this to persist the updated leaveTime so other nodes see the player as offline.
+     *
+     * @param player The QueuePlayer that went offline (with leaveTime already set)
+     */
+    public void onPlayerOffline(QueuePlayer player) {
+        // no-op for in-memory holders; the QueuePlayerImpl object persists in the list directly
+    }
 }
