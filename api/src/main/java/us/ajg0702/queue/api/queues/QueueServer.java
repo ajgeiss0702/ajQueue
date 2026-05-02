@@ -82,6 +82,23 @@ public interface QueueServer {
     boolean isManuallyFull();
 
     /**
+     * Checks if the total number of players in this server/group is above the dynamically-set max player count
+     * @return If the server is at or above the dynamically-set player limit
+     */
+    boolean isDynamicallyFull();
+
+    /**
+     * Sets the dynamic max player cap for this server/group. This is used for temporarily lowering the max player count of a server/group.
+     * @param amount the new dynamic max player count. Negative values will be ignored, behaving as resetDynamicMax
+     */
+    void setDynamicMax(int amount);
+
+    /**
+     * Resets the dynamic max player cap for this server/group. This will make it so the dynamic player cap is no longer a consideration.
+     */
+    void resetDynamicMax();
+
+    /**
      * Pauses or unpauses a server
      * @param paused true = paused, false = unpaused
      */
