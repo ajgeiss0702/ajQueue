@@ -1,6 +1,7 @@
 package us.ajg0702.queue.common.queues;
 
 import com.google.common.collect.ImmutableList;
+import org.jetbrains.annotations.Nullable;
 import us.ajg0702.queue.api.AjQueueAPI;
 import us.ajg0702.queue.api.events.PositionChangeEvent;
 import us.ajg0702.queue.api.players.AdaptedPlayer;
@@ -319,6 +320,11 @@ public class QueueServerImpl implements QueueServer {
             this.resetDynamicMax();
         }
         this.dynamicMaxPlayers = amount;
+    }
+
+    @Override
+    public @Nullable Integer getDynamicMax() {
+        return this.dynamicMaxPlayers;
     }
 
     @Override

@@ -1,6 +1,7 @@
 package us.ajg0702.queue.api.queues;
 
 import com.google.common.collect.ImmutableList;
+import org.jetbrains.annotations.Nullable;
 import us.ajg0702.queue.api.players.AdaptedPlayer;
 import us.ajg0702.queue.api.players.QueuePlayer;
 import us.ajg0702.queue.api.queueholders.QueueHolder;
@@ -92,6 +93,13 @@ public interface QueueServer {
      * @param amount the new dynamic max player count. Negative values will be ignored, behaving as resetDynamicMax
      */
     void setDynamicMax(int amount);
+
+    /**
+     * Gets the dynamic max (null when no max is set)
+     * @return integer (0 or larger) or null if no dynamic max is set
+     */
+    @Nullable
+    Integer getDynamicMax();
 
     /**
      * Resets the dynamic max player cap for this server/group. This will make it so the dynamic player cap is no longer a consideration.
