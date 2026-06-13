@@ -112,6 +112,7 @@ public class RedisQueueHolder extends QueueHolder {
     private final QueueServer queueServer;
     private final String standardKey;
     private final String expressKey;
+    private final String lastSentKey;
 
     /**
      * Creates a holder backed by Redis for the given queue server.
@@ -125,6 +126,7 @@ public class RedisQueueHolder extends QueueHolder {
         String safeName = queueServer.getName().replace(":", "_");
         this.standardKey = "ajqueue:queue:" + safeName + ":standard";
         this.expressKey  = "ajqueue:queue:" + safeName + ":express";
+        this.lastSentKey = "ajqueue:queue:" + safeName + ":lastSent";
         ensureClient();
         Debug.info("[redis] RedisQueueHolder created for " + queueServer.getName()
                 + " (standardKey=" + standardKey + ", expressKey=" + expressKey + ")");
@@ -231,6 +233,24 @@ public class RedisQueueHolder extends QueueHolder {
 
     @Override
     public String getIdentifier() { return "redis"; }
+
+    @Override
+    public long getSharedLastSendTimestamp() {
+        return withRedis("getSharedLastSendTimestamp", cmd -> {
+            String val = cmd.get(lastSentKey);
+            if (val == null) return 0L;
+            try { return Long.parseLong(val); } catch (NumberFormatException e) { return 0L; }
+        });
+    }
+
+    @Override
+    public void recordSharedSend(long timestamp) {
+        Debug.info("[redis] recordSharedSend: " + queueServer.getName() + " lastSent=" + timestamp);
+        withRedis("recordSharedSend", cmd -> {
+            cmd.set(lastSentKey, String.valueOf(timestamp));
+            return null;
+        });
+    }
 
     @Override
     public void addPlayer(QueuePlayer player) {

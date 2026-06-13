@@ -228,17 +228,33 @@ public class QueueServerImpl implements QueueServer {
 
     @Override
     public long getLastSentTime() {
+        // For persistent (Redis) holders, read the shared timestamp so that the wait-time is
+        // enforced across all proxy instances, not just within this one.
+        if (queueHolder.isPersistent()) {
+            long shared = queueHolder.getSharedLastSendTimestamp();
+            if (shared > 0) {
+                long elapsed = System.currentTimeMillis() - shared;
+                Debug.info("getLastSentTime [" + name + "]: using shared Redis timestamp, elapsed=" + elapsed + "ms");
+                return elapsed;
+            }
+        }
         return System.currentTimeMillis() - lastSentTime;
     }
+
     @Override
     public void setLastSentTime(long lastSentTime) {
         int sendTimesToKeep = main.getConfig().getInt("send-times-to-keep");
 
         if(sendTimesToKeep > 0) {
-            long previousSendTime = this.lastSentTime;
+            // For cross-proxy ETA accuracy: use the shared last-send timestamp as the interval baseline
+            // so the average reflects the real observed gap, not just this instance's local state.
+            long previousSendTime = queueHolder.isPersistent()
+                    ? queueHolder.getSharedLastSendTimestamp()
+                    : this.lastSentTime;
+            if (previousSendTime == 0) previousSendTime = this.lastSentTime;
             int previousQueueSize = this.lastSendQueueSize;
 
-            // We don't add a queue time if the previous send resulted an in an empty queue.
+            // We don't add a queue time if the previous send resulted in an empty queue.
             // This is so we don't count the time that the queue was sitting idle with 0 players in it.
             // The setLastSentTime method is called after removing the player from the queue,
             //  so if the last size is 0, then the last send resulted in an empty queue.
@@ -265,9 +281,13 @@ public class QueueServerImpl implements QueueServer {
             );
         }
 
-
         this.lastSendQueueSize = queueHolder.getTotalQueueSize();
         this.lastSentTime = lastSentTime;
+
+        // Publish to Redis so other proxy instances respect the same send-rate limit.
+        if (queueHolder.isPersistent()) {
+            queueHolder.recordSharedSend(lastSentTime);
+        }
     }
 
     @Override

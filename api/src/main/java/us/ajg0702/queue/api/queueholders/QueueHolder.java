@@ -151,4 +151,29 @@ public abstract class QueueHolder {
     public boolean isPersistent() {
         return false;
     }
+
+    /**
+     * Returns the epoch-millisecond timestamp of the most recent player send recorded by
+     * <em>any</em> proxy instance, or {@code 0} if no send has been recorded yet.
+     *
+     * <p>Default implementation returns {@code 0} (no shared tracking).
+     * Persistent holders (e.g. Redis) should override this to return the value stored in their
+     * shared store so that cross-proxy send-rate limiting works correctly.
+     */
+    public long getSharedLastSendTimestamp() {
+        return 0;
+    }
+
+    /**
+     * Records that a player was just sent at the given epoch-millisecond {@code timestamp}.
+     *
+     * <p>Default implementation is a no-op.
+     * Persistent holders (e.g. Redis) should override this to write the value to their shared
+     * store so all proxy instances respect the same send-rate limit.
+     *
+     * @param timestamp {@code System.currentTimeMillis()} at the moment of the send
+     */
+    public void recordSharedSend(long timestamp) {
+        // no-op for in-memory holders
+    }
 }
