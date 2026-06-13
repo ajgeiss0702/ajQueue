@@ -49,10 +49,10 @@ public class RedisQueueHolder extends QueueHolder {
         if (redisClient != null && connectionPool != null) return;
 
         Config config = AjQueueAPI.getInstance().getConfig();
-        String host     = config.getString("redis.host");
-        int    port     = config.getInt("redis.port");
-        String password = config.getString("redis.password");
-        int    database = config.getInt("redis.database");
+        String host     = config.getString("redis-host");
+        int    port     = config.getInt("redis-port");
+        String password = config.getString("redis-password");
+        int    database = config.getInt("redis-database");
 
         RedisURI.Builder uriBuilder = RedisURI.builder()
                 .withHost(host)
@@ -83,9 +83,14 @@ public class RedisQueueHolder extends QueueHolder {
         );
     }
 
+    @Override
+    public void onShutdown() {
+        closeClient();
+    }
+
     /**
      * Shuts down the shared connection pool and Redis client.
-     * Should be called on plugin disable to release resources.
+     * Safe to call multiple times; subsequent calls are no-ops.
      */
     public static synchronized void closeClient() {
         if (connectionPool != null) { connectionPool.close(); connectionPool = null; }

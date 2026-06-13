@@ -131,4 +131,13 @@ public abstract class QueueHolder {
     public void onPlayerOffline(QueuePlayer player) {
         // no-op for in-memory holders; the QueuePlayerImpl object persists in the list directly
     }
+
+    /**
+     * Called once when the plugin is shutting down.
+     * Default implementation is a no-op; holders that manage external resources (e.g. a Redis
+     * connection pool) should override this to release them cleanly.
+     */
+    public void onShutdown() {
+        // no-op for in-memory holders
+    }
 }
