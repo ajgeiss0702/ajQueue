@@ -827,6 +827,24 @@ public class QueueManagerImpl implements QueueManager {
 
             if(!server.isOnline()) continue;
 
+            // Cross-proxy rate limiting: each proxy instance has its own independent scheduler,
+            // so without this check two proxies would each send a player in the same cycle,
+            // doubling the effective send rate. Read the shared Redis timestamp and skip this
+            // server if not enough time has elapsed since any proxy last sent.
+            if (queueHolder.isPersistent()) {
+                long sharedTimestamp = queueHolder.getSharedLastSendTimestamp();
+                if (sharedTimestamp > 0) {
+                    long elapsed = System.currentTimeMillis() - sharedTimestamp;
+                    long required = (long) Math.floor(main.getTimeBetweenPlayers() * 1000);
+                    if (elapsed < required) {
+                        Debug.info("sendPlayers: skipping " + server.getName()
+                                + " - cross-proxy rate limit: only " + elapsed + "ms since last send across all proxies"
+                                + " (need " + required + "ms)");
+                        continue;
+                    }
+                }
+            }
+
             QueueType lastSend = server.getLastQueueSend();
             ExpressRatio expressRatio = main.isPremium() ? main.getExpressRatio() : ExpressRatio.oneToOne();
 
@@ -846,7 +864,7 @@ public class QueueManagerImpl implements QueueManager {
                 Debug.info(server.getName() + " currently on express " + express + " with " + server.getSendCount() + " and lastSend " + lastSend);
             }
 
-//            Debug.info("should send when back online: " + !server.isGroup() + " && " + main.getConfig().getBoolean("send-all-when-back-online") + " && " + server.getServers().get(0).justWentOnline());
+            Debug.info("should send when back online: " + !server.isGroup() + " && " + main.getConfig().getBoolean("send-all-when-back-online") + " && " + server.getServers().get(0).justWentOnline());
             if(!server.isGroup() && main.getConfig().getBoolean("send-all-when-back-online") && server.getServers().get(0).justWentOnline()) {
                 List<QueuePlayer> expressPlayers = new ArrayList<>(server.getQueueHolder().getAllExpressPlayers());
                 List<QueuePlayer> standardPlayers = new ArrayList<>(server.getQueueHolder().getAllStandardPlayers());
