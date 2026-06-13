@@ -1,12 +1,16 @@
 package us.ajg0702.queue.common;
+
 import com.google.common.collect.ImmutableList;
+
 import io.lettuce.core.RedisClient;
 import io.lettuce.core.RedisURI;
 import io.lettuce.core.api.StatefulRedisConnection;
 import io.lettuce.core.api.sync.RedisCommands;
 import io.lettuce.core.support.ConnectionPoolSupport;
+
 import org.apache.commons.pool2.impl.GenericObjectPool;
 import org.apache.commons.pool2.impl.GenericObjectPoolConfig;
+
 import us.ajg0702.queue.api.AjQueueAPI;
 import us.ajg0702.queue.api.players.AdaptedPlayer;
 import us.ajg0702.queue.api.players.QueuePlayer;
@@ -15,46 +19,41 @@ import us.ajg0702.queue.api.queues.QueueServer;
 import us.ajg0702.queue.api.queues.QueueType;
 import us.ajg0702.queue.common.players.QueuePlayerImpl;
 import us.ajg0702.utils.common.Config;
+
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.Predicate;
-import java.util.logging.Logger;
+
 /**
- * A QueueHolder that stores queued players in Redis using Lettuce, enabling cross-proxy queue syncing.
+ * Redis-backed {@link QueueHolder} implementation.
  *
- * Configure via config.yml:
- *   queue-holder: redis
- *   redis:
- *     host: localhost
- *     port: 6379
- *     password: ""
- *     database: 0
+ * <p>Each queue server gets two Redis lists:
+ * {@code ajqueue:queue:<name>:standard} and {@code ajqueue:queue:<name>:express}.
+ * Players are stored as pipe-delimited strings (see {@link #serialize} / {@link #deserialize}).
+ *
+ * <p>The Lettuce client and connection pool are shared across all instances via static state
+ * and initialised lazily on the first constructor call.
  */
 public class RedisQueueHolder extends QueueHolder {
+
     private static RedisClient redisClient;
     private static GenericObjectPool<StatefulRedisConnection<String, String>> connectionPool;
-    private final String standardKey;
-    private final String expressKey;
-    private final QueueServer queueServer;
-    public RedisQueueHolder(QueueServer queueServer) {
-        super(queueServer);
-        this.queueServer = queueServer;
-        String safeName = queueServer.getName().replace(":", "_");
-        this.standardKey = "ajqueue:queue:" + safeName + ":standard";
-        this.expressKey  = "ajqueue:queue:" + safeName + ":express";
-        ensureClient();
-    }
+
+    /**
+     * Initialises the shared {@link RedisClient} and connection pool from plugin config.
+     * No-ops if already initialised. Safe to call from multiple threads.
+     */
     private static synchronized void ensureClient() {
-        if (redisClient != null && connectionPool != null) {
-            return;
-        }
+        if (redisClient != null && connectionPool != null) return;
+
         Config config = AjQueueAPI.getInstance().getConfig();
         String host     = config.getString("redis.host");
         int    port     = config.getInt("redis.port");
         String password = config.getString("redis.password");
         int    database = config.getInt("redis.database");
+
         RedisURI.Builder uriBuilder = RedisURI.builder()
                 .withHost(host)
                 .withPort(port)
@@ -63,43 +62,84 @@ public class RedisQueueHolder extends QueueHolder {
         if (password != null && !password.isEmpty()) {
             uriBuilder.withPassword(password.toCharArray());
         }
+
         redisClient = RedisClient.create(uriBuilder.build());
+
         GenericObjectPoolConfig<StatefulRedisConnection<String, String>> poolConfig =
                 new GenericObjectPoolConfig<>();
         poolConfig.setMaxTotal(10);
         poolConfig.setMaxIdle(5);
         poolConfig.setMinIdle(1);
-        // Never ping on borrow — avoids blocking the caller thread every time
+        // Avoid blocking the caller thread on every borrow with a ping round-trip.
         poolConfig.setTestOnBorrow(false);
         poolConfig.setTestOnReturn(false);
-        // Fail fast if pool is exhausted rather than blocking forever
+        // Fail fast when the pool is exhausted rather than queuing callers indefinitely.
         poolConfig.setMaxWait(Duration.ofSeconds(5));
+
         connectionPool = ConnectionPoolSupport.createGenericObjectPool(
                 () -> redisClient.connect(),
                 poolConfig,
-                true   // wrapConnections=true: close() returns to pool instead of destroying
+                true   // wrapConnections=true: close() returns the connection to the pool
         );
     }
-    // -----------------------------------------------------------------------
-    // Redis execution — runs on the dedicated redis thread, never the main thread
-    // -----------------------------------------------------------------------
+
+    /**
+     * Shuts down the shared connection pool and Redis client.
+     * Should be called on plugin disable to release resources.
+     */
+    public static synchronized void closeClient() {
+        if (connectionPool != null) { connectionPool.close(); connectionPool = null; }
+        if (redisClient != null)    { redisClient.shutdown(); redisClient = null; }
+    }
+
+    private final QueueServer queueServer;
+    private final String standardKey;
+    private final String expressKey;
+
+    /**
+     * Creates a holder backed by Redis for the given queue server.
+     * The Redis client is initialised on first use if it has not been already.
+     *
+     * @param queueServer the server whose queue this holder manages
+     */
+    public RedisQueueHolder(QueueServer queueServer) {
+        super(queueServer);
+        this.queueServer = queueServer;
+        String safeName = queueServer.getName().replace(":", "_");
+        this.standardKey = "ajqueue:queue:" + safeName + ":standard";
+        this.expressKey  = "ajqueue:queue:" + safeName + ":express";
+        ensureClient();
+    }
+
+    /** Callback executed inside a borrowed Redis connection. */
     @FunctionalInterface
     private interface RedisAction<T> {
         T run(RedisCommands<String, String> commands) throws Exception;
     }
+
+    /**
+     * Borrows a connection from the pool, runs {@code action}, then returns the connection.
+     *
+     * @param opName label included in the exception message if the operation fails
+     * @param action the Redis work to perform
+     * @return whatever {@code action} returns
+     * @throws RuntimeException wrapping any exception thrown by the action or pool
+     */
     private <T> T withRedis(String opName, RedisAction<T> action) {
-        long t0 = System.currentTimeMillis();
         try (StatefulRedisConnection<String, String> conn = connectionPool.borrowObject()) {
-            T result = action.run(conn.sync());
-            return result;
+            return action.run(conn.sync());
         } catch (Exception e) {
             throw new RuntimeException("Redis operation failed [" + opName + "]", e);
         }
     }
-    // -----------------------------------------------------------------------
-    // Serialization: uuid|name|queueType|priority|maxOfflineTime|leaveTime
-    // -----------------------------------------------------------------------
+
+    /** Field separator used in the pipe-delimited Redis value. */
     private static final String SEP = "|";
+
+    /**
+     * Encodes a {@link QueuePlayer} as a pipe-delimited string.
+     * Format: {@code uuid|name|queueType|priority|maxOfflineTime|leaveTime}
+     */
     private String serialize(QueuePlayer player) {
         long leaveTime = (player instanceof QueuePlayerImpl)
                 ? ((QueuePlayerImpl) player).getLeaveTime()
@@ -111,40 +151,57 @@ public class RedisQueueHolder extends QueueHolder {
                 + SEP + player.getMaxOfflineTime()
                 + SEP + leaveTime;
     }
+
+    /**
+     * Reconstructs a {@link QueuePlayer} from a serialized Redis value.
+     * Returns {@code null} if the value is malformed or the UUID is invalid.
+     * If the player is currently online, their {@link AdaptedPlayer} is attached.
+     */
     private QueuePlayer deserialize(String raw) {
         if (raw == null) return null;
         String[] parts = raw.split("\\|", 6);
         if (parts.length < 5) return null;
+
         UUID uuid;
         try { uuid = UUID.fromString(parts[0]); } catch (IllegalArgumentException e) { return null; }
+
         String name = parts[1];
+
         QueueType queueType;
         try { queueType = QueueType.valueOf(parts[2]); } catch (IllegalArgumentException e) { queueType = QueueType.STANDARD; }
+
         int priority, maxOfflineTime;
         try {
             priority       = Integer.parseInt(parts[3]);
             maxOfflineTime = Integer.parseInt(parts[4]);
         } catch (NumberFormatException e) { priority = 0; maxOfflineTime = 0; }
-        // Field 6: leaveTime (added in v2 of the format; default 0 for old entries)
+
         long leaveTime = 0;
         if (parts.length >= 6) {
             try { leaveTime = Long.parseLong(parts[5]); } catch (NumberFormatException ignored) {}
         }
+
         QueuePlayerImpl qp = new QueuePlayerImpl(uuid, name, queueServer, priority, maxOfflineTime, queueType);
         if (leaveTime > 0) qp.restoreLeaveTime(leaveTime);
         AdaptedPlayer online = AjQueueAPI.getInstance().getPlatformMethods().getPlayer(uuid);
         if (online != null) qp.setPlayer(online);
         return qp;
     }
-    // -----------------------------------------------------------------------
-    // QueueHolder implementation
-    // -----------------------------------------------------------------------
-    @Override public String getIdentifier() { return "redis"; }
+
+    @Override
+    public String getIdentifier() { return "redis"; }
+
     @Override
     public void addPlayer(QueuePlayer player) {
         String key = player.isInStandardQueue() ? standardKey : expressKey;
         withRedis("addPlayer:" + player.getUniqueId(), cmd -> cmd.rpush(key, serialize(player)));
     }
+
+    /**
+     * Inserts {@code player} at the given 1-based {@code position} in the queue.
+     * The position is clamped to {@code [1, size+1]}, so passing a value larger than
+     * the current size is equivalent to appending.
+     */
     @Override
     public void addPlayer(QueuePlayer player, int position) {
         String key = player.isInStandardQueue() ? standardKey : expressKey;
@@ -156,123 +213,17 @@ public class RedisQueueHolder extends QueueHolder {
             return null;
         });
     }
+
     @Override
     public void removePlayer(QueuePlayer player) {
         String key = player.isInStandardQueue() ? standardKey : expressKey;
         withRedis("removePlayer:" + player.getUniqueId(),
                 cmd -> { removeByUuid(cmd, key, player.getUniqueId()); return null; });
     }
-    @Override
-    public QueuePlayer findPlayer(UUID uuid) {
-        return withRedis("findPlayer:uuid:" + uuid, cmd -> {
-            QueuePlayer p = findInList(cmd, standardKey, uuid);
-            if (p != null) return p;
-            return findInList(cmd, expressKey, uuid);
-        });
-    }
-    @Override
-    public QueuePlayer findPlayer(String name) {
-        return withRedis("findPlayer:name:" + name, cmd -> {
-            QueuePlayer p = findInListByName(cmd, standardKey, name);
-            if (p != null) return p;
-            return findInListByName(cmd, expressKey, name);
-        });
-    }
-    @Override
-    public int getStandardQueueSize() {
-        return withRedis("getStandardQueueSize:" + standardKey,
-                cmd -> Math.toIntExact(cmd.llen(standardKey)));
-    }
-    @Override
-    public int getExpressQueueSize() {
-        return withRedis("getExpressQueueSize:" + expressKey,
-                cmd -> Math.toIntExact(cmd.llen(expressKey)));
-    }
-    @Override
-    public int getTotalQueueSize() {
-        return withRedis("getTotalQueueSize",
-                cmd -> Math.toIntExact(cmd.llen(standardKey) + cmd.llen(expressKey)));
-    }
-    @Override
-    public int getTotalOnlineQueueSize() {
-        Predicate<QueuePlayer> online = p -> p.getPlayer() != null && p.getPlayer().isConnected();
-        return withRedis("getTotalOnlineQueueSize", cmd -> {
-            long count = cmd.lrange(standardKey, 0, -1).stream()
-                    .map(this::deserialize).filter(p -> p != null && online.test(p)).count();
-            count += cmd.lrange(expressKey, 0, -1).stream()
-                    .map(this::deserialize).filter(p -> p != null && online.test(p)).count();
-            return Math.toIntExact(count);
-        });
-    }
-    @Override
-    public int getPosition(QueuePlayer player) {
-        String key = player.isInStandardQueue() ? standardKey : expressKey;
-        // Compare UUID prefix in raw string to avoid deserializing every entry (which would
-        // re-enter withRedis and deadlock the connection pool via nested borrow).
-        String uuidPrefix = player.getUniqueId().toString() + SEP;
-        return withRedis("getPosition:" + player.getUniqueId(), cmd -> {
-            List<String> list = cmd.lrange(key, 0, -1);
-            for (int i = 0; i < list.size(); i++) {
-                if (list.get(i).startsWith(uuidPrefix)) return i + 1;
-            }
-            return -1;
-        });
-    }
-    @Override
-    public List<QueuePlayer> getAllStandardPlayers() {
-        return withRedis("getAllStandardPlayers",
-                cmd -> deserializeList(cmd.lrange(standardKey, 0, -1)));
-    }
-    @Override
-    public List<QueuePlayer> getAllExpressPlayers() {
-        return withRedis("getAllExpressPlayers",
-                cmd -> deserializeList(cmd.lrange(expressKey, 0, -1)));
-    }
-    // -----------------------------------------------------------------------
-    // Private helpers
-    // -----------------------------------------------------------------------
-    private List<QueuePlayer> deserializeList(List<String> raw) {
-        List<QueuePlayer> result = new ArrayList<>(raw.size());
-        for (int i = 0; i < raw.size(); i++) {
-            QueuePlayer p = deserialize(raw.get(i));
-            if (p != null) {
-                // Set lastPosition to the known 1-based position so that positionChange()
-                // comparisons are accurate without requiring another Redis round-trip.
-                ((QueuePlayerImpl) p).lastPosition = i + 1;
-                result.add(p);
-            }
-        }
-        return ImmutableList.copyOf(result);
-    }
-    private QueuePlayer findInList(RedisCommands<String, String> cmd, String key, UUID uuid) {
-        for (String raw : cmd.lrange(key, 0, -1)) {
-            QueuePlayer p = deserialize(raw);
-            if (p != null && p.getUniqueId().equals(uuid)) return p;
-        }
-        return null;
-    }
-    private QueuePlayer findInListByName(RedisCommands<String, String> cmd, String key, String name) {
-        for (String raw : cmd.lrange(key, 0, -1)) {
-            QueuePlayer p = deserialize(raw);
-            if (p != null && p.getName().equalsIgnoreCase(name)) return p;
-        }
-        return null;
-    }
-    private void removeByUuid(RedisCommands<String, String> cmd, String key, UUID uuid) {
-        for (String raw : cmd.lrange(key, 0, -1)) {
-            QueuePlayer p = deserialize(raw);
-            if (p != null && p.getUniqueId().equals(uuid)) {
-                cmd.lrem(key, 0, raw);
-            }
-        }
-    }
-    private void rebuildList(RedisCommands<String, String> cmd, String key, List<String> items) {
-        cmd.del(key);
-        if (!items.isEmpty()) cmd.rpush(key, items.toArray(new String[0]));
-    }
+
     /**
-     * Persists the updated leaveTime (and maxOfflineTime) back to Redis so every other proxy
-     * sees the player as offline on their next getAllPlayers() call.
+     * Persists the player's current state (including {@code leaveTime}) back into Redis
+     * so that offline-queue tracking survives server restarts or cross-node reads.
      */
     @Override
     public void onPlayerOffline(QueuePlayer player) {
@@ -290,11 +241,138 @@ public class RedisQueueHolder extends QueueHolder {
             return null;
         });
     }
+
+    @Override
+    public QueuePlayer findPlayer(UUID uuid) {
+        return withRedis("findPlayer:uuid:" + uuid, cmd -> {
+            QueuePlayer p = findInList(cmd, standardKey, uuid);
+            return (p != null) ? p : findInList(cmd, expressKey, uuid);
+        });
+    }
+
+    @Override
+    public QueuePlayer findPlayer(String name) {
+        return withRedis("findPlayer:name:" + name, cmd -> {
+            QueuePlayer p = findInListByName(cmd, standardKey, name);
+            return (p != null) ? p : findInListByName(cmd, expressKey, name);
+        });
+    }
+
     /**
-     * Closes the Lettuce client and connection pool. Called on plugin shutdown.
+     * Returns the 1-based position of {@code player} in their queue, or {@code -1} if not found.
+     *
+     * <p>Uses a raw-string prefix scan instead of full deserialization to avoid re-entering
+     * {@link #withRedis} (which would deadlock by trying to borrow a second connection from
+     * the same thread).
      */
-    public static synchronized void closeClient() {
-        if (connectionPool != null) { connectionPool.close(); connectionPool = null; }
-        if (redisClient != null) { redisClient.shutdown(); redisClient = null; }
+    @Override
+    public int getPosition(QueuePlayer player) {
+        String key = player.isInStandardQueue() ? standardKey : expressKey;
+        String uuidPrefix = player.getUniqueId().toString() + SEP;
+        return withRedis("getPosition:" + player.getUniqueId(), cmd -> {
+            List<String> list = cmd.lrange(key, 0, -1);
+            for (int i = 0; i < list.size(); i++) {
+                if (list.get(i).startsWith(uuidPrefix)) return i + 1;
+            }
+            return -1;
+        });
+    }
+
+    @Override
+    public int getStandardQueueSize() {
+        return withRedis("getStandardQueueSize",
+                cmd -> Math.toIntExact(cmd.llen(standardKey)));
+    }
+
+    @Override
+    public int getExpressQueueSize() {
+        return withRedis("getExpressQueueSize",
+                cmd -> Math.toIntExact(cmd.llen(expressKey)));
+    }
+
+    @Override
+    public int getTotalQueueSize() {
+        return withRedis("getTotalQueueSize",
+                cmd -> Math.toIntExact(cmd.llen(standardKey) + cmd.llen(expressKey)));
+    }
+
+    @Override
+    public int getTotalOnlineQueueSize() {
+        Predicate<QueuePlayer> isOnline = p -> p.getPlayer() != null && p.getPlayer().isConnected();
+        return withRedis("getTotalOnlineQueueSize", cmd -> {
+            long count = cmd.lrange(standardKey, 0, -1).stream()
+                    .map(this::deserialize).filter(p -> p != null && isOnline.test(p)).count();
+            count += cmd.lrange(expressKey, 0, -1).stream()
+                    .map(this::deserialize).filter(p -> p != null && isOnline.test(p)).count();
+            return Math.toIntExact(count);
+        });
+    }
+
+    @Override
+    public List<QueuePlayer> getAllStandardPlayers() {
+        return withRedis("getAllStandardPlayers",
+                cmd -> deserializeList(cmd.lrange(standardKey, 0, -1)));
+    }
+
+    @Override
+    public List<QueuePlayer> getAllExpressPlayers() {
+        return withRedis("getAllExpressPlayers",
+                cmd -> deserializeList(cmd.lrange(expressKey, 0, -1)));
+    }
+
+    // --- private helpers -----------------------------------------------------
+
+    /**
+     * Deserializes a raw Redis list into an immutable {@link QueuePlayer} list.
+     * Each player's {@code lastPosition} is set to their index so that
+     * {@code positionChange()} comparisons work without an extra Redis round-trip.
+     */
+    private List<QueuePlayer> deserializeList(List<String> raw) {
+        List<QueuePlayer> result = new ArrayList<>(raw.size());
+        for (int i = 0; i < raw.size(); i++) {
+            QueuePlayer p = deserialize(raw.get(i));
+            if (p != null) {
+                ((QueuePlayerImpl) p).lastPosition = i + 1;
+                result.add(p);
+            }
+        }
+        return ImmutableList.copyOf(result);
+    }
+
+    /** Scans {@code key} and returns the first entry whose UUID matches, or {@code null}. */
+    private QueuePlayer findInList(RedisCommands<String, String> cmd, String key, UUID uuid) {
+        for (String raw : cmd.lrange(key, 0, -1)) {
+            QueuePlayer p = deserialize(raw);
+            if (p != null && p.getUniqueId().equals(uuid)) return p;
+        }
+        return null;
+    }
+
+    /** Scans {@code key} and returns the first entry whose name matches (case-insensitive), or {@code null}. */
+    private QueuePlayer findInListByName(RedisCommands<String, String> cmd, String key, String name) {
+        for (String raw : cmd.lrange(key, 0, -1)) {
+            QueuePlayer p = deserialize(raw);
+            if (p != null && p.getName().equalsIgnoreCase(name)) return p;
+        }
+        return null;
+    }
+
+    /** Removes all entries in {@code key} whose UUID matches. */
+    private void removeByUuid(RedisCommands<String, String> cmd, String key, UUID uuid) {
+        for (String raw : cmd.lrange(key, 0, -1)) {
+            QueuePlayer p = deserialize(raw);
+            if (p != null && p.getUniqueId().equals(uuid)) {
+                cmd.lrem(key, 0, raw);
+            }
+        }
+    }
+
+    /**
+     * Replaces the Redis list at {@code key} with {@code items} atomically via DEL + RPUSH.
+     * Used when an in-place index operation (e.g. positional insert) isn't possible.
+     */
+    private void rebuildList(RedisCommands<String, String> cmd, String key, List<String> items) {
+        cmd.del(key);
+        if (!items.isEmpty()) cmd.rpush(key, items.toArray(new String[0]));
     }
 }
