@@ -33,6 +33,8 @@ tasks.shadowJar {
     relocate("io.leangen.geantyref", "us.ajg0702.queue.libs.geantyref")
     relocate("org.spongepowered", "us.ajg0702.queue.libs.sponge")
     relocate("org.yaml", "us.ajg0702.queue.libs.yaml")
+    relocate("io.lettuce", "us.ajg0702.queue.libs.lettuce")
+    relocate("org.apache.commons.pool2", "us.ajg0702.queue.libs.pool2")
     archiveBaseName.set("ajQueue")
     archiveClassifier.set("")
 }
