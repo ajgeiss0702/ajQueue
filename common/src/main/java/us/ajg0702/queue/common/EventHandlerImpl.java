@@ -73,8 +73,6 @@ public class EventHandlerImpl implements EventHandler {
         ImmutableList<QueuePlayer> queues = main.getQueueManager().findPlayerInQueues(player);
         for(QueuePlayer queuePlayer : queues) {
             ((QueuePlayerImpl) queuePlayer).setLeaveTime(System.currentTimeMillis());
-            // Notify the holder so persistent backends (e.g. Redis) can write the updated
-            // leaveTime back to their store, making other proxies aware the player went offline.
             queuePlayer.getQueueServer().getQueueHolder().onPlayerOffline(queuePlayer);
         }
         main.getQueueManager().clear(player);
