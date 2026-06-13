@@ -363,19 +363,18 @@ express-ratio: "1:1"
 queue-holder: default
 
 # Redis connection settings (only used when queue-holder is set to 'redis')
-redis:
-  # Redis server hostname or IP
-  #  Default: localhost
-  host: localhost
-  # Redis server port
-  #  Default: 6379
-  port: 6379
-  # Redis password (leave empty if no authentication is required)
-  #  Default: ""
-  password: ""
-  # Redis database index
-  #  Default: 0
-  database: 0
+# Redis server hostname or IP
+#  Default: localhost
+redis-host: localhost
+# Redis server port
+#  Default: 6379
+redis-port: 6379
+# Redis password (leave empty if no authentication is required)
+#  Default: ""
+redis-password: ""
+# Redis database index
+#  Default: 0
+redis-database: 0
 
 
 # Should we enable the ajqueue.make-room permission?
