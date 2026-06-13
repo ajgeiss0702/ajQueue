@@ -325,8 +325,6 @@ public class RedisQueueHolder extends QueueHolder {
                 cmd -> deserializeList(cmd.lrange(expressKey, 0, -1)));
     }
 
-    // --- private helpers -----------------------------------------------------
-
     /**
      * Deserializes a raw Redis list into an immutable {@link QueuePlayer} list.
      * Each player's {@code lastPosition} is set to their index so that
