@@ -18,6 +18,7 @@ import us.ajg0702.queue.api.queueholders.QueueHolder;
 import us.ajg0702.queue.api.queues.QueueServer;
 import us.ajg0702.queue.api.queues.QueueType;
 import us.ajg0702.queue.common.players.QueuePlayerImpl;
+import us.ajg0702.queue.common.utils.Debug;
 import us.ajg0702.utils.common.Config;
 
 import java.time.Duration;
@@ -54,6 +55,10 @@ public class RedisQueueHolder extends QueueHolder {
         String password = config.getString("redis-password");
         int    database = config.getInt("redis-database");
 
+        AjQueueAPI.getInstance().getLogger().info(
+                "[redis] Connecting to Redis at " + host + ":" + port + " (database " + database + ")"
+        );
+
         RedisURI.Builder uriBuilder = RedisURI.builder()
                 .withHost(host)
                 .withPort(port)
@@ -81,6 +86,13 @@ public class RedisQueueHolder extends QueueHolder {
                 poolConfig,
                 true   // wrapConnections=true: close() returns the connection to the pool
         );
+
+        AjQueueAPI.getInstance().getLogger().info("[redis] Redis connection pool initialised");
+    }
+
+    @Override
+    public boolean isPersistent() {
+        return true;
     }
 
     @Override
@@ -114,6 +126,8 @@ public class RedisQueueHolder extends QueueHolder {
         this.standardKey = "ajqueue:queue:" + safeName + ":standard";
         this.expressKey  = "ajqueue:queue:" + safeName + ":express";
         ensureClient();
+        Debug.info("[redis] RedisQueueHolder created for " + queueServer.getName()
+                + " (standardKey=" + standardKey + ", expressKey=" + expressKey + ")");
     }
 
     /** Callback executed inside a borrowed Redis connection. */
@@ -134,6 +148,9 @@ public class RedisQueueHolder extends QueueHolder {
         try (StatefulRedisConnection<String, String> conn = connectionPool.borrowObject()) {
             return action.run(conn.sync());
         } catch (Exception e) {
+            AjQueueAPI.getInstance().getLogger().warning(
+                    "[redis] Operation failed [" + opName + "]: " + e.getMessage()
+            );
             throw new RuntimeException("Redis operation failed [" + opName + "]", e);
         }
     }
@@ -160,26 +177,38 @@ public class RedisQueueHolder extends QueueHolder {
     /**
      * Reconstructs a {@link QueuePlayer} from a serialized Redis value.
      * Returns {@code null} if the value is malformed or the UUID is invalid.
-     * If the player is currently online, their {@link AdaptedPlayer} is attached.
+     * If the player is currently online on this proxy, their {@link AdaptedPlayer} is attached.
      */
     private QueuePlayer deserialize(String raw) {
         if (raw == null) return null;
         String[] parts = raw.split("\\|", 6);
-        if (parts.length < 5) return null;
+        if (parts.length < 5) {
+            Debug.info("[redis] deserialize: malformed entry (only " + parts.length + " fields): " + raw);
+            return null;
+        }
 
         UUID uuid;
-        try { uuid = UUID.fromString(parts[0]); } catch (IllegalArgumentException e) { return null; }
+        try { uuid = UUID.fromString(parts[0]); } catch (IllegalArgumentException e) {
+            Debug.info("[redis] deserialize: invalid UUID in entry: " + raw);
+            return null;
+        }
 
         String name = parts[1];
 
         QueueType queueType;
-        try { queueType = QueueType.valueOf(parts[2]); } catch (IllegalArgumentException e) { queueType = QueueType.STANDARD; }
+        try { queueType = QueueType.valueOf(parts[2]); } catch (IllegalArgumentException e) {
+            Debug.info("[redis] deserialize: unknown QueueType '" + parts[2] + "' for " + uuid + ", defaulting to STANDARD");
+            queueType = QueueType.STANDARD;
+        }
 
         int priority, maxOfflineTime;
         try {
             priority       = Integer.parseInt(parts[3]);
             maxOfflineTime = Integer.parseInt(parts[4]);
-        } catch (NumberFormatException e) { priority = 0; maxOfflineTime = 0; }
+        } catch (NumberFormatException e) {
+            Debug.info("[redis] deserialize: bad priority/maxOfflineTime for " + uuid);
+            priority = 0; maxOfflineTime = 0;
+        }
 
         long leaveTime = 0;
         if (parts.length >= 6) {
@@ -188,8 +217,15 @@ public class RedisQueueHolder extends QueueHolder {
 
         QueuePlayerImpl qp = new QueuePlayerImpl(uuid, name, queueServer, priority, maxOfflineTime, queueType);
         if (leaveTime > 0) qp.restoreLeaveTime(leaveTime);
+
         AdaptedPlayer online = AjQueueAPI.getInstance().getPlatformMethods().getPlayer(uuid);
-        if (online != null) qp.setPlayer(online);
+        if (online != null) {
+            qp.setPlayer(online);
+            Debug.info("[redis] deserialize: " + name + " (" + uuid + ") is online on this proxy");
+        } else {
+            Debug.info("[redis] deserialize: " + name + " (" + uuid + ") is NOT on this proxy"
+                    + (leaveTime > 0 ? " (leaveTime=" + leaveTime + ")" : " (online on another proxy)"));
+        }
         return qp;
     }
 
@@ -199,7 +235,11 @@ public class RedisQueueHolder extends QueueHolder {
     @Override
     public void addPlayer(QueuePlayer player) {
         String key = player.isInStandardQueue() ? standardKey : expressKey;
-        withRedis("addPlayer:" + player.getUniqueId(), cmd -> cmd.rpush(key, serialize(player)));
+        String serialized = serialize(player);
+        Debug.info("[redis] addPlayer: " + player.getName() + " (" + player.getUniqueId()
+                + ") -> key=" + key + " value=" + serialized);
+        withRedis("addPlayer:" + player.getUniqueId(), cmd -> cmd.rpush(key, serialized));
+        Debug.info("[redis] addPlayer: done for " + player.getName());
     }
 
     /**
@@ -210,20 +250,27 @@ public class RedisQueueHolder extends QueueHolder {
     @Override
     public void addPlayer(QueuePlayer player, int position) {
         String key = player.isInStandardQueue() ? standardKey : expressKey;
+        String serialized = serialize(player);
+        Debug.info("[redis] addPlayer[pos=" + position + "]: " + player.getName()
+                + " (" + player.getUniqueId() + ") -> key=" + key);
         withRedis("addPlayer[pos=" + position + "]:" + player.getUniqueId(), cmd -> {
             List<String> current = new ArrayList<>(cmd.lrange(key, 0, -1));
             int insertAt = Math.max(0, Math.min(position - 1, current.size()));
-            current.add(insertAt, serialize(player));
+            current.add(insertAt, serialized);
             rebuildList(cmd, key, current);
             return null;
         });
+        Debug.info("[redis] addPlayer[pos=" + position + "]: done for " + player.getName());
     }
 
     @Override
     public void removePlayer(QueuePlayer player) {
         String key = player.isInStandardQueue() ? standardKey : expressKey;
+        Debug.info("[redis] removePlayer: " + player.getName() + " (" + player.getUniqueId()
+                + ") from key=" + key);
         withRedis("removePlayer:" + player.getUniqueId(),
                 cmd -> { removeByUuid(cmd, key, player.getUniqueId()); return null; });
+        Debug.info("[redis] removePlayer: done for " + player.getName());
     }
 
     /**
@@ -235,31 +282,58 @@ public class RedisQueueHolder extends QueueHolder {
         String key = player.isInStandardQueue() ? standardKey : expressKey;
         String uuidPrefix = player.getUniqueId().toString() + SEP;
         String serialized = serialize(player);
+        long leaveTime = (player instanceof QueuePlayerImpl) ? ((QueuePlayerImpl) player).getLeaveTime() : 0L;
+        Debug.info("[redis] onPlayerOffline: " + player.getName() + " (" + player.getUniqueId()
+                + ") leaveTime=" + leaveTime + " key=" + key);
         withRedis("onPlayerOffline:" + player.getUniqueId(), cmd -> {
             List<String> list = cmd.lrange(key, 0, -1);
             for (int i = 0; i < list.size(); i++) {
                 if (list.get(i).startsWith(uuidPrefix)) {
                     cmd.lset(key, i, serialized);
+                    Debug.info("[redis] onPlayerOffline: updated entry at index " + i + " for " + player.getName());
                     return null;
                 }
             }
+            Debug.info("[redis] onPlayerOffline: player " + player.getName() + " not found in Redis key=" + key);
             return null;
         });
     }
 
     @Override
     public QueuePlayer findPlayer(UUID uuid) {
+        Debug.info("[redis] findPlayer(uuid): " + uuid + " in " + queueServer.getName());
         return withRedis("findPlayer:uuid:" + uuid, cmd -> {
             QueuePlayer p = findInList(cmd, standardKey, uuid);
-            return (p != null) ? p : findInList(cmd, expressKey, uuid);
+            if (p != null) {
+                Debug.info("[redis] findPlayer(uuid): found " + p.getName() + " in standard queue");
+                return p;
+            }
+            p = findInList(cmd, expressKey, uuid);
+            if (p != null) {
+                Debug.info("[redis] findPlayer(uuid): found " + p.getName() + " in express queue");
+            } else {
+                Debug.info("[redis] findPlayer(uuid): " + uuid + " NOT found in " + queueServer.getName());
+            }
+            return p;
         });
     }
 
     @Override
     public QueuePlayer findPlayer(String name) {
+        Debug.info("[redis] findPlayer(name): " + name + " in " + queueServer.getName());
         return withRedis("findPlayer:name:" + name, cmd -> {
             QueuePlayer p = findInListByName(cmd, standardKey, name);
-            return (p != null) ? p : findInListByName(cmd, expressKey, name);
+            if (p != null) {
+                Debug.info("[redis] findPlayer(name): found " + name + " in standard queue");
+                return p;
+            }
+            p = findInListByName(cmd, expressKey, name);
+            if (p != null) {
+                Debug.info("[redis] findPlayer(name): found " + name + " in express queue");
+            } else {
+                Debug.info("[redis] findPlayer(name): " + name + " NOT found in " + queueServer.getName());
+            }
+            return p;
         });
     }
 
@@ -277,8 +351,13 @@ public class RedisQueueHolder extends QueueHolder {
         return withRedis("getPosition:" + player.getUniqueId(), cmd -> {
             List<String> list = cmd.lrange(key, 0, -1);
             for (int i = 0; i < list.size(); i++) {
-                if (list.get(i).startsWith(uuidPrefix)) return i + 1;
+                if (list.get(i).startsWith(uuidPrefix)) {
+                    Debug.info("[redis] getPosition: " + player.getName() + " is at position " + (i + 1)
+                            + " in key=" + key);
+                    return i + 1;
+                }
             }
+            Debug.info("[redis] getPosition: " + player.getName() + " NOT found in key=" + key);
             return -1;
         });
     }
@@ -309,20 +388,30 @@ public class RedisQueueHolder extends QueueHolder {
                     .map(this::deserialize).filter(p -> p != null && isOnline.test(p)).count();
             count += cmd.lrange(expressKey, 0, -1).stream()
                     .map(this::deserialize).filter(p -> p != null && isOnline.test(p)).count();
+            Debug.info("[redis] getTotalOnlineQueueSize for " + queueServer.getName() + ": " + count
+                    + " (total in Redis: " + (cmd.llen(standardKey) + cmd.llen(expressKey)) + ")");
             return Math.toIntExact(count);
         });
     }
 
     @Override
     public List<QueuePlayer> getAllStandardPlayers() {
-        return withRedis("getAllStandardPlayers",
-                cmd -> deserializeList(cmd.lrange(standardKey, 0, -1)));
+        return withRedis("getAllStandardPlayers", cmd -> {
+            List<String> raw = cmd.lrange(standardKey, 0, -1);
+            Debug.info("[redis] getAllStandardPlayers for " + queueServer.getName()
+                    + ": " + raw.size() + " entries in Redis");
+            return deserializeList(raw);
+        });
     }
 
     @Override
     public List<QueuePlayer> getAllExpressPlayers() {
-        return withRedis("getAllExpressPlayers",
-                cmd -> deserializeList(cmd.lrange(expressKey, 0, -1)));
+        return withRedis("getAllExpressPlayers", cmd -> {
+            List<String> raw = cmd.lrange(expressKey, 0, -1);
+            Debug.info("[redis] getAllExpressPlayers for " + queueServer.getName()
+                    + ": " + raw.size() + " entries in Redis");
+            return deserializeList(raw);
+        });
     }
 
     /**
@@ -362,11 +451,16 @@ public class RedisQueueHolder extends QueueHolder {
 
     /** Removes all entries in {@code key} whose UUID matches. */
     private void removeByUuid(RedisCommands<String, String> cmd, String key, UUID uuid) {
+        boolean removed = false;
         for (String raw : cmd.lrange(key, 0, -1)) {
             QueuePlayer p = deserialize(raw);
             if (p != null && p.getUniqueId().equals(uuid)) {
                 cmd.lrem(key, 0, raw);
+                removed = true;
             }
+        }
+        if (!removed) {
+            Debug.info("[redis] removeByUuid: " + uuid + " not found in key=" + key);
         }
     }
 

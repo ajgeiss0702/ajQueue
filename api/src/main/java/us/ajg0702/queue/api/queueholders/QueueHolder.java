@@ -140,4 +140,15 @@ public abstract class QueueHolder {
     public void onShutdown() {
         // no-op for in-memory holders
     }
+
+    /**
+     * Returns true if this holder persists queue data independently of the JVM lifecycle
+     * (e.g. Redis, database).  When true, {@link QueueServer} will skip migrating in-memory player
+     * lists into the holder on reload - the data is already there and attempting to re-insert it
+     * creates a race-condition window where a player that was just sent by another proxy instance
+     * can be silently re-added with stale state.
+     */
+    public boolean isPersistent() {
+        return false;
+    }
 }

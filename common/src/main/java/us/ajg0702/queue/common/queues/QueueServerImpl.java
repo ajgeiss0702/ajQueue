@@ -111,36 +111,45 @@ public class QueueServerImpl implements QueueServer {
             break;
         }
 
-        List<QueuePlayer> previousPlayers = new ArrayList<>();
-        previousPlayers.addAll(previousExpressPlayers);
-        previousPlayers.addAll(previousStandardPlayers);
+        // Persistent holders (e.g. Redis) already have the data stored externally.
+        // Re-inserting previousPlayers would create a race-condition window where a player
+        // removed by another proxy instance gets silently re-added with stale state (leaveTime=0).
+        if (!queueHolder.isPersistent()) {
+            List<QueuePlayer> previousPlayers = new ArrayList<>();
+            previousPlayers.addAll(previousExpressPlayers);
+            previousPlayers.addAll(previousStandardPlayers);
 
-        for(QueuePlayer queuePlayer : previousPlayers) {
-            if(queuePlayer.getPlayer() == null) {
-                addPlayer(
-                        new QueuePlayerImpl(
-                                queuePlayer.getUniqueId(),
-                                queuePlayer.getName(),
-                                this,
-                                queuePlayer.getPriority(),
-                                queuePlayer.getMaxOfflineTime(),
-                                queuePlayer.getQueueType()
-                        )
-                );
-            } else {
-                addPlayer(
-                        new QueuePlayerImpl(
-                                queuePlayer.getPlayer(),
-                                this,
-                                queuePlayer.getPriority(),
-                                queuePlayer.getMaxOfflineTime(),
-                                queuePlayer.getQueueType()
-                        )
-                );
+            for(QueuePlayer queuePlayer : previousPlayers) {
+                if(queuePlayer.getPlayer() == null) {
+                    QueuePlayerImpl newPlayer = new QueuePlayerImpl(
+                            queuePlayer.getUniqueId(),
+                            queuePlayer.getName(),
+                            this,
+                            queuePlayer.getPriority(),
+                            queuePlayer.getMaxOfflineTime(),
+                            queuePlayer.getQueueType()
+                    );
+                    // Preserve offline-time so playerDisconnectedTooLong works correctly after reload
+                    if (queuePlayer instanceof QueuePlayerImpl) {
+                        long lt = ((QueuePlayerImpl) queuePlayer).getLeaveTime();
+                        if (lt > 0) newPlayer.restoreLeaveTime(lt);
+                    }
+                    addPlayer(newPlayer);
+                } else {
+                    addPlayer(
+                            new QueuePlayerImpl(
+                                    queuePlayer.getPlayer(),
+                                    this,
+                                    queuePlayer.getPriority(),
+                                    queuePlayer.getMaxOfflineTime(),
+                                    queuePlayer.getQueueType()
+                            )
+                    );
+                }
             }
         }
 
-        // Start off average send time as the time between players, so its not 0
+        // Start off average send time as the time between players, so it's not 0
         averageSendTime = main.getTimeBetweenPlayers();
     }
 
