@@ -69,8 +69,6 @@ public class QueueCommand extends BaseCommand {
                 sender.sendMessage(main.getMessages().getComponent("errors.too-fast-queue"));
                 return;
             }
-
-            cooldowns.put(player, System.currentTimeMillis());
         }
 
         if(args.length > 0) {
@@ -86,7 +84,10 @@ public class QueueCommand extends BaseCommand {
                 player.sendMessage(getMessages().getComponent("errors.deny-joining-from-server"));
                 return;
             }
-            main.getQueueManager().addToQueue(player, args[0]);
+            boolean success = main.getQueueManager().addToQueue(player, args[0]);
+            if(success && cooldownTime > 0) {
+                cooldowns.put(player, System.currentTimeMillis());
+            }
         } else {
             sender.sendMessage(getMessages().getComponent("commands.joinqueue.usage"));
         }

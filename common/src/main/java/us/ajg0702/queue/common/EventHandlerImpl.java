@@ -195,7 +195,7 @@ public class EventHandlerImpl implements EventHandler {
         for(QueueServer server : queuedServers) {
             if(!(server.getServerNames().contains(from.getName()))) continue;
             QueuePlayer queuePlayer = server.findPlayer(player);
-            if(queuePlayer.getPosition() != 1) continue;
+            if(queuePlayer == null || queuePlayer.getPosition() != 1) continue;
             List<String> kickReasons = main.getConfig().getStringList("kick-reasons");
             boolean kickPlayer = main.getConfig().getBoolean("kick-kicked-players");
             if(kickPlayer) {
