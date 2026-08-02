@@ -27,8 +27,8 @@
 
 
 # The time the server will wait between sending people in the queue (in seconds, supports decimals)
-#  Default: 5
-wait-time: 5.0
+#  Default: 1
+wait-time: 1.0
 
 # The time ajQueue will wait between sending players update messages on
 #  what position they are in the queue, their ETA, and status of the queue (in seconds)
