@@ -33,10 +33,12 @@ import us.ajg0702.utils.foliacompat.CompatScheduler;
 
 import java.io.File;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.logging.Level;
-
-import static us.ajg0702.utils.common.Messages.color;
 
 @SuppressWarnings("UnstableApiUsage")
 public class SpigotMain extends JavaPlugin implements PluginMessageListener,Listener {
@@ -44,7 +46,7 @@ public class SpigotMain extends JavaPlugin implements PluginMessageListener,List
 	private boolean papi = false;
 	private PlaceholderExpansion placeholders;
 
-	private ResponseManager responseManager = new ResponseManager();
+	private final ResponseManager responseManager = new ResponseManager();
 
 	private final CompatScheduler compatScheduler = new CompatScheduler(this);
 	
@@ -100,29 +102,65 @@ public class SpigotMain extends JavaPlugin implements PluginMessageListener,List
 			placeholders.register();
 			getLogger().info("Registered PlaceholderAPI placeholders");
 		}
-		
+
+		Method getTPSC = null;
+		Method getAverageTickTimeC = null;
+        try {
+			getAverageTickTimeC = Bukkit.getServer().getClass().getMethod("getAverageTickTime");
+        } catch (NoSuchMethodException ignored) {}
+		try {
+			getTPSC = Bukkit.getServer().getClass().getMethod("getTPS");
+		} catch (NoSuchMethodException ignored) {}
+		final Method getAverageTickTime = getAverageTickTimeC;
+		final Method getTPS = getTPSC;
+
 		getScheduler().runTaskTimerAsynchronously(() -> {
-			if(Bukkit.getOnlinePlayers().size() <= 0 || queuebatch.size() <= 0) return;
+			if(Bukkit.getOnlinePlayers().isEmpty() || queueBatch.isEmpty()) return;
+
 			StringBuilder msg = new StringBuilder();
-			for(Player p : queuebatch.keySet()) {
+			for(Player p : queueBatch.keySet()) {
 				if(p == null || !p.isOnline()) continue;
-				msg.append(p.getName()).append(":").append(queuebatch.get(p)).append(",");
+				msg.append(p.getName()).append(":").append(queueBatch.get(p)).append(",");
 			}
 			if(msg.length() > 1) {
 				msg = new StringBuilder(msg.substring(0, msg.length() - 1));
 			}
-			queuebatch.clear();
+			queueBatch.clear();
 			sendMessage("massqueue", msg.toString());
 		}, 2*20, 20);
 
-		getLogger().info("Spigot side enabled! v"+getDescription().getVersion());
+		getScheduler().runTaskTimerAsynchronously(() -> {
+			if(Bukkit.getOnlinePlayers().isEmpty()) return;
+
+			List<String> parts = new ArrayList<>();
+			if(getAverageTickTime != null) {
+                try {
+                    double mspt = (double) getAverageTickTime.invoke(Bukkit.getServer());
+					parts.add("mspt=" + mspt);
+                } catch (IllegalAccessException | InvocationTargetException ignored) {}
+            }
+
+			if(getTPS != null) {
+				try {
+					double[] tps = (double[]) getTPS.invoke(Bukkit.getServer());
+					if(tps != null && tps.length > 0) parts.add("tps=" + tps[0]);
+				} catch(IllegalAccessException | InvocationTargetException ignored) {}
+			}
+
+			if(parts.isEmpty()) return;
+			sendMessage("health", String.join(";", parts));
+
+
+		}, 20, 3 * 20);
+
+		getLogger().info("Backend extension enabled! v"+getDescription().getVersion());
 	}
 
 	public boolean hasProxy() {
 		return hasProxy;
 	}
 
-	final HashMap<Player, String> queuebatch = new HashMap<>();
+	final HashMap<Player, String> queueBatch = new HashMap<>();
 
 	@Override
 	public void onPluginMessageReceived(@NotNull String channel, @NotNull Player player, byte[] message) {
@@ -235,6 +273,6 @@ public class SpigotMain extends JavaPlugin implements PluginMessageListener,List
 	}
 
 	public HashMap<Player, String> getQueueBatch() {
-		return queuebatch;
+		return queueBatch;
 	}
 }

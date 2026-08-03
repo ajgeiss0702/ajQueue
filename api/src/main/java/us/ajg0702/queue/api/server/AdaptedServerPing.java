@@ -7,7 +7,7 @@ import us.ajg0702.queue.api.util.Handle;
 public interface AdaptedServerPing extends Handle {
     /**
      * Gets the component of the description (aka MOTD)
-     * @return A compoent of the description
+     * @return A component of the description
      */
     Component getDescriptionComponent();
 
@@ -30,7 +30,7 @@ public interface AdaptedServerPing extends Handle {
     int getMaxPlayers();
 
     /**
-     * Temporarly adds one player to the player count
+     * Temporarily adds one player to the player count
      */
     void addPlayer();
 
@@ -39,4 +39,10 @@ public interface AdaptedServerPing extends Handle {
      * @return A long of an epoch timestamp
      */
     long getFetchedTime();
+
+    /**
+     * The end-to-latency latency of this ping, from the time it was sent by ajQueue to the time ajQueue received it.
+     * @return The end-to-end latency of this ping (in ms)
+     */
+    long getLatency();
 }

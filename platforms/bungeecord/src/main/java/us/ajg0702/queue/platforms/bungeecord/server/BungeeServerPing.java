@@ -11,10 +11,12 @@ public class BungeeServerPing implements AdaptedServerPing {
 
     final ServerPing handle;
     private final long sent;
+    private final long latency;
 
     public BungeeServerPing(@NotNull ServerPing handle, long sent) {
         this.handle = handle;
         this.sent = sent;
+        this.latency = System.currentTimeMillis() - sent;
     }
 
     @Override
@@ -51,6 +53,11 @@ public class BungeeServerPing implements AdaptedServerPing {
     @Override
     public long getFetchedTime() {
         return sent;
+    }
+
+    @Override
+    public long getLatency() {
+        return latency;
     }
 
     @Override

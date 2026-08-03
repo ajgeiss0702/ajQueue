@@ -9,9 +9,11 @@ public class VelocityServerPing implements AdaptedServerPing {
 
     private final ServerPing handle;
     private final long sent;
+    private final long latency;
     public VelocityServerPing(ServerPing handle, long sent) {
         this.handle = handle;
         this.sent = sent;
+        this.latency = System.currentTimeMillis() - sent;
     }
 
     @Override
@@ -46,6 +48,11 @@ public class VelocityServerPing implements AdaptedServerPing {
     @Override
     public long getFetchedTime() {
         return sent;
+    }
+
+    @Override
+    public long getLatency() {
+        return latency;
     }
 
     @Override

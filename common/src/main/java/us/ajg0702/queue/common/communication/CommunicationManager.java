@@ -21,6 +21,8 @@ public class CommunicationManager {
         handlers = new MapBuilder<>(
             "ack", new AckHandler(main),
 
+                "health", new HealthHandler(main),
+
                 "queue", new QueueHandler(main),
                 "massqueue", new MassQueueHandler(main),
                 "leavequeue", new LeaveQueueHandler(main),

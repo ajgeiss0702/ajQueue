@@ -1,5 +1,6 @@
 package us.ajg0702.queue.api.server;
 
+import org.jetbrains.annotations.Nullable;
 import us.ajg0702.queue.api.AjQueueAPI;
 import us.ajg0702.queue.api.players.AdaptedPlayer;
 import us.ajg0702.queue.api.util.Handle;
@@ -166,6 +167,58 @@ public interface AdaptedServer extends Handle {
             uuids.add(parsedUUID);
         }
         return uuids;
+    }
+
+    void setTPS(double tps);
+
+    /**
+     * Gets the TPS last reported by the server, if available
+     * @return An optional with the last TPS reported by the server if available
+     */
+    Optional<Double> getTPS();
+
+    void setMSPT(double mspt);
+
+    /**
+     * Gets the MSPT last reported by the server, if available
+     * @return An optional with the last MSPT reported by the server if available
+     */
+    Optional<Double> getMSPT();
+
+    default ServerHealth getHealthStatus() {
+        if(!isOnline()) return ServerHealth.HEALTHY;
+        boolean littleSlow = false;
+        double mspt = getMSPT().orElse(-1d);
+        if(mspt >= 50) {
+            if(mspt <= 55) {
+                littleSlow = true;
+            } else {
+                return ServerHealth.UNHEALTHY;
+            }
+        }
+
+        double tps = getTPS().orElse(-1d);
+        if(tps != -1 && tps < 20) {
+            if(tps > 18.5) {
+                littleSlow = true;
+            } else {
+                return ServerHealth.UNHEALTHY;
+            }
+        }
+
+        if(getLastPing().isPresent()) {
+            long latency = getLastPing().get().getLatency();
+            if(latency > 100) {
+                if(latency <= 300) {
+                    littleSlow = true;
+                } else {
+                    return ServerHealth.UNHEALTHY;
+                }
+            }
+        }
+
+        if(littleSlow) return ServerHealth.LITTLE_SLOW;
+        return ServerHealth.HEALTHY;
     }
 
 }

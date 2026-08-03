@@ -23,7 +23,7 @@ public class BungeeServer implements AdaptedServer {
     private final BungeeServerInfo serverInfo;
 
     private AdaptedServerPing lastPing = null;
-    private AdaptedServerPing lastSuccessfullPing = null;
+    private AdaptedServerPing lastSuccessfulPing = null;
     private long lastOffline;
 
     private int offlineTime = 0;
@@ -60,7 +60,7 @@ public class BungeeServer implements AdaptedServer {
             offlineTime = 0;
 
             BungeeServerPing ping = new BungeeServerPing(pp, sent);
-            lastSuccessfullPing = ping;
+            lastSuccessfulPing = ping;
 
             if(debug) logger.info(
                     "[pinger] [" + getName() + "] online. motd: "+ping.getPlainDescription()+" " +
@@ -74,13 +74,15 @@ public class BungeeServer implements AdaptedServer {
     }
 
     private void markOffline(boolean debug, QueueLogger logger, CompletableFuture<AdaptedServerPing> future, long sent, @Nullable Throwable e) {
-        long lastOnline = lastSuccessfullPing == null ? 0 : lastSuccessfullPing.getFetchedTime();
+        long lastOnline = lastSuccessfulPing == null ? 0 : lastSuccessfulPing.getFetchedTime();
         offlineTime = (int) Math.min(sent - lastOnline, Integer.MAX_VALUE) / 1000;
 
         lastOffline = sent;
 
         future.completeExceptionally(e);
         lastPing = null;
+        tps = null;
+        mspt = null;
         if(debug) logger.info("[pinger] [" + getName() + "] offline:", e);
     }
 
@@ -116,6 +118,35 @@ public class BungeeServer implements AdaptedServer {
     @Override
     public boolean shouldWaitAfterOnline() {
         return System.currentTimeMillis()-lastOffline <= (AjQueueAPI.getInstance().getConfig().getDouble("wait-after-online") * 2 * 1000) && getLastPing().isPresent();
+    }
+
+    private long lastTPS = 0;
+    private Double tps = null;
+    @Override
+    public void setTPS(double tps) {
+        lastTPS = System.currentTimeMillis();
+        this.tps = tps;
+    }
+
+    @Override
+    public Optional<Double> getTPS() {
+        if(System.currentTimeMillis() - lastTPS > 10e3) return Optional.empty();
+        return Optional.ofNullable(tps);
+    }
+
+
+    private long lastMSPT = 0;
+    private Double mspt = null;
+    @Override
+    public void setMSPT(double mspt) {
+        lastMSPT = System.currentTimeMillis();
+        this.mspt = mspt;
+    }
+
+    @Override
+    public Optional<Double> getMSPT() {
+        if(System.currentTimeMillis() - lastMSPT > 10e3) return Optional.empty();
+        return Optional.ofNullable(mspt);
     }
 
     @Override
