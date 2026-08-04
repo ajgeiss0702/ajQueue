@@ -130,10 +130,9 @@ public class PremiumLogic implements Logic {
     public boolean hasAnyBypass(AdaptedPlayer player, String server) {
         return player.hasPermission("ajqueue.bypass") ||
                 player.hasPermission("ajqueue.serverbypass."+ server) ||
-                player.hasPermission("ajqueue.joinfullandbypassserver."+ server) ||
                 player.hasPermission("ajqueue.joinfullandbypass") ||
                 permissionGetter.hasContextBypass(player, server) ||
-                (QueueMain.getInstance().isPremium() && permissionGetter.hasUniqueFullBypass(player, server));
+                permissionGetter.hasUniqueFullBypass(player, server);
     }
 
 }

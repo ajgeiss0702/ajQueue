@@ -251,11 +251,11 @@ public class EventHandlerImpl implements EventHandler {
         for (String toName : toNames) {
             QueueServer to = main.getQueueManager().findServer(toName);
 
-            if(!main.getQueueManager().canSendInstantly(player, to)) continue;
+            AdaptedServer ideal = to.getIdealServer(player);
+            if(!main.getQueueManager().canSendInstantly(player, to, ideal)) continue;
 
             Debug.info(player.getName()+" can be sent to "+to.getName()+" (skip-queue-server-if-possible)");
 
-            AdaptedServer ideal = to.getIdealServer(player);
 
             if(ideal == null) continue;
             Debug.info("Got ideal");

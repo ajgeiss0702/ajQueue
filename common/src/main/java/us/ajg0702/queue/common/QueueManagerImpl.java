@@ -3,6 +3,7 @@ package us.ajg0702.queue.common;
 import com.google.common.collect.ImmutableList;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.title.Title;
+import org.jetbrains.annotations.Nullable;
 import us.ajg0702.queue.api.QueueManager;
 import us.ajg0702.queue.api.events.BuildServersEvent;
 import us.ajg0702.queue.api.events.PreQueueEvent;
@@ -13,6 +14,7 @@ import us.ajg0702.queue.api.queueholders.QueueHolder;
 import us.ajg0702.queue.api.queues.QueueServer;
 import us.ajg0702.queue.api.queues.QueueType;
 import us.ajg0702.queue.api.server.AdaptedServer;
+import us.ajg0702.queue.api.server.ServerHealth;
 import us.ajg0702.queue.api.util.ExpressRatio;
 import us.ajg0702.queue.commands.commands.manage.PauseQueueServer;
 import us.ajg0702.queue.common.players.QueuePlayerImpl;
@@ -374,7 +376,7 @@ public class QueueManagerImpl implements QueueManager {
         );
 
         boolean hasBypass = main.getLogic().hasAnyBypass(player, server.getName());
-        boolean sentInstantly = canSendInstantly(player, server, hasBypass);
+        boolean sentInstantly = canSendInstantly(player, server, hasBypass, ideal);
 
         String express = queuePlayer.isInExpressQueue() ?
                 main.getMessages().getString("actionbar.express") :
@@ -434,19 +436,36 @@ public class QueueManagerImpl implements QueueManager {
 
     @Override
     public boolean canSendInstantly(AdaptedPlayer player, QueueServer queueServer) {
-        return canSendInstantly(player, queueServer, main.getLogic().hasAnyBypass(player, queueServer.getName()));
+        return canSendInstantly(player, queueServer, main.getLogic().hasAnyBypass(player, queueServer.getName()), null);
     }
 
     @Override
     public boolean canSendInstantly(AdaptedPlayer player, QueueServer queueServer, boolean hasBypass) {
+        return canSendInstantly(player, queueServer, hasBypass, null);
+    }
+    @Override
+    public boolean canSendInstantly(AdaptedPlayer player, QueueServer queueServer, AdaptedServer ideal) {
+        return canSendInstantly(player, queueServer, main.getLogic().hasAnyBypass(player, queueServer.getName()), ideal);
+    }
+
+    @Override
+    public boolean canSendInstantly(AdaptedPlayer player, QueueServer queueServer, boolean hasBypass, @Nullable AdaptedServer ideal) {
         boolean isJoinable = queueServer.isJoinable(player);
         boolean sizeGood = queueServer.getQueueHolder().getTotalOnlineQueueSize() <= 1 && isJoinable;
         boolean timeGood = !main.getConfig().getBoolean("check-last-player-sent-time") || queueServer.getLastSentTime() > Math.floor(main.getTimeBetweenPlayers() * 1000);
         boolean alwaysSendInstantly = main.getConfig().getStringList("send-instantly").contains(queueServer.getName());
 
-        boolean sentInstantly = isJoinable && (sizeGood || hasBypass) && (alwaysSendInstantly || timeGood || hasBypass);
-        Debug.info("should send instantly (" + sentInstantly + "): " + isJoinable + " && (" + sizeGood + " || " + hasBypass + ") && (" + alwaysSendInstantly + " || " + timeGood + " || " + hasBypass + ")");
-        return sentInstantly;
+        boolean sendInstantly = isJoinable && (sizeGood || hasBypass) && (alwaysSendInstantly || timeGood || hasBypass);
+        Debug.info("should send instantly (ignoring health) (" + sendInstantly + "): " + isJoinable + " && (" + sizeGood + " || " + hasBypass + ") && (" + alwaysSendInstantly + " || " + timeGood + " || " + hasBypass + ")");
+        // don't instant send if the server isn't healthy
+        if(sendInstantly && !hasBypass) {
+            AdaptedServer server = ideal;
+            if(server == null) server = queueServer.getIdealServer(player);
+            if(server != null) {
+                if(server.getHealthStatus() != ServerHealth.HEALTHY) return false;
+            }
+        }
+        return sendInstantly;
     }
 
     @Override
@@ -936,6 +955,22 @@ public class QueueManagerImpl implements QueueManager {
             if(selected == null) {
                 main.getLogger().severe("Could not find ideal server for server/group '"+server.getName()+"'");
                 continue;
+            }
+
+            ServerHealth selectedHealth = selected.getHealthStatus();
+
+            if(selectedHealth != ServerHealth.HEALTHY) {
+                boolean hasBypass = main.getLogic().hasAnyBypass(nextPlayer, server.getName());
+                if(!hasBypass) {
+                    if(selectedHealth == ServerHealth.LITTLE_SLOW) {
+                        double limit = main.getConfig().getDouble("little-slow-server-send-limit");
+                        if(server.getLastSentTime() < limit * 1e3) continue;
+                    }
+                    if(selectedHealth == ServerHealth.UNHEALTHY) {
+                        double limit = main.getConfig().getDouble("unhealthy-server-send-limit");
+                        if(server.getLastSentTime() < limit * 1e3) continue;
+                    }
+                }
             }
 
             if(selected.isWhitelisted() && !selected.getWhitelistedPlayers().contains(nextPlayer.getUniqueId())) continue;

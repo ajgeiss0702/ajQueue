@@ -198,7 +198,7 @@ public interface AdaptedServer extends Handle {
         }
 
         double tps = getTPS().orElse(-1d);
-        if(tps != -1 && tps < 20) {
+        if(tps != -1 && tps < 19.5) {
             if(tps > 18.5) {
                 littleSlow = true;
             } else {

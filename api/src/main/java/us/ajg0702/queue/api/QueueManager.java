@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableList;
 import us.ajg0702.queue.api.players.AdaptedPlayer;
 import us.ajg0702.queue.api.players.QueuePlayer;
 import us.ajg0702.queue.api.queues.QueueServer;
+import us.ajg0702.queue.api.server.AdaptedServer;
 
 import java.util.Map;
 
@@ -34,6 +35,8 @@ public interface QueueManager {
      */
     boolean canSendInstantly(AdaptedPlayer player, QueueServer queueServer);
     boolean canSendInstantly(AdaptedPlayer player, QueueServer queueServer, boolean hasBypass);
+    boolean canSendInstantly(AdaptedPlayer player, QueueServer queueServer, boolean hasBypass, AdaptedServer ideal);
+    boolean canSendInstantly(AdaptedPlayer player, QueueServer queueServer, AdaptedServer ideal);
 
 
     /**

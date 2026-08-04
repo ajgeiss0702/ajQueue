@@ -171,6 +171,21 @@ balancer-types:
 allow-group-requeue: false
 
 
+# What should the minimum time (in seconds) between player sends be if ajQueue detected the server is a little slow?
+# This is meant to slow players joining when the server is lagging, to prevent the lag from getting even worse.
+# ajQueue counts a server as slow if it has an avg tps (1m) of <19.5, an avg mspt (5s) of >= 50, or a ping latency of >100ms
+# If a server's health improves, this limit will no longer apply. Even if it's been less than this time.
+#  Default: 5.0
+little-slow-server-send-limit: 5.0
+
+# What should the minimum time (in seconds) between player sends be if ajQueue detected the server is definitely lagging?
+# This is meant to slow players joining when the server is lagging, to prevent the lag from getting even worse.
+# ajQueue counts a server as unhealthy if it has an avg tps (1m) of <=18.5, an avg mspt (5s) of > 55, or a ping latency of >300ms
+# If a server's health improves, this limit will no longer apply. Even if it's been less than this time.
+#  Default: 60.0
+unhealthy-server-send-limit: 60.0
+
+
 # What priority should we give whitelisted players priority when the server is whitelisted?
 # This will have no effect if the server isn't whitelisted
 # If you set to 0, this will be disabled
@@ -529,7 +544,7 @@ debug: false
 
 
 # Don't touch this number please
-config-version: 69
+config-version: 70
 
 
 # This is ONLY here so that they can be moved to messages.yml. Please edit these in messages.yml!

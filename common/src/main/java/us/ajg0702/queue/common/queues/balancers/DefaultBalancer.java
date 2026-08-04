@@ -5,13 +5,13 @@ import us.ajg0702.queue.api.players.AdaptedPlayer;
 import us.ajg0702.queue.api.queues.Balancer;
 import us.ajg0702.queue.api.queues.QueueServer;
 import us.ajg0702.queue.api.server.AdaptedServer;
+import us.ajg0702.queue.api.server.ServerHealth;
 import us.ajg0702.queue.common.QueueMain;
 import us.ajg0702.utils.common.GenUtils;
 
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.function.Predicate;
 
 public class DefaultBalancer implements Balancer {
 
@@ -24,6 +24,10 @@ public class DefaultBalancer implements Balancer {
 
     @Override
     public AdaptedServer getIdealServer(@Nullable AdaptedPlayer player) {
+        List<AdaptedServer> servers = server.getServers();
+        if(servers.size() == 1) {
+            return servers.get(0);
+        }
         AdaptedServer alreadyConnected;
         if(player == null) {
             alreadyConnected = null;
@@ -31,47 +35,59 @@ public class DefaultBalancer implements Balancer {
             alreadyConnected = player.getCurrentServer();
         }
         Integer protocol = player == null ? null : player.getProtocolVersion();
-        List<AdaptedServer> servers = server.getServers();
         AdaptedServer selected = null;
         int selectednum = 0;
-        if(servers.size() == 1) {
-            selected = servers.get(0);
-        } else {
-            for(AdaptedServer sv : servers) {
-                if(!sv.isOnline()) continue;
-                if(sv.equals(alreadyConnected)) continue;
-                int online = sv.getPlayerCount();
-                if(selected == null) {
+        for(AdaptedServer sv : servers) {
+            if(!sv.isOnline()) continue;
+            if(sv.equals(alreadyConnected)) continue;
+            int online = sv.getPlayerCount();
+            if(selected == null) {
+                selected = sv;
+                selectednum = online;
+                continue;
+            } else if(selected.getHealthStatus().ordinal() < sv.getHealthStatus().ordinal() && selected.isJoinable(player)) {
+                // if the already selected server is joinable and more healthy than this server, dont consider this server
+                continue;
+            }
+            boolean joinable = sv.isJoinable(player);
+            if(joinable) {
+                ServerHealth svHealth = sv.getHealthStatus();
+                ServerHealth selectedHealth = selected.getHealthStatus();
+                if(
+                        (selectedHealth != ServerHealth.HEALTHY && svHealth == ServerHealth.HEALTHY) ||
+                                (selectedHealth == ServerHealth.UNHEALTHY && svHealth != ServerHealth.UNHEALTHY)
+                ) {
+                    // promotes a (joinable) healthy or little slow server to replace an initially selected unhealthy server
                     selected = sv;
                     selectednum = online;
                     continue;
                 }
-                if(!selected.isJoinable(player) && sv.isJoinable(player)) {
-                    if(protocol != null) {
-                        List<QueueServer> queues = main.getQueueManager().getServers();
-                        AdaptedServer finalSelected = selected;
-                        Optional<QueueServer> selectedQueueServer = queues.stream()
-                                .filter(s -> Objects.equals(s.getName(), finalSelected.getName()))
-                                .findAny();
-                        Optional<QueueServer> svQueueServer = queues.stream()
-                                .filter(s -> Objects.equals(s.getName(), sv.getName()))
-                                .findAny();
-                        if(selectedQueueServer.isPresent() && svQueueServer.isPresent()) {
-                            QueueServer selectedQueue = selectedQueueServer.get();
-                            QueueServer svQueue = svQueueServer.get();
-                            if(selectedQueue.isSupportedProtocol(protocol) && !svQueue.isSupportedProtocol(protocol)) {
-                                continue;
-                            }
+            }
+            if(!selected.isJoinable(player) && joinable) {
+                if(protocol != null) {
+                    List<QueueServer> queues = main.getQueueManager().getServers();
+                    AdaptedServer finalSelected = selected;
+                    Optional<QueueServer> selectedQueueServer = queues.stream()
+                            .filter(s -> Objects.equals(s.getName(), finalSelected.getName()))
+                            .findAny();
+                    Optional<QueueServer> svQueueServer = queues.stream()
+                            .filter(s -> Objects.equals(s.getName(), sv.getName()))
+                            .findAny();
+                    if(selectedQueueServer.isPresent() && svQueueServer.isPresent()) {
+                        QueueServer selectedQueue = selectedQueueServer.get();
+                        QueueServer svQueue = svQueueServer.get();
+                        if(selectedQueue.isSupportedProtocol(protocol) && !svQueue.isSupportedProtocol(protocol)) {
+                            continue;
                         }
                     }
-                    selected = sv;
-                    selectednum = online;
-                    continue;
                 }
-                if(selectednum > online && sv.isJoinable(player)) {
-                    selected = sv;
-                    selectednum = online;
-                }
+                selected = sv;
+                selectednum = online;
+                continue;
+            }
+            if(selectednum > online && sv.isJoinable(player)) {
+                selected = sv;
+                selectednum = online;
             }
         }
         if(selected == null && servers.size() > 0) {
