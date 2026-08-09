@@ -143,7 +143,6 @@ public class VelocityQueue implements Implementation {
         main.getEventHandler().handleMessage(new VelocityPlayer((Player) e.getTarget()), e.getData());
     }
 
-    @SuppressWarnings("UnstableApiUsage")
     @Subscribe
     public void onJoin(ServerPostConnectEvent e) {
         if(e.getPreviousServer() == null) { // only run if the player just joined

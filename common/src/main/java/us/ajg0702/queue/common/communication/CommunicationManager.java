@@ -47,7 +47,7 @@ public class CommunicationManager {
         MessageHandler handler = handlers.get(subChannel);
 
         if(handler == null) {
-            main.getLogger().warn("Invalid sub-channel " + subChannel);
+            main.getLogger().warn("Unknown sub-channel " + subChannel + ". Make sure that the versions of ajQueue on the proxy and backend match!");
             return;
         }
 
