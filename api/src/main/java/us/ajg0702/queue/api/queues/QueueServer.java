@@ -1,6 +1,7 @@
 package us.ajg0702.queue.api.queues;
 
 import com.google.common.collect.ImmutableList;
+import org.jetbrains.annotations.Nullable;
 import us.ajg0702.queue.api.players.AdaptedPlayer;
 import us.ajg0702.queue.api.players.QueuePlayer;
 import us.ajg0702.queue.api.queueholders.QueueHolder;
@@ -80,6 +81,30 @@ public interface QueueServer {
      * @return If the server is at or above the manually-set player limit
      */
     boolean isManuallyFull();
+
+    /**
+     * Checks if the total number of players in this server/group is above the dynamically-set max player count
+     * @return If the server is at or above the dynamically-set player limit
+     */
+    boolean isDynamicallyFull();
+
+    /**
+     * Sets the dynamic max player cap for this server/group. This is used for temporarily lowering the max player count of a server/group.
+     * @param amount the new dynamic max player count. Negative values will be ignored, behaving as resetDynamicMax
+     */
+    void setDynamicMax(int amount);
+
+    /**
+     * Gets the dynamic max (null when no max is set)
+     * @return integer (0 or larger) or null if no dynamic max is set
+     */
+    @Nullable
+    Integer getDynamicMax();
+
+    /**
+     * Resets the dynamic max player cap for this server/group. This will make it so the dynamic player cap is no longer a consideration.
+     */
+    void resetDynamicMax();
 
     /**
      * Pauses or unpauses a server

@@ -894,7 +894,7 @@ public class QueueManagerImpl implements QueueManager {
 
                     if(
                             (selected.isFull() && !selected.canJoinFull(player)) ||
-                                    (server.isManuallyFull() && !AdaptedServer.canJoinFull(player, server.getName()))
+                                    ((server.isManuallyFull() || server.isDynamicallyFull()) && !AdaptedServer.canJoinFull(player, server.getName()))
                     ) continue;
 
                     player.sendMessage(msgs.getComponent("status.sending-now", "SERVER:"+server.getAlias()));
@@ -980,12 +980,12 @@ public class QueueManagerImpl implements QueueManager {
             if(
                     (
                             (selected.isFull() && !selected.canJoinFull(nextPlayer)) ||
-                            (server.isManuallyFull() && !AdaptedServer.canJoinFull(nextPlayer, server.getName()))
+                            ((server.isManuallyFull() || server.isDynamicallyFull()) && !AdaptedServer.canJoinFull(nextPlayer, server.getName()))
                     ) &&
                             !(
                                     nextPlayer.hasPermission("ajqueue.make-room") &&
                                             main.getConfig().getBoolean("enable-make-room-permission") &&
-                                            (!server.isGroup() || server.isManuallyFull()) // only use make-room on groups if the server is manually full
+                                            (!server.isGroup() || server.isManuallyFull() || server.isDynamicallyFull()) // only use make-room on groups if the server is manually or dynamically full
                             )
             ) continue;
 
@@ -994,11 +994,11 @@ public class QueueManagerImpl implements QueueManager {
             if(
                     (
                             (selected.isFull() && !selected.canJoinFull(nextPlayer)) ||
-                                    (server.isManuallyFull() && !AdaptedServer.canJoinFull(nextPlayer, server.getName()))
+                                    ((server.isManuallyFull() || server.isDynamicallyFull()) && !AdaptedServer.canJoinFull(nextPlayer, server.getName()))
                     ) &&
                             main.getConfig().getBoolean("enable-make-room-permission") &&
                             nextPlayer.hasPermission("ajqueue.make-room") &&
-                            (!server.isGroup() || server.isManuallyFull()) && // only use make-room on groups if the server is manually full
+                            (!server.isGroup() || server.isManuallyFull() || server.isDynamicallyFull()) && // only use make-room on groups if the server is manually or dynamically full
                             ( // don't make room more than the minimum ping time
                                     System.currentTimeMillis() - makeRoomAntispam.getOrDefault(nextQueuePlayer, 0L)
                                             >= (main.getConfig().getDouble("minimum-ping-time") * 1e3)

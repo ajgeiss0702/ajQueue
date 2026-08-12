@@ -1,6 +1,7 @@
 package us.ajg0702.queue.common.queues;
 
 import com.google.common.collect.ImmutableList;
+import org.jetbrains.annotations.Nullable;
 import us.ajg0702.queue.api.AjQueueAPI;
 import us.ajg0702.queue.api.events.PositionChangeEvent;
 import us.ajg0702.queue.api.players.AdaptedPlayer;
@@ -43,6 +44,7 @@ public class QueueServerImpl implements QueueServer {
     private double averageSendTime = 0;
 
     private int manualMaxPlayers = Integer.MAX_VALUE;
+    private Integer dynamicMaxPlayers = null;
 
     private QueueType lastQueueSend = QueueType.STANDARD;
     private int sendCount = 0;
@@ -164,7 +166,7 @@ public class QueueServerImpl implements QueueServer {
             return msgs.getString("status.offline.whitelisted");
         }
 
-        if((server.isFull() && !server.canJoinFull(p)) || (isManuallyFull() && !AdaptedServer.canJoinFull(p, getName()))) {
+        if((server.isFull() && !server.canJoinFull(p)) || ((isManuallyFull() || isDynamicallyFull()) && !AdaptedServer.canJoinFull(p, getName()))) {
             return msgs.getString("status.offline.full");
         }
 
@@ -200,7 +202,7 @@ public class QueueServerImpl implements QueueServer {
             return "whitelisted";
         }
 
-        if(((server.isFull() && !server.canJoinFull(p)) || (isManuallyFull() && !AdaptedServer.canJoinFull(p, getName())))) {
+        if(((server.isFull() && !server.canJoinFull(p)) || ((isManuallyFull() || isDynamicallyFull()) && !AdaptedServer.canJoinFull(p, getName())))) {
             return "full";
         }
 
@@ -273,7 +275,7 @@ public class QueueServerImpl implements QueueServer {
 
     @Override
     public boolean isJoinable(AdaptedPlayer p, boolean ignoreFull) {
-        if(!ignoreFull && isManuallyFull() && !AdaptedServer.canJoinFull(p, getName())) return false;
+        if(!ignoreFull && (isManuallyFull() || isDynamicallyFull()) && !AdaptedServer.canJoinFull(p, getName())) return false;
         AdaptedServer server = getIdealServer(p);
         if(server == null) return false;
         return server.isJoinable(p, ignoreFull) && !isPaused();
@@ -296,6 +298,38 @@ public class QueueServerImpl implements QueueServer {
 //        Debug.info(total + " >= " + getManualMaxPlayers() + " = " + (total >= getManualMaxPlayers()));
 
         return total >= getManualMaxPlayers();
+    }
+
+    @Override
+    public boolean isDynamicallyFull() {
+        if (this.dynamicMaxPlayers == null) {
+            return false;
+        }
+        int total = 0;
+        for (AdaptedServer server : servers) {
+            Optional<AdaptedServerPing> lastPing = server.getLastPing();
+            if(!lastPing.isPresent()) continue;
+            total += lastPing.get().getPlayerCount();
+        }
+        return total >= this.dynamicMaxPlayers;
+    }
+
+    @Override
+    public void setDynamicMax(int amount) {
+        if (amount < 0) {
+            this.resetDynamicMax();
+        }
+        this.dynamicMaxPlayers = amount;
+    }
+
+    @Override
+    public @Nullable Integer getDynamicMax() {
+        return this.dynamicMaxPlayers;
+    }
+
+    @Override
+    public void resetDynamicMax() {
+        this.dynamicMaxPlayers = null;
     }
 
     @Override
