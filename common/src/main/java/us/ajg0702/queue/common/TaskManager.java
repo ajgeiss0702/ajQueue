@@ -142,7 +142,7 @@ public class TaskManager {
             try {
                 command.run();
             } catch (Exception e) {
-                System.out.println("An error ocurred while running an ajQueue task");
+                System.out.println("An error occurred while running an ajQueue task");
                 e.printStackTrace();
             }
         }, initialDelay, period, unit);

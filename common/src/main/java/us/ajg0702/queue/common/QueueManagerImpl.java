@@ -94,7 +94,7 @@ public class QueueManagerImpl implements QueueManager {
             }
 
             if(!groupRaw.contains(":")) {
-                main.getLogger().warning("Incorrect formatting! Each server group needs to have a name and a list of servers seperated by a colon (:).");
+                main.getLogger().warning("Incorrect formatting! Each server group needs to have a name and a list of servers separated by a colon (:).");
                 continue;
             }
 
@@ -138,7 +138,7 @@ public class QueueManagerImpl implements QueueManager {
         for(String supportedProtocolsString : supportedProtocolsRaw) {
             String[] parts = supportedProtocolsString.split(":");
             if(parts.length < 2) {
-                main.getLogger().warn("Invalid supported protocols entry! Must have a colon to seperate the server(s) and the protocols");
+                main.getLogger().warn("Invalid supported protocols entry! Must have a colon to separate the server(s) and the protocols");
                 continue;
             }
             String serversRaw = parts[0];

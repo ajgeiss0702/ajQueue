@@ -2,7 +2,7 @@
 
 !!!   READ BEFORE CREATING A GITHUB ISSUE   !!!
 
-GitHub Issues are not the place to get support. Before creating an issue, make sure you have talked to aj and agree that it is appropiate for a GitHub Issue.
+GitHub Issues are not the place to get support. Before creating an issue, make sure you have talked to aj and agree that it is appropriate for a GitHub Issue.
 
 Even if you are sure it is an issue with the plugin, it could still be a configuration issue.
 

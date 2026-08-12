@@ -7,7 +7,7 @@ import us.ajg0702.queue.api.server.AdaptedServer;
 
 public interface EventHandler {
 
-    void handleMessage(AdaptedPlayer reciever, byte[] data);
+    void handleMessage(AdaptedPlayer receiver, byte[] data);
 
     void onPlayerJoin(AdaptedPlayer player);
 
