@@ -58,7 +58,15 @@ public class EventHandlerImpl implements EventHandler {
         }
 
         ImmutableList<QueuePlayer> queues = main.getQueueManager().findPlayerInQueues(player);
+        if(queues.size() > 0) {
+            Debug.info("onPlayerJoin: " + player.getName() + " is queued for " + queues.size()
+                    + " server(s) (restored from "
+                    + (main.getConfig().getString("queue-holder").equals("redis") ? "Redis" : "memory") + ")");
+        }
         for(QueuePlayer queuePlayer : queues) {
+            Debug.info("onPlayerJoin: restoring player reference for " + player.getName()
+                    + " in queue for " + queuePlayer.getQueueServer().getName()
+                    + " (position=" + queuePlayer.getPosition() + ")");
             queuePlayer.setPlayer(player);
         }
         if(queues.size() > 0) {
@@ -73,6 +81,7 @@ public class EventHandlerImpl implements EventHandler {
         ImmutableList<QueuePlayer> queues = main.getQueueManager().findPlayerInQueues(player);
         for(QueuePlayer queuePlayer : queues) {
             ((QueuePlayerImpl) queuePlayer).setLeaveTime(System.currentTimeMillis());
+            queuePlayer.getQueueServer().getQueueHolder().onPlayerOffline(queuePlayer);
         }
         main.getQueueManager().clear(player);
         QueueCommand.cooldowns.remove(player);

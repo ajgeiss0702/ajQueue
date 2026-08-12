@@ -11,13 +11,37 @@ import java.util.concurrent.ConcurrentHashMap;
 public class QueueHolderRegistry {
 
     private Map<String, Class<? extends QueueHolder>> holders = new ConcurrentHashMap<>();
+    private Map<String, Runnable> shutdownHooks = new ConcurrentHashMap<>();
 
     /**
-     * Register a QueueHolder that can be used
-     * @param holder The QueueHolder to register
+     * Registers a QueueHolder that can be used.
+     * @param identifier the config key used to select this holder
+     * @param holder     the holder class (must have a {@code QueueServer} constructor)
      */
     public void register(String identifier, Class<? extends QueueHolder> holder) {
         holders.put(identifier, holder);
+    }
+
+    /**
+     * Registers a QueueHolder with a shutdown hook that is run when {@link #shutdown()} is called.
+     * Use this for holders that manage shared resources (e.g. a static connection pool) that need
+     * to be released on plugin disable regardless of how many servers are configured.
+     *
+     * @param identifier   the config key used to select this holder
+     * @param holder       the holder class (must have a {@code QueueServer} constructor)
+     * @param shutdownHook called once during {@link #shutdown()}
+     */
+    public void register(String identifier, Class<? extends QueueHolder> holder, Runnable shutdownHook) {
+        holders.put(identifier, holder);
+        shutdownHooks.put(identifier, shutdownHook);
+    }
+
+    /**
+     * Runs the shutdown hook for every registered holder that provided one.
+     * Should be called from the plugin's disable/shutdown routine.
+     */
+    public void shutdown() {
+        shutdownHooks.values().forEach(Runnable::run);
     }
 
     public QueueHolder getQueueHolder(QueueServer queueServer) {

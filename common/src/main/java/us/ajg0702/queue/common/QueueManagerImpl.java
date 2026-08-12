@@ -828,13 +828,41 @@ public class QueueManagerImpl implements QueueManager {
             QueueHolder queueHolder = server.getQueueHolder();
             for(QueuePlayer queuePlayer : queueHolder.getAllPlayers()) {
                 if(queuePlayer.getPlayer() != null) continue;
+                long timeSinceOnline = queuePlayer.getTimeSinceOnline();
+                if(timeSinceOnline == 0) {
+                    // leaveTime == 0 means the player is online on another proxy instance (Redis cross-proxy)
+                    // or has not yet disconnected on this proxy. Skip without removing.
+                    Debug.info("Skipping " + queuePlayer.getName() + " in queue for " + server.getName()
+                            + " - not on this proxy (likely on another proxy instance)");
+                    continue;
+                }
                 if(main.getLogic().playerDisconnectedTooLong(queuePlayer)) {
-                    Debug.info("Removing " + queuePlayer.getName() + " due to them being disconnected too long");
+                    Debug.info("Removing " + queuePlayer.getName() + " due to them being disconnected too long"
+                            + " (timeSinceOnline=" + timeSinceOnline + "ms, maxOfflineTime="
+                            + queuePlayer.getMaxOfflineTime() + "s)");
                     server.removePlayer(queuePlayer);
                 }
             }
 
             if(!server.isOnline()) continue;
+
+            // Cross-proxy rate limiting: each proxy instance has its own independent scheduler,
+            // so without this check two proxies would each send a player in the same cycle,
+            // doubling the effective send rate. Read the shared Redis timestamp and skip this
+            // server if not enough time has elapsed since any proxy last sent.
+            if (queueHolder.isPersistent()) {
+                long sharedTimestamp = queueHolder.getSharedLastSendTimestamp();
+                if (sharedTimestamp > 0) {
+                    long elapsed = System.currentTimeMillis() - sharedTimestamp;
+                    long required = (long) Math.floor(main.getTimeBetweenPlayers() * 1000);
+                    if (elapsed < required) {
+                        Debug.info("sendPlayers: skipping " + server.getName()
+                                + " - cross-proxy rate limit: only " + elapsed + "ms since last send across all proxies"
+                                + " (need " + required + "ms)");
+                        continue;
+                    }
+                }
+            }
 
             QueueType lastSend = server.getLastQueueSend();
             ExpressRatio expressRatio = main.isPremium() ? main.getExpressRatio() : ExpressRatio.oneToOne();
@@ -855,7 +883,7 @@ public class QueueManagerImpl implements QueueManager {
                 Debug.info(server.getName() + " currently on express " + express + " with " + server.getSendCount() + " and lastSend " + lastSend);
             }
 
-//            Debug.info("should send when back online: " + !server.isGroup() + " && " + main.getConfig().getBoolean("send-all-when-back-online") + " && " + server.getServers().get(0).justWentOnline());
+            Debug.info("should send when back online: " + !server.isGroup() + " && " + main.getConfig().getBoolean("send-all-when-back-online") + " && " + server.getServers().get(0).justWentOnline());
             if(!server.isGroup() && main.getConfig().getBoolean("send-all-when-back-online") && server.getServers().get(0).justWentOnline()) {
                 List<QueuePlayer> expressPlayers = new ArrayList<>(server.getQueueHolder().getAllExpressPlayers());
                 List<QueuePlayer> standardPlayers = new ArrayList<>(server.getQueueHolder().getAllStandardPlayers());
@@ -921,7 +949,7 @@ public class QueueManagerImpl implements QueueManager {
 
 
 
-            // If the first person int the queue is offline or already in the server, find the next online player in the queue
+            // If the first person in the queue is offline or already in the server, find the next online player in the queue
             int i = 0;
             List<String> excludableServers = new ArrayList<>(server.getServerNames());
             if(nextQueuePlayer.getInitialServer() != null) excludableServers.remove(nextQueuePlayer.getInitialServer().getName());
@@ -938,6 +966,11 @@ public class QueueManagerImpl implements QueueManager {
                         break;
                     }
                 } else {
+                    // nextPlayer == null: player at position (i+1) is not on this proxy.
+                    // With Redis cross-proxy queues this is expected - they will be sent by their own proxy.
+                    Debug.info("sendPlayers: skipping " + nextQueuePlayer.getName()
+                            + " (position " + (i + 1) + " in " + server.getName()
+                            + ") - not on this proxy (will be handled by the proxy they are connected to)");
                     i++;
                     if(i > queueSize.get()-1) {
                         break;
@@ -949,7 +982,11 @@ public class QueueManagerImpl implements QueueManager {
                 }
             }
 
-            if(nextPlayer == null) continue; // None of the players in the queue are online
+            if(nextPlayer == null) {
+                Debug.info("sendPlayers: no online players found in queue for " + server.getName()
+                        + " on this proxy (total in Redis: " + queueHolder.getTotalQueueSize() + ")");
+                continue;
+            }
 
             AdaptedServer selected = server.getIdealServer(nextPlayer);
             if(selected == null) {

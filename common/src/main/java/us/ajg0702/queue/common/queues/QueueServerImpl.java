@@ -30,7 +30,7 @@ public class QueueServerImpl implements QueueServer {
 
     private final List<AdaptedServer> servers;
 
-    private final QueueHolder queueHolder = AjQueueAPI.getQueueHolderRegistry().getQueueHolder(this);
+    private final QueueHolder queueHolder;
 
     private List<Integer> supportedProtocols = new ArrayList<>();
 
@@ -58,6 +58,7 @@ public class QueueServerImpl implements QueueServer {
         this.name = name;
         this.servers = servers;
         this.main = main;
+        this.queueHolder = AjQueueAPI.getQueueHolderRegistry().getQueueHolder(this);
 
         List<String> types = main.getConfig().getStringList("balancer-types");
         for(String type : types) {
@@ -110,36 +111,45 @@ public class QueueServerImpl implements QueueServer {
             break;
         }
 
-        List<QueuePlayer> previousPlayers = new ArrayList<>();
-        previousPlayers.addAll(previousExpressPlayers);
-        previousPlayers.addAll(previousStandardPlayers);
+        // Persistent holders (e.g. Redis) already have the data stored externally.
+        // Re-inserting previousPlayers would create a race-condition window where a player
+        // removed by another proxy instance gets silently re-added with stale state (leaveTime=0).
+        if (!queueHolder.isPersistent()) {
+            List<QueuePlayer> previousPlayers = new ArrayList<>();
+            previousPlayers.addAll(previousExpressPlayers);
+            previousPlayers.addAll(previousStandardPlayers);
 
-        for(QueuePlayer queuePlayer : previousPlayers) {
-            if(queuePlayer.getPlayer() == null) {
-                addPlayer(
-                        new QueuePlayerImpl(
-                                queuePlayer.getUniqueId(),
-                                queuePlayer.getName(),
-                                this,
-                                queuePlayer.getPriority(),
-                                queuePlayer.getMaxOfflineTime(),
-                                queuePlayer.getQueueType()
-                        )
-                );
-            } else {
-                addPlayer(
-                        new QueuePlayerImpl(
-                                queuePlayer.getPlayer(),
-                                this,
-                                queuePlayer.getPriority(),
-                                queuePlayer.getMaxOfflineTime(),
-                                queuePlayer.getQueueType()
-                        )
-                );
+            for(QueuePlayer queuePlayer : previousPlayers) {
+                if(queuePlayer.getPlayer() == null) {
+                    QueuePlayerImpl newPlayer = new QueuePlayerImpl(
+                            queuePlayer.getUniqueId(),
+                            queuePlayer.getName(),
+                            this,
+                            queuePlayer.getPriority(),
+                            queuePlayer.getMaxOfflineTime(),
+                            queuePlayer.getQueueType()
+                    );
+                    // Preserve offline-time so playerDisconnectedTooLong works correctly after reload
+                    if (queuePlayer instanceof QueuePlayerImpl) {
+                        long lt = ((QueuePlayerImpl) queuePlayer).getLeaveTime();
+                        if (lt > 0) newPlayer.restoreLeaveTime(lt);
+                    }
+                    addPlayer(newPlayer);
+                } else {
+                    addPlayer(
+                            new QueuePlayerImpl(
+                                    queuePlayer.getPlayer(),
+                                    this,
+                                    queuePlayer.getPriority(),
+                                    queuePlayer.getMaxOfflineTime(),
+                                    queuePlayer.getQueueType()
+                            )
+                    );
+                }
             }
         }
 
-        // Start off average send time as the time between players, so its not 0
+        // Start off average send time as the time between players, so it's not 0
         averageSendTime = main.getTimeBetweenPlayers();
     }
 
@@ -218,17 +228,33 @@ public class QueueServerImpl implements QueueServer {
 
     @Override
     public long getLastSentTime() {
+        // For persistent (Redis) holders, read the shared timestamp so that the wait-time is
+        // enforced across all proxy instances, not just within this one.
+        if (queueHolder.isPersistent()) {
+            long shared = queueHolder.getSharedLastSendTimestamp();
+            if (shared > 0) {
+                long elapsed = System.currentTimeMillis() - shared;
+                Debug.info("getLastSentTime [" + name + "]: using shared Redis timestamp, elapsed=" + elapsed + "ms");
+                return elapsed;
+            }
+        }
         return System.currentTimeMillis() - lastSentTime;
     }
+
     @Override
     public void setLastSentTime(long lastSentTime) {
         int sendTimesToKeep = main.getConfig().getInt("send-times-to-keep");
 
         if(sendTimesToKeep > 0) {
-            long previousSendTime = this.lastSentTime;
+            // For cross-proxy ETA accuracy: use the shared last-send timestamp as the interval baseline
+            // so the average reflects the real observed gap, not just this instance's local state.
+            long previousSendTime = queueHolder.isPersistent()
+                    ? queueHolder.getSharedLastSendTimestamp()
+                    : this.lastSentTime;
+            if (previousSendTime == 0) previousSendTime = this.lastSentTime;
             int previousQueueSize = this.lastSendQueueSize;
 
-            // We don't add a queue time if the previous send resulted an in an empty queue.
+            // We don't add a queue time if the previous send resulted in an empty queue.
             // This is so we don't count the time that the queue was sitting idle with 0 players in it.
             // The setLastSentTime method is called after removing the player from the queue,
             //  so if the last size is 0, then the last send resulted in an empty queue.
@@ -255,9 +281,13 @@ public class QueueServerImpl implements QueueServer {
             );
         }
 
-
         this.lastSendQueueSize = queueHolder.getTotalQueueSize();
         this.lastSentTime = lastSentTime;
+
+        // Publish to Redis so other proxy instances respect the same send-rate limit.
+        if (queueHolder.isPersistent()) {
+            queueHolder.recordSharedSend(lastSentTime);
+        }
     }
 
     @Override

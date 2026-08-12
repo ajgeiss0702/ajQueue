@@ -57,7 +57,11 @@ public class QueuePlayerImpl implements QueuePlayer {
 
         initialServer = player != null ? player.getCurrentServer() : null;
 
-        lastPosition = getPosition();
+        // lastPosition is initialized to -1; callers (e.g. RedisQueueHolder.deserializeList)
+        // are responsible for setting it to the correct value after construction if needed.
+        // Calling getPosition() here would trigger a nested Redis borrow inside withRedis()
+        // and deadlock the connection pool.
+        lastPosition = -1;
     }
 
     @Override
@@ -157,6 +161,13 @@ public class QueuePlayerImpl implements QueuePlayer {
         if(player != null && player.isConnected()) {
             return 0;
         }
+        // leaveTime == 0 means setLeaveTime() was never called on this proxy for this player.
+        // This happens with Redis-deserialized players who are online on another proxy,
+        // or for players who just joined the queue and haven't disconnected yet.
+        // In both cases we must NOT count them as having been offline since the epoch.
+        if(leaveTime == 0) {
+            return 0;
+        }
         return System.currentTimeMillis()-leaveTime;
     }
 
@@ -177,6 +188,19 @@ public class QueuePlayerImpl implements QueuePlayer {
 
 
     private long leaveTime = 0;
+
+    public long getLeaveTime() {
+        return leaveTime;
+    }
+
+    /**
+     * Restores leaveTime from a persisted value (e.g. Redis deserialization)
+     * WITHOUT triggering the maxOfflineTime recalculation that setLeaveTime() does.
+     */
+    public void restoreLeaveTime(long leaveTime) {
+        this.leaveTime = leaveTime;
+    }
+
     public void setLeaveTime(long leaveTime) {
         // Update the offline time when they leave to be sure we have the most up-to-date allowed offline time
         if(AjQueueAPI.getInstance().isPremium()) {

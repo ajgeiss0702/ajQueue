@@ -119,4 +119,61 @@ public abstract class QueueHolder {
         players.addAll(getAllStandardPlayers());
         return players;
     }
+
+    /**
+     * Called when a player goes offline (i.e. disconnects from the proxy) while in this queue.
+     * The player's leaveTime has already been set via QueuePlayerImpl.setLeaveTime() before this is called.
+     * Default implementation is a no-op; persistent queue holders (e.g. Redis) should override
+     * this to persist the updated leaveTime so other nodes see the player as offline.
+     *
+     * @param player The QueuePlayer that went offline (with leaveTime already set)
+     */
+    public void onPlayerOffline(QueuePlayer player) {
+        // no-op for in-memory holders; the QueuePlayerImpl object persists in the list directly
+    }
+
+    /**
+     * Called once when the plugin is shutting down.
+     * Default implementation is a no-op; holders that manage external resources (e.g. a Redis
+     * connection pool) should override this to release them cleanly.
+     */
+    public void onShutdown() {
+        // no-op for in-memory holders
+    }
+
+    /**
+     * Returns true if this holder persists queue data independently of the JVM lifecycle
+     * (e.g. Redis, database).  When true, {@link QueueServer} will skip migrating in-memory player
+     * lists into the holder on reload - the data is already there and attempting to re-insert it
+     * creates a race-condition window where a player that was just sent by another proxy instance
+     * can be silently re-added with stale state.
+     */
+    public boolean isPersistent() {
+        return false;
+    }
+
+    /**
+     * Returns the epoch-millisecond timestamp of the most recent player send recorded by
+     * <em>any</em> proxy instance, or {@code 0} if no send has been recorded yet.
+     *
+     * <p>Default implementation returns {@code 0} (no shared tracking).
+     * Persistent holders (e.g. Redis) should override this to return the value stored in their
+     * shared store so that cross-proxy send-rate limiting works correctly.
+     */
+    public long getSharedLastSendTimestamp() {
+        return 0;
+    }
+
+    /**
+     * Records that a player was just sent at the given epoch-millisecond {@code timestamp}.
+     *
+     * <p>Default implementation is a no-op.
+     * Persistent holders (e.g. Redis) should override this to write the value to their shared
+     * store so all proxy instances respect the same send-rate limit.
+     *
+     * @param timestamp {@code System.currentTimeMillis()} at the moment of the send
+     */
+    public void recordSharedSend(long timestamp) {
+        // no-op for in-memory holders
+    }
 }

@@ -25,6 +25,8 @@ dependencies {
     compileOnly("org.spongepowered:configurate-yaml:4.0.0")
 
     implementation(project(":api"))
+    implementation("io.lettuce:lettuce-core:7.5.1.RELEASE")
+    implementation("org.apache.commons:commons-pool2:2.12.0")
 }
 
 publishing {
