@@ -188,6 +188,15 @@ public class VelocityQueue implements Implementation {
     public void onPreConnect(ServerPreConnectEvent e) {
         RegisteredServer to = e.getResult().getServer().orElse(null);
 
+        // A denied result with the player no longer on any server is a limbo plugin relocating them
+        // into the queue-server; denials where they still have a server are another plugin's decision
+        if(to == null && !e.getPlayer().getCurrentServer().isPresent()) {
+            to = e.getOriginalServer();
+            if(to != null) {
+                Debug.info("Connection to " + to.getServerInfo().getName() + " for " + e.getPlayer().getUsername() + " was denied, using the original server for the queue-server check");
+            }
+        }
+
         if(to == null) return;
 
         AdaptedServer newServer = main.getEventHandler().changeTargetServer(new VelocityPlayer(e.getPlayer()), new VelocityServer(to));

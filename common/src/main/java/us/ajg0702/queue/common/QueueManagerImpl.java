@@ -646,39 +646,48 @@ public class QueueManagerImpl implements QueueManager {
     @Override
     public void sendQueueEvents() {
         if(main.getConfig().getBoolean("force-queue-server-target")) {
-            List<String> svs = main.getConfig().getStringList("queue-servers");
-            for(String s : svs) {
+            // Match by name instead of server player lists, since virtual servers (e.g. limbos) don't populate them
+            Map<String, List<QueueServer>> queueServers = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+            for(String s : main.getConfig().getStringList("queue-servers")) {
                 if(!s.contains(":")) continue;
                 String[] parts = s.split(":");
-                String fromName = parts[0];
-                String toName = parts[1];
-                AdaptedServer from = main.getPlatformMethods().getServer(fromName);
-                QueueServer to = findServer(toName);
-                if(from == null || to == null) continue;
-                from.getPlayers().forEach(player -> {
+                if(parts.length < 2) continue;
+                QueueServer to = findServer(parts[1]);
+                if(to == null) continue;
+                queueServers.computeIfAbsent(parts[0], k -> new ArrayList<>()).add(to);
+            }
+            int delay = Math.min(Math.max(main.getConfig().getInt("queue-server-delay"), 0), 3000);
+            boolean requirePermission = main.getConfig().getBoolean("require-queueserver-permission");
+            if(!queueServers.isEmpty()) {
+                for(AdaptedPlayer player : main.getPlatformMethods().getOnlinePlayers()) {
+                    String serverName = player.getServerName();
+                    if(serverName == null) continue;
+                    List<QueueServer> targets = queueServers.get(serverName);
+                    if(targets == null) continue;
                     if(PauseQueueServer.pausedPlayers.contains(player)) {
                         long lastReminder = pausedAntiSpam.getOrDefault(player, 0L);
                         if(System.currentTimeMillis() - lastReminder > 60e3) { // 60 second cooldown on the reminder messages
                             player.sendMessage(main.getMessages().getComponent("commands.pausequeueserver.reminder"));
                             pausedAntiSpam.put(player, System.currentTimeMillis());
                         }
-                        return;
+                        continue;
                     }
                     long lastSwitch = main.getServerTimeManager().getLastServerChange(player);
-                    int delay = Math.min(Math.max(main.getConfig().getInt("queue-server-delay"), 0), 3000);
-                    if(System.currentTimeMillis() - lastSwitch < delay + 1000 || !Objects.equals(player.getCurrentServer(), from)) {
-                        return;
+                    if(System.currentTimeMillis() - lastSwitch < delay + 1000) {
+                        continue;
                     }
-                    if(
-                            !getPlayerQueues(player).contains(to) &&
-                                    (
-                                            !main.getConfig().getBoolean("require-queueserver-permission") ||
-                                                    player.hasPermission("ajqueue.queueserver." + to.getName())
-                                    )
-                    ) {
-                        addToQueue(player, to);
+                    for(QueueServer to : targets) {
+                        if(
+                                !getPlayerQueues(player).contains(to) &&
+                                        (
+                                                !requirePermission ||
+                                                        player.hasPermission("ajqueue.queueserver." + to.getName())
+                                        )
+                        ) {
+                            addToQueue(player, to);
+                        }
                     }
-                });
+                }
             }
         }
         for (QueueServer s : servers) {

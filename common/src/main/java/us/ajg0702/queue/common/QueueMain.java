@@ -120,10 +120,11 @@ public class QueueMain extends AjQueueAPI {
     @Override
     public Map<String, List<String>> getQueueServers() {
         List<String> rawQueueServers = getConfig().getStringList("queue-servers");
-        Map<String, List<String>> r = new HashMap<>();
+        Map<String, List<String>> r = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
         for(String rawQueueServer : rawQueueServers) {
             if(!rawQueueServer.contains(":")) continue;
             String[] parts = rawQueueServer.split(":");
+            if(parts.length < 2) continue;
             String fromName = parts[0];
             String toName = parts[1];
             QueueServer toServer = getQueueManager().findServer(toName);

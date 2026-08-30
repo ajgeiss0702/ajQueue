@@ -111,6 +111,7 @@ public class EventHandlerImpl implements EventHandler {
             for(String s : svs) {
                 if(!s.contains(":")) continue;
                 String[] parts = s.split(":");
+                if(parts.length < 2) continue;
                 String from = parts[0];
                 QueueServer to = main.getQueueManager().findServer(parts[1]);
                 if(
@@ -205,6 +206,7 @@ public class EventHandlerImpl implements EventHandler {
                 for(String s : svs) {
                     if(!s.contains(":")) continue;
                     String[] parts = s.split(":");
+                    if(parts.length < 2) continue;
                     String fromName = parts[0];
                     QueueServer toServer = main.getQueueManager().findServer(parts[1]);
                     if(toServer == null) continue;
