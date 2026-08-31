@@ -136,7 +136,7 @@ skip-queue-server-if-possible: true
 kick-kicked-players: true
 
 # This option allows you to manually set player caps for servers
-# Note that this does NOT override the player cap returned by the server.
+# Note that this does NOT allow MORE players in the server/group than the backend server's limit.
 #  Format: - '<server>:<max-players>'
 #  Example: - 'lobbys:50'
 # The example above will limit the lobbys group to have a total of 50 players.
